@@ -1,4 +1,4 @@
-AC_INIT([FileZilla],[3.43.0-rc1],[tim.kosse@filezilla-project.org],[],[https://filezilla-project.org/])
+AC_INIT([FileZilla],[3.43.0-rc2],[tim.kosse@filezilla-project.org],[],[https://filezilla-project.org/])
 AC_CONFIG_HEADERS([src/include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(config)
@@ -149,7 +149,7 @@ if test "$buildmain" = "yes"; then
 
   # Find libfilezilla
   # -----------------
-  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.17.0],, [
+  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.17.1],, [
 	AC_MSG_ERROR([libfilezilla not found: $LIBFILEZILLA_PKG_ERRORS. You can download it from https://lib.filezilla-project.org/])
   ])
   AC_SUBST(LIBFILEZILLA_CFLAGS)
