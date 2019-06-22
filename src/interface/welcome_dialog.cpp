@@ -169,7 +169,7 @@ void CWelcomeDialog::InitFooter(wxString const& resources)
 
 			wxXmlResource res(wxXRC_NO_RELOADING);
 			InitHandlers(res);
-			if (res.Load(_T("blob:") + resources)) {
+			if (res.Load(_T("blob64:") + resources)) {
 				CreateMessagePanel(*this, "ID_HEADERMESSAGE_PANEL", res, _T("ID_WELCOME_HEADER"));
 				CreateMessagePanel(*this, "ID_FOOTERMESSAGE_PANEL", res, _T("ID_WELCOME_FOOTER"));
 			}
