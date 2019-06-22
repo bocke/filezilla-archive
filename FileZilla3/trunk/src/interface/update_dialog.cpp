@@ -159,7 +159,7 @@ void CUpdateDialog::InitFooter()
 
 			wxXmlResource res(wxXRC_NO_RELOADING);
 			InitHandlers(res);
-			if (res.Load(_T("blob:") + resources)) {
+			if (res.Load(_T("blob64:") + resources)) {
 				auto sizer = xrc_call(*this, "ID_NEWVERSION_PANEL", &wxPanel::GetSizer);
 				if (sizer) {
 					wxPanel* p{};
