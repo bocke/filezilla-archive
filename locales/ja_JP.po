@@ -10,10 +10,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: FileZilla 3.42.0\n"
+"Project-Id-Version: FileZilla 3.43.0\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-06-18 09:54+0200\n"
-"PO-Revision-Date: 2019-04-26 20:52+0900\n"
+"POT-Creation-Date: 2019-06-19 09:40+0200\n"
+"PO-Revision-Date: 2019-06-22 13:30+0900\n"
 "Last-Translator: Rukoto Luther <rukotolucies at hotmail.com>\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -7613,6 +7613,10 @@ msgstr "ターゲットのファイル名は既に存在しています!"
 #: ../src/interface/RemoteListView.cpp:1743
 msgid "Target filename already exists, really continue?"
 msgstr "ターゲットのファイル名は既に存在しています。本当に続けますか?"
+
+#: ../src/interface/verifycertdialog.cpp:653
+msgid "Telephone number:"
+msgstr "電話番号:"
 
 #: ../src/engine/socket_errors.cpp:70
 msgid "Temporary failure in name resolution"
