@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.43.0 (2019-06-27)
+
+! Filenames containing double-quotation marks were not escaped correctly when selected for opening/editing. Depending on the associated program, parts of the filename could be interpreted as commands.
+- Added a second layer of authentication to the update mechanism
+
 3.43.0-rc2 (2019-06-21)
 
 - Rebuilt against libfilezilla 0.17.1
