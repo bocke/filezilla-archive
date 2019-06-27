@@ -665,8 +665,9 @@ void CEditHandler::CheckForModifications(bool emitEvent)
 	for (int i = 0; i < 2; ++i) {
 checkmodifications_loopbegin:
 		for (auto iter = m_fileDataList[i].begin(); iter != m_fileDataList[i].end(); ++iter) {
-			if (iter->state != edit)
+			if (iter->state != edit) {
 				continue;
+			}
 
 			fz::datetime mtime;
 			bool is_link;
@@ -677,16 +678,18 @@ checkmodifications_loopbegin:
 				goto checkmodifications_loopbegin;
 			}
 
-			if (mtime.empty())
+			if (mtime.empty()) {
 				continue;
+			}
 
-			if (!iter->modificationTime.empty() && !iter->modificationTime.compare(mtime))
+			if (!iter->modificationTime.empty() && !iter->modificationTime.compare(mtime)) {
 				continue;
+			}
 
 			// File has changed, ask user what to do
 
 			m_busyTimer.Stop();
-			if (!wxDialogEx::CanShowPopupDialog() ) {
+			if (!wxDialogEx::CanShowPopupDialog()) {
 				m_busyTimer.Start(1000, true);
 				insideCheckForModifications = false;
 				return;
@@ -700,8 +703,9 @@ checkmodifications_loopbegin:
 
 			bool remove;
 			int res = DisplayChangeNotification(CEditHandler::fileType(i), iter, remove);
-			if (res == -1)
+			if (res == -1) {
 				continue;
+			}
 
 			if (res == wxID_YES) {
 				UploadFile(CEditHandler::fileType(i), iter, remove);
@@ -724,8 +728,9 @@ checkmodifications_loopbegin:
 				m_fileDataList[i].erase(iter);
 				goto checkmodifications_loopbegin;
 			}
-			else
+			else {
 				iter->modificationTime = mtime;
+			}
 		}
 	}
 
@@ -737,12 +742,15 @@ checkmodifications_loopbegin:
 int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::list<CEditHandler::t_fileData>::const_iterator iter, bool& remove)
 {
 	CChangedFileDialog dlg;
-	if (!dlg.Load(wxTheApp->GetTopWindow(), _T("ID_CHANGEDFILE")))
+	if (!dlg.Load(wxTheApp->GetTopWindow(), _T("ID_CHANGEDFILE"))) {
 		return -1;
-	if (type == remote)
+	}
+	if (type == remote) {
 		XRCCTRL(dlg, "ID_DESC_UPLOAD_LOCAL", wxStaticText)->Hide();
-	else
+	}
+	else {
 		XRCCTRL(dlg, "ID_DESC_UPLOAD_REMOTE", wxStaticText)->Hide();
+	}
 
 	dlg.SetChildLabel(XRCID("ID_FILENAME"), iter->name);
 
@@ -762,8 +770,9 @@ int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::li
 			XRCCTRL(dlg, "ID_DESC_OPENEDAS", wxStaticText)->Hide();
 			XRCCTRL(dlg, "ID_OPENEDAS", wxStaticText)->Hide();
 		}
-		else
+		else {
 			dlg.SetChildLabel(XRCID("ID_OPENEDAS"), file);
+		}
 	}
 
 	dlg.SetChildLabel(XRCID("ID_SERVER"), iter->site.Format(ServerFormat::with_user_and_optional_port));
@@ -867,22 +876,27 @@ wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& file
 	wxASSERT(type != none);
 
 	wxString command = GetOpenCommand(fileName, program_exists);
-	if (command.empty() || !program_exists)
+	if (command.empty() || !program_exists) {
 		return command;
+	}
 
 	wxFileName fn;
-	if (type == remote)
+	if (type == remote) {
 		fn = wxFileName(m_localDir, fileName);
-	else
+	}
+	else {
 		fn = wxFileName(fileName);
+	}
 
 	wxString name = fn.GetFullPath();
 	wxString tmp = command;
 	wxString args;
-	if (UnquoteCommand(tmp, args) && tmp == name)
+	if (UnquoteCommand(tmp, args) && tmp == name) {
 		dangerous = true;
-	else
+	}
+	else {
 		dangerous = false;
+	}
 
 	return command;
 }
@@ -891,42 +905,48 @@ wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists
 {
 	if (!COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
 		const wxString command = GetCustomOpenCommand(file, program_exists);
-		if (!command.empty())
+		if (!command.empty()) {
 			return command;
+		}
 
 		if (COptions::Get()->GetOptionVal(OPTION_EDIT_INHERITASSOCIATIONS)) {
 			const wxString sysCommand = GetSystemOpenCommand(file, program_exists);
-			if (!sysCommand.empty())
+			if (!sysCommand.empty()) {
 				return sysCommand;
+			}
 		}
 	}
 
 	wxString command = COptions::Get()->GetOption(OPTION_EDIT_DEFAULTEDITOR);
-	if (command.empty() || command[0] == '0')
+	if (command.empty() || command[0] == '0') {
 		return wxString(); // None set
+	}
 	else if (command[0] == '1') {
 		// Text editor
 		const wxString random = _T("5AC2EE515D18406 space aB77C2C60F1F88952.txt"); // Chosen by fair dice roll. Guaranteed to be random.
 		wxString sysCommand = GetSystemOpenCommand(random, program_exists);
-		if (sysCommand.empty() || !program_exists)
+		if (sysCommand.empty() || !program_exists) {
 			return sysCommand;
+		}
 
 		sysCommand.Replace(random, file);
 		return sysCommand;
 	}
-	else if (command[0] == '2')
+	else if (command[0] == '2') {
 		command = command.Mid(1);
+	}
 
-	if (command.empty())
+	if (command.empty()) {
 		return wxString();
+	}
 
 	wxString args;
 	wxString editor = command;
-	if (!UnquoteCommand(editor, args))
+	if (!UnquoteCommand(editor, args)) {
 		return wxString();
+	}
 
-	if (!ProgramExists(editor))
-	{
+	if (!ProgramExists(editor)) {
 		program_exists = false;
 		return editor;
 	}
@@ -1090,8 +1110,9 @@ bool CEditHandler::FilenameExists(const wxString& file)
 			wxRemoveFile(file);
 		}
 
-		if (wxFileName::FileExists(file))
+		if (wxFileName::FileExists(file)) {
 			return true;
+		}
 	}
 
 	return false;
@@ -1127,21 +1148,23 @@ CEditHandlerStatusDialog::~CEditHandlerStatusDialog()
 int CEditHandlerStatusDialog::ShowModal()
 {
 	const CEditHandler* const pEditHandler = CEditHandler::Get();
-	if (!pEditHandler)
+	if (!pEditHandler) {
 		return wxID_CANCEL;
+	}
 
-	if (!pEditHandler->GetFileCount(CEditHandler::none, CEditHandler::unknown))
-	{
+	if (!pEditHandler->GetFileCount(CEditHandler::none, CEditHandler::unknown)) {
 		wxMessageBoxEx(_("No files are currently being edited."), _("Cannot show dialog"), wxICON_INFORMATION, m_pParent);
 		return wxID_CANCEL;
 	}
 
-	if (!Load(m_pParent, _T("ID_EDITING")))
+	if (!Load(m_pParent, _T("ID_EDITING"))) {
 		return wxID_CANCEL;
+	}
 
 	wxListCtrl* pListCtrl = XRCCTRL(*this, "ID_FILES", wxListCtrl);
-	if (!pListCtrl)
+	if (!pListCtrl) {
 		return wxID_CANCEL;
+	}
 
 	pListCtrl->InsertColumn(0, _("Filename"));
 	pListCtrl->InsertColumn(1, _("Type"));
@@ -1151,8 +1174,7 @@ int CEditHandlerStatusDialog::ShowModal()
 	{
 		const std::list<CEditHandler::t_fileData>& files = pEditHandler->GetFiles(CEditHandler::remote);
 		unsigned int i = 0;
-		for (std::list<CEditHandler::t_fileData>::const_iterator iter = files.begin(); iter != files.end(); ++iter, ++i)
-		{
+		for (std::list<CEditHandler::t_fileData>::const_iterator iter = files.begin(); iter != files.end(); ++iter, ++i) {
 			pListCtrl->InsertItem(i, iter->name);
 			pListCtrl->SetItem(i, COLUMN_TYPE, _("Remote"));
 			switch (iter->state)
@@ -1213,8 +1235,9 @@ int CEditHandlerStatusDialog::ShowModal()
 		}
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; ++i) {
 		pListCtrl->SetColumnWidth(i, wxLIST_AUTOSIZE);
+	}
 	pListCtrl->SetMinSize(wxSize(pListCtrl->GetColumnWidth(0) + pListCtrl->GetColumnWidth(1) + pListCtrl->GetColumnWidth(2) + pListCtrl->GetColumnWidth(3) + 10, pListCtrl->GetMinSize().GetHeight()));
 	GetSizer()->Fit(this);
 
@@ -1225,8 +1248,9 @@ int CEditHandlerStatusDialog::ShowModal()
 
 	int res = wxDialogEx::ShowModal();
 
-	for (int i = 0; i < pListCtrl->GetItemCount(); i++)
+	for (int i = 0; i < pListCtrl->GetItemCount(); ++i) {
 		delete (CEditHandler::t_fileData*)pListCtrl->GetItemData(i);
+	}
 
 	return res;
 }
@@ -1234,8 +1258,9 @@ int CEditHandlerStatusDialog::ShowModal()
 void CEditHandlerStatusDialog::SetCtrlState()
 {
 	const CEditHandler* const pEditHandler = CEditHandler::Get();
-	if (!pEditHandler)
+	if (!pEditHandler) {
 		return;
+	}
 
 	wxListCtrl* pListCtrl = XRCCTRL(*this, "ID_FILES", wxListCtrl);
 
@@ -1244,16 +1269,18 @@ void CEditHandlerStatusDialog::SetCtrlState()
 	bool selectedUploadRemoveFailed = false;
 
 	int item = -1;
-	while ((item = pListCtrl->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1)
-	{
+	while ((item = pListCtrl->GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1) {
 		CEditHandler::fileType type;
 		CEditHandler::t_fileData* pData = GetDataFromItem(item, type);
-		if (pData->state == CEditHandler::edit)
+		if (pData->state == CEditHandler::edit) {
 			selectedEdited = true;
-		else if (pData->state == CEditHandler::upload_and_remove_failed)
+		}
+		else if (pData->state == CEditHandler::upload_and_remove_failed) {
 			selectedUploadRemoveFailed = true;
-		else
+		}
+		else {
 			selectedOther = true;
+		}
 	}
 
 	bool select = selectedEdited && !selectedOther && !selectedUploadRemoveFailed;
@@ -1271,8 +1298,9 @@ void CEditHandlerStatusDialog::OnSelectionChanged(wxListEvent&)
 void CEditHandlerStatusDialog::OnUnedit(wxCommandEvent&)
 {
 	CEditHandler* const pEditHandler = CEditHandler::Get();
-	if (!pEditHandler)
+	if (!pEditHandler) {
 		return;
+	}
 
 	wxListCtrl* pListCtrl = XRCCTRL(*this, "ID_FILES", wxListCtrl);
 
@@ -1306,8 +1334,9 @@ void CEditHandlerStatusDialog::OnUnedit(wxCommandEvent&)
 				delete pData;
 				pListCtrl->DeleteItem(i);
 			}
-			else
+			else {
 				pListCtrl->SetItem(i, COLUMN_STATUS, _("Pending removal"));
+			}
 		}
 	}
 
@@ -1403,8 +1432,9 @@ void CEditHandlerStatusDialog::OnEdit(wxCommandEvent&)
 					delete pData;
 					pListCtrl->DeleteItem(i);
 				}
-				else
+				else {
 					pListCtrl->SetItem(i, COLUMN_STATUS, _("Pending removal"));
+				}
 			}
 		}
 		else {
@@ -1597,13 +1627,16 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 				wxMessageBoxEx(_("The default editor for text files could not be found."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
 				return;
 			}
-			if (cmd.Find(' ') != -1)
+			if (cmd.Find(' ') != -1) {
 				cmd = _T("\"") + cmd + _T("\"");
+			}
 			wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.Last() != '\n')
+			if (!associations.empty() && associations.Last() != '\n') {
 				associations += '\n';
-			if (m_ext.empty())
+			}
+			if (m_ext.empty()) {
 				m_ext = _T("/");
+			}
 			associations += m_ext + _T(" ") + cmd;
 			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations.ToStdWstring());
 		}
