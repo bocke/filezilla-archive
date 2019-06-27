@@ -389,18 +389,18 @@ int main()
 		if (env) {
 			return;
 		}
-		storj_bridge_options_t options{};
+		static storj_bridge_options_t options{};
 		options.host = host.c_str();
 		options.proto = "https";
 		options.port = port;
 		options.user = user.c_str();
 		options.pass = pass.c_str();
 
-		storj_encrypt_options_t encrypt_options{};
+		static storj_encrypt_options_t encrypt_options{};
 		encrypt_options.mnemonic = mnemonic.c_str();
 
-		storj_http_options_t http_options{};
-		http_options.user_agent = "FileZilla";
+		static storj_http_options_t http_options{};
+		http_options.user_agent = "FileZilla/3";
 		http_options.low_speed_limit = STORJ_LOW_SPEED_LIMIT;
 		http_options.low_speed_time = STORJ_LOW_SPEED_TIME;
 		http_options.timeout = timeout;
