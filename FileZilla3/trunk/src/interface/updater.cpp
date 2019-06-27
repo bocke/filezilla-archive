@@ -15,6 +15,7 @@
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/hash.hpp>
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/signature.hpp>
 #include <libfilezilla/translate.hpp>
 
 #include <string>
@@ -727,8 +728,31 @@ void CUpdater::ParseData()
 			auto const size = fz::to_integral<uint64_t>(sizestr);
 			if (!size) {
 				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-					log_ += fz::sprintf(L"Could not parse size: %s", sizestr) + L"\n";
+					log_ += fz::sprintf(L"Could not parse size: %s\n", sizestr);
 				}
+				continue;
+			}
+
+			bool valid_signature{};
+			for (size_t i = 6; i < tokens.size(); ++i) {
+				auto const& token = tokens[6];
+				if (token.substr(0, 4) == "sig:") {
+					auto const& sig = token.substr(4);
+					auto raw_sig = fz::base64_decode(fz::to_utf8(sig));
+					auto raw_hash = fz::hex_decode(hash);
+
+					// Append the version to the file hash to protect against replays
+					raw_hash.push_back(0);
+					raw_hash.insert(raw_hash.cend(), versionOrDate.cbegin(), versionOrDate.cend());
+
+					if (!raw_sig.empty() || !raw_hash.empty()) {
+						auto const pub = fz::public_verification_key::from_base64("xrjuitldZT7pvIhK9q1GVNfptrepB/ctt5aK1QO5RaI");
+						valid_signature = fz::verify(std::string_view(reinterpret_cast<char const*>(raw_hash.data()), raw_hash.size()), raw_sig, pub);
+					}
+				}
+			}
+			if (!valid_signature) {
+				log_ += fz::sprintf(L"Ignoring line with inalid or missing signature for hash %s\n", hash);
 				continue;
 			}
 
