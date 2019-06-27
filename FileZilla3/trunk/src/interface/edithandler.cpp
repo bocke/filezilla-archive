@@ -903,6 +903,15 @@ wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& file
 
 wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists)
 {
+#ifdef __WXMSW__
+	if (file.find('"') != std::wstring::npos) {
+		// Windows doesn't allow double-quotes in filenames.
+		// On top if it, wxExecute does not properly deal with quotes preceeded by backslashes.
+		// This is the safe choice.
+		return wxString();
+	}
+#endif
+
 	if (!COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
 		const wxString command = GetCustomOpenCommand(file, program_exists);
 		if (!command.empty()) {
@@ -952,11 +961,27 @@ wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists
 	}
 
 	program_exists = true;
+#ifndef __WXMSW__
+	wxString escaped = file;
+	escaped.Replace(L"\\", L"\\\\");
+	escaped.Replace(L"\"", L"\\\"");
+	return command + _T(" \"") + escaped + _T("\"");
+#else
 	return command + _T(" \"") + file + _T("\"");
+#endif
 }
 
 wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_exists)
 {
+#ifdef __WXMSW__
+	if (file.find('"') != std::wstring::npos) {
+		// Windows doesn't allow double-quotes in filenames.
+		// On top if it, wxExecute does not properly deal with quotes preceeded by backslashes.
+		// This is the safe choice.
+		return wxString();
+	}
+#endif
+
 	wxFileName fn(file);
 
 	wxString ext = fn.GetExt();
@@ -1006,7 +1031,13 @@ wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_
 		}
 
 		program_exists = true;
-		return command + _T(" \"") + fn.GetFullPath() + _T("\"");
+
+		wxString arg = fn.GetFullPath();
+#ifndef __WXMSW__
+		arg.Replace(L"\\", L"\\\\");
+		arg.Replace(L"\"", L"\\\"");
+#endif
+		return command + L" \"" + arg + L"\"";
 	}
 
 	return wxString();

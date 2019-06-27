@@ -100,6 +100,19 @@ bool OpenInFileManager(std::wstring const& dir)
 
 wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 {
+	// Disallowed on MSW. On other platforms wxWidgets doens't escape properly.
+	// For now don't support these files until we can replace wx with something sane.
+	if (file.find('"') != std::wstring::npos) {
+		return wxString();
+	}
+#ifndef __WXMSW__
+	// wxWidgets doens't escape backslashes properly.
+	// For now don't support these files until we can replace wx with something sane.
+	if (file.find('\\') != std::wstring::npos) {
+		return wxString();
+	}
+#endif
+
 	wxFileName fn(file);
 
 	const wxString& ext = fn.GetExt();
