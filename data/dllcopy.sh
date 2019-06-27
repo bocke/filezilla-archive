@@ -1,5 +1,7 @@
 #! /bin/sh
 
+set -e
+
 if [ $# != 5 ]; then
   echo Wrong number of arguments
   exit 1
@@ -12,7 +14,7 @@ cxx="$4"
 searchpath="$5"
 
 searchpath=`echo $searchpath | sed "s/\\(^\\|:\\)\\/c\\/windows[/a-z0-9]*//gi"`
-searchpath="$searchpath:`\"$cxx\" -print-search-dirs | grep libraries | sed 's/libraries: =//'`"
+searchpath="$searchpath:`$cxx -print-search-dirs | grep libraries | sed 's/libraries: =//'`"
 
 #echo $searchpath
 
@@ -53,7 +55,7 @@ process_dlls()
 
 process_file()
 {
-  process_dlls `"$objdump" -j .idata -x "$1" | grep 'DLL Name:' | sed 's/ *DLL Name: *//'`
+  process_dlls `$objdump -j .idata -x "$1" | grep 'DLL Name:' | sed 's/ *DLL Name: *//'`
 }
 
 if [ -f "$exepath/.libs/$exename" ]; then
