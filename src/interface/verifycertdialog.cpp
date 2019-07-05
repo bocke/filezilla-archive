@@ -180,7 +180,7 @@ void CertStore::LoadTrustedCerts()
 
 		auto const processEntry = [&](pugi::xml_node const& node)
 		{
-			std::string host = node.value();
+			std::string host = node.child_value();
 			unsigned int port = node.attribute("Port").as_uint();
 			if (host.empty() || port < 1 || port > 65535) {
 				return false;
