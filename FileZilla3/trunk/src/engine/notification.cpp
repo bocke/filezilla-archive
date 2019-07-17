@@ -83,7 +83,7 @@ CCertificateNotification::CCertificateNotification(fz::tls_session_info&& info)
 {
 }
 
-CInsecureFTPNotification::CInsecureFTPNotification(CServer const& server)
+CInsecureConnectionNotification::CInsecureConnectionNotification(CServer const& server)
 	: server_(server)
 {
 }

@@ -68,6 +68,6 @@ private:
 	CertStore & certStore_;
 };
 
-void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & notification);
+void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecureConnectionNotification & notification);
 
 #endif

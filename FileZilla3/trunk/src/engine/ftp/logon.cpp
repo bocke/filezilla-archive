@@ -121,6 +121,19 @@ int CFtpLogonOpData::Send()
 		return controlSocket_.SendCommand(L"AUTH TLS", false, false);
 	case LOGON_AUTH_SSL:
 		return controlSocket_.SendCommand(L"AUTH SSL", false, false);
+	case LOGON_SECURITY:
+		if (currentServer_.GetProtocol() == INSECURE_FTP) {
+			log(logmsg::status, _("Plain FTP is insecure. Please switch to FTP over TLS."));
+		}
+		opState = LOGON_LOGON;
+		if (controlSocket_.tls_layer_) {
+			return FZ_REPLY_CONTINUE;
+		}
+		else {
+			auto notification = new CInsecureConnectionNotification(currentServer_);
+			controlSocket_.SendAsyncRequest(notification);
+			return FZ_REPLY_WOULDBLOCK;
+		}
 	case LOGON_SYST:
 		return controlSocket_.SendCommand(L"SYST");
 	case LOGON_LOGON:
@@ -244,10 +257,7 @@ int CFtpLogonOpData::ParseResponse()
 					log(logmsg::status, _("Insecure server, it does not support FTP over TLS."));
 					neededCommands[LOGON_PBSZ] = 0;
 					neededCommands[LOGON_PROT] = 0;
-
-					auto notification = new CInsecureFTPNotification(currentServer_);
-					controlSocket_.SendAsyncRequest(notification);
-					opState = LOGON_LOGON;
+					opState = LOGON_SECURITY;
 					return FZ_REPLY_WOULDBLOCK;
 				}
 				else {
