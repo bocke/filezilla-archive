@@ -12,7 +12,8 @@ enum iconSize
 	iconSizeSmall,
 	iconSize24,
 	iconSizeNormal,
-	iconSizeLarge
+	iconSizeLarge,
+	iconSizeHuge
 };
 
 class CTheme final

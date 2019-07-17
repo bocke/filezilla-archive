@@ -501,6 +501,15 @@ wxSize CThemeProvider::GetIconSize(iconSize size, bool userScaled)
 			s += s / 2;
 		}
 	}
+	else if (size == iconSizeHuge) {
+		s = wxSystemSettings::GetMetric(wxSYS_ICON_X);
+		if (s <= 0) {
+			s = 64;
+		}
+		else {
+			s *= 2;
+		}
+	}
 	else {
 		s = wxSystemSettings::GetMetric(wxSYS_ICON_X);
 		if (s <= 0) {
