@@ -105,9 +105,9 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 			return true;
 		}
 		break;
-	case reqId_insecure_ftp:
+	case reqId_insecure_connection:
 		{
-			auto & insecureNotification = static_cast<CInsecureFTPNotification&>(*pNotification.get());
+			auto & insecureNotification = static_cast<CInsecureConnectionNotification&>(*pNotification.get());
 			if (!certStore_->IsInsecure(fz::to_utf8(insecureNotification.server_.GetHost()), insecureNotification.server_.GetPort())) {
 				break;
 			}
@@ -214,14 +214,14 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		SendReply(entry);
 	}
-	else if (entry.pNotification->GetRequestID() == reqId_insecure_ftp) {
+	else if (entry.pNotification->GetRequestID() == reqId_insecure_connection) {
 		if (!CheckWindowState()) {
 			return false;
 		}
 
-		auto & notification = static_cast<CInsecureFTPNotification&>(*entry.pNotification.get());
+		auto & notification = static_cast<CInsecureConnectionNotification&>(*entry.pNotification.get());
 
-		ConfirmInsecureConection(*certStore_.get(), notification);
+		ConfirmInsecureConection(m_pMainFrame, *certStore_.get(), notification);
 
 		SendReply(entry);
 	}

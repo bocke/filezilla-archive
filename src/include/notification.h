@@ -52,14 +52,15 @@ enum NotificationId
 // Async request IDs
 enum RequestId
 {
-	reqId_fileexists,		// Target file already exists, awaiting further instructions
-	reqId_interactiveLogin, // gives a challenge prompt for a password
-	reqId_hostkey,			// used only by SSH/SFTP to indicate new host key
-	reqId_hostkeyChanged,	// used only by SSH/SFTP to indicate changed host key
-	reqId_certificate,		// sent after a successful TLS handshake to allow certificate
-							// validation
-	reqId_insecure_ftp		// If using opportunistic FTP over TLS, ask user whether he really wants
-							// to use plaintext FTP
+	reqId_fileexists,         // Target file already exists, awaiting further instructions
+	reqId_interactiveLogin,   // gives a challenge prompt for a password
+	reqId_hostkey,            // used only by SSH/SFTP to indicate new host key
+	reqId_hostkeyChanged,     // used only by SSH/SFTP to indicate changed host key
+	reqId_certificate,        // sent after a successful TLS handshake to allow certificate
+	                          // validation.
+	reqId_insecure_connection // If using opportunistic FTP over TLS, or a completely
+	                          // unprotected protocol ask user whether he really wants
+	                          // to use a plaintext connection.
 };
 
 class CNotification
@@ -361,11 +362,11 @@ public:
 	CLocalPath dir;
 };
 
-class CInsecureFTPNotification final : public CAsyncRequestNotification
+class CInsecureConnectionNotification final : public CAsyncRequestNotification
 {
 public:
-	CInsecureFTPNotification(CServer const& server);
-	virtual RequestId GetRequestID() const { return reqId_insecure_ftp; }
+	CInsecureConnectionNotification(CServer const& server);
+	virtual RequestId GetRequestID() const { return reqId_insecure_connection; }
 
 	CServer const server_;
 	bool allow_{};

@@ -533,9 +533,9 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 			}
 		}
 		break;
-	case reqId_insecure_ftp:
+	case reqId_insecure_connection:
 		{
-			auto & notification = static_cast<CInsecureFTPNotification&>(*pNotification);
+			auto & notification = static_cast<CInsecureConnectionNotification&>(*pNotification);
 			if (!notification.allow_) {
 				ResetOperation(FZ_REPLY_CANCELED);
 				return false;

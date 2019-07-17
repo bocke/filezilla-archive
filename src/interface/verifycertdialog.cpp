@@ -711,10 +711,23 @@ void CVerifyCertDialog::OnCertificateChoice(wxCommandEvent& event)
 }
 
 
-void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & notification)
+void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecureConnectionNotification & notification)
 {
 	wxDialogEx dlg;
-	dlg.Create(0, wxID_ANY, _("Insecure FTP connection"));
+
+	auto const protocol = notification.server_.GetProtocol();
+
+	wxString name;
+	switch (protocol) {
+	case FTP:
+	case INSECURE_FTP:
+		name = L"FTP";
+		break;
+	default:
+		name = CServer::GetProtocolName(protocol);
+		break;
+	}
+	dlg.Create(parent, wxID_ANY, wxString::Format(_("Insecure %s connection"), name));
 
 	auto const& lay = dlg.layout();
 	auto outer = new wxBoxSizer(wxVERTICAL);
@@ -726,11 +739,21 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	bool const warning = certStore.HasCertificate(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
 
 	if (warning) {
-		main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
-		main->Add(new wxStaticText(&dlg, -1, _("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
+		if (protocol == FTP) {
+			main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
+			main->Add(new wxStaticText(&dlg, -1, _("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
+		}
+		else {
+			main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using TLS.")));
+		}
 	}
 	else {
-		main->Add(new wxStaticText(&dlg, -1, _("This server does not support FTP over TLS.")));
+		if (protocol == FTP) {
+			main->Add(new wxStaticText(&dlg, -1, _("This server does not support FTP over TLS.")));
+		}
+		else {
+			main->Add(new wxStaticText(&dlg, -1, wxString::Format(_("Using plain %s is insecure."), name)));
+		}
 	}
 	main->Add(new wxStaticText(&dlg, -1, _("If you continue, your password and files will be sent in clear over the internet.")));
 
@@ -742,7 +765,7 @@ void ConfirmInsecureConection(CertStore & certStore, CInsecureFTPNotification & 
 	flex->Add(new wxStaticText(&dlg, -1, _("Port:")), lay.valign);
 	flex->Add(new wxStaticText(&dlg, -1, fz::to_wstring(notification.server_.GetPort())), lay.valign);
 
-	auto always = new wxCheckBox(&dlg, -1, _("&Always allow insecure plain FTP for this server."));
+	auto always = new wxCheckBox(&dlg, -1, wxString::Format(_("&Always allow insecure plain %s for this server."), name));
 	main->Add(always);
 
 	auto buttons = lay.createButtonSizer(&dlg, main, true);
