@@ -367,6 +367,9 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 
 	std::vector<ParameterTraits> const& parameterTraits = ExtraServerParameterTraits(protocol);
 	for (auto const& trait : parameterTraits) {
+		if (trait.section_ == ParameterSection::custom) {
+			continue;
+		}
 		auto & parameters = extraParameters_[trait.section_];
 		auto & it = paramIt[trait.section_];
 
@@ -445,13 +448,14 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	}
 
 	if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::Charset)) {
-		if (GetPageCount() != m_totalPages) {
+		if (FindPage(m_pCharsetPage) == wxNOT_FOUND) {
 			AddPage(m_pCharsetPage, m_charsetPageText);
 			wxGetApp().GetWrapEngine()->WrapRecursive(XRCCTRL(*this, "ID_CHARSET_AUTO", wxWindow)->GetParent(), 1.3);
 		}
 	}
 	else {
-		if (GetPageCount() == m_totalPages) {
+		m_charsetPageIndex = FindPage(m_pCharsetPage);
+		if (m_charsetPageIndex != wxNOT_FOUND) {
 			RemovePage(m_charsetPageIndex);
 		}
 	}
@@ -669,6 +673,11 @@ bool CSiteManagerSite::Verify(bool predefined)
 
 	std::vector<ParameterTraits> const& parameterTraits = ExtraServerParameterTraits(protocol);
 	for (auto const& trait : parameterTraits) {
+		if (trait.section_ == ParameterSection::custom) {
+			continue;
+		}
+		assert(paramIt[trait.section_] != extraParameters_[trait.section_].cend());
+
 		if (!(trait.flags_ & ParameterTraits::optional)) {
 			auto & controls = *paramIt[trait.section_];
 			if (controls.second->GetValue().empty()) {
@@ -783,14 +792,14 @@ void CSiteManagerSite::UpdateSite(Site &site)
 void CSiteManagerSite::UpdateExtraParameters(CServer & server)
 {
 	server.ClearExtraParameters();
-	
+
 	std::vector<std::pair<wxStaticText*, wxTextCtrl*>>::iterator paramIt[ParameterSection::section_count];
 	for (int i = 0; i < ParameterSection::section_count; ++i) {
 		paramIt[i] = extraParameters_[i].begin();
 	}
 	auto const& traits = ExtraServerParameterTraits(server.GetProtocol());
 	for (auto const& trait : traits) {
-		if (trait.section_ == ParameterSection::credentials) {
+		if (trait.section_ == ParameterSection::credentials || trait.section_ == ParameterSection::custom) {
 			continue;
 		}
 
@@ -987,7 +996,7 @@ void CSiteManagerSite::SetExtraParameters(CServer const& server)
 	}
 	auto const& traits = ExtraServerParameterTraits(server.GetProtocol());
 	for (auto const& trait : traits) {
-		if (trait.section_ == ParameterSection::credentials) {
+		if (trait.section_ == ParameterSection::credentials || trait.section_ == ParameterSection::custom) {
 			continue;
 		}
 
