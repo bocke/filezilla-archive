@@ -103,7 +103,7 @@ int CFtpLogonOpData::Send()
 			int ret = controlSocket_.DoConnect(host_, port_);
 			if (ret == FZ_REPLY_WOULDBLOCK) {
 				// Enable TCP_NODELAY, speeds things up a bit.
-				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay | fz::socket::flag_keepalive);
+				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay | fz::socket::flag_keepalive, true);
 
 				// Enable SO_KEEPALIVE, lots of clueless users have broken routers and
 				// firewalls which terminate the control connection on long transfers.

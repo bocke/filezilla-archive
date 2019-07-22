@@ -184,7 +184,7 @@ void CTransferSocket::OnConnect()
 
 	if (tls_layer_) {
 		// Re-enable Nagle algorithm
-		socket_->set_flags(socket_->flags() & (~fz::socket::flag_nodelay));
+		socket_->set_flags(fz::socket::flag_nodelay, false);
 	}
 
 #ifdef FZ_WINDOWS
@@ -490,7 +490,7 @@ bool CTransferSocket::InitLayers(bool active)
 
 	if (controlSocket_.m_protectDataChannel) {
 		// Disable Nagle's algorithm during TLS handshake
-		socket_->set_flags(socket_->flags() | fz::socket::flag_nodelay);
+		socket_->set_flags(fz::socket::flag_nodelay, true);
 
 		tls_layer_ = std::make_unique<fz::tls_layer>(controlSocket_.event_loop_, nullptr, *active_layer_, nullptr, controlSocket_.logger_);
 		active_layer_ = tls_layer_.get();
