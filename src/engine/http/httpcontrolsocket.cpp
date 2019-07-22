@@ -190,6 +190,8 @@ void CHttpControlSocket::OnConnect()
 		return;
 	}
 
+	socket_->set_flags(fz::socket::flag_nodelay, true);
+
 	auto & data = static_cast<CHttpInternalConnectOpData &>(*operations_.back());
 
 	if (data.tls_) {

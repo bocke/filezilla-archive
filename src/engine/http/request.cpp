@@ -198,6 +198,11 @@ int CHttpRequestOpData::Send()
 				else {
 					log(logmsg::debug_info, "Finished sending request header.");
 					sendLogLevel_ = logmsg::debug_debug;
+
+					// Disable Nagle's algorithm if we have a beefy body
+					if (req.body_->size() > 536) { // TCPv4 minimum required MSS
+						controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, false);
+					}
 				}
 
 				auto result = controlSocket_.Send(command.c_str(), command.size());
@@ -248,6 +253,8 @@ int CHttpRequestOpData::Send()
 				}
 
 				log(logmsg::debug_info, "Finished sending request body");
+
+				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, true);
 
 				req.flags_ |= HttpRequest::flag_sent_body;
 
