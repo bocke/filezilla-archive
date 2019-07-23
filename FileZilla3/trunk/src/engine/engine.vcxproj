@@ -186,8 +186,6 @@
     <ClCompile Include="sftp\rmd.cpp" />
     <ClCompile Include="sftp\sftpcontrolsocket.cpp" />
     <ClCompile Include="sizeformatting_base.cpp" />
-      <PrecompiledHeader />
-    </ClCompile>
     <ClCompile Include="storj\connect.cpp" />
     <ClCompile Include="storj\delete.cpp" />
     <ClCompile Include="storj\file_transfer.cpp" />
@@ -234,12 +232,12 @@
     <ClInclude Include="..\include\libfilezilla_engine.h" />
     <ClInclude Include="..\include\local_path.h" />
     <ClInclude Include="..\include\logging.h" />
-    <ClInclude Include="logging_private.h" />
     <ClInclude Include="..\include\misc.h" />
     <ClInclude Include="..\include\notification.h" />
     <ClInclude Include="..\include\option_change_event_handler.h" />
     <ClInclude Include="..\include\optionsbase.h" />
     <ClInclude Include="..\include\xmlutils.h" />
+    <ClInclude Include="logging_private.h" />
     <ClInclude Include="oplock_manager.h" />
     <ClInclude Include="pathcache.h" />
     <ClInclude Include="proxy.h" />
