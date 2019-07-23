@@ -28,6 +28,8 @@ protected:
 
 	void InitFooter();
 
+	void UpdateProgress();
+
 	wxWindow* parent_;
 	CUpdater& updater_;
 
