@@ -2315,7 +2315,7 @@ void CMainFrame::OnActivate(wxActivateEvent& event)
 		return;
 	}
 
-#ifdef __WXMAC__
+#if defined(__WXMAC__) && !wxCHECK_VERSION(3, 1, 0)
 	// wxMac looses focus information if the window becomes inactive.
 	// Restore focus to the previously focused child, otherwise focus ends up
 	// in the quickconnect bar.

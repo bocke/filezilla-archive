@@ -142,8 +142,12 @@ void CViewHeader::OnComboPaint(wxPaintEvent& event)
 	}
 
 #if wxUSE_UXTHEME
+#if wxCHECK_VERSION(3, 1, 0)
+	if (wxUxThemeIsActive())
+#else
 	wxUxThemeEngine *p = wxUxThemeEngine::Get();
 	if (p && p->IsThemeActive())
+#endif
 	{
 	}
 	else

@@ -276,17 +276,16 @@ void CUpdateDialog::UpdaterStateChanged( UpdaterState s, build const& v )
 
 		XRCCTRL(*this, "ID_NEWS_LABEL", wxStaticText)->Show(!news.empty());
 		XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->Show(!news.empty());
-		if( news != XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->GetValue() ) {
+		if (news != XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->GetValue()) {
 			XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->ChangeValue(news);
 		}
 		bool downloading = s == UpdaterState::newversion_downloading;
 		XRCCTRL(*this, "ID_DOWNLOAD_LABEL", wxStaticText)->Show(downloading);
 		XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl)->Show(downloading);
 		XRCCTRL(*this, "ID_DOWNLOAD_PROGRESS", wxStaticText)->Show(downloading);
-		if( downloading ) {
+		if (downloading) {
 			timer_.Start(500);
-			wxTimerEvent ev;
-			OnTimer(ev);
+			UpdateProgress();
 		}
 
 		bool ready = s == UpdaterState::newversion_ready;
@@ -338,6 +337,11 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 }
 
 void CUpdateDialog::OnTimer(wxTimerEvent&)
+{
+	UpdateProgress();
+}
+
+void CUpdateDialog::UpdateProgress()
 {
 	int64_t size = updater_.AvailableBuild().size_;
 	int64_t downloaded = updater_.BytesDownloaded();
