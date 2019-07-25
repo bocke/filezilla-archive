@@ -964,6 +964,7 @@ void CSiteManagerDialog::OnBeginLabelEdit(wxTreeEvent& event)
 
 void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 {
+	lastEditVetoed_ = false;
 	if (event.IsEditCancelled()) {
 		return;
 	}
@@ -971,18 +972,24 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 	wxTreeItemId item = event.GetItem();
 	if (item != tree_->GetSelection()) {
 		if (!Verify()) {
+			lastEditVetoed_ = true;
 			event.Veto();
 			return;
 		}
 	}
 
 	if (!item.IsOk() || item == tree_->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
+		lastEditVetoed_ = true;
 		event.Veto();
 		return;
 	}
 
 	wxString name = event.GetLabel();
 	name = name.substr(0, 255);
+	if (name.empty()) {
+		event.Veto();
+		return;
+	}
 
 	wxTreeItemId parent = tree_->GetItemParent(item);
 
@@ -992,6 +999,7 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 			continue;
 		}
 		if (!name.CmpNoCase(tree_->GetItemText(child))) {
+			lastEditVetoed_ = true;
 			wxMessageBoxEx(_("Name already exists"), _("Cannot rename entry"), wxICON_EXCLAMATION, this);
 			event.Veto();
 			return;
@@ -1052,7 +1060,7 @@ void CSiteManagerDialog::OnDelete(wxCommandEvent&)
 	}
 
 	wxTreeItemId to_select = tree_->GetItemParent(items.front());
-	
+
 	m_is_deleting = true;
 
 	for (auto const& item : items) {
@@ -1080,15 +1088,21 @@ void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 		return;
 	}
 
-#ifdef __WXMSW__
 	if (tree_->GetEditControl()) {
+#ifdef __WXMSW__
 		bool ok = TreeView_EndEditLabelNow(tree_->GetHWND(), false);
 		if (!ok) {
 			event.Veto();
 			return;
 		}
-	}
+#else
+		tree_->EndEditLabel(wxTreeItemId(), false);
+		if (lastEditVetoed_) {
+			event.Veto();
+			return;
+		}
 #endif
+	}
 
 	if (!Verify()) {
 		event.Veto();
