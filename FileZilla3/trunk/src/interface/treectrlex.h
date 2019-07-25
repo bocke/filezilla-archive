@@ -16,7 +16,7 @@ public:
 			   const wxPoint& pos = wxDefaultPosition,
 			   const wxSize& size = wxDefaultSize,
 			   long style = wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT);
-	void SafeSelectItem(const wxTreeItemId& item);
+	void SafeSelectItem(wxTreeItemId const& item);
 
 	// Small wrappers to make wxTreeCtrl(Ex) API more similar to wxListCtrl(ex).
 	int GetItemCount() const { return GetCount(); }
@@ -28,6 +28,11 @@ public:
 	bool Valid(wxTreeItemId const& i) const { return i.IsOk(); }
 
 	wxWindow* GetMainWindow() { return this; }
+
+	virtual wxTreeItemId GetSelection() const override;
+
+	// wxTreeCtrl::GetSelections has an atrocious interface
+	std::vector<wxTreeItemId> GetSelections() const;
 
 	// Items with a collapsed ancestor are not included
 	wxTreeItemId GetFirstItem() const;

@@ -36,21 +36,86 @@ wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 	SetBackgroundStyle(wxBG_STYLE_SYSTEM);
 }
 
-void wxTreeCtrlEx::SafeSelectItem(const wxTreeItemId& item)
+wxTreeItemId wxTreeCtrlEx::GetSelection() const
 {
-	if( !item ) {
+	if (HasFlag(wxTR_MULTIPLE)) {
+		auto const selections = GetSelections();
+		if (selections.size() != 1) {
+			return wxTreeItemId();
+		}
+		return selections.front();
+	}
+	else {
+		return wxTreeCtrl::GetSelection();
+	}
+}
+
+std::vector<wxTreeItemId> wxTreeCtrlEx::GetSelections() const
+{
+	std::vector<wxTreeItemId> ret;
+
+	// Not only does wxTreeCtrl::GetSelections have a terrible API, it also returns items in a really weird order.
+	// Sadly on MSW, the native TreeView_GetNextSelected can't be used either, it uses a weird and also nodeterministic order.
+	//
+	// Traverse the tree ourselves, in a nice, deterministic depth-first approach.
+
+	wxTreeItemIdValue unused;
+
+	wxTreeItemId item = GetRootItem();
+	while (item) {
+		if (IsSelected(item)) {
+			ret.push_back(item);
+		}
+		wxTreeItemId next = GetFirstChild(item, unused);
+		if (!next) {
+			next = GetNextSibling(item);
+			while (!next && item) {
+				item = GetItemParent(item);
+				if (item) {
+					next = GetNextSibling(item);
+				}
+			}
+		}
+		item = next;
+	}
+
+	return ret;
+}
+
+void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item)
+{
+	if (!item) {
 		++m_setSelection;
 		UnselectAll();
 		--m_setSelection;
 	}
 	else {
-		const wxTreeItemId old_selection = GetSelection();
+		std::vector<wxTreeItemId> selections;
+		if (HasFlag(wxTR_MULTIPLE)) {
+			selections = GetSelections();
+			UnselectAll();
+			SetFocusedItem(item);
+		}
+		else {
+			auto old = GetSelection();
+			if (old) {
+				selections.push_back(old);
+			}
+		}
 
 		++m_setSelection;
 		SelectItem(item);
 		--m_setSelection;
-		if (item != old_selection)
+
+		bool found{};
+		for (auto const& old : selections) {
+			if (item == old) {
+				found = true;
+			}
+		}
+		if (!found) {
 			EnsureVisible(item);
+		}
 	}
 }
 

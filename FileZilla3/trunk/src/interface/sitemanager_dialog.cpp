@@ -18,6 +18,7 @@
 
 #include <wx/dnd.h>
 #include <wx/file.h>
+#include <wx/statline.h>
 
 #include <algorithm>
 #include <array>
@@ -96,51 +97,51 @@ public:
 		if (!hit) {
 			return false;
 		}
-		if (hit == m_pSiteManager->m_dropSource) {
-			return false;
-		}
 
 		const bool predefined = m_pSiteManager->IsPredefinedItem(hit);
 		if (predefined) {
 			return false;
 		}
 
-		wxTreeCtrl *pTree = XRCCTRL(*m_pSiteManager, "ID_SITETREE", wxTreeCtrl);
-		if (!pTree) {
+		auto * tree = m_pSiteManager->tree_;
+
+		CSiteManagerItemData *pData = (CSiteManagerItemData *)tree->GetItemData(hit);
+		// Cannot drop on bookmark
+		if (pData && !pData->m_site) {
 			return false;
 		}
 
-		CSiteManagerItemData *pData = (CSiteManagerItemData *)pTree->GetItemData(hit);
-		CSiteManagerItemData *pSourceData = (CSiteManagerItemData *)pTree->GetItemData(m_pSiteManager->m_dropSource);
-		if (pData) {
-			// Cannot drop on bookmark
-			if (!pData->m_site) {
+		for (auto const& item : m_pSiteManager->draggedItems_) {
+			if (hit == item) {
 				return false;
 			}
 
-			// If dropping on a site, source needs to be a bookmark
-			if (!pSourceData || pSourceData->m_site) {
+			CSiteManagerItemData* pSourceData = (CSiteManagerItemData*)tree->GetItemData(item);
+			if (pData) {
+				// If dropping on a site, source needs to be a bookmark
+				if (!pSourceData || pSourceData->m_site) {
+					return false;
+				}
+			}
+			// Target is a directory, so source must not be a bookmark
+			else if (pSourceData && !pSourceData->m_site) {
 				return false;
 			}
-		}
-		// Target is a directory, so source must not be a bookmark
-		else if (pSourceData && !pSourceData->m_site) {
-			return false;
-		}
 
-		// Disallow dragging into own child
-		wxTreeItemId item = hit;
-		while (item != pTree->GetRootItem()) {
-			if (item == m_pSiteManager->m_dropSource) {
-				ClearDropHighlight();
-				return wxDragNone;
+			// Disallow dragging into own child
+			wxTreeItemId cur = hit;
+			while (cur && cur != tree->GetRootItem()) {
+				if (cur == item) {
+					ClearDropHighlight();
+					return wxDragNone;
+				}
+				cur = tree->GetItemParent(cur);
 			}
-			item = pTree->GetItemParent(item);
-		}
 
-		// If moving, disallow moving to direct parent
-		if (def == wxDragMove && pTree->GetItemParent(m_pSiteManager->m_dropSource) == hit) {
-			return false;
+			// If moving, disallow moving to direct parent
+			if (def == wxDragMove && tree->GetItemParent(item) == hit) {
+				return false;
+			}
 		}
 
 		return true;
@@ -161,9 +162,15 @@ public:
 			return wxDragNone;
 		}
 
-		if (!m_pSiteManager->MoveItems(m_pSiteManager->m_dropSource, hit, def == wxDragCopy)) {
-			return wxDragNone;
+		m_pSiteManager->m_is_deleting = true;
+		for (auto const& item : m_pSiteManager->draggedItems_) {
+			if (!m_pSiteManager->MoveItems(item, hit, def == wxDragCopy, true)) {
+				def = wxDragNone;
+				break;
+			}
 		}
+		m_pSiteManager->m_is_deleting = false;
+		m_pSiteManager->SetCtrlState();
 
 		return def;
 	}
@@ -197,8 +204,7 @@ public:
 	{
 		int flags = 0;
 
-		wxTreeCtrl *pTree = XRCCTRL(*m_pSiteManager, "ID_SITETREE", wxTreeCtrl);
-		wxTreeItemId hit = pTree->HitTest(point, flags);
+		wxTreeItemId hit = m_pSiteManager->tree_->HitTest(point, flags);
 
 		if (flags & (wxTREE_HITTEST_ABOVE | wxTREE_HITTEST_BELOW | wxTREE_HITTEST_NOWHERE | wxTREE_HITTEST_TOLEFT | wxTREE_HITTEST_TORIGHT)) {
 			return wxTreeItemId();
@@ -235,8 +241,8 @@ public:
 			return;
 		}
 
-		wxTreeCtrl *pTree = XRCCTRL(*m_pSiteManager, "ID_SITETREE", wxTreeCtrl);
-		pTree->SetItemDropHighlight(m_dropHighlight, false);
+		auto* tree = m_pSiteManager->tree_;
+		tree->SetItemDropHighlight(m_dropHighlight, false);
 		m_dropHighlight = wxTreeItemId();
 	}
 
@@ -246,8 +252,8 @@ public:
 
 		wxTreeItemId hit = GetHit(p);
 		if (hit.IsOk()) {
-			wxTreeCtrl *pTree = XRCCTRL(*m_pSiteManager, "ID_SITETREE", wxTreeCtrl);
-			pTree->SetItemDropHighlight(hit, true);
+			auto* tree = m_pSiteManager->tree_;
+			tree->SetItemDropHighlight(hit, true);
 			m_dropHighlight = hit;
 		}
 
@@ -273,12 +279,12 @@ CSiteManagerDialog::~CSiteManagerDialog()
 	}
 }
 
-bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *connected_sites, Site const* site)
+bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* connected_sites, Site const* site)
 {
 	m_pSiteManagerMutex = new CInterProcessMutex(MUTEX_SITEMANAGERGLOBAL, false);
 	if (m_pSiteManagerMutex->TryLock() == 0) {
 		int answer = wxMessageBoxEx(_("The Site Manager is opened in another instance of FileZilla 3.\nDo you want to continue? Any changes made in the Site Manager won't be saved then."),
-								  _("Site Manager already open"), wxYES_NO | wxICON_QUESTION);
+			_("Site Manager already open"), wxYES_NO | wxICON_QUESTION);
 		if (answer != wxYES) {
 			return false;
 		}
@@ -286,16 +292,64 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *
 		delete m_pSiteManagerMutex;
 		m_pSiteManagerMutex = 0;
 	}
-	if (!wxDialogEx::Load(parent, _T("ID_SITEMANAGER"))) {
+
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	if (!wxDialogEx::Create(parent, XRCID("ID_SITEMANAGER"), _("Site Manager"), wxDefaultPosition, wxDefaultSize, wxCAPTION | wxSYSTEM_MENU | wxRESIZE_BORDER | wxCLOSE_BOX)) {
 		return false;
 	}
+
+	auto const& lay = layout();
+	auto outer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(outer);
+
+	auto main = lay.createFlex(1);
+	main->AddGrowableCol(0);
+	main->AddGrowableRow(0);
+	outer->Add(main, 1, wxGROW | wxALL, lay.border);
+
+
+	auto sides = new wxBoxSizer(wxHORIZONTAL);
+	main->Add(sides, lay.grow)->SetProportion(1);
+
+	auto left = lay.createFlex(1);
+	left->AddGrowableCol(0);
+	left->AddGrowableRow(1);
+	sides->Add(left, lay.grow)->SetProportion(1);
+
+	left->Add(new wxStaticText(this, wxID_ANY, _("&Select entry:")));
+
+	tree_ = new wxTreeCtrlEx(this, XRCID("ID_SITETREE"), wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_HAS_BUTTONS | wxTR_MULTIPLE);
+	left->Add(tree_, lay.grow)->SetProportion(1);
+
+	auto entrybuttons = new wxGridSizer(2, wxSize(lay.gap, lay.gap));
+	left->Add(entrybuttons, lay.halign);
+
+	entrybuttons->Add(new wxButton(this, XRCID("ID_NEWSITE"), _("&New site")), lay.grow);
+	entrybuttons->Add(new wxButton(this, XRCID("ID_NEWFOLDER"), _("New &folder")), lay.grow);
+	entrybuttons->Add(new wxButton(this, XRCID("ID_NEWBOOKMARK"), _("New Book&mark")), lay.grow);
+	entrybuttons->Add(new wxButton(this, XRCID("ID_RENAME"), _("&Rename")), lay.grow);
+	entrybuttons->Add(new wxButton(this, XRCID("ID_DELETE"), _("&Delete")), lay.grow);
+	entrybuttons->Add(new wxButton(this, XRCID("ID_COPY"), _("Dupl&icate")), lay.grow);
+
+	main->Add(new wxStaticLine(this), lay.grow);
+
+	auto buttons = new wxGridSizer(1, 0, wxSize(lay.gap, lay.gap));
+	main->Add(buttons, 0, wxALIGN_RIGHT);
+
+	auto connect = new wxButton(this, XRCID("ID_CONNECT"), _("&Connect"));
+	connect->SetDefault();
+	buttons->Add(connect);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	buttons->Add(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->Add(cancel);
+
+	outer->Fit(this);
+
 
 	// Now create the imagelist for the site tree
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return false;
-	}
-
 	wxSize s = CThemeProvider::GetIconSize(iconSizeSmall);
 	wxImageList* pImageList = new wxImageList(s.x, s.y);
 
@@ -304,68 +358,66 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site> *
 	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_SERVER"), wxART_OTHER, s));
 	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_BOOKMARK"), wxART_OTHER, s));
 
-	pTree->AssignImageList(pImageList);
+	tree_->AssignImageList(pImageList);
 
-	wxWindow* placeholder = XRCCTRL(*this, "ID_NOTEBOOK_PLACEHOLDER", wxWindow);
-	if (placeholder) {
-		wxSizer *pSizer = placeholder->GetContainingSizer();
+	auto right = new wxBoxSizer(wxVERTICAL);
+	sides->Add(right, 0, wxLEFT|wxGROW, lay.gap);
 
-		m_pNotebook_Site = new CSiteManagerSite(*this);
-		if (!m_pNotebook_Site->Load(placeholder->GetParent())) {
-			return false;
-		}
-
-		pSizer->Add(m_pNotebook_Site, 1, wxGROW);
-
-		Layout();
-
-
-		wxSize minSize = GetSizer()->GetMinSize();
-
-		wxSize size = GetSize();
-		wxSize clientSize = GetClientSize();
-		SetMinSize(GetSizer()->GetMinSize() + size - clientSize);
-		SetClientSize(minSize);
-
-		// Load bookmark notebook
-		m_pNotebook_Bookmark = new wxNotebook(placeholder->GetParent(), -1);
-		wxPanel* pPanel = new wxPanel;
-		wxXmlResource::Get()->LoadPanel(pPanel, m_pNotebook_Bookmark, _T("ID_SITEMANAGER_BOOKMARK_PANEL"));
-		m_pNotebook_Bookmark->Hide();
-		m_pNotebook_Bookmark->AddPage(pPanel, _("Bookmark"));
-		pSizer->Add(m_pNotebook_Bookmark, 2, wxGROW);
-		pSizer->SetItemMinSize(2, pSizer->GetItem((size_t)0)->GetMinSize().GetWidth(), -1);
+	m_pNotebook_Site = new CSiteManagerSite(*this);
+	if (!m_pNotebook_Site->Load(this)) {
+		return false;
 	}
+
+	right->Add(m_pNotebook_Site, 1, wxGROW);
+
+	Layout();
+
+	wxSize minSize = GetSizer()->GetMinSize();
+
+	wxSize size = GetSize();
+	wxSize clientSize = GetClientSize();
+	SetMinSize(GetSizer()->GetMinSize() + size - clientSize);
+	SetClientSize(minSize);
+
+	// Load bookmark notebook
+	m_pNotebook_Bookmark = new wxNotebook(this, -1);
+	wxPanel* pPanel = new wxPanel;
+	wxXmlResource::Get()->LoadPanel(pPanel, m_pNotebook_Bookmark, _T("ID_SITEMANAGER_BOOKMARK_PANEL"));
+	m_pNotebook_Bookmark->Hide();
+	m_pNotebook_Bookmark->AddPage(pPanel, _("Bookmark"));
+	right->Add(m_pNotebook_Bookmark, 2, wxGROW);
+	right->SetItemMinSize(1, right->GetItem((size_t)0)->GetMinSize().GetWidth(), -1);
+
 
 	// Set min size of tree to actual size of tree.
 	// Otherwise some platforms automatically calculate a min size fitting all items,
 	// resulting in a huge dialog if there are many sites.
-	wxSize const treeSize = pTree->GetSize();
+	wxSize const treeSize = tree_->GetSize();
 	if (treeSize.IsFullySpecified()) {
-		pTree->SetMinSize(treeSize);
+		tree_->SetMinSize(treeSize);
 	}
 
 	if (!Load()) {
 		return false;
 	}
 
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
-		pTree->SafeSelectItem(m_ownSites);
+		tree_->SafeSelectItem(m_ownSites);
 	}
 	SetCtrlState();
 
 	m_pWindowStateManager = new CWindowStateManager(this);
 	m_pWindowStateManager->Restore(OPTION_SITEMANAGER_POSITION);
 
-	pTree->SetDropTarget(new CSiteManagerDropTarget(this));
+	tree_->SetDropTarget(new CSiteManagerDropTarget(this));
 
 #ifdef __WXGTK__
 	{
 		CSiteManagerItemData* data = 0;
-		wxTreeItemId selected = pTree->GetSelection();
+		wxTreeItemId selected = tree_->GetSelection();
 		if (selected.IsOk()) {
-			data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(selected));
+			data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(selected));
 		}
 		if (!data) {
 			XRCCTRL(*this, "wxID_OK", wxButton)->SetFocus();
@@ -398,11 +450,6 @@ void CSiteManagerDialog::MarkConnectedSite(int connected_site)
 		return;
 	}
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
 	if (connected_site_path[0] == '1') {
 		// Default sites never change
 		return;
@@ -421,13 +468,13 @@ void CSiteManagerDialog::MarkConnectedSite(int connected_site)
 	wxTreeItemId current = m_ownSites;
 	for (auto const& segment : segments) {
 		wxTreeItemIdValue c;
-		wxTreeItemId child = pTree->GetFirstChild(current, c);
+		wxTreeItemId child = tree_->GetFirstChild(current, c);
 		while (child) {
-			if (pTree->GetItemText(child) == segment) {
+			if (tree_->GetItemText(child) == segment) {
 				break;
 			}
 
-			child = pTree->GetNextChild(current, c);
+			child = tree_->GetNextChild(current, c);
 		}
 		if (!child) {
 			return;
@@ -436,7 +483,7 @@ void CSiteManagerDialog::MarkConnectedSite(int connected_site)
 		current = child;
 	}
 
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(current));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(current));
 	if (!data || !data->m_site) {
 		return;
 	}
@@ -471,17 +518,12 @@ void CSiteManagerDialog::OnCancel(wxCommandEvent&)
 
 void CSiteManagerDialog::OnConnect(wxCommandEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return;
 	}
 
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!data) {
 		wxBell();
 		return;
@@ -508,8 +550,8 @@ void CSiteManagerDialog::OnConnect(wxCommandEvent&)
 class CSiteManagerXmlHandler_Tree : public CSiteManagerXmlHandler
 {
 public:
-	CSiteManagerXmlHandler_Tree(wxTreeCtrlEx* pTree, wxTreeItemId root, std::wstring const& lastSelection, bool predefined)
-		: m_pTree(pTree), m_item(root), m_predefined(predefined)
+	CSiteManagerXmlHandler_Tree(wxTreeCtrlEx* tree_, wxTreeItemId root, std::wstring const& lastSelection, bool predefined)
+		: m_tree_(tree_), m_item(root), m_predefined(predefined)
 	{
 		if (!CSiteManager::UnescapeSitePath(lastSelection, m_lastSelection)) {
 			m_lastSelection.clear();
@@ -521,15 +563,15 @@ public:
 
 	virtual ~CSiteManagerXmlHandler_Tree()
 	{
-		m_pTree->SortChildren(m_item);
-		m_pTree->Expand(m_item);
+		m_tree_->SortChildren(m_item);
+		m_tree_->Expand(m_item);
 	}
 
 	virtual bool AddFolder(std::wstring const& name, bool expanded)
 	{
-		wxTreeItemId newItem = m_pTree->AppendItem(m_item, name, 0, 0);
-		m_pTree->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
-		m_pTree->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
+		wxTreeItemId newItem = m_tree_->AppendItem(m_item, name, 0, 0);
+		m_tree_->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
+		m_tree_->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
 
 		m_item = newItem;
 		m_expand.push_back(expanded);
@@ -538,7 +580,7 @@ public:
 			if (*m_lastSelectionIt == name) {
 				++m_lastSelectionIt;
 				if (m_lastSelectionIt == m_lastSelection.cend()) {
-					m_pTree->SafeSelectItem(newItem);
+					m_tree_->SafeSelectItem(newItem);
 				}
 			}
 			else {
@@ -566,7 +608,7 @@ public:
 		std::wstring const name = data->server.GetName();
 
 		CSiteManagerItemData* pData = new CSiteManagerItemData(std::move(data));
-		wxTreeItemId newItem = m_pTree->AppendItem(m_item, name, 2, 2, pData);
+		wxTreeItemId newItem = m_tree_->AppendItem(m_item, name, 2, 2, pData);
 
 		bool can_select = false;
 		if (!m_wrong_sel_depth && m_lastSelectionIt != m_lastSelection.cend()) {
@@ -574,7 +616,7 @@ public:
 				++m_lastSelectionIt;
 				can_select = true;
 				if (m_lastSelectionIt == m_lastSelection.cend()) {
-					m_pTree->SafeSelectItem(newItem);
+					m_tree_->SafeSelectItem(newItem);
 				}
 			}
 		}
@@ -583,8 +625,8 @@ public:
 			AddBookmark(newItem, bookmark, can_select);
 		}
 
-		m_pTree->SortChildren(newItem);
-		m_pTree->Expand(newItem);
+		m_tree_->SortChildren(newItem);
+		m_tree_->Expand(newItem);
 
 		return true;
 	}
@@ -593,13 +635,13 @@ public:
 	{
 		CSiteManagerItemData* pData = new CSiteManagerItemData;
 		pData->m_bookmark = std::make_unique<Bookmark>(bookmark);
-		wxTreeItemId newItem = m_pTree->AppendItem(parent, bookmark.m_name, 3, 3, pData);
+		wxTreeItemId newItem = m_tree_->AppendItem(parent, bookmark.m_name, 3, 3, pData);
 
 		if (can_select && m_lastSelectionIt != m_lastSelection.cend()) {
 			if (*m_lastSelectionIt == bookmark.m_name) {
 				++m_lastSelectionIt;
 				if (m_lastSelectionIt == m_lastSelection.cend()) {
-					m_pTree->SafeSelectItem(newItem);
+					m_tree_->SafeSelectItem(newItem);
 				}
 			}
 		}
@@ -617,12 +659,12 @@ public:
 			const bool expand = m_expand.back();
 			m_expand.pop_back();
 			if (expand) {
-				m_pTree->Expand(m_item);
+				m_tree_->Expand(m_item);
 			}
 		}
-		m_pTree->SortChildren(m_item);
+		m_tree_->SortChildren(m_item);
 
-		wxTreeItemId parent = m_pTree->GetItemParent(m_item);
+		wxTreeItemId parent = m_tree_->GetItemParent(m_item);
 		if (!parent) {
 			return false;
 		}
@@ -632,7 +674,7 @@ public:
 	}
 
 protected:
-	wxTreeCtrlEx * const m_pTree;
+	wxTreeCtrlEx * const m_tree_;
 	wxTreeItemId m_item;
 
 	std::vector<std::wstring> m_lastSelection;
@@ -647,12 +689,7 @@ protected:
 
 bool CSiteManagerDialog::Load()
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return false;
-	}
-
-	pTree->DeleteAllItems();
+	tree_->DeleteAllItems();
 
 	// We have to synchronize access to sitemanager.xml so that multiple processed don't write
 	// to the same file or one is reading while the other one writes.
@@ -661,15 +698,15 @@ bool CSiteManagerDialog::Load()
 	// Load default sites
 	bool hasDefaultSites = LoadDefaultSites();
 	if (hasDefaultSites) {
-		m_ownSites = pTree->AppendItem(pTree->GetRootItem(), _("My Sites"), 0, 0);
+		m_ownSites = tree_->AppendItem(tree_->GetRootItem(), _("My Sites"), 0, 0);
 	}
 	else {
-		m_ownSites = pTree->AddRoot(_("My Sites"), 0, 0);
+		m_ownSites = tree_->AddRoot(_("My Sites"), 0, 0);
 	}
 
 	wxTreeItemId treeId = m_ownSites;
-	pTree->SetItemImage(treeId, 1, wxTreeItemIcon_Expanded);
-	pTree->SetItemImage(treeId, 1, wxTreeItemIcon_SelectedExpanded);
+	tree_->SetItemImage(treeId, 1, wxTreeItemIcon_Expanded);
+	tree_->SetItemImage(treeId, 1, wxTreeItemIcon_SelectedExpanded);
 
 	CXmlFile file(wxGetApp().GetSettingsFile(_T("sitemanager")));
 	auto document = file.Load();
@@ -695,7 +732,7 @@ bool CSiteManagerDialog::Load()
 	std::wstring lastSelection = COptions::Get()->GetOption(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '0') {
 		if (lastSelection == _T("0")) {
-			pTree->SafeSelectItem(treeId);
+			tree_->SafeSelectItem(treeId);
 		}
 		else {
 			lastSelection = lastSelection.substr(1);
@@ -704,17 +741,17 @@ bool CSiteManagerDialog::Load()
 	else {
 		lastSelection.clear();
 	}
-	CSiteManagerXmlHandler_Tree handler(pTree, treeId, lastSelection, false);
+	CSiteManagerXmlHandler_Tree handler(tree_, treeId, lastSelection, false);
 
 	bool res = CSiteManager::Load(element, handler);
 
-	pTree->SortChildren(treeId);
-	pTree->Expand(treeId);
-	if (!pTree->GetSelection()) {
-		pTree->SafeSelectItem(treeId);
+	tree_->SortChildren(treeId);
+	tree_->Expand(treeId);
+	if (!tree_->GetSelection()) {
+		tree_->SafeSelectItem(treeId);
 	}
 
-	pTree->EnsureVisible(pTree->GetSelection());
+	tree_->EnsureVisible(tree_->GetSelection());
 
 	return res;
 }
@@ -722,11 +759,6 @@ bool CSiteManagerDialog::Load()
 bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 {
 	if (!m_pSiteManagerMutex) {
-		return false;
-	}
-
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
 		return false;
 	}
 
@@ -771,11 +803,11 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 
 	wxTreeItemId child;
 	wxTreeItemIdValue cookie;
-	child = pTree->GetFirstChild(treeId, cookie);
+	child = tree_->GetFirstChild(treeId, cookie);
 	while (child.IsOk()) {
 		SaveChild(element, child);
 
-		child = pTree->GetNextChild(treeId, cookie);
+		child = tree_->GetNextChild(treeId, cookie);
 	}
 
 	return false;
@@ -783,17 +815,12 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 
 bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return false;
-	}
+	std::wstring const name = tree_->GetItemText(child).ToStdWstring();
 
-	std::wstring const name = pTree->GetItemText(child).ToStdWstring();
-
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(child));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(child));
 	if (!data) {
 		auto node = element.append_child("Folder");
-		const bool expanded = pTree->IsExpanded(child);
+		const bool expanded = tree_->IsExpanded(child);
 		SetTextAttribute(node, "expanded", expanded ? _T("1") : _T("0"));
 		AddTextElement(node, name);
 		Save(node, child);
@@ -805,13 +832,13 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 		data->m_site->m_bookmarks.clear();
 
 		wxTreeItemIdValue cookie;
-		wxTreeItemId bookmarkChild = pTree->GetFirstChild(child, cookie);
+		wxTreeItemId bookmarkChild = tree_->GetFirstChild(child, cookie);
 		while (bookmarkChild.IsOk()) {
-			CSiteManagerItemData* bookmarkData = static_cast<CSiteManagerItemData* >(pTree->GetItemData(bookmarkChild));
+			CSiteManagerItemData* bookmarkData = static_cast<CSiteManagerItemData* >(tree_->GetItemData(bookmarkChild));
 			wxASSERT(bookmarkData->m_bookmark);
-			bookmarkData->m_bookmark->m_name = pTree->GetItemText(bookmarkChild).ToStdWstring();
+			bookmarkData->m_bookmark->m_name = tree_->GetItemText(bookmarkChild).ToStdWstring();
 			data->m_site->m_bookmarks.push_back(*bookmarkData->m_bookmark);
-			bookmarkChild = pTree->GetNextChild(child, cookie);
+			bookmarkChild = tree_->GetNextChild(child, cookie);
 		}
 
 		CSiteManager::Save(node, *data->m_site);
@@ -829,18 +856,13 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 
 void CSiteManagerDialog::OnNewFolder(wxCommandEvent&)
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return;
 	}
 
-	while (pTree->GetItemData(item)) {
-		item = pTree->GetItemParent(item);
+	while (tree_->GetItemData(item)) {
+		item = tree_->GetItemParent(item);
 	}
 
 	if (!Verify()) {
@@ -849,28 +871,23 @@ void CSiteManagerDialog::OnNewFolder(wxCommandEvent&)
 
 	wxString name = FindFirstFreeName(item, _("New folder"));
 
-	wxTreeItemId newItem = pTree->AppendItem(item, name, 0, 0);
-	pTree->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
-	pTree->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
-	pTree->SortChildren(item);
-	pTree->EnsureVisible(newItem);
-	pTree->SafeSelectItem(newItem);
-	pTree->EditLabel(newItem);
+	wxTreeItemId newItem = tree_->AppendItem(item, name, 0, 0);
+	tree_->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
+	tree_->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
+	tree_->SortChildren(item);
+	tree_->EnsureVisible(newItem);
+	tree_->SafeSelectItem(newItem);
+	tree_->EditLabel(newItem);
 }
 
 bool CSiteManagerDialog::Verify()
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return true;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return true;
 	}
 
-	CSiteManagerItemData* data = (CSiteManagerItemData *)pTree->GetItemData(item);
+	CSiteManagerItemData* data = (CSiteManagerItemData *)tree_->GetItemData(item);
 	if (!data) {
 		return true;
 	}
@@ -882,11 +899,11 @@ bool CSiteManagerDialog::Verify()
 		}
 	}
 	else {
-		wxTreeItemId parent = pTree->GetItemParent(item);
+		wxTreeItemId parent = tree_->GetItemParent(item);
 		if (!parent) {
 			return false;
 		}
-		CSiteManagerItemData* pServer = static_cast<CSiteManagerItemData*>(pTree->GetItemData(parent));
+		CSiteManagerItemData* pServer = static_cast<CSiteManagerItemData*>(tree_->GetItemData(parent));
 		if (!pServer || !pServer->m_site) {
 			return false;
 		}
@@ -931,13 +948,7 @@ bool CSiteManagerDialog::Verify()
 
 void CSiteManagerDialog::OnBeginLabelEdit(wxTreeEvent& event)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		event.Veto();
-		return;
-	}
-
-	if (event.GetItem() != pTree->GetSelection()) {
+	if (event.GetItem() != tree_->GetSelection()) {
 		if (!Verify()) {
 			event.Veto();
 			return;
@@ -945,7 +956,7 @@ void CSiteManagerDialog::OnBeginLabelEdit(wxTreeEvent& event)
 	}
 
 	wxTreeItemId item = event.GetItem();
-	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
+	if (!item.IsOk() || item == tree_->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
 		event.Veto();
 		return;
 	}
@@ -957,21 +968,15 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 		return;
 	}
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		event.Veto();
-		return;
-	}
-
 	wxTreeItemId item = event.GetItem();
-	if (item != pTree->GetSelection()) {
+	if (item != tree_->GetSelection()) {
 		if (!Verify()) {
 			event.Veto();
 			return;
 		}
 	}
 
-	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
+	if (!item.IsOk() || item == tree_->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
 		event.Veto();
 		return;
 	}
@@ -979,14 +984,14 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 	wxString name = event.GetLabel();
 	name = name.substr(0, 255);
 
-	wxTreeItemId parent = pTree->GetItemParent(item);
+	wxTreeItemId parent = tree_->GetItemParent(item);
 
 	wxTreeItemIdValue cookie;
-	for (wxTreeItemId child = pTree->GetFirstChild(parent, cookie); child.IsOk(); child = pTree->GetNextChild(parent, cookie)) {
+	for (wxTreeItemId child = tree_->GetFirstChild(parent, cookie); child.IsOk(); child = tree_->GetNextChild(parent, cookie)) {
 		if (child == item) {
 			continue;
 		}
-		if (!name.CmpNoCase(pTree->GetItemText(child))) {
+		if (!name.CmpNoCase(tree_->GetItemText(child))) {
 			wxMessageBoxEx(_("Name already exists"), _("Cannot rename entry"), wxICON_EXCLAMATION, this);
 			event.Veto();
 			return;
@@ -995,55 +1000,74 @@ void CSiteManagerDialog::OnEndLabelEdit(wxTreeEvent& event)
 
 	// Always veto and manually change name so that the sorting works
 	event.Veto();
-	pTree->SetItemText(item, name);
-	pTree->SortChildren(parent);
+	tree_->SetItemText(item, name);
+	tree_->SortChildren(parent);
 }
 
 void CSiteManagerDialog::OnRename(wxCommandEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
+	wxTreeItemId item = tree_->GetSelection();
+	if (!item.IsOk() || item == tree_->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
 		return;
 	}
 
-	wxTreeItemId item = pTree->GetSelection();
-	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
-		return;
-	}
-
-	pTree->EditLabel(item);
+	tree_->EditLabel(item);
 }
 
 void CSiteManagerDialog::OnDelete(wxCommandEvent&)
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
+	auto selections = tree_->GetSelections();
+	if (selections.empty()) {
 		return;
 	}
 
-	wxTreeItemId item = pTree->GetSelection();
-	if (!item.IsOk() || item == pTree->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
+	std::vector<wxTreeItemId> items;
+	wxTreeItemId ancestor;
+	for (auto const& item : selections) {
+		if (!item.IsOk() || item == tree_->GetRootItem() || item == m_ownSites || IsPredefinedItem(item)) {
+			return;
+		}
+
+		// Only keep items that do not have an ancestor that is already being deleted
+		auto parent = tree_->GetItemParent(item);
+		while (parent && parent != ancestor) {
+			parent = tree_->GetItemParent(parent);
+		}
+		if (!parent) {
+			ancestor = item;
+			items.push_back(item);
+		}
+	}
+	if (items.empty()) {
 		return;
 	}
 
 	CConditionalDialog dlg(this, CConditionalDialog::sitemanager_confirmdelete, CConditionalDialog::yesno);
-	dlg.SetTitle(_("Delete Site Manager entry"));
+	dlg.SetTitle(_("Delete Site Manager entries"));
 
-	dlg.AddText(_("Do you really want to delete selected entry?"));
+	dlg.AddText(_("Do you really want to delete the selected entries?"));
 
 	if (!dlg.Run()) {
 		return;
 	}
 
-	wxTreeItemId parent = pTree->GetItemParent(item);
-	if (pTree->GetChildrenCount(parent) == 1) {
-		pTree->Collapse(parent);
-	}
-
+	wxTreeItemId to_select = tree_->GetItemParent(items.front());
+	
 	m_is_deleting = true;
 
-	pTree->Delete(item);
-	pTree->SafeSelectItem(parent);
+	for (auto const& item : items) {
+		wxTreeItemId parent = tree_->GetItemParent(item);
+		if (tree_->GetChildrenCount(parent) == 1) {
+			tree_->Collapse(parent);
+		}
+#ifdef __WXMSW__
+		// Delete tries to move selection to next visible, collapse so that it's never a child.
+		tree_->Collapse(item);
+#endif
+		tree_->Delete(item);
+	}
+
+	tree_->SafeSelectItem(to_select);
 
 	m_is_deleting = false;
 
@@ -1056,10 +1080,15 @@ void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 		return;
 	}
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
+#ifdef __WXMSW__
+	if (tree_->GetEditControl()) {
+		bool ok = TreeView_EndEditLabelNow(tree_->GetHWND(), false);
+		if (!ok) {
+			event.Veto();
+			return;
+		}
 	}
+#endif
 
 	if (!Verify()) {
 		event.Veto();
@@ -1070,23 +1099,22 @@ void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 
 void CSiteManagerDialog::OnSelChanged(wxTreeEvent&)
 {
+	if (m_is_deleting) {
+		return;
+	}
+
 	SetCtrlState();
 }
 
 void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk() || IsPredefinedItem(item)) {
 		return;
 	}
 
-	while (pTree->GetItemData(item)) {
-		item = pTree->GetItemParent(item);
+	while (tree_->GetItemData(item)) {
+		item = tree_->GetItemParent(item);
 	}
 
 	if (!Verify()) {
@@ -1100,12 +1128,7 @@ void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 
 bool CSiteManagerDialog::UpdateItem()
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return false;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return false;
 	}
@@ -1114,23 +1137,23 @@ bool CSiteManagerDialog::UpdateItem()
 		return true;
 	}
 
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!data) {
 		return false;
 	}
 
 	if (data->m_site) {
-		UpdateServer(*data->m_site, pTree->GetItemText(item));
+		UpdateServer(*data->m_site, tree_->GetItemText(item));
 		return true;
 	}
 	else {
 		wxASSERT(data->m_bookmark);
-		wxTreeItemId parent = pTree->GetItemParent(item);
-		CSiteManagerItemData const* pServer = static_cast<CSiteManagerItemData*>(pTree->GetItemData(parent));
+		wxTreeItemId parent = tree_->GetItemParent(item);
+		CSiteManagerItemData const* pServer = static_cast<CSiteManagerItemData*>(tree_->GetItemData(parent));
 		if (!pServer || !pServer->m_site) {
 			return false;
 		}
-		data->m_bookmark->m_name = pTree->GetItemText(item).ToStdWstring();
+		data->m_bookmark->m_name = tree_->GetItemText(item).ToStdWstring();
 		return UpdateBookmark(*data->m_bookmark, *pServer->m_site);
 	}
 }
@@ -1156,24 +1179,19 @@ void CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
 
 bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return false;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return false;
 	}
 
-	CSiteManagerItemData* pData = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* pData = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!pData) {
 		return false;
 	}
 
 	if (pData->m_bookmark) {
-		item = pTree->GetItemParent(item);
-		CSiteManagerItemData* pSiteData = static_cast<CSiteManagerItemData*>(pTree->GetItemData(item));
+		item = tree_->GetItemParent(item);
+		CSiteManagerItemData* pSiteData = static_cast<CSiteManagerItemData*>(tree_->GetItemData(item));
 
 		data = *pSiteData->m_site;
 		bookmark = data.m_default_bookmark;
@@ -1207,20 +1225,15 @@ bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
 
 void CSiteManagerDialog::OnItemActivated(wxTreeEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return;
 	}
 
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!data) {
-		if (item != pTree->GetRootItem() || !pTree->IsExpanded(item)) {
-			pTree->Toggle(item);
+		if (item != tree_->GetRootItem() || !tree_->IsExpanded(item)) {
+			tree_->Toggle(item);
 		}
 		return;
 	}
@@ -1231,14 +1244,14 @@ void CSiteManagerDialog::OnItemActivated(wxTreeEvent&)
 
 void CSiteManagerDialog::SetCtrlState()
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
+	auto const selections = tree_->GetSelections();
+
+	wxTreeItemId item;
+	if (selections.size() == 1) {
+		item = selections.front();
 	}
-
-	wxTreeItemId item = pTree->GetSelection();
-
-	const bool predefined = IsPredefinedItem(item);
+	bool const multiple = selections.size() > 0;
+	bool const predefined = IsPredefinedItem(item);
 
 #ifdef __WXGTK__
 	wxWindow* pFocus = FindFocus();
@@ -1246,22 +1259,21 @@ void CSiteManagerDialog::SetCtrlState()
 
 	CSiteManagerItemData* data = 0;
 	if (item.IsOk()) {
-		data = static_cast<CSiteManagerItemData*>(pTree->GetItemData(item));
+		data = static_cast<CSiteManagerItemData*>(tree_->GetItemData(item));
 	}
 	if (!data) {
 		// Set the control states according if it's possible to use the control
-		const bool root_or_predefined = (item == pTree->GetRootItem() || item == m_ownSites || predefined);
+		const bool root_or_predefined = (item == tree_->GetRootItem() || item == m_ownSites || predefined);
 
 		m_pNotebook_Site->Show();
 		m_pNotebook_Bookmark->Hide();
-		m_pNotebook_Site->SetSite(Site(), root_or_predefined);
+		m_pNotebook_Site->SetSite(Site(), root_or_predefined || multiple);
 		m_pNotebook_Site->Enable(false);
 		m_pNotebook_Site->GetContainingSizer()->Layout();
 
-
-		xrc_call(*this, "ID_RENAME", &wxWindow::Enable, !root_or_predefined);
-		xrc_call(*this, "ID_DELETE", &wxWindow::Enable, !root_or_predefined);
-		xrc_call(*this, "ID_COPY", &wxWindow::Enable, false);
+		xrc_call(*this, "ID_RENAME", &wxWindow::Enable, !selections.empty() && !root_or_predefined && !multiple);
+		xrc_call(*this, "ID_DELETE", &wxWindow::Enable, !selections.empty() && !root_or_predefined);
+		xrc_call(*this, "ID_COPY", &wxWindow::Enable, !selections.empty());
 		xrc_call(*this, "ID_NEWFOLDER", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_NEWSITE", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_NEWBOOKMARK", &wxWindow::Enable, false);
@@ -1328,87 +1340,62 @@ void CSiteManagerDialog::SetCtrlState()
 
 void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return;
-	}
+	std::vector<wxTreeItemId> items;
 
-	wxTreeItemId item = pTree->GetSelection();
-	if (!item.IsOk()) {
-		return;
-	}
-
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
-	if (!data) {
-		return;
-	}
-
-	if (!Verify()) {
-		return;
-	}
-
-	if (!UpdateItem()) {
-		return;
-	}
-
-	wxTreeItemId parent;
-	if (IsPredefinedItem(item)) {
-		parent = m_ownSites;
-	}
-	else {
-		parent = pTree->GetItemParent(item);
-	}
-
-	wxString const name = pTree->GetItemText(item).substr(0, 230);
-	wxString newName = wxString::Format(_("Copy of %s"), name);
-	int index = 2;
-	for (;;) {
-		wxTreeItemId child;
-		wxTreeItemIdValue cookie;
-		child = pTree->GetFirstChild(parent, cookie);
-		bool found = false;
-		while (child.IsOk()) {
-			wxString const child_name = pTree->GetItemText(child);
-			int cmp = child_name.CmpNoCase(newName);
-			if (!cmp) {
-				found = true;
-				break;
+	wxTreeItemId item = tree_->GetSelection();
+	if (item) {
+		CSiteManagerItemData* data = static_cast<CSiteManagerItemData*>(tree_->GetItemData(item));
+		if (data) {
+			if (!Verify()) {
+				return;
 			}
 
-			child = pTree->GetNextChild(parent, cookie);
-		}
-		if (!found) {
-			break;
+			if (!UpdateItem()) {
+				return;
+			}
 		}
 
-		newName = wxString::Format(_("Copy (%d) of %s"), ++index, name);
-	}
-
-	wxTreeItemId newItem;
-	if (data->m_site) {
-		CSiteManagerItemData* newData = new CSiteManagerItemData;
-		newData->m_site = std::make_unique<Site>(*data->m_site);
-		newItem = pTree->AppendItem(parent, newName, 2, 2, newData);
-
-		wxTreeItemIdValue cookie;
-		for (wxTreeItemId child = pTree->GetFirstChild(item, cookie); child.IsOk(); child = pTree->GetNextChild(item, cookie)) {
-			CSiteManagerItemData* pData = new CSiteManagerItemData;
-			pData->m_bookmark = std::make_unique<Bookmark>(*static_cast<CSiteManagerItemData*>(pTree->GetItemData(child))->m_bookmark);
-			pTree->AppendItem(newItem, pTree->GetItemText(child), 3, 3, pData);
-		}
-		if (pTree->IsExpanded(item)) {
-			pTree->Expand(newItem);
-		}
+		items.push_back(item);
 	}
 	else {
-		CSiteManagerItemData* newData = new CSiteManagerItemData;
-		newData->m_bookmark = std::make_unique<Bookmark>(*data->m_bookmark);
-		newItem = pTree->AppendItem(parent, newName, 3, 3, newData);
+		auto selections = tree_->GetSelections();
+
+		wxTreeItemId ancestor;
+		for (auto const& item : selections) {
+			if (!item.IsOk() || item == tree_->GetRootItem()) {
+				return;
+			}
+
+			// Only keep items that do not have an ancestor that is already being copied
+			auto parent = tree_->GetItemParent(item);
+			while (parent && parent != ancestor) {
+				parent = tree_->GetItemParent(parent);
+			}
+			if (!parent) {
+				ancestor = item;
+				items.push_back(item);
+			}
+		}
 	}
-	pTree->SortChildren(parent);
-	pTree->EnsureVisible(newItem);
-	pTree->SafeSelectItem(newItem);
-	pTree->EditLabel(newItem);
+
+	if (items.empty()) {
+		return;
+	}
+
+	for (auto const& item : items) {
+		wxTreeItemId parent = tree_->GetItemParent(item);
+		if (!parent || IsPredefinedItem(parent) || parent == tree_->GetRootItem()) {
+			parent = m_ownSites;
+		}
+
+		auto newItem = MoveItems(item, parent, true, false);
+
+		if (items.size() == 1) {
+			tree_->EnsureVisible(newItem);
+			tree_->SafeSelectItem(newItem);
+			tree_->EditLabel(newItem);
+		}
+	}
 }
 
 bool CSiteManagerDialog::LoadDefaultSites()
@@ -1430,23 +1417,18 @@ bool CSiteManagerDialog::LoadDefaultSites()
 		return false;
 	}
 
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return false;
-	}
+	int style = tree_->GetWindowStyle();
+	tree_->SetWindowStyle(style | wxTR_HIDE_ROOT);
+	wxTreeItemId root = tree_->AddRoot(wxString(), 0, 0);
 
-	int style = pTree->GetWindowStyle();
-	pTree->SetWindowStyle(style | wxTR_HIDE_ROOT);
-	wxTreeItemId root = pTree->AddRoot(wxString(), 0, 0);
-
-	m_predefinedSites = pTree->AppendItem(root, _("Predefined Sites"), 0, 0);
-	pTree->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_Expanded);
-	pTree->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_SelectedExpanded);
+	m_predefinedSites = tree_->AppendItem(root, _("Predefined Sites"), 0, 0);
+	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_Expanded);
+	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_SelectedExpanded);
 
 	std::wstring lastSelection = COptions::Get()->GetOption(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '1') {
 		if (lastSelection == _T("1")) {
-			pTree->SafeSelectItem(m_predefinedSites);
+			tree_->SafeSelectItem(m_predefinedSites);
 		}
 		else {
 			lastSelection = lastSelection.substr(1);
@@ -1455,7 +1437,7 @@ bool CSiteManagerDialog::LoadDefaultSites()
 	else {
 		lastSelection.clear();
 	}
-	CSiteManagerXmlHandler_Tree handler(pTree, m_predefinedSites, lastSelection, true);
+	CSiteManagerXmlHandler_Tree handler(tree_, m_predefinedSites, lastSelection, true);
 
 	CSiteManager::Load(element, handler);
 
@@ -1464,17 +1446,11 @@ bool CSiteManagerDialog::LoadDefaultSites()
 
 bool CSiteManagerDialog::IsPredefinedItem(wxTreeItemId item)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	wxASSERT(pTree);
-	if (!pTree) {
-		return false;
-	}
-
 	while (item) {
 		if (item == m_predefinedSites) {
 			return true;
 		}
-		item = pTree->GetItemParent(item);
+		item = tree_->GetItemParent(item);
 	}
 
 	return false;
@@ -1492,21 +1468,41 @@ void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 	}
 	UpdateItem();
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
+	wxTreeItemId dragItem = event.GetItem();
+	if (!dragItem.IsOk() || !tree_->IsSelected(dragItem)) {
 		event.Veto();
 		return;
 	}
 
-	wxTreeItemId item = event.GetItem();
-	if (!item.IsOk()) {
-		event.Veto();
-		return;
+	std::vector<wxTreeItemId> items;
+	auto selections = tree_->GetSelections();
+
+	bool predefined{};
+
+	wxTreeItemId ancestor;
+	for (auto const& item : selections) {
+		if (!item.IsOk() || item == tree_->GetRootItem()) {
+			return;
+		}
+
+		// Only keep items that do not have an ancestor that is already being copied
+		auto parent = tree_->GetItemParent(item);
+		while (parent && parent != ancestor) {
+			parent = tree_->GetItemParent(parent);
+		}
+		if (!parent) {
+			ancestor = item;
+			items.push_back(item);
+
+			predefined |= IsPredefinedItem(item);
+			if (item == tree_->GetRootItem() || item == m_ownSites) {
+				event.Veto();
+				return;
+			}
+		}
 	}
 
-	const bool predefined = IsPredefinedItem(item);
-	const bool root = item == pTree->GetRootItem() || item == m_ownSites;
-	if (root) {
+	if (items.empty()) {
 		event.Veto();
 		return;
 	}
@@ -1516,11 +1512,11 @@ void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 	wxDropSource source(this);
 	source.SetData(obj);
 
-	m_dropSource = item;
+	draggedItems_ = items;
 
 	source.DoDragDrop(predefined ? wxDrag_CopyOnly : wxDrag_DefaultMove);
 
-	m_dropSource = wxTreeItemId();
+	draggedItems_.clear();
 
 	SetCtrlState();
 }
@@ -1531,58 +1527,61 @@ struct itempair
 	wxTreeItemId target;
 };
 
-bool CSiteManagerDialog::MoveItems(wxTreeItemId source, wxTreeItemId target, bool copy)
+wxTreeItemId CSiteManagerDialog::MoveItems(wxTreeItemId source, wxTreeItemId target, bool copy, bool use_existing_name)
 {
 	if (source == target) {
-		return false;
+		return wxTreeItemId();
 	}
 
 	if (IsPredefinedItem(target)) {
-		return false;
+		return wxTreeItemId();
 	}
 
 	if (IsPredefinedItem(source) && !copy) {
-		return false;
+		return wxTreeItemId();
 	}
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-
-	CSiteManagerItemData *pTargetData = (CSiteManagerItemData *)pTree->GetItemData(target);
-	CSiteManagerItemData *pSourceData = (CSiteManagerItemData *)pTree->GetItemData(source);
+	CSiteManagerItemData *pTargetData = (CSiteManagerItemData *)tree_->GetItemData(target);
+	CSiteManagerItemData *pSourceData = (CSiteManagerItemData *)tree_->GetItemData(source);
 	if (pTargetData) {
 		if (pTargetData->m_bookmark) {
-			return false;
+			return wxTreeItemId();
 		}
 		if (!pSourceData || pSourceData->m_site) {
-			return false;
+			return wxTreeItemId();
 		}
 	}
 	else if (pSourceData && !pSourceData->m_site) {
-		return false;
+		return wxTreeItemId();
 	}
 
 	wxTreeItemId item = target;
-	while (item != pTree->GetRootItem()) {
+	while (item != tree_->GetRootItem()) {
 		if (item == source) {
-			return false;
+			return wxTreeItemId();
 		}
-		item = pTree->GetItemParent(item);
+		item = tree_->GetItemParent(item);
 	}
 
-	if (!copy && pTree->GetItemParent(source) == target) {
-		return false;
+	if (!copy && tree_->GetItemParent(source) == target) {
+		return wxTreeItemId();
 	}
 
-	wxString sourceName = pTree->GetItemText(source);
+	wxString newName;
 
-
-	wxTreeItemIdValue cookie;
-	for (auto child = pTree->GetFirstChild(target, cookie); child.IsOk(); child = pTree->GetNextChild(target, cookie)) {
-		wxString const childName = pTree->GetItemText(child);
-		if (!sourceName.CmpNoCase(childName)) {
-			wxMessageBoxEx(_("An item with the same name as the dragged item already exists at the target location."), _("Failed to copy or move sites"), wxICON_INFORMATION);
-			return false;
+	if (use_existing_name) {
+		wxString oldName = tree_->GetItemText(source);
+		wxTreeItemIdValue cookie;
+		for (auto child = tree_->GetFirstChild(target, cookie); child.IsOk(); child = tree_->GetNextChild(target, cookie)) {
+			wxString const childName = tree_->GetItemText(child);
+			if (!oldName.CmpNoCase(childName)) {
+				wxMessageBoxEx(_("An item with the same name as the dragged item already exists at the target location."), _("Failed to copy or move sites"), wxICON_INFORMATION);
+				return wxTreeItemId();
+			}
 		}
+	}
+	else {
+		newName = FindFirstFreeName(target, tree_->GetItemText(source));
 	}
 
 	std::list<itempair> work;
@@ -1593,20 +1592,30 @@ bool CSiteManagerDialog::MoveItems(wxTreeItemId source, wxTreeItemId target, boo
 
 	std::list<wxTreeItemId> expand;
 
+	wxTreeItemId ret;
+
 	while (!work.empty()) {
 		itempair pair = work.front();
 		work.pop_front();
 
-		wxString name = pTree->GetItemText(pair.source);
+		wxString name = tree_->GetItemText(pair.source);
+		if (!newName.empty()) {
+			name = newName;
+			newName.clear();
+		}
 
-		CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(pair.source));
+		CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(pair.source));
 
-		wxTreeItemId newItem = pTree->AppendItem(pair.target, name, data ? 2 : 0);
+		wxTreeItemId newItem = tree_->AppendItem(pair.target, name, data ? 2 : 0);
+		if (!ret) {
+			ret = newItem;
+		}
+
 		if (!data) {
-			pTree->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
-			pTree->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
+			tree_->SetItemImage(newItem, 1, wxTreeItemIcon_Expanded);
+			tree_->SetItemImage(newItem, 1, wxTreeItemIcon_SelectedExpanded);
 
-			if (pTree->IsExpanded(pair.source)) {
+			if (tree_->IsExpanded(pair.source)) {
 				expand.push_back(newItem);
 			}
 		}
@@ -1614,44 +1623,52 @@ bool CSiteManagerDialog::MoveItems(wxTreeItemId source, wxTreeItemId target, boo
 			CSiteManagerItemData* newData = new CSiteManagerItemData;
 			newData->m_site = std::make_unique<Site>(*data->m_site);
 			newData->connected_item = copy ? -1 : data->connected_item;
-			pTree->SetItemData(newItem, newData);
+			tree_->SetItemData(newItem, newData);
+
+			if (tree_->IsExpanded(pair.source)) {
+				expand.push_back(newItem);
+			}
 		}
 		else {
-			pTree->SetItemImage(newItem, 3, wxTreeItemIcon_Normal);
-			pTree->SetItemImage(newItem, 3, wxTreeItemIcon_Selected);
+			tree_->SetItemImage(newItem, 3, wxTreeItemIcon_Normal);
+			tree_->SetItemImage(newItem, 3, wxTreeItemIcon_Selected);
 
 			CSiteManagerItemData* newData = new CSiteManagerItemData;
 			newData->m_bookmark = std::make_unique<Bookmark>(*data->m_bookmark);
-			pTree->SetItemData(newItem, newData);
+			tree_->SetItemData(newItem, newData);
 		}
 
 		wxTreeItemIdValue cookie2;
-		for (auto child = pTree->GetFirstChild(pair.source, cookie2); child.IsOk(); child = pTree->GetNextChild(pair.source, cookie2)) {
+		for (auto child = tree_->GetFirstChild(pair.source, cookie2); child.IsOk(); child = tree_->GetNextChild(pair.source, cookie2)) {
 			itempair newPair;
 			newPair.source = child;
 			newPair.target = newItem;
 			work.push_back(newPair);
 		}
 
-		pTree->SortChildren(pair.target);
+		tree_->SortChildren(pair.target);
 	}
 
 	if (!copy) {
-		wxTreeItemId parent = pTree->GetItemParent(source);
-		if (pTree->GetChildrenCount(parent) == 1) {
-			pTree->Collapse(parent);
+		wxTreeItemId parent = tree_->GetItemParent(source);
+		if (tree_->GetChildrenCount(parent) == 1) {
+			tree_->Collapse(parent);
 		}
 
-		pTree->Delete(source);
+#ifdef __WXMSW__
+		// Delete tries to move selection to next visible, collapse so that it's never a child.
+		tree_->Collapse(source);
+#endif
+		tree_->Delete(source);
 	}
 
 	for (auto iter = expand.begin(); iter != expand.end(); ++iter) {
-		pTree->Expand(*iter);
+		tree_->Expand(*iter);
 	}
 
-	pTree->Expand(target);
+	tree_->Expand(target);
 
-	return true;
+	return ret;
 }
 
 void CSiteManagerDialog::OnChar(wxKeyEvent& event)
@@ -1674,33 +1691,40 @@ void CSiteManagerDialog::CopyAddServer(Site const& site)
 	AddNewSite(m_ownSites, site, true);
 }
 
-wxString CSiteManagerDialog::FindFirstFreeName(const wxTreeItemId &parent, const wxString& name)
+wxString CSiteManagerDialog::FindFirstFreeName(wxTreeItemId const& parent, wxString const& name)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	wxASSERT(pTree);
-
 	wxString newName = name;
-	int index = 2;
+	wxString root = name;
+
+	size_t pos = root.find_last_not_of(L"0123456789");
+	int index = 1;
+	if (pos != std::wstring::npos && pos + 1 < newName.size() && newName.size() - pos < 10) {
+		root = newName.substr(0, pos + 1);
+		index = fz::to_integral<int>(newName.substr(pos + 1).ToStdWstring());
+	}
+	else {
+		root += L" ";
+	}
 	for (;;) {
 		wxTreeItemId child;
 		wxTreeItemIdValue cookie;
-		child = pTree->GetFirstChild(parent, cookie);
+		child = tree_->GetFirstChild(parent, cookie);
 		bool found = false;
 		while (child.IsOk()) {
-			wxString child_name = pTree->GetItemText(child);
+			wxString child_name = tree_->GetItemText(child);
 			int cmp = child_name.CmpNoCase(newName);
 			if (!cmp) {
 				found = true;
 				break;
 			}
 
-			child = pTree->GetNextChild(parent, cookie);
+			child = tree_->GetNextChild(parent, cookie);
 		}
 		if (!found) {
 			break;
 		}
 
-		newName = name + wxString::Format(_T(" %d"), ++index);
+		newName = root + wxString::Format(_T("%d"), ++index);
 	}
 
 	return newName;
@@ -1708,11 +1732,6 @@ wxString CSiteManagerDialog::FindFirstFreeName(const wxTreeItemId &parent, const
 
 void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, Site const& site, bool connected)
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return;
-	}
-
 	wxString name = FindFirstFreeName(parent, _("New site"));
 
 	CSiteManagerItemData* pData = new CSiteManagerItemData;
@@ -1722,48 +1741,41 @@ void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, Site const& site, bool 
 		pData->connected_item = 0;
 	}
 
-	wxTreeItemId newItem = pTree->AppendItem(parent, name, 2, 2, pData);
-	pTree->SortChildren(parent);
-	pTree->EnsureVisible(newItem);
-	pTree->SafeSelectItem(newItem);
+	wxTreeItemId newItem = tree_->AppendItem(parent, name, 2, 2, pData);
+	tree_->SortChildren(parent);
+	tree_->EnsureVisible(newItem);
+	tree_->SafeSelectItem(newItem);
 #ifdef __WXMAC__
 	// Need to trigger dirty processing of generic tree control.
 	// Else edit control will be hidden behind item
-	pTree->OnInternalIdle();
+	tree_->OnInternalIdle();
 #endif
-	pTree->EditLabel(newItem);
+	tree_->EditLabel(newItem);
 }
 
 void CSiteManagerDialog::AddNewBookmark(wxTreeItemId parent)
 {
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (!pTree) {
-		return;
-	}
-
 	wxString name = FindFirstFreeName(parent, _("New bookmark"));
 
 	CSiteManagerItemData* pData = new CSiteManagerItemData;
 	pData->m_bookmark = std::make_unique<Bookmark>();
-	wxTreeItemId newItem = pTree->AppendItem(parent, name, 3, 3, pData);
-	pTree->SortChildren(parent);
-	pTree->EnsureVisible(newItem);
-	pTree->SafeSelectItem(newItem);
-	pTree->EditLabel(newItem);
+	wxTreeItemId newItem = tree_->AppendItem(parent, name, 3, 3, pData);
+	tree_->SortChildren(parent);
+	tree_->EnsureVisible(newItem);
+	tree_->SafeSelectItem(newItem);
+	tree_->EditLabel(newItem);
 }
 
 void CSiteManagerDialog::RememberLastSelected()
 {
-	wxString path;
+	std::wstring path;
 
-	wxTreeCtrlEx *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrlEx);
-	if (pTree) {
-		wxTreeItemId sel = pTree->GetSelection();
-		if (sel) {
-			path = GetSitePath(sel);
-		}
+	wxTreeItemId sel = tree_->GetSelection();
+	if (sel) {
+		path = GetSitePath(sel);
 	}
-	COptions::Get()->SetOption(OPTION_SITEMANAGER_LASTSELECTED, path.ToStdWstring());
+	
+	COptions::Get()->SetOption(OPTION_SITEMANAGER_LASTSELECTED, path);
 }
 
 void CSiteManagerDialog::OnContextMenu(wxTreeEvent& event)
@@ -1806,17 +1818,12 @@ void CSiteManagerDialog::OnExportSelected(wxCommandEvent&)
 
 void CSiteManagerDialog::OnBookmarkBrowse(wxCommandEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk()) {
 		return;
 	}
 
-	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* data = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!data || !data->m_bookmark) {
 		return;
 	}
@@ -1831,22 +1838,17 @@ void CSiteManagerDialog::OnBookmarkBrowse(wxCommandEvent&)
 
 void CSiteManagerDialog::OnNewBookmark(wxCommandEvent&)
 {
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return;
-	}
-
-	wxTreeItemId item = pTree->GetSelection();
+	wxTreeItemId item = tree_->GetSelection();
 	if (!item.IsOk() || IsPredefinedItem(item)) {
 		return;
 	}
 
-	CSiteManagerItemData *pData = (CSiteManagerItemData *)pTree->GetItemData(item);
+	CSiteManagerItemData *pData = (CSiteManagerItemData *)tree_->GetItemData(item);
 	if (!pData) {
 		return;
 	}
 	if (pData->m_bookmark) {
-		item = pTree->GetItemParent(item);
+		item = tree_->GetItemParent(item);
 	}
 
 	if (!Verify()) {
@@ -1860,18 +1862,13 @@ std::wstring CSiteManagerDialog::GetSitePath(wxTreeItemId item, bool stripBookma
 {
 	wxASSERT(item);
 
-	wxTreeCtrl *pTree = XRCCTRL(*this, "ID_SITETREE", wxTreeCtrl);
-	if (!pTree) {
-		return std::wstring();
-	}
-
-	CSiteManagerItemData* pData = static_cast<CSiteManagerItemData* >(pTree->GetItemData(item));
+	CSiteManagerItemData* pData = static_cast<CSiteManagerItemData* >(tree_->GetItemData(item));
 	if (!pData) {
 		return std::wstring();
 	}
 
 	if (stripBookmark && pData->m_bookmark) {
-		item = pTree->GetItemParent(item);
+		item = tree_->GetItemParent(item);
 	}
 
 	std::wstring path;
@@ -1882,9 +1879,9 @@ std::wstring CSiteManagerDialog::GetSitePath(wxTreeItemId item, bool stripBookma
 		else if (item == m_ownSites) {
 			return _T("0") + path;
 		}
-		path = _T("/") + CSiteManager::EscapeSegment(pTree->GetItemText(item).ToStdWstring()) + path;
+		path = _T("/") + CSiteManager::EscapeSegment(tree_->GetItemText(item).ToStdWstring()) + path;
 
-		item = pTree->GetItemParent(item);
+		item = tree_->GetItemParent(item);
 	}
 
 	return _T("0") + path;
