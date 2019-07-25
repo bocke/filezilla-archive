@@ -45,6 +45,7 @@ CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
 
 bool CSiteManagerSite::Load(wxWindow* parent)
 {
+	InitXrc();
 	if (!wxXmlResource::Get()->LoadObject(this, parent, _T("ID_SITEMANAGER_NOTEBOOK_SITE"), _T("wxNotebook"))) {
 		return false;
 	}

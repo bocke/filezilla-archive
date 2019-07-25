@@ -8,6 +8,7 @@ class CInterProcessMutex;
 class CWindowStateManager;
 class CSiteManagerDropTarget;
 class CSiteManagerSite;
+class wxTreeCtrlEx;
 
 class CSiteManagerDialog final : public wxDialogEx
 {
@@ -85,12 +86,13 @@ protected:
 	wxTreeItemId m_predefinedSites;
 	wxTreeItemId m_ownSites;
 
-	wxTreeItemId m_dropSource;
+	std::vector<wxTreeItemId> draggedItems_;
 
 	wxTreeItemId m_contextMenuItem;
 
-	bool MoveItems(wxTreeItemId source, wxTreeItemId target, bool copy);
+	wxTreeItemId MoveItems(wxTreeItemId source, wxTreeItemId target, bool copy, bool use_existing_name);
 
+	wxTreeCtrlEx* tree_{};
 protected:
 	CWindowStateManager* m_pWindowStateManager{};
 
