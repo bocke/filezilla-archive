@@ -102,6 +102,7 @@ protected:
 	std::vector<_connected_site> *m_connected_sites{};
 
 	bool m_is_deleting{};
+	bool lastEditVetoed_{};
 };
 
 #endif
