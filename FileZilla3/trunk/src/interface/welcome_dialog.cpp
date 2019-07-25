@@ -68,13 +68,13 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 	headerLeft->Add(heading);
 	headerLeft->Add(new wxStaticText(this, -1, _("The free open source FTP solution")));
 
-	header->AddSpacer(wxDLG_UNIT(this, wxSize(10, -1)).x);
+	header->AddSpacer(lay.dlgUnits(5));
 
 	header->Add(new wxStaticBitmap(this, -1, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))), lay.valign);
 
 	main->Add(new wxStaticLine(this), lay.grow);
 
-	int const leftIndent = wxDLG_UNIT(this, wxPoint(10, 0)).x;
+	int const leftIndent = lay.dlgUnits(10);
 	wxString const url = _T("https://welcome.filezilla-project.org/welcome?type=client&category=%s&version=") + ownVersion;
 
 	main->Add(new wxPanel(this, XRCID("ID_HEADERMESSAGE_PANEL")), lay.halign)->Show(false);

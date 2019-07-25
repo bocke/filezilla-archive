@@ -299,14 +299,10 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	}
 
 	auto const& lay = layout();
-	auto outer = new wxBoxSizer(wxVERTICAL);
-	SetSizer(outer);
 
-	auto main = lay.createFlex(1);
+	auto main = lay.createMain(this, 1);
 	main->AddGrowableCol(0);
 	main->AddGrowableRow(0);
-	outer->Add(main, 1, wxGROW | wxALL, lay.border);
-
 
 	auto sides = new wxBoxSizer(wxHORIZONTAL);
 	main->Add(sides, lay.grow)->SetProportion(1);
@@ -319,6 +315,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	left->Add(new wxStaticText(this, wxID_ANY, _("&Select entry:")));
 
 	tree_ = new wxTreeCtrlEx(this, XRCID("ID_SITETREE"), wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_HAS_BUTTONS | wxTR_MULTIPLE);
+	tree_->SetFocus();
 	left->Add(tree_, lay.grow)->SetProportion(1);
 
 	auto entrybuttons = new wxGridSizer(2, wxSize(lay.gap, lay.gap));
@@ -346,7 +343,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
 	buttons->Add(cancel);
 
-	outer->Fit(this);
+	GetSizer()->Fit(this);
 
 
 	// Now create the imagelist for the site tree
@@ -382,6 +379,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	// Load bookmark notebook
 	m_pNotebook_Bookmark = new wxNotebook(this, -1);
 	wxPanel* pPanel = new wxPanel;
+	InitXrc();
 	wxXmlResource::Get()->LoadPanel(pPanel, m_pNotebook_Bookmark, _T("ID_SITEMANAGER_BOOKMARK_PANEL"));
 	m_pNotebook_Bookmark->Hide();
 	m_pNotebook_Bookmark->AddPage(pPanel, _("Bookmark"));

@@ -207,8 +207,24 @@ wxSizerFlags const DialogLayout::valigng(wxSizerFlags().Align(wxALIGN_CENTER_VER
 DialogLayout::DialogLayout(wxTopLevelWindow * parent)
 	: parent_(parent)
 {
-	gap = wxDLG_UNIT(parent_, wxPoint(0, 3)).y;
-	border = wxDLG_UNIT(parent_, wxPoint(0, 3)).y;
+	gap = dlgUnits(3);
+	border = dlgUnits(3);
+}
+
+int DialogLayout::dlgUnits(int num) const
+{
+	return wxDLG_UNIT(parent_, wxPoint(0, num)).y;
+}
+
+wxFlexGridSizer* DialogLayout::createMain(wxWindow* parent, int cols, int rows) const
+{
+	auto outer = new wxBoxSizer(wxVERTICAL);
+	parent->SetSizer(outer);
+
+	auto main = createFlex(cols, rows);
+	outer->Add(main, 1, wxALL|wxGROW, border);
+
+	return main;
 }
 
 wxFlexGridSizer* DialogLayout::createFlex(int cols, int rows) const
