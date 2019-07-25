@@ -48,7 +48,26 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	InitXrc();
 	if (!wxXmlResource::Get()->LoadObject(this, parent, _T("ID_SITEMANAGER_NOTEBOOK_SITE"), _T("wxNotebook"))) {
 		return false;
+	
 	}
+
+	DialogLayout lay(static_cast<wxTopLevelWindow*>(wxGetTopLevelParent(parent)));
+
+	m_pCharsetPage = new wxPanel(this);
+	AddPage(m_pCharsetPage, _("Charset"));
+
+	auto* main = lay.createMain(m_pCharsetPage, 1);
+	main->Add(new wxStaticText(m_pCharsetPage, -1, _("The server uses following charset encoding for filenames:")));
+	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_AUTO"), _("&Autodetect"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
+	main->Add(new wxStaticText(m_pCharsetPage, -1, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
+	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_UTF8"), _("Force &UTF-8")));
+	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_CUSTOM"), _("Use &custom charset")));
+	auto row = lay.createFlex(0, 1);
+	row->Add(new wxStaticText(m_pCharsetPage, -1, _("&Encoding:")), lay.valign);
+	row->Add(new wxTextCtrl(m_pCharsetPage, XRCID("ID_ENCODING")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 18);
+	main->Add(row);
+	main->AddSpacer(lay.dlgUnits(6));
+	main->Add(new wxStaticText(m_pCharsetPage, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
 
 	extraParameters_[ParameterSection::host].emplace_back(XRCCTRL(*this, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_HOST", wxTextCtrl));
 	extraParameters_[ParameterSection::user].emplace_back(XRCCTRL(*this, "ID_EXTRA_USER_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_USER", wxTextCtrl));
@@ -58,12 +77,10 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	InitProtocols();
 
 	m_totalPages = GetPageCount();
-	m_pCharsetPage = XRCCTRL(*this, "ID_CHARSET_PANEL", wxPanel);
-	if (m_pCharsetPage) {
-		m_charsetPageIndex = FindPage(m_pCharsetPage);
-		m_charsetPageText = GetPageText(m_charsetPageIndex);
-		wxGetApp().GetWrapEngine()->WrapRecursive(XRCCTRL(*this, "ID_CHARSET_AUTO", wxWindow)->GetParent(), 1.3);
-	}
+
+	m_charsetPageIndex = FindPage(m_pCharsetPage);
+	m_charsetPageText = GetPageText(m_charsetPageIndex);
+	wxGetApp().GetWrapEngine()->WrapRecursive(m_pCharsetPage, 1.3);
 
 	auto generalSizer = static_cast<wxGridBagSizer*>(xrc_call(*this, "ID_PROTOCOL", &wxWindow::GetContainingSizer));
 	generalSizer->SetEmptyCellSize(wxSize(-generalSizer->GetHGap(), -generalSizer->GetVGap()));

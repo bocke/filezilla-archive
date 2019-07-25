@@ -10,11 +10,14 @@ public:
 	int gap{};
 	int border{};
 
+	int dlgUnits(int num) const;
+
 	static wxSizerFlags const grow;
 	static wxSizerFlags const halign;
 	static wxSizerFlags const valign;
 	static wxSizerFlags const valigng;
 
+	wxFlexGridSizer* createMain(wxWindow* parent, int cols, int rows = 0) const;
 	wxFlexGridSizer* createFlex(int cols, int rows = 0) const;
 	wxGridBagSizer* createGridBag(int cols, int rows = 0) const;
 	wxStdDialogButtonSizer* createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const;

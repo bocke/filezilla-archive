@@ -185,8 +185,8 @@ bool COptionsPagePasswords::CreateControls(wxWindow* parent)
 	changeSizer->Add(new wxStaticText(box, -1, _("Repeat password:")), layout.valign);
 	changeSizer->Add(new wxTextCtrl(box, XRCID("ID_MASTERPASSWORD_REPEAT"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), layout.valigng);
 
-	sizer->Add(changeSizer, 0, wxGROW|wxLEFT, wxDLG_UNIT(this, wxSize(0, 10)).y);
-	sizer->Add(new wxStaticText(box, -1, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, wxDLG_UNIT(this, wxSize(0, 10)).y);
+	sizer->Add(changeSizer, 0, wxGROW | wxLEFT, layout.dlgUnits(10));
+	sizer->Add(new wxStaticText(box, -1, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, layout.dlgUnits(10));
 
 	auto outer = new wxBoxSizer(wxVERTICAL);
 	outer->Add(boxSizer, layout.grow);
