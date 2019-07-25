@@ -856,7 +856,12 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 
 void CSiteManagerDialog::OnNewFolder(wxCommandEvent&)
 {
-	wxTreeItemId item = tree_->GetSelection();
+	auto const selections = tree_->GetSelections();
+	if (selections.empty()) {
+		return;
+	}
+
+	wxTreeItemId item = selections.front();
 	if (!item.IsOk()) {
 		return;
 	}
@@ -1122,7 +1127,12 @@ void CSiteManagerDialog::OnSelChanged(wxTreeEvent&)
 
 void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 {
-	wxTreeItemId item = tree_->GetSelection();
+	auto const selections = tree_->GetSelections();
+	if (selections.empty()) {
+		return;
+	}
+
+	wxTreeItemId item = selections.front();
 	if (!item.IsOk() || IsPredefinedItem(item)) {
 		return;
 	}
