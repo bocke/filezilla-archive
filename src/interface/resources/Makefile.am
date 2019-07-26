@@ -14,7 +14,6 @@ dist_xrc_DATA = \
 	xrc/inputdialog.xrc \
 	xrc/netconfwizard.xrc \
 	xrc/settings.xrc \
-	xrc/sitemanager.xrc \
 	xrc/storj.xrc \
 	xrc/update.xrc
 

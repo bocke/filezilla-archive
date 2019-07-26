@@ -266,7 +266,7 @@ void DialogLayout::gbNewRow(wxGridBagSizer * gb) const
 	gb->SetRows(gb->GetRows() + 1);
 }
 
-wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags) const
+wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer* gb, wxWindow* wnd, wxSizerFlags const& flags) const
 {
 	int const row = gb->GetRows() - 1;
 	int col;
@@ -277,6 +277,20 @@ wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlag
 	}
 
 	auto item = gb->Add(wnd, wxGBPosition(row, col), wxGBSpan(), flags.GetFlags(), flags.GetBorderInPixels());
+	return item;
+}
+
+wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer* gb, wxSizer* sizer, wxSizerFlags const& flags) const
+{
+	int const row = gb->GetRows() - 1;
+	int col;
+	for (col = 0; col < gb->GetCols(); ++col) {
+		if (!gb->FindItemAtPosition(wxGBPosition(row, col))) {
+			break;
+		}
+	}
+
+	auto item = gb->Add(sizer, wxGBPosition(row, col), wxGBSpan(), flags.GetFlags(), flags.GetBorderInPixels());
 	return item;
 }
 

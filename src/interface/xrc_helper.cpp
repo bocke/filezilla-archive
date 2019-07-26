@@ -47,7 +47,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxTreeCtrlXmlHandler);
 	res.AddHandler(new wxListCtrlXmlHandler);
 	res.AddHandler(new wxCheckListBoxXmlHandler);
-	res.AddHandler(new wxGaugeXmlHandler);
 	res.AddHandler(new wxSpinCtrlXmlHandler);
 	res.AddHandler(new wxNotebookXmlHandler);
 	res.AddHandler(new wxListBoxXmlHandler);
@@ -79,7 +78,6 @@ void InitXrc()
 	pResource->LoadFile(wxString(dir + L"inputdialog.xrc"));
 	pResource->LoadFile(wxString(dir + L"netconfwizard.xrc"));
 	pResource->LoadFile(wxString(dir + L"settings.xrc"));
-	pResource->LoadFile(wxString(dir + L"sitemanager.xrc"));
 	pResource->LoadFile(wxString(dir + L"update.xrc"));
 	pResource->LoadFile(wxString(dir + L"storj.xrc"));
 }
