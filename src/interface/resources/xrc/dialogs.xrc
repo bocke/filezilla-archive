@@ -2982,62 +2982,6 @@
       </object>
     </object>
   </object>
-  <object class="wxPanel" name="ID_SITEMANAGER_BOOKMARK_PANEL">
-    <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
-      <object class="sizeritem">
-        <object class="wxFlexGridSizer">
-          <cols>1</cols>
-          <object class="sizeritem">
-            <object class="wxStaticText" name="">
-              <label>&amp;Local directory:</label>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxFlexGridSizer">
-              <cols>2</cols>
-              <object class="sizeritem">
-                <object class="wxTextCtrl" name="ID_BOOKMARK_LOCALDIR"/>
-                <flag>wxALIGN_CENTRE_VERTICAL|wxGROW</flag>
-              </object>
-              <object class="sizeritem">
-                <object class="wxButton" name="ID_BOOKMARK_BROWSE">
-                  <label>&amp;Browse...</label>
-                </object>
-                <flag>wxALIGN_CENTRE_VERTICAL</flag>
-              </object>
-              <hgap>5</hgap>
-              <growablecols>0</growablecols>
-            </object>
-            <flag>wxGROW</flag>
-          </object>
-          <vgap>5</vgap>
-          <object class="sizeritem">
-            <object class="wxStaticText" name="">
-              <label>&amp;Remote directory:</label>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxTextCtrl" name="ID_BOOKMARK_REMOTEDIR"/>
-            <flag>wxGROW</flag>
-          </object>
-          <growablecols>0</growablecols>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="ID_BOOKMARK_SYNC">
-              <label>Use &amp;synchronized browsing</label>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxCheckBox" name="ID_BOOKMARK_COMPARISON">
-              <label>Directory comparison</label>
-            </object>
-          </object>
-        </object>
-        <flag>wxALL|wxGROW</flag>
-        <border>5</border>
-      </object>
-    </object>
-  </object>
   <object class="wxDialog" name="ID_BOOKMARKS">
     <centered>1</centered>
     <style>wxCAPTION|wxSYSTEM_MENU|wxRESIZE_BORDER|wxCLOSE_BOX</style>

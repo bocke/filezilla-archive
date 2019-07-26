@@ -279,6 +279,30 @@ CSiteManagerDialog::~CSiteManagerDialog()
 	}
 }
 
+wxPanel * CreateBookmarkPanel(wxWindow* parent, DialogLayout const& lay)
+{
+	wxPanel* panel = new wxPanel(parent);
+
+	auto* main = lay.createMain(panel, 1);
+	main->AddGrowableCol(0);
+
+	main->Add(new wxStaticText(panel, -1, _("&Local directory:")));
+	
+	auto row = lay.createFlex(0, 1);
+	main->Add(row, lay.grow);
+	row->AddGrowableCol(0);
+	row->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_LOCALDIR")), lay.valigng);
+	row->Add(new wxButton(panel, XRCID("ID_BOOKMARK_BROWSE"), _("&Browse")), lay.valign);
+
+	main->Add(new wxStaticText(panel, -1, _("&Remote directory:")));
+	main->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_REMOTEDIR")), lay.grow);
+	main->AddSpacer(0);
+	main->Add(new wxCheckBox(panel, XRCID("ID_BOOKMARK_SYNC"), _("Use &synchronized browsing")));
+	main->Add(new wxCheckBox(panel, XRCID("ID_BOOKMARK_COMPARISON"), _("Directory comparison")));
+
+	return panel;
+}
+
 bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* connected_sites, Site const* site)
 {
 	m_pSiteManagerMutex = new CInterProcessMutex(MUTEX_SITEMANAGERGLOBAL, false);
@@ -343,9 +367,6 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
 	buttons->Add(cancel);
 
-	GetSizer()->Fit(this);
-
-
 	// Now create the imagelist for the site tree
 	wxSize s = CThemeProvider::GetIconSize(iconSizeSmall);
 	wxImageList* pImageList = new wxImageList(s.x, s.y);
@@ -378,11 +399,11 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 
 	// Load bookmark notebook
 	m_pNotebook_Bookmark = new wxNotebook(this, -1);
-	wxPanel* pPanel = new wxPanel;
-	InitXrc();
-	wxXmlResource::Get()->LoadPanel(pPanel, m_pNotebook_Bookmark, _T("ID_SITEMANAGER_BOOKMARK_PANEL"));
+
+	auto * bookmarkPanel = CreateBookmarkPanel(m_pNotebook_Bookmark, lay);
+
 	m_pNotebook_Bookmark->Hide();
-	m_pNotebook_Bookmark->AddPage(pPanel, _("Bookmark"));
+	m_pNotebook_Bookmark->AddPage(bookmarkPanel, _("Bookmark"));
 	right->Add(m_pNotebook_Bookmark, 2, wxGROW);
 	right->SetItemMinSize(1, right->GetItem((size_t)0)->GetMinSize().GetWidth(), -1);
 
