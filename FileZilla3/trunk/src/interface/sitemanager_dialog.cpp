@@ -292,8 +292,8 @@ wxPanel * CreateBookmarkPanel(wxWindow* parent, DialogLayout const& lay)
 	main->Add(row, lay.grow);
 	row->AddGrowableCol(0);
 	row->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_LOCALDIR")), lay.valigng);
-	row->Add(new wxButton(panel, XRCID("ID_BOOKMARK_BROWSE"), _("&Browse")), lay.valign);
-
+	row->Add(new wxButton(panel, XRCID("ID_BOOKMARK_BROWSE"), _("&Browse...")), lay.valign);
+	main->AddSpacer(0);
 	main->Add(new wxStaticText(panel, -1, _("&Remote directory:")));
 	main->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_REMOTEDIR")), lay.grow);
 	main->AddSpacer(0);
@@ -379,7 +379,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	tree_->AssignImageList(pImageList);
 
 	auto right = new wxBoxSizer(wxVERTICAL);
-	sides->Add(right, 0, wxLEFT|wxGROW, lay.gap);
+	sides->Add(right, 1, wxLEFT|wxGROW, lay.gap);
 
 	m_pNotebook_Site = new CSiteManagerSite(*this);
 	if (!m_pNotebook_Site->Load(this)) {

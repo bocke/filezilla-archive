@@ -27,6 +27,7 @@ public:
 	void gbNewRow(wxGridBagSizer * gb) const;
 	wxSizerItem* gbAddRow(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags = wxSizerFlags()) const;
 	wxSizerItem* gbAdd(wxGridBagSizer * gb, wxWindow* wnd, wxSizerFlags const& flags = wxSizerFlags()) const;
+	wxSizerItem* gbAdd(wxGridBagSizer* gb, wxSizer* sizer, wxSizerFlags const& flags = wxSizerFlags()) const;
 
 protected:
 	wxTopLevelWindow * parent_;

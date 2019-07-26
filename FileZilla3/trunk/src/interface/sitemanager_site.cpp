@@ -15,6 +15,8 @@
 
 #include <wx/dcclient.h>
 #include <wx/gbsizer.h>
+#include <wx/hyperlink.h>
+#include <wx/statline.h>
 
 #ifdef __WXMSW__
 #include "commctrl.h"
@@ -45,29 +47,190 @@ CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
 
 bool CSiteManagerSite::Load(wxWindow* parent)
 {
-	InitXrc();
-	if (!wxXmlResource::Get()->LoadObject(this, parent, _T("ID_SITEMANAGER_NOTEBOOK_SITE"), _T("wxNotebook"))) {
-		return false;
-	
-	}
+	Create(parent, -1);
 
 	DialogLayout lay(static_cast<wxTopLevelWindow*>(wxGetTopLevelParent(parent)));
 
-	m_pCharsetPage = new wxPanel(this);
-	AddPage(m_pCharsetPage, _("Charset"));
+	{
+		wxPanel* generalPage = new wxPanel(this);
+		AddPage(generalPage, _("General"));
 
-	auto* main = lay.createMain(m_pCharsetPage, 1);
-	main->Add(new wxStaticText(m_pCharsetPage, -1, _("The server uses following charset encoding for filenames:")));
-	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_AUTO"), _("&Autodetect"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
-	main->Add(new wxStaticText(m_pCharsetPage, -1, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
-	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_UTF8"), _("Force &UTF-8")));
-	main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_CUSTOM"), _("Use &custom charset")));
-	auto row = lay.createFlex(0, 1);
-	row->Add(new wxStaticText(m_pCharsetPage, -1, _("&Encoding:")), lay.valign);
-	row->Add(new wxTextCtrl(m_pCharsetPage, XRCID("ID_ENCODING")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 18);
-	main->Add(row);
-	main->AddSpacer(lay.dlgUnits(6));
-	main->Add(new wxStaticText(m_pCharsetPage, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
+		auto* main = lay.createMain(generalPage, 1);
+		main->AddGrowableCol(0);
+
+		auto * bag = lay.createGridBag(2);
+		bag->AddGrowableCol(1);
+		main->Add(bag, 0, wxGROW);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, -1, _("Pro&tocol:")), lay.valign);
+		lay.gbAdd(bag, new wxChoice(generalPage, XRCID("ID_PROTOCOL")), lay.valigng);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_HOST_DESC"), _("&Host:")), lay.valign);
+		auto * row = lay.createFlex(0, 1);
+		row->AddGrowableCol(0);
+		lay.gbAdd(bag, row, lay.valigng);
+		row->Add(new wxTextCtrl(generalPage, XRCID("ID_HOST")), lay.valigng);
+		row->Add(new wxStaticText(generalPage, -1, _("&Port:")), lay.valign);
+		auto* port = new wxTextCtrl(generalPage, XRCID("ID_PORT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(27), -1));
+		port->SetMaxLength(5);
+		row->Add(port, lay.valign);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_ENCRYPTION_DESC"), _("&Encryption:")), lay.valign);
+		auto brow = new wxBoxSizer(wxHORIZONTAL);
+		lay.gbAdd(bag, brow, lay.valigng);
+		brow->Add(new wxChoice(generalPage, XRCID("ID_ENCRYPTION")), 1);
+		brow->Add(new wxHyperlinkCtrl(generalPage, XRCID("ID_SIGNUP"), _("Signup"), L"https://app.storj.io/#/signup"), lay.valign)->Show(false);
+		brow->AddSpacer(0);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_HOST_DESC"), L""), lay.valign)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_HOST")), lay.valigng)->Show(false);
+
+		lay.gbAddRow(bag, new wxStaticLine(generalPage), lay.grow);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, -1, _("&Logon Type:")), lay.valign);
+		lay.gbAdd(bag, new wxChoice(generalPage, XRCID("ID_LOGONTYPE")), lay.valigng);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_USER_DESC"), _("&User:")), lay.valign);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_USER")), lay.valigng);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_USER_DESC"), L""), lay.valign)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_USER")), lay.valigng)->Show(false);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_PASS_DESC"), _("Pass&word:")), lay.valign);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_PASS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_ACCOUNT_DESC"), _("&Account:")), lay.valign);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_ACCOUNT")), lay.valigng);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_KEYFILE_DESC"), _("&Key file:")), lay.valign)->Show(false);
+		row = lay.createFlex(0, 1);
+		row->AddGrowableCol(0);
+		lay.gbAdd(bag, row, lay.valigng);
+		row->Add(new wxTextCtrl(generalPage, XRCID("ID_KEYFILE")), lay.valigng)->Show(false);
+		row->Add(new wxButton(generalPage, XRCID("ID_KEYFILE_BROWSE"), _("Browse...")), lay.valign)->Show(false);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_ENCRYPTIONKEY_DESC"), _("Encryption &key:")), lay.valign)->Show(false);
+		row = lay.createFlex(0, 1);
+		row->AddGrowableCol(0);
+		lay.gbAdd(bag, row, lay.valigng);
+		row->Add(new wxTextCtrl(generalPage, XRCID("ID_ENCRYPTIONKEY")), lay.valigng)->Show(false);
+		row->Add(new wxButton(generalPage, XRCID("ID_ENCRYPTIONKEY_GENERATE"), _("Generate...")), lay.valign)->Show(false);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_CREDENTIALS_DESC"), L""), lay.valign)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_CREDENTIALS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng)->Show(false);
+
+		lay.gbNewRow(bag);
+		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_EXTRA_DESC"), L""), lay.valign)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_EXTRA")), lay.valigng)->Show(false);
+
+		main->Add(new wxStaticLine(generalPage), lay.grow);
+
+		row = lay.createFlex(0, 1);
+		main->Add(row);
+		row->Add(new wxStaticText(generalPage, -1, _("&Background color:")), lay.valign);
+		row->Add(new wxChoice(generalPage, XRCID("ID_COLOR")), lay.valign);
+
+		main->Add(new wxStaticText(generalPage, -1, _("Co&mments:")));
+		main->Add(new wxTextCtrl(generalPage, XRCID("ID_COMMENTS"), L"", wxDefaultPosition, wxSize(-1, lay.dlgUnits(43)), wxTE_MULTILINE), 1, wxGROW);
+		main->AddGrowableRow(main->GetEffectiveRowsCount() - 1);
+	}
+
+	{
+		wxPanel* advancedPage = new wxPanel(this);
+		AddPage(advancedPage, _("Advanced"));
+
+		auto * main = lay.createMain(advancedPage, 1);
+		main->AddGrowableCol(0);
+		auto* row = lay.createFlex(0, 1);
+		main->Add(row);
+
+		row->Add(new wxStaticText(advancedPage, XRCID("ID_SERVERTYPE_LABEL"), _("Server &type:")), lay.valign);
+		row->Add(new wxChoice(advancedPage, XRCID("ID_SERVERTYPE")), lay.valign);
+		main->AddSpacer(0);
+		main->Add(new wxCheckBox(advancedPage, XRCID("ID_BYPASSPROXY"), _("B&ypass proxy")));
+
+		main->Add(new wxStaticLine(advancedPage), lay.grow);
+
+		main->Add(new wxStaticText(advancedPage, -1, _("Default &local directory:")));
+
+		row = lay.createFlex(0, 1);
+		main->Add(row, lay.grow);
+		row->AddGrowableCol(0);
+		row->Add(new wxTextCtrl(advancedPage, XRCID("ID_LOCALDIR")), lay.valigng);
+		row->Add(new wxButton(advancedPage, XRCID("ID_BROWSE"), _("&Browse...")), lay.valign);
+		main->AddSpacer(0);
+		main->Add(new wxStaticText(advancedPage, -1, _("Default r&emote directory:")));
+		main->Add(new wxTextCtrl(advancedPage, XRCID("ID_REMOTEDIR")), lay.grow);
+		main->AddSpacer(0);
+		main->Add(new wxCheckBox(advancedPage, XRCID("ID_SYNC"), _("&Use synchronized browsing")));
+		main->Add(new wxCheckBox(advancedPage, XRCID("ID_COMPARISON"), _("Directory comparison")));
+
+		main->Add(new wxStaticLine(advancedPage), lay.grow);
+
+		main->Add(new wxStaticText(advancedPage, -1, _("&Adjust server time, offset by:")));
+		row = lay.createFlex(0, 1);
+		main->Add(row);
+		auto* hours = new wxSpinCtrl(advancedPage, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		hours->SetRange(-24, 24);
+		row->Add(hours, lay.valign);
+		row->Add(new wxStaticText(advancedPage, -1, _("Hours,")), lay.valign);
+		auto* minutes = new wxSpinCtrl(advancedPage, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		minutes->SetRange(-59, 59);
+		row->Add(minutes, lay.valign);
+		row->Add(new wxStaticText(advancedPage, -1, _("Minutes")), lay.valign);
+	}
+
+	{
+		wxPanel* transferPage = new wxPanel(this);
+		AddPage(transferPage, _("Transfer Settings"));
+
+		auto * main = lay.createMain(transferPage, 1);
+		main->Add(new wxStaticText(transferPage, XRCID("ID_TRANSFERMODE_LABEL"), _("&Transfer mode:")));
+		auto * row = lay.createFlex(0, 1);
+		main->Add(row);
+		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_DEFAULT"), _("D&efault"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), lay.valign);
+		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_ACTIVE"), _("&Active")), lay.valign);
+		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_PASSIVE"), _("&Passive")), lay.valign);
+		main->AddSpacer(0);
+
+		main->Add(new wxCheckBox(transferPage, XRCID("ID_LIMITMULTIPLE"), _("&Limit number of simultaneous connections")));
+		row = lay.createFlex(0, 1);
+		main->Add(row, 0, wxLEFT, lay.dlgUnits(10));
+		row->Add(new wxStaticText(transferPage, -1, _("&Maximum number of connections:")), lay.valign);
+		auto * spin = new wxSpinCtrl(transferPage, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		spin->SetRange(1, 10);
+		row->Add(spin, lay.valign);
+	}
+
+	{
+		m_pCharsetPage = new wxPanel(this);
+		AddPage(m_pCharsetPage, _("Charset"));
+
+		auto * main = lay.createMain(m_pCharsetPage, 1);
+		main->Add(new wxStaticText(m_pCharsetPage, -1, _("The server uses following charset encoding for filenames:")));
+		main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_AUTO"), _("&Autodetect"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
+		main->Add(new wxStaticText(m_pCharsetPage, -1, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
+		main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_UTF8"), _("Force &UTF-8")));
+		main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_CUSTOM"), _("Use &custom charset")));
+		auto * row = lay.createFlex(0, 1);
+		row->Add(new wxStaticText(m_pCharsetPage, -1, _("&Encoding:")), lay.valign);
+		row->Add(new wxTextCtrl(m_pCharsetPage, XRCID("ID_ENCODING")), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 18);
+		main->Add(row);
+		main->AddSpacer(lay.dlgUnits(6));
+		main->Add(new wxStaticText(m_pCharsetPage, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
+	}
 
 	extraParameters_[ParameterSection::host].emplace_back(XRCCTRL(*this, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_HOST", wxTextCtrl));
 	extraParameters_[ParameterSection::user].emplace_back(XRCCTRL(*this, "ID_EXTRA_USER_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_USER", wxTextCtrl));
@@ -428,43 +591,22 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		encryptionkeySizer->Layout();
 	}
 
-	auto serverTypeSizer = XRCCTRL(*this, "ID_SERVERTYPE", wxChoice)->GetContainingSizer();
-	if (serverTypeSizer) {
-		auto labelSizerItem = serverTypeSizer->GetItemById(XRCID("ID_SERVERTYPE_LABEL_SIZERITEM"));
-		auto choiceSizerItem = serverTypeSizer->GetItemById(XRCID("ID_SERVERTYPE_CHOICE_SIZERITEM"));
-		if (labelSizerItem && choiceSizerItem) {
-			if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType)) {
-				labelSizerItem->Show(true);
-				choiceSizerItem->Show(true);
-			}
-			else {
-				labelSizerItem->Show(false);
-				choiceSizerItem->Show(false);
-			}
-			serverTypeSizer->CalcMin();
-			serverTypeSizer->Layout();
-			xrc_call(*this, "ID_ADVANCED_PANEL", &wxPanel::Layout);
-		}
-	}
+	bool const hasServerType = CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType);
+	xrc_call(*this, "ID_SERVERTYPE_LABEL", &wxWindow::Show, hasServerType);
+	xrc_call(*this, "ID_SERVERTYPE", &wxWindow::Show, hasServerType);
+	auto * serverTypeSizer = xrc_call(*this, "ID_SERVERTYPE_LABEL", &wxWindow::GetContainingSizer)->GetContainingWindow()->GetSizer();
+	serverTypeSizer->CalcMin();
+	serverTypeSizer->Layout();
 
-	auto transferModeSizer = XRCCTRL(*this, "ID_TRANSFERMODE_LABEL", wxStaticText)->GetContainingSizer();
-	if (transferModeSizer) {
-		auto labelSizerItem = transferModeSizer->GetItemById(XRCID("ID_TRANSFERMODE_LABEL_SIZERITEM"));
-		auto groupSizerItem = transferModeSizer->GetItemById(XRCID("ID_TRANSFERMODE_GROUP_SIZERITEM"));
-		if (labelSizerItem && groupSizerItem) {
-			if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode)) {
-				labelSizerItem->Show(true);
-				groupSizerItem->Show(true);
-			}
-			else {
-				labelSizerItem->Show(false);
-				groupSizerItem->Show(false);
-			}
-			transferModeSizer->CalcMin();
-			transferModeSizer->Layout();
-		}
-	}
-
+	bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
+	xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
+	xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
+	xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Show, hasTransferMode);
+	auto* transferModeLabel = XRCCTRL(*this, "ID_TRANSFERMODE_LABEL", wxStaticText);
+	transferModeLabel->Show(hasTransferMode);
+	transferModeLabel->GetContainingSizer()->CalcMin();
+	transferModeLabel->GetContainingSizer()->Layout();
+	
 	if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::Charset)) {
 		if (FindPage(m_pCharsetPage) == wxNOT_FOUND) {
 			AddPage(m_pCharsetPage, m_charsetPageText);
