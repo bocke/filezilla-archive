@@ -234,6 +234,8 @@ void CBookmarksDialog::LoadSiteSpecificBookmarks()
 	m_pTree->SortChildren(m_bookmarks_site);
 }
 
+wxPanel* CreateBookmarkPanel(wxWindow* parent, DialogLayout const& lay);
+
 int CBookmarksDialog::Run()
 {
 	if (!Load(m_parent, _T("ID_BOOKMARKS"))) {
@@ -266,8 +268,7 @@ int CBookmarksDialog::Run()
 
 	wxNotebook *pBook = XRCCTRL(*this, "ID_NOTEBOOK", wxNotebook);
 
-	wxPanel* pPanel = new wxPanel;
-	wxXmlResource::Get()->LoadPanel(pPanel, pBook, _T("ID_SITEMANAGER_BOOKMARK_PANEL"));
+	auto * pPanel = CreateBookmarkPanel(pBook, layout());
 	pBook->AddPage(pPanel, _("Bookmark"));
 
 	xrc_call(*this, "ID_BOOKMARK_LOCALDIR", &wxTextCtrl::GetContainingSizer)->GetItem((size_t)0)->SetMinSize(200, -1);
