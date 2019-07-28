@@ -4,9 +4,9 @@
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_layer.hpp>
 
-#include <random>
 #include <cstdint>
 #include <cwctype>
+#include <random>
 
 #include <string.h>
 
@@ -62,7 +62,7 @@ namespace {
 template<typename Arg>
 inline std::string ProcessStrerrorResult(Arg ret, char* buf, int err)
 {
-	if constexpr (std::is_same_v(Arg, int)) {
+	if constexpr (std::is_same_v<Arg, int>) {
 		// XSI strerror_r
 		if (!ret) {
 			buf[999] = 0;
