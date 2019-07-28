@@ -59,31 +59,23 @@ int GetSystemErrorCode()
 }
 
 namespace {
-inline std::string ProcessStrerrorResult(int ret, char* buf, int err)
+template<typename Arg>
+inline std::string ProcessStrerrorResult(Arg ret, char* buf, int err)
 {
-	// For XSI strerror_r
-	std::string s;
-	if (!ret) {
-		buf[999] = 0;
-		s = buf;
+	if constexpr (std::is_same_v(Arg, int)) {
+		// XSI strerror_r
+		if (!ret) {
+			buf[999] = 0;
+			return buf;
+		}
 	}
 	else {
-		s = fz::to_string(fz::sprintf(_("Unknown error %d"), err));
+		// GNU strerror_r
+		if (ret && *ret) {
+			return ret;
+		}
 	}
-	return s;
-}
-
-inline std::string ProcessStrerrorResult(char* ret, char*, int err)
-{
-	// For GNU strerror_r
-	std::string s;
-	if (ret) {
-		s = ret;
-	}
-	else {
-		s = fz::to_string(fz::sprintf(_("Unknown error %d"), err));
-	}
-	return s;
+	return fz::to_string(fz::sprintf(_("Unknown error %d"), err));
 }
 }
 
