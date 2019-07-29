@@ -13,6 +13,8 @@
 #endif
 #include "xrc_helper.h"
 
+#include <s3sse.h>
+
 #include <wx/dcclient.h>
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
@@ -232,6 +234,38 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		main->Add(new wxStaticText(m_pCharsetPage, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
 	}
 
+	{
+		m_pS3Page = new wxPanel(this);
+		m_pS3Page->Hide();
+
+		auto * main = lay.createMain(m_pS3Page, 1);
+		main->AddGrowableCol(0);
+		main->Add(new wxStaticText(m_pS3Page, -1, _("Server Side Encryption:")));
+
+		main->Add(new wxRadioButton(m_pS3Page, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
+
+		main->Add(new wxRadioButton(m_pS3Page, XRCID("ID_S3_AES256"), _("&AWS S3 encryption")));
+
+		main->Add(new wxRadioButton(m_pS3Page, XRCID("ID_S3_AWSKMS"), _("AWS &KMS encryption")));
+		auto * row = lay.createFlex(2);
+		row->AddGrowableCol(1);
+		main->Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
+		row->Add(new wxStaticText(m_pS3Page, -1, _("&Select a key:")), lay.valign);
+		auto * choice = new wxChoice(m_pS3Page, XRCID("ID_S3_KMSKEY"));
+		choice->Append(_("Default (AWS/S3)"));
+		choice->Append(_("Custom KMS ARN"));
+		row->Add(choice, lay.valigng);
+		row->Add(new wxStaticText(m_pS3Page, -1, _("C&ustom KMS ARN:")), lay.valign);
+		row->Add(new wxTextCtrl(m_pS3Page, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
+
+		main->Add(new wxRadioButton(m_pS3Page, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption")));
+		row = lay.createFlex(2);
+		row->AddGrowableCol(1);
+		main->Add(row, 0, wxLEFT | wxGROW, lay.dlgUnits(10));
+		row->Add(new wxStaticText(m_pS3Page, -1, _("Cus&tomer Key:")), lay.valign);
+		row->Add(new wxTextCtrl(m_pS3Page, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
+	}
+
 	extraParameters_[ParameterSection::host].emplace_back(XRCCTRL(*this, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_HOST", wxTextCtrl));
 	extraParameters_[ParameterSection::user].emplace_back(XRCCTRL(*this, "ID_EXTRA_USER_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_USER", wxTextCtrl));
 	extraParameters_[ParameterSection::credentials].emplace_back(XRCCTRL(*this, "ID_EXTRA_CREDENTIALS_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_CREDENTIALS", wxTextCtrl));
@@ -241,8 +275,8 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 
 	m_totalPages = GetPageCount();
 
-	m_charsetPageIndex = FindPage(m_pCharsetPage);
-	m_charsetPageText = GetPageText(m_charsetPageIndex);
+	int const charsetPageIndex = FindPage(m_pCharsetPage);
+	m_charsetPageText = GetPageText(charsetPageIndex);
 	wxGetApp().GetWrapEngine()->WrapRecursive(m_pCharsetPage, 1.3);
 
 	auto generalSizer = static_cast<wxGridBagSizer*>(xrc_call(*this, "ID_PROTOCOL", &wxWindow::GetContainingSizer));
@@ -614,9 +648,21 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		}
 	}
 	else {
-		m_charsetPageIndex = FindPage(m_pCharsetPage);
-		if (m_charsetPageIndex != wxNOT_FOUND) {
-			RemovePage(m_charsetPageIndex);
+		int const charsetPageIndex = FindPage(m_pCharsetPage);
+		if (charsetPageIndex != wxNOT_FOUND) {
+			RemovePage(charsetPageIndex);
+		}
+	}
+
+	if (protocol == S3) {
+		if (FindPage(m_pS3Page) == wxNOT_FOUND) {
+			AddPage(m_pS3Page, L"S3");
+		}
+	}
+	else {
+		int const s3PageIndex = FindPage(m_pS3Page);
+		if (s3PageIndex != wxNOT_FOUND) {
+			RemovePage(s3PageIndex);
 		}
 	}
 
@@ -966,6 +1012,27 @@ void CSiteManagerSite::UpdateExtraParameters(CServer & server)
 		server.SetExtraParameter(trait.name_, paramIt[trait.section_]->second->GetValue().ToStdWstring());
 		++paramIt[trait.section_];
 	}
+
+	if (server.GetProtocol() == S3) {
+		if (xrc_call(*this, "ID_S3_NOENCRYPTION", &wxRadioButton::GetValue)) {
+			server.ClearExtraParameter("ssealgorithm");
+		}
+		else if (xrc_call(*this, "ID_S3_AES256", &wxRadioButton::GetValue)) {
+			server.SetExtraParameter("ssealgorithm", L"AES256");
+			
+		}
+		else if (xrc_call(*this, "ID_S3_AWSKMS", &wxRadioButton::GetValue)) {
+			server.SetExtraParameter("ssealgorithm", L"aws:kms");
+			if (xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::GetSelection) == static_cast<int>(s3_sse::KmsKey::CUSTOM)) {
+				server.SetExtraParameter("ssekmskey", fz::to_wstring(xrc_call(*this, "ID_S3_CUSTOM_KMS", &wxTextCtrl::GetValue)));
+			}
+		}
+		else if (xrc_call(*this, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::GetValue)) {
+			server.SetExtraParameter("ssealgorithm", L"customer");
+			server.SetExtraParameter("ssecustomerkey", fz::to_wstring(xrc_call(*this, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue)));
+		}
+	}
+
 }
 
 void CSiteManagerSite::SetSite(Site const& site, bool predefined)
@@ -1145,6 +1212,28 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		}
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server.GetEncodingType() == ENCODING_CUSTOM);
 		xrc_call(*this, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server.GetCustomEncoding());
+
+		xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
+		auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
+		if (ssealgorithm.empty()) {
+			xrc_call(*this, "ID_S3_NOENCRYPTION", &wxRadioButton::SetValue, true);
+		}
+		else if (ssealgorithm == "AES256") {
+			xrc_call(*this, "ID_S3_AES256", &wxRadioButton::SetValue, true);
+		}
+		else if (ssealgorithm == "aws:kms") {
+			xrc_call(*this, "ID_S3_AWSKMS", &wxRadioButton::SetValue, true);
+			auto sseKmsKey = site.server.GetExtraParameter("ssekmskey");
+			if (!sseKmsKey.empty()) {
+				xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::CUSTOM));
+				xrc_call(*this, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sseKmsKey);
+			}
+		}
+		else if (ssealgorithm == "customer") {
+			xrc_call(*this, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::SetValue, true);
+			auto customerKey = site.server.GetExtraParameter("ssecustomerkey");
+			xrc_call(*this, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
+		}
 	}
 }
 
