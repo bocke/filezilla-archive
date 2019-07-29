@@ -14,6 +14,7 @@ noinst_HEADERS = \
 	notification.h \
 	optionsbase.h \
 	option_change_event_handler.h \
+	s3sse.h \
 	server.h \
 	serverpath.h \
 	setup.h \
