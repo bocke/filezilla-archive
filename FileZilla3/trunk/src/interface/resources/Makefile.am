@@ -11,7 +11,6 @@ xrcdir = $(pkgdatadir)/resources/xrc
 dist_xrc_DATA = \
 	xrc/certificate.xrc \
 	xrc/dialogs.xrc \
-	xrc/inputdialog.xrc \
 	xrc/netconfwizard.xrc \
 	xrc/settings.xrc \
 	xrc/storj.xrc \

@@ -1391,7 +1391,7 @@ void CSiteManagerDialog::SetCtrlState()
 void CSiteManagerDialog::OnSearch(wxCommandEvent&)
 {
 	CInputDialog dlg;
-	if (!dlg.Create(this, _("Search sites"), _("Search for entries containing the entered text"))) {
+	if (!dlg.Create(this, _("Search sites"), _("Search for entries containing the entered text."))) {
 		return;
 	}
 

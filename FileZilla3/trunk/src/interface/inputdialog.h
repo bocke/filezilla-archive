@@ -8,7 +8,7 @@ class CInputDialog final : public wxDialogEx
 public:
 	CInputDialog() = default;
 
-	bool Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len = -1);
+	bool Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len = -1, bool password = false);
 
 	bool SetPasswordMode(bool password);
 	void AllowEmpty(bool allowEmpty);
@@ -21,8 +21,6 @@ public:
 protected:
 	DECLARE_EVENT_TABLE()
 	void OnValueChanged(wxCommandEvent& event);
-	void OnOK(wxCommandEvent& event);
-	void OnCancel(wxCommandEvent& event);
 
 	bool m_allowEmpty{};
 	wxTextCtrl* m_pTextCtrl{};
