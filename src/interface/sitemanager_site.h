@@ -46,8 +46,8 @@ private:
 	std::map<ServerProtocol, int> mainProtocolListIndex_;
 
 	wxNotebookPage *m_pCharsetPage{};
-	wxNotebookPage *m_pS3Page{};
 	wxString m_charsetPageText;
+	wxNotebookPage *m_pS3Page{};
 	size_t m_totalPages = -1;
 
 	ServerProtocol previousProtocol_{UNKNOWN};
