@@ -6,8 +6,7 @@
 class CInputDialog final : public wxDialogEx
 {
 public:
-	CInputDialog();
-	virtual ~CInputDialog() {}
+	CInputDialog() = default;
 
 	bool Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len = -1);
 
@@ -25,8 +24,8 @@ protected:
 	void OnOK(wxCommandEvent& event);
 	void OnCancel(wxCommandEvent& event);
 
-	bool m_allowEmpty;
-	wxTextCtrl* m_pTextCtrl;
+	bool m_allowEmpty{};
+	wxTextCtrl* m_pTextCtrl{};
 };
 
 #endif

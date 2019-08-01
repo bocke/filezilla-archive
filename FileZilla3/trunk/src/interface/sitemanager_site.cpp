@@ -276,7 +276,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 
 	{
 		m_pS3Page = new wxPanel(this);
-		m_pS3Page->Hide();
+		AddPage(m_pS3Page, L"S3");
 
 		auto * main = lay.createMain(m_pS3Page, 1);
 		main->AddGrowableCol(0);
@@ -716,7 +716,6 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	if (protocol == S3) {
 		if (FindPage(m_pS3Page) == wxNOT_FOUND) {
 			AddPage(m_pS3Page, L"S3");
-			m_pS3Page->Show();
 		}
 	}
 	else {

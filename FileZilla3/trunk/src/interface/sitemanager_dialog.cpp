@@ -6,6 +6,7 @@
 #include "conditionaldialog.h"
 #include "drop_target_ex.h"
 #include "filezillaapp.h"
+#include "inputdialog.h"
 #include "ipcmutex.h"
 #include "Options.h"
 #include "sitemanager_site.h"
@@ -43,6 +44,7 @@ EVT_TREE_ITEM_MENU(XRCID("ID_SITETREE"), CSiteManagerDialog::OnContextMenu)
 EVT_MENU(XRCID("ID_EXPORT"), CSiteManagerDialog::OnExportSelected)
 EVT_BUTTON(XRCID("ID_NEWBOOKMARK"), CSiteManagerDialog::OnNewBookmark)
 EVT_BUTTON(XRCID("ID_BOOKMARK_BROWSE"), CSiteManagerDialog::OnBookmarkBrowse)
+EVT_MENU(XRCID("ID_SEARCH"), CSiteManagerDialog::OnSearch)
 END_EVENT_TABLE()
 
 class CSiteManagerItemData : public wxTreeItemData
@@ -443,6 +445,11 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 		}
 	}
 #endif
+
+	wxAcceleratorEntry accel(0, WXK_F3, XRCID("ID_SEARCH"));
+	wxAcceleratorTable accelTable(1, &accel);
+	SetAcceleratorTable(accelTable);
+
 
 	m_connected_sites = connected_sites;
 	MarkConnectedSites();
@@ -1381,8 +1388,47 @@ void CSiteManagerDialog::SetCtrlState()
 #endif
 }
 
-void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
+void CSiteManagerDialog::OnSearch(wxCommandEvent&)
 {
+	CInputDialog dlg;
+	if (!dlg.Create(this, _("Search sites"), _("Search for entries containing the entered text"))) {
+		return;
+	}
+
+	if (dlg.ShowModal() != wxID_OK) {
+		return;
+	}
+
+	wxString search = dlg.GetValue().Lower();
+
+	m_is_deleting = true;
+	tree_->UnselectAll();
+
+	bool match{};
+	wxTreeItemId item = tree_->GetRootItem();
+	while (item) {
+		auto name = tree_->GetItemText(item).Lower();
+		if (name.find(search) != wxString::npos) {
+			tree_->SafeSelectItem(item, false);
+			match = true;
+		}
+
+		item = tree_->GetNextItemSimple(item, true);
+	}
+	SetCtrlState();
+	m_is_deleting = false;
+
+	if (match) {
+		tree_->SetFocus();
+	}
+	else {
+		wxMessageBoxEx(wxString::Format(_("No entries found matching '%s'."), dlg.GetValue()), _("Search result"), MB_ICONINFORMATION);
+	}
+}
+
+
+void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
+	{
 	std::vector<wxTreeItemId> items;
 
 	wxTreeItemId item = tree_->GetSelection();
