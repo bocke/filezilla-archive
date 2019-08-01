@@ -39,7 +39,9 @@ enum ServerProtocol
 
 	BOX,
 
-	MAX_VALUE = BOX
+	INSECURE_WEBDAV,
+
+	MAX_VALUE = INSECURE_WEBDAV
 };
 
 enum ServerType
@@ -96,7 +98,8 @@ enum class ProtocolFeature
 	RecursiveDelete,
 	ServerAssignedHome,
 	TemporaryUrl,
-	S3Sse
+	S3Sse,
+	Security // Encryption, integrity protection and authentication
 };
 
 class Credentials;
