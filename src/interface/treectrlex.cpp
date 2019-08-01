@@ -58,31 +58,18 @@ std::vector<wxTreeItemId> wxTreeCtrlEx::GetSelections() const
 	// Sadly on MSW, the native TreeView_GetNextSelected can't be used either, it uses a weird and also nodeterministic order.
 	//
 	// Traverse the tree ourselves, in a nice, deterministic depth-first approach.
-
-	wxTreeItemIdValue unused;
-
 	wxTreeItemId item = GetRootItem();
 	while (item) {
 		if (IsSelected(item)) {
 			ret.push_back(item);
 		}
-		wxTreeItemId next = GetFirstChild(item, unused);
-		if (!next) {
-			next = GetNextSibling(item);
-			while (!next && item) {
-				item = GetItemParent(item);
-				if (item) {
-					next = GetNextSibling(item);
-				}
-			}
-		}
-		item = next;
+		item = GetNextItemSimple(item, true);
 	}
 
 	return ret;
 }
 
-void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item)
+void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item, bool clearSelection)
 {
 	if (!item) {
 		++m_setSelection;
@@ -92,9 +79,16 @@ void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item)
 	else {
 		std::vector<wxTreeItemId> selections;
 		if (HasFlag(wxTR_MULTIPLE)) {
+			++m_setSelection;
 			selections = GetSelections();
-			UnselectAll();
-			SetFocusedItem(item);
+			if (clearSelection) {
+				UnselectAll();
+			}
+			
+			if (clearSelection || selections.empty()) {
+				SetFocusedItem(item);
+			}
+			--m_setSelection;
 		}
 		else {
 			auto old = GetSelection();
@@ -107,14 +101,19 @@ void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item)
 		SelectItem(item);
 		--m_setSelection;
 
-		bool found{};
-		for (auto const& old : selections) {
-			if (item == old) {
-				found = true;
-			}
-		}
-		if (!found) {
+		if (selections.empty()) {
 			EnsureVisible(item);
+		}
+		else if (clearSelection) {
+			bool found{};
+			for (auto const& old : selections) {
+				if (item == old) {
+					found = true;
+				}
+			}
+			if (!found) {
+				EnsureVisible(item);
+			}
 		}
 	}
 }
@@ -168,9 +167,9 @@ wxTreeItemId wxTreeCtrlEx::GetBottomItem() const
 	return cur;
 }
 
-wxTreeItemId wxTreeCtrlEx::GetNextItemSimple(wxTreeItemId const& item) const
+wxTreeItemId wxTreeCtrlEx::GetNextItemSimple(wxTreeItemId const& item, bool includeCollapsed) const
 {
-	if (item.IsOk() && ItemHasChildren(item) && IsExpanded(item)) {
+	if (item.IsOk() && ItemHasChildren(item) && (includeCollapsed || IsExpanded(item))) {
 		wxTreeItemIdValue cookie;
 		return GetFirstChild(item, cookie);
 	}

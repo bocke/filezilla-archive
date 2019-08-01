@@ -16,7 +16,7 @@ public:
 			   const wxPoint& pos = wxDefaultPosition,
 			   const wxSize& size = wxDefaultSize,
 			   long style = wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT);
-	void SafeSelectItem(wxTreeItemId const& item);
+	void SafeSelectItem(wxTreeItemId const& item, bool clearSelection = true);
 
 	// Small wrappers to make wxTreeCtrl(Ex) API more similar to wxListCtrl(ex).
 	int GetItemCount() const { return GetCount(); }
@@ -39,7 +39,7 @@ public:
 	wxTreeItemId GetLastItem() const;
 	wxTreeItemId GetBottomItem() const;
 
-	wxTreeItemId GetNextItemSimple(wxTreeItemId const& item) const;
+	wxTreeItemId GetNextItemSimple(wxTreeItemId const& item, bool includeCollapsed = false) const;
 	wxTreeItemId GetPrevItemSimple(wxTreeItemId const& item) const;
 
 protected:

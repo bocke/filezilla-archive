@@ -80,6 +80,7 @@ protected:
 	void OnExportSelected(wxCommandEvent&);
 	void OnNewBookmark(wxCommandEvent&);
 	void OnBookmarkBrowse(wxCommandEvent&);
+	void OnSearch(wxCommandEvent&);
 
 	CInterProcessMutex* m_pSiteManagerMutex{};
 
