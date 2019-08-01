@@ -17,26 +17,27 @@ struct t_protocolInfo
 };
 
 static const t_protocolInfo protocolInfos[] = {
-	{ FTP,          L"ftp",      false, 21, true,  fztranslate_mark("FTP - File Transfer Protocol with optional encryption"), L"" },
-	{ SFTP,         L"sftp",     true,  22, false, "SFTP - SSH File Transfer Protocol",                                       L"" },
-	{ HTTP,         L"http",     true,  80, false, "HTTP - Hypertext Transfer Protocol",                                      L"" },
-	{ HTTPS,        L"https",    true, 443, true,  fztranslate_mark("HTTPS - HTTP over TLS"),                                 L"" },
-	{ FTPS,         L"ftps",     true, 990, true,  fztranslate_mark("FTPS - FTP over implicit TLS"),                          L"" },
-	{ FTPES,        L"ftpes",    true,  21, true,  fztranslate_mark("FTPES - FTP over explicit TLS"),                         L"" },
-	{ INSECURE_FTP, L"ftp",      false, 21, true,  fztranslate_mark("FTP - Insecure File Transfer Protocol"),                 L"" },
-	{ S3,           L"s3",       true, 443, false, "S3 - Amazon Simple Storage Service",                                      L"" },
-	{ STORJ,        L"storj",    true, 443, true,  fztranslate_mark("Storj - Decentralized Cloud Storage"),                   L"" },
-	{ WEBDAV,       L"webdav",   true, 443, true,  "WebDAV",                                                                  L"https" },
-	{ AZURE_FILE,   L"azfile",   true, 443, false, "Microsoft Azure File Storage Service",                                    L"https" },
-	{ AZURE_BLOB,   L"azblob",   true, 443, false, "Microsoft Azure Blob Storage Service",                                    L"https" },
-	{ SWIFT,        L"swift",    true, 443, false, "OpenStack Swift",                                                         L"https" },
-	{ GOOGLE_CLOUD, L"google",   true, 443, false, "Google Cloud Storage",                                                    L"https" },
-	{ GOOGLE_DRIVE, L"gdrive",   true, 443, false, "Google Drive",                                                            L"https" },
-	{ DROPBOX,      L"dropbox",  true, 443, false, "Dropbox",                                                                 L"https" },
-	{ ONEDRIVE,     L"onedrive", true, 443, false, "Microsoft OneDrive",                                                      L"https" },
-	{ B2,           L"b2",       true, 443, false, "Backblaze B2",                                                            L"https" },
-	{ BOX,          L"box",      true, 443, false, "Box",                                                                     L"https" },
-	{ UNKNOWN,      L"",         false, 21, false, "", L"" }
+	{ FTP,             L"ftp",      false, 21, true,  fztranslate_mark("FTP - File Transfer Protocol with optional encryption"), L"" },
+	{ SFTP,            L"sftp",     true,  22, false, "SFTP - SSH File Transfer Protocol",                                       L"" },
+	{ HTTP,            L"http",     true,  80, false, "HTTP - Hypertext Transfer Protocol",                                      L"" },
+	{ HTTPS,           L"https",    true, 443, true,  fztranslate_mark("HTTPS - HTTP over TLS"),                                 L"" },
+	{ FTPS,            L"ftps",     true, 990, true,  fztranslate_mark("FTPS - FTP over implicit TLS"),                          L"" },
+	{ FTPES,           L"ftpes",    true,  21, true,  fztranslate_mark("FTPES - FTP over explicit TLS"),                         L"" },
+	{ INSECURE_FTP,    L"ftp",      false, 21, true,  fztranslate_mark("FTP - Insecure File Transfer Protocol"),                 L"" },
+	{ S3,              L"s3",       true, 443, false, "S3 - Amazon Simple Storage Service",                                      L"" },
+	{ STORJ,           L"storj",    true, 443, true,  fztranslate_mark("Storj - Decentralized Cloud Storage"),                   L"" },
+	{ WEBDAV,          L"webdav",   true, 443, true,  fztranslate_mark("WebDAV using HTTPS"),                                    L"https" },
+	{ AZURE_FILE,      L"azfile",   true, 443, false, "Microsoft Azure File Storage Service",                                    L"https" },
+	{ AZURE_BLOB,      L"azblob",   true, 443, false, "Microsoft Azure Blob Storage Service",                                    L"https" },
+	{ SWIFT,           L"swift",    true, 443, false, "OpenStack Swift",                                                         L"https" },
+	{ GOOGLE_CLOUD,    L"google",   true, 443, false, "Google Cloud Storage",                                                    L"https" },
+	{ GOOGLE_DRIVE,    L"gdrive",   true, 443, false, "Google Drive",                                                            L"https" },
+	{ DROPBOX,         L"dropbox",  true, 443, false, "Dropbox",                                                                 L"https" },
+	{ ONEDRIVE,        L"onedrive", true, 443, false, "Microsoft OneDrive",                                                      L"https" },
+	{ B2,              L"b2",       true, 443, false, "Backblaze B2",                                                            L"https" },
+	{ BOX,             L"box",      true, 443, false, "Box",                                                                     L"https" },
+	{ INSECURE_WEBDAV, L"webdav",   true,  80, true,  fztranslate_mark("WebDAV using HTTP (insecure)"),                          L"http" },
+	{ UNKNOWN,         L"",         false, 21, false, "",                                                                        L"" }
 };
 
 static std::vector<ServerProtocol> const defaultProtocols = {
@@ -633,6 +634,9 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		if (protocol == S3) {
 			return true;
 		}
+		break;
+	case ProtocolFeature::Security:
+		return protocol != HTTP && protocol != INSECURE_FTP && protocol != INSECURE_WEBDAV;
 	}
 	return false;
 }
@@ -816,6 +820,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 	case B2:
 		return {LogonType::normal, LogonType::ask};
 	case WEBDAV:
+	case INSECURE_WEBDAV:
 		return {LogonType::anonymous, LogonType::normal, LogonType::ask};
 	case GOOGLE_CLOUD:
 	case GOOGLE_DRIVE:
