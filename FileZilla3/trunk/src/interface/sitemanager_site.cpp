@@ -15,6 +15,8 @@
 
 #include <s3sse.h>
 
+#include <libfilezilla/translate.hpp>
+
 #include <wx/dcclient.h>
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
@@ -39,7 +41,45 @@ EVT_BUTTON(XRCID("ID_ENCRYPTIONKEY_GENERATE"), CSiteManagerSite::OnGenerateEncry
 END_EVENT_TABLE()
 
 namespace {
-std::array<ServerProtocol, 4> const ftpSubOptions{ FTP, FTPES, FTPS, INSECURE_FTP };
+struct ProtocolGroup {
+	std::wstring name;
+	std::vector<std::pair<ServerProtocol, std::wstring>> protocols;
+};
+
+std::array<ProtocolGroup, 2> const& protocolGroups()
+{
+	static auto const groups = std::array<ProtocolGroup, 2>{{
+		{
+			fztranslate("FTP - File Transfer Protocol"), {
+				{ FTP, fztranslate("Use explicit FTP over TLS if available") },
+				{ FTPES, fztranslate("Require explicit FTP over TLS") },
+				{ FTPS, fztranslate("Require implicit FTP over TLS") },
+				{ INSECURE_FTP, fztranslate("Only use plain FTP (insecure)") }
+			}
+		},
+		{
+			fztranslate("WebDAV"), {
+				{ WEBDAV, fztranslate("Using secure HTTPS") },
+				{ INSECURE_WEBDAV, fztranslate("Using insecure HTTP") }
+			}
+		}
+	}};
+	return groups;
+}
+
+std::pair<std::array<ProtocolGroup, 2>::const_iterator, std::vector<std::pair<ServerProtocol, std::wstring>>::const_iterator> findGroup(ServerProtocol protocol)
+{
+	auto const& groups = protocolGroups();
+	for (auto group = groups.cbegin(); group != groups.cend(); ++group) {
+		for (auto entry = group->protocols.cbegin(); entry != group->protocols.cend(); ++entry) {
+			if (entry->first == protocol) {
+				return std::make_pair(group, entry);
+			}
+		}
+	}
+
+	return std::make_pair(groups.cend(), std::vector<std::pair<ServerProtocol, std::wstring>>::const_iterator());
+}
 }
 
 CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
@@ -342,13 +382,18 @@ void CSiteManagerSite::InitProtocols()
 		return;
 	}
 
-	mainProtocolListIndex_[FTP] = pProtocol->Append(_("FTP - File Transfer Protocol"));
 	for (auto const& proto : CServer::GetDefaultProtocols()) {
-		if (std::find(ftpSubOptions.cbegin(), ftpSubOptions.cend(), proto) == ftpSubOptions.cend()) {
-			mainProtocolListIndex_[proto] = pProtocol->Append(CServer::GetProtocolName(proto));
+		auto const entry = findGroup(proto);
+		if (entry.first != protocolGroups().cend()) {
+			if (entry.second == entry.first->protocols.cbegin()) {
+				mainProtocolListIndex_[proto] = pProtocol->Append(entry.first->name);
+			}
+			else {
+				mainProtocolListIndex_[proto] = mainProtocolListIndex_[entry.first->protocols.front().first];
+			}
 		}
 		else {
-			mainProtocolListIndex_[proto] = mainProtocolListIndex_[FTP];
+			mainProtocolListIndex_[proto] = pProtocol->Append(CServer::GetProtocolName(proto));
 		}
 	}
 
@@ -363,15 +408,6 @@ void CSiteManagerSite::InitProtocols()
 	for (int i = 0; i < static_cast<int>(LogonType::count); ++i) {
 		pChoice->Append(GetNameFromLogonType(static_cast<LogonType>(i)));
 	}
-
-	wxChoice* pEncryption = XRCCTRL(*this, "ID_ENCRYPTION", wxChoice);
-
-	// Order must match ftpSubOptions
-	pEncryption->Append(_("Use explicit FTP over TLS if available"));
-	pEncryption->Append(_("Require explicit FTP over TLS"));
-	pEncryption->Append(_("Require implicit FTP over TLS"));
-	pEncryption->Append(_("Only use plain FTP (insecure)"));
-	pEncryption->SetSelection(0);
 
 	wxChoice* pColors = XRCCTRL(*this, "ID_COLOR", wxChoice);
 	if (pColors) {
@@ -391,23 +427,43 @@ void CSiteManagerSite::SetProtocol(ServerProtocol protocol)
 	wxChoice* pEncryption = XRCCTRL(*this, "ID_ENCRYPTION", wxChoice);
 	wxStaticText* pEncryptionDesc = XRCCTRL(*this, "ID_ENCRYPTION_DESC", wxStaticText);
 
-	auto const it = std::find(ftpSubOptions.cbegin(), ftpSubOptions.cend(), protocol);
-
-	if (it != ftpSubOptions.cend()) {
-		pEncryption->SetSelection(it - ftpSubOptions.cbegin());
+	auto const entry = findGroup(protocol);
+	if (entry.first != protocolGroups().cend()) {
+		pEncryption->Clear();
+		for (auto const& prot : entry.first->protocols) {
+			std::wstring name = prot.second;
+			if (!CServer::ProtocolHasFeature(prot.first, ProtocolFeature::Security)) {
+				name += ' ';
+				name += 0x26a0; // Unicode's warning emoji
+				name += 0xfe0f; // Variant selector, makes it colorful
+			}
+			pEncryption->AppendString(name);
+		}
 		pEncryption->Show();
 		pEncryptionDesc->Show();
+		pEncryption->SetSelection(entry.second - entry.first->protocols.cbegin());
 	}
 	else {
 		pEncryption->Hide();
 		pEncryptionDesc->Hide();
 	}
+
 	auto const protoIt = mainProtocolListIndex_.find(protocol);
 	if (protoIt != mainProtocolListIndex_.cend()) {
 		pProtocol->SetSelection(protoIt->second);
 	}
 	else if (protocol != ServerProtocol::UNKNOWN) {
-		mainProtocolListIndex_[protocol] = pProtocol->Append(CServer::GetProtocolName(protocol));
+		auto const entry = findGroup(protocol);
+		if (entry.first != protocolGroups().cend()) {
+			mainProtocolListIndex_[protocol] = pProtocol->Append(entry.first->name);
+			for (auto const& sub : entry.first->protocols) {
+				mainProtocolListIndex_[sub.first] = mainProtocolListIndex_[protocol];
+			}
+		}
+		else {
+			mainProtocolListIndex_[protocol] = pProtocol->Append(CServer::GetProtocolName(protocol));
+		}
+
 		pProtocol->SetSelection(mainProtocolListIndex_[protocol]);
 	}
 	else {
@@ -421,31 +477,34 @@ void CSiteManagerSite::SetProtocol(ServerProtocol protocol)
 ServerProtocol CSiteManagerSite::GetProtocol() const
 {
 	int const sel = xrc_call(*this, "ID_PROTOCOL", &wxChoice::GetSelection);
-	if (sel == mainProtocolListIndex_.at(FTP)) {
+
+	ServerProtocol protocol = UNKNOWN;
+	for (auto const it : mainProtocolListIndex_) {
+		if (it.second == sel) {
+			protocol = it.first;
+			break;
+		}
+	}
+
+	auto const group = findGroup(protocol);
+	if (group.first != protocolGroups().cend()) {
 		int encSel = xrc_call(*this, "ID_ENCRYPTION", &wxChoice::GetSelection);
-		if (encSel >= 0 && encSel < static_cast<int>(ftpSubOptions.size())) {
-			return ftpSubOptions[encSel];
+		if (encSel < 0 && encSel >= static_cast<int>(group.first->protocols.size())) {
+			encSel = 0;
 		}
-
-		return FTP;
-	}
-	else {
-		for (auto const it : mainProtocolListIndex_) {
-			if (it.second == sel) {
-				return it.first;
-			}
-		}
+		protocol = group.first->protocols[encSel].first;
 	}
 
-	return UNKNOWN;
+	return protocol;
 }
 
 void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType type)
 {
-	bool const isFtp = std::find(ftpSubOptions.cbegin(), ftpSubOptions.cend(), protocol) != ftpSubOptions.cend();
+	auto const group = findGroup(protocol);
+	bool const isFtp = group.first != protocolGroups().cend() && group.first->protocols.front().first == FTP;
 
-	xrc_call(*this, "ID_ENCRYPTION_DESC", &wxStaticText::Show, isFtp);
-	xrc_call(*this, "ID_ENCRYPTION", &wxChoice::Show, isFtp);
+	xrc_call(*this, "ID_ENCRYPTION_DESC", &wxStaticText::Show, group.first != protocolGroups().cend());
+	xrc_call(*this, "ID_ENCRYPTION", &wxChoice::Show, group.first != protocolGroups().cend());
 
 	xrc_call(*this, "ID_SIGNUP", &wxControl::Show, protocol == STORJ);
 
@@ -657,6 +716,7 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	if (protocol == S3) {
 		if (FindPage(m_pS3Page) == wxNOT_FOUND) {
 			AddPage(m_pS3Page, L"S3");
+			m_pS3Page->Show();
 		}
 	}
 	else {
@@ -1272,7 +1332,7 @@ void CSiteManagerSite::OnProtocolSelChanged(wxCommandEvent&)
 	SetControlVisibility(protocol, logonType);
 	SetLogonTypeCtrlState();
 
-	previousProtocol_ = protocol;
+	SetProtocol(protocol);
 }
 
 void CSiteManagerSite::OnLogontypeSelChanged(wxCommandEvent&)
