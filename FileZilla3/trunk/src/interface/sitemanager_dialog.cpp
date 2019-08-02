@@ -1422,7 +1422,7 @@ void CSiteManagerDialog::OnSearch(wxCommandEvent&)
 		tree_->SetFocus();
 	}
 	else {
-		wxMessageBoxEx(wxString::Format(_("No entries found matching '%s'."), dlg.GetValue()), _("Search result"), MB_ICONINFORMATION);
+		wxMessageBoxEx(wxString::Format(_("No entries found matching '%s'."), dlg.GetValue()), _("Search result"), wxICON_INFORMATION);
 	}
 }
 
