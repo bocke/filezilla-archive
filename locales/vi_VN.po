@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: filezilla 3.42.1\n"
+"Project-Id-Version: filezilla 3.43.0\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-06-19 09:40+0200\n"
-"PO-Revision-Date: 2019-05-10 15:33+0700\n"
+"POT-Creation-Date: 2019-08-02 13:34+0200\n"
+"PO-Revision-Date: 2019-07-31 14:57+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
 "Language: vi_VN\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Language-Team-Website: <http://translationproject.org/team/vi.html>\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.3\n"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../src/interface/statuslinectrl.cpp:59
@@ -183,7 +183,11 @@ msgstr "%u - Tài khoản"
 msgid "%w - Proxy password"
 msgstr "%w - Mật khẩu máy chủ ủy nhiệm"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3682
+#: ../src/interface/sitemanager_site.cpp:287
+msgid "&AWS S3 encryption"
+msgstr "&Mã hóa AWS S3"
+
+#: ../src/interface/resources/xrc/dialogs.xrc:3626
 msgid "&Abort previous connection and connect in current tab"
 msgstr "&Bãi bỏ kết nối trước đó và kết nối vào tab hiện hành"
 
@@ -192,23 +196,23 @@ msgid "&About..."
 msgstr "&Giới thiệu…"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:278
+#: ../src/interface/sitemanager_site.cpp:552
 msgid "&Access key ID:"
 msgstr "Mã số khó&a truy cập:"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:302
+#: ../src/interface/sitemanager_site.cpp:576
 msgid "&Account ID:"
 msgstr "ID tà&i khoản:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2734
-#: ../src/interface/resources/xrc/sitemanager.xrc:303
+#: ../src/interface/sitemanager_site.cpp:153
 msgid "&Account:"
 msgstr "Tà&i khoản:"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:80
 #: ../src/interface/resources/xrc/settings.xrc:209
-#: ../src/interface/resources/xrc/sitemanager.xrc:617
+#: ../src/interface/sitemanager_site.cpp:246
 msgid "&Active"
 msgstr "&Tích cực"
 
@@ -216,7 +220,7 @@ msgstr "&Tích cực"
 msgid "&Add bookmark..."
 msgstr "&Thêm đánh dấu…"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:4020
+#: ../src/interface/resources/xrc/dialogs.xrc:3964
 msgid "&Add directory..."
 msgstr "&Thêm thư mục…"
 
@@ -234,13 +238,14 @@ msgstr "&Thêm tập tin khóa…"
 msgid "&Add to queue"
 msgstr "&Thêm vào hàng đợi"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:546
+#: ../src/interface/sitemanager_site.cpp:224
 msgid "&Adjust server time, offset by:"
 msgstr "Chỉnh sử&a độ lệch với múi giờ máy chủ:"
 
-#: ../src/interface/verifycertdialog.cpp:745
-msgid "&Always allow insecure plain FTP for this server."
-msgstr "&Luôn cho phép FTP thường không an toàn cho máy chủ này."
+#: ../src/interface/verifycertdialog.cpp:768
+#, c-format
+msgid "&Always allow insecure plain %s for this server."
+msgstr "&Luôn cho phép %s thường không an toàn cho máy chủ này."
 
 #: ../src/interface/resources/xrc/certificate.xrc:256
 msgid "&Always trust certificate in future sessions."
@@ -254,7 +259,7 @@ msgstr "&Luôn tin máy chủ này, thêm khóa này vào bộ nhớ"
 msgid "&Always use default editor"
 msgstr "&Luôn dùng trình soạn thảo mặc định"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3213
+#: ../src/interface/resources/xrc/dialogs.xrc:3157
 msgid "&Always use selection for unassociated files"
 msgstr ""
 "&Luôn dùng chương trình đã chọn cho các tập tin chưa có ứng dụng tiếp nhận"
@@ -272,11 +277,11 @@ msgstr "&Lấy địa chỉ IP từ hệ điều hành của bạn"
 msgid "&Auto"
 msgstr "&Tự động"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:679
+#: ../src/interface/sitemanager_site.cpp:265
 msgid "&Autodetect"
 msgstr "&Tự dò tìm"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:417
+#: ../src/interface/sitemanager_site.cpp:184
 msgid "&Background color:"
 msgstr "Mà&u nền:"
 
@@ -295,12 +300,12 @@ msgstr "&Dấu trang"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2507
 #: ../src/interface/resources/xrc/dialogs.xrc:2918
-#: ../src/interface/resources/xrc/dialogs.xrc:3005
-#: ../src/interface/resources/xrc/dialogs.xrc:3200
-#: ../src/interface/resources/xrc/dialogs.xrc:3413
+#: ../src/interface/resources/xrc/dialogs.xrc:3144
+#: ../src/interface/resources/xrc/dialogs.xrc:3357
 #: ../src/interface/resources/xrc/settings.xrc:1788
 #: ../src/interface/resources/xrc/settings.xrc:2003
-#: ../src/interface/resources/xrc/sitemanager.xrc:506
+#: ../src/interface/sitemanager_dialog.cpp:297
+#: ../src/interface/sitemanager_site.cpp:214
 msgid "&Browse..."
 msgstr "&Duyệt…"
 
@@ -311,11 +316,11 @@ msgstr "&Khoảng chấp nhận:"
 #: ../src/interface/resources/xrc/dialogs.xrc:386
 #: ../src/interface/resources/xrc/dialogs.xrc:494
 #: ../src/interface/resources/xrc/dialogs.xrc:1227
-#: ../src/interface/resources/xrc/dialogs.xrc:3809
-#: ../src/interface/resources/xrc/dialogs.xrc:3911
-#: ../src/interface/resources/xrc/inputdialog.xrc:40
+#: ../src/interface/resources/xrc/dialogs.xrc:3753
+#: ../src/interface/resources/xrc/dialogs.xrc:3855
 #: ../src/interface/resources/xrc/settings.xrc:35
-#: ../src/interface/verifycertdialog.cpp:757
+#: ../src/interface/inputdialog.cpp:33
+#: ../src/interface/verifycertdialog.cpp:780
 msgid "&Cancel"
 msgstr "&Thôi"
 
@@ -343,7 +348,7 @@ msgstr "Đặt giới hạn tố&c độ…"
 msgid "&Configure..."
 msgstr "&Cấu hình…"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:106
+#: ../src/interface/sitemanager_dialog.cpp:362
 msgid "&Connect"
 msgstr "&Kết nối"
 
@@ -373,7 +378,7 @@ msgstr "&Gỡ lỗi"
 
 #: ../src/interface/resources/xrc/settings.xrc:2092
 msgid "&Debug information in message log:"
-msgstr "&Gỡ lỗi bằng sổ nhật ký:"
+msgstr "&Gỡ lỗi thông tin trong nhật ký thông báo:"
 
 #: ../src/interface/resources/xrc/settings.xrc:1758
 msgid "&Default editor:"
@@ -389,14 +394,14 @@ msgstr "Thời gian &nghỉ giữa các lần đăng nhập sai:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1271
 #: ../src/interface/resources/xrc/dialogs.xrc:1440
-#: ../src/interface/resources/xrc/dialogs.xrc:3085
-#: ../src/interface/resources/xrc/sitemanager.xrc:59
+#: ../src/interface/resources/xrc/dialogs.xrc:3029
 #: ../src/interface/LocalListView.cpp:802
 #: ../src/interface/LocalTreeView.cpp:1109
+#: ../src/interface/sitemanager_dialog.cpp:354
 msgid "&Delete"
 msgstr "&Xóa bỏ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3605
+#: ../src/interface/resources/xrc/dialogs.xrc:3549
 msgid "&Delete symlink"
 msgstr "&Xóa liên kết mềm"
 
@@ -453,7 +458,7 @@ msgstr "Hành động khi bấm đú&p chuột vào tập tin:"
 msgid "&Download"
 msgstr "Tải &xuống"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3399
+#: ../src/interface/resources/xrc/dialogs.xrc:3343
 msgid "&Download to:"
 msgstr "Tải &xuống:"
 
@@ -483,16 +488,16 @@ msgstr "&Bật"
 msgid "&Enable compression"
 msgstr "&Cho phép nén"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3737
+#: ../src/interface/resources/xrc/dialogs.xrc:3681
 #: ../src/interface/resources/xrc/settings.xrc:897
 msgid "&Enable speed limits"
 msgstr "&Bật giới hạn tốc độ"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:704
+#: ../src/interface/sitemanager_site.cpp:270
 msgid "&Encoding:"
 msgstr "&Bộ mã:"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:189
+#: ../src/interface/sitemanager_site.cpp:123
 msgid "&Encryption:"
 msgstr "&Mã hóa:"
 
@@ -500,7 +505,7 @@ msgstr "&Mã hóa:"
 msgid "&Enter custom command..."
 msgstr "&Nhập vào dòng lệnh của bạn…"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3675
+#: ../src/interface/resources/xrc/dialogs.xrc:3619
 msgid "&Establish connection in a new tab"
 msgstr "&Thiết lập kết nối trong một tab mới"
 
@@ -513,7 +518,7 @@ msgid "&Export Site Manager entries"
 msgstr "&Xuất ra các đề mục từ Quản lý địa chỉ"
 
 #: ../src/interface/menu_bar.cpp:57
-#: ../src/interface/sitemanager_dialog.cpp:1772
+#: ../src/interface/sitemanager_dialog.cpp:1873
 msgid "&Export..."
 msgstr "&Xuất ra…"
 
@@ -523,7 +528,7 @@ msgstr "&Quay lại chế độ tích cực"
 
 #: ../src/interface/menu_bar.cpp:44
 msgid "&File"
-msgstr "&Chính"
+msgstr "&Tập tin"
 
 #: ../src/interface/RemoteTreeView.cpp:925
 msgid "&File Attributes..."
@@ -557,7 +562,7 @@ msgstr "Bộ &lọc:"
 msgid "&Finish editing and delete local file"
 msgstr "&Hoàn tất biên tập và xóa tập tin trên máy nội bộ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3530
+#: ../src/interface/resources/xrc/dialogs.xrc:3474
 msgid ""
 "&Flatten local paths, upload all contained files directly into target "
 "directory"
@@ -565,7 +570,7 @@ msgstr ""
 "&Làm phẳng đường dẫn máy nội bộ, tải lên tất cả các tập tin chứa bên trong "
 "vào thư mục đích"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3435
+#: ../src/interface/resources/xrc/dialogs.xrc:3379
 msgid ""
 "&Flatten remote paths, download all contained files directly into target "
 "directory"
@@ -573,7 +578,7 @@ msgstr ""
 "&Làm phẳng đường dẫn máy mạng, tải tất cả các tập tin chứa bên trong vào thư "
 "mục đích"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3612
+#: ../src/interface/resources/xrc/dialogs.xrc:3556
 msgid "&Follow symlink, delete target directory contents"
 msgstr "&Theo liên kết mềm, xóa nội dung thư mục đích"
 
@@ -610,9 +615,9 @@ msgid "&Highest available port:"
 msgstr "Cổng cao n&hất có thể:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2642
-#: ../src/interface/resources/xrc/sitemanager.xrc:156
 #: ../src/interface/quickconnectbar.cpp:41
-#: ../src/interface/sitemanager_site.cpp:270
+#: ../src/interface/sitemanager_site.cpp:112
+#: ../src/interface/sitemanager_site.cpp:544
 msgid "&Host:"
 msgstr "Máy c&hủ:"
 
@@ -636,15 +641,15 @@ msgstr "Kế thừa các ràng buộc xử lý k&iểu tập tin từ hệ thố
 msgid "&Install new version"
 msgstr "&Cài đặt phiên bản mới"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3523
+#: ../src/interface/resources/xrc/dialogs.xrc:3467
 msgid "&Keep local path structure relative to search root"
 msgstr "&Giữ cấu trúc đường dẫn máy nội bộ tương đối để tìm kiếm thư mục gốc"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3428
+#: ../src/interface/resources/xrc/dialogs.xrc:3372
 msgid "&Keep remote path structure relative to search root"
 msgstr "&Giữ cấu trúc đường dẫn máy mạng tương đối để tìm kiếm thư mục gốc"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:315
+#: ../src/interface/sitemanager_site.cpp:157
 msgid "&Key file:"
 msgstr "Tập tin &khóa:"
 
@@ -656,7 +661,7 @@ msgstr "&Cách bố trí bảng chứa tập tin và thư mục:"
 msgid "&Limit local ports used by FileZilla"
 msgstr "Giới hạn cổng trên máy nội bộ dùng bởi FileZi&lla"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:633
+#: ../src/interface/sitemanager_site.cpp:250
 msgid "&Limit number of simultaneous connections"
 msgstr "&Giới hạn kết nối đồng thời"
 
@@ -665,11 +670,11 @@ msgid "&Local directory tree"
 msgstr "&Cây thư mục trên máy nội bộ"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2903
-#: ../src/interface/resources/xrc/dialogs.xrc:2993
+#: ../src/interface/sitemanager_dialog.cpp:291
 msgid "&Local directory:"
 msgstr "&Thư mục máy nội bộ:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3259
+#: ../src/interface/resources/xrc/dialogs.xrc:3203
 msgid "&Local search"
 msgstr "Tìm kiếm nội &bộ"
 
@@ -677,7 +682,7 @@ msgstr "Tìm kiếm nội &bộ"
 msgid "&Log to file"
 msgstr "Ghi nhật &ký vào tập tin"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:246
+#: ../src/interface/sitemanager_site.cpp:137
 msgid "&Logon Type:"
 msgstr "Kiểu đăng &nhập:"
 
@@ -697,7 +702,7 @@ msgstr "&Quản lý dấu trang…"
 msgid "&Manual transfer..."
 msgstr "Truyền thủ &công…"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:643
+#: ../src/interface/sitemanager_site.cpp:253
 msgid "&Maximum number of connections:"
 msgstr "Số kết nối &tối đa:"
 
@@ -729,9 +734,9 @@ msgstr "Giúp đỡ kết &nối trực quan…"
 msgid "&New"
 msgstr "Tạo &mới"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:35
-msgid "&New Site"
-msgstr "Địa chỉ &mới"
+#: ../src/interface/sitemanager_dialog.cpp:350
+msgid "&New site"
+msgstr "Tạo địa chỉ &mới"
 
 #: ../src/interface/Mainfrm.cpp:1798
 msgid "&New version available!"
@@ -762,9 +767,10 @@ msgstr "Giá trị bằ&ng số:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:378
 #: ../src/interface/resources/xrc/dialogs.xrc:486
-#: ../src/interface/resources/xrc/dialogs.xrc:3134
-#: ../src/interface/resources/xrc/sitemanager.xrc:114
-#: ../src/interface/verifycertdialog.cpp:750
+#: ../src/interface/resources/xrc/dialogs.xrc:3078
+#: ../src/interface/inputdialog.cpp:29
+#: ../src/interface/sitemanager_dialog.cpp:366
+#: ../src/interface/verifycertdialog.cpp:773
 msgid "&OK"
 msgstr "Đồn&g ý"
 
@@ -781,7 +787,7 @@ msgstr "&Mở"
 msgid "&Overwrite"
 msgstr "&Ghi đè"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:624
+#: ../src/interface/sitemanager_site.cpp:247
 msgid "&Passive"
 msgstr "&Thụ động"
 
@@ -794,8 +800,8 @@ msgid "&Play sound"
 msgstr "&Mở một đoạn âm thanh"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2655
-#: ../src/interface/resources/xrc/sitemanager.xrc:169
 #: ../src/interface/quickconnectbar.cpp:54
+#: ../src/interface/sitemanager_site.cpp:117
 msgid "&Port:"
 msgstr "Cổn&g:"
 
@@ -844,7 +850,7 @@ msgid "&Remember password until FileZilla is closed"
 msgstr "N&hớ mật khẩu cho đến khi FileZilla được đóng lại"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2930
-#: ../src/interface/resources/xrc/dialogs.xrc:3017
+#: ../src/interface/sitemanager_dialog.cpp:299
 msgid "&Remote directory:"
 msgstr "&Thư mục máy mạng:"
 
@@ -852,7 +858,7 @@ msgstr "&Thư mục máy mạng:"
 msgid "&Remote path:"
 msgstr "Đường &dẫn máy mạng:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3266
+#: ../src/interface/resources/xrc/dialogs.xrc:3210
 msgid "&Remote search"
 msgstr "Tìm kiếm trên máy &mạng"
 
@@ -864,18 +870,18 @@ msgstr "&Xóa bỏ"
 msgid "&Remove key"
 msgstr "&Xóa bỏ khóa"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:4025
+#: ../src/interface/resources/xrc/dialogs.xrc:3969
 #: ../src/interface/QueueView.cpp:1819
 msgid "&Remove selected"
 msgstr "&Xóa mục đã chọn"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1446
-#: ../src/interface/resources/xrc/dialogs.xrc:3079
-#: ../src/interface/resources/xrc/sitemanager.xrc:53
+#: ../src/interface/resources/xrc/dialogs.xrc:3023
 #: ../src/interface/LocalListView.cpp:803
 #: ../src/interface/LocalTreeView.cpp:1110
 #: ../src/interface/RemoteListView.cpp:1139
 #: ../src/interface/RemoteTreeView.cpp:917
+#: ../src/interface/sitemanager_dialog.cpp:353
 msgid "&Rename"
 msgstr "Đổi tê&n"
 
@@ -935,7 +941,7 @@ msgstr "&SOCKS 5"
 msgid "&Save as..."
 msgstr "&Ghi lại bằng tên mới…"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3274
+#: ../src/interface/resources/xrc/dialogs.xrc:3218
 msgid "&Search"
 msgstr "&Tìm kiếm"
 
@@ -943,9 +949,13 @@ msgstr "&Tìm kiếm"
 msgid "&Search remote files..."
 msgstr "&Tìm kiếm tập tin từ máy mạng…"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:18
-msgid "&Select Entry:"
-msgstr "&Chọn mục tin:"
+#: ../src/interface/sitemanager_site.cpp:293
+msgid "&Select a key:"
+msgstr "&Chọn một khóa:"
+
+#: ../src/interface/sitemanager_dialog.cpp:341
+msgid "&Select entry:"
+msgstr "&Chọn mục:"
 
 #: ../src/interface/resources/xrc/settings.xrc:1725
 msgid "&Select language:"
@@ -1000,8 +1010,8 @@ msgstr "Bỏ &qua"
 msgid "&Speed limits"
 msgstr "&Giới hạn tốc độ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3446
-#: ../src/interface/resources/xrc/dialogs.xrc:3541
+#: ../src/interface/resources/xrc/dialogs.xrc:3390
+#: ../src/interface/resources/xrc/dialogs.xrc:3485
 msgid "&Start transfer immediately"
 msgstr "Bắt đầu truyền ngay &lập tức"
 
@@ -1025,7 +1035,7 @@ msgstr "&Kiểu dáng cửa sổ:"
 msgid "&Transfer"
 msgstr "&Truyền"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:600
+#: ../src/interface/sitemanager_site.cpp:242
 msgid "&Transfer mode:"
 msgstr "Chế độ &truyền:"
 
@@ -1056,7 +1066,7 @@ msgstr "&Cập nhật bộ nhớ đệm khóa cho máy chủ này"
 msgid "&Upload"
 msgstr "Tải &lên"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3500
+#: ../src/interface/resources/xrc/dialogs.xrc:3444
 msgid "&Upload to:"
 msgstr "Tải &lên:"
 
@@ -1069,11 +1079,11 @@ msgstr "Tải &lên…"
 msgid "&Uploads:"
 msgstr "Tải &lên:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3188
+#: ../src/interface/resources/xrc/dialogs.xrc:3132
 msgid "&Use custom program"
 msgstr "&Dùng chương trình riêng"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:527
+#: ../src/interface/sitemanager_site.cpp:219
 msgid "&Use synchronized browsing"
 msgstr "Dùng d&uyệt đồng bộ"
 
@@ -1095,9 +1105,9 @@ msgstr "Dùng dấ&u ngăn cách mỗi nghìn"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:323
 #: ../src/interface/resources/xrc/dialogs.xrc:2709
-#: ../src/interface/resources/xrc/sitemanager.xrc:260
-#: ../src/interface/sitemanager_site.cpp:273
-#: ../src/interface/sitemanager_site.cpp:356
+#: ../src/interface/sitemanager_site.cpp:141
+#: ../src/interface/sitemanager_site.cpp:547
+#: ../src/interface/sitemanager_site.cpp:630
 msgid "&User:"
 msgstr "&Tài khoản:"
 
@@ -1152,7 +1162,7 @@ msgid "'%s' is not a supported protocol."
 msgstr "“%s” không phải một giao thức được hỗ trợ."
 
 #: ../src/interface/manual_transfer.cpp:419
-#: ../src/interface/sitemanager_site.cpp:504
+#: ../src/interface/sitemanager_site.cpp:773
 msgid "'Account' logontype not supported by selected protocol"
 msgstr "Kiểu “tài khoản” đăng nhập không được hỗ trợ bởi giao thức đã chọn"
 
@@ -1164,7 +1174,7 @@ msgstr ""
 "Kiểu đăng nhập “Thông thường” và “ Tài khoản” không sẵn sàng, đang dùng “Hỏi "
 "mật khẩu” để thay thế."
 
-#: ../src/interface/sitemanager_site.cpp:521
+#: ../src/interface/sitemanager_site.cpp:790
 msgid ""
 "'Normal' and 'Account' logontypes are not available. Your entry has been "
 "changed to 'Ask for password'."
@@ -1189,7 +1199,7 @@ msgid "(%d object filtered)"
 msgid_plural "(%d objects filtered)"
 msgstr[0] "(lọc ra %d đối tượng)"
 
-#: ../src/interface/update_dialog.cpp:350
+#: ../src/interface/update_dialog.cpp:354
 #, c-format
 msgid "(%u%% downloaded)"
 msgstr "(đã tải về %u%%)"
@@ -1228,8 +1238,8 @@ msgstr "(ví dụ: %H:%M)"
 msgid "(example: %Y-%m-%d)"
 msgstr "(ví dụ: %Y-%m-%d)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3756
-#: ../src/interface/resources/xrc/dialogs.xrc:3773
+#: ../src/interface/resources/xrc/dialogs.xrc:3700
+#: ../src/interface/resources/xrc/dialogs.xrc:3717
 #: ../src/interface/resources/xrc/settings.xrc:920
 #: ../src/interface/resources/xrc/settings.xrc:945
 #, c-format
@@ -1321,11 +1331,11 @@ msgstr ""
 msgid "A file previously opened has been changed."
 msgstr "Tập tin mở trước đó đã bị thay đổi."
 
-#: ../src/interface/edithandler.cpp:1736
+#: ../src/interface/edithandler.cpp:1800
 msgid "A file with that name is already being transferred."
 msgstr "Tập tin với tên đó đang truyền đi."
 
-#: ../src/interface/edithandler.cpp:1740
+#: ../src/interface/edithandler.cpp:1804
 msgid ""
 "A file with that name is still being edited. Please close it and try again."
 msgstr "Tập tin đó vẫn đang bị biên tập. Làm ơn đóng nó lại và thử lại."
@@ -1345,7 +1355,7 @@ msgstr ""
 "sách.\n"
 "Không có thêm thông tin cảnh báo sẽ hiển thị trong lần làm việc này."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3892
+#: ../src/interface/resources/xrc/dialogs.xrc:3836
 #: ../src/interface/settings/optionspage_passwords.cpp:189
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
@@ -1416,6 +1426,10 @@ msgstr "Tự độn&g xóa các chuyển tác thành công"
 msgid "ASCII"
 msgstr "ASCII"
 
+#: ../src/interface/sitemanager_site.cpp:289
+msgid "AWS &KMS encryption"
+msgstr "Mã hóa AWS &KMS"
+
 #: ../src/interface/resources/xrc/dialogs.xrc:767
 msgid "About FileZilla"
 msgstr "Giới thiệu về FileZilla"
@@ -1424,7 +1438,7 @@ msgstr "Giới thiệu về FileZilla"
 msgid "Above the file lists"
 msgstr "Trên danh sách tập tin"
 
-#: ../src/interface/sitemanager_site.cpp:286
+#: ../src/interface/sitemanager_site.cpp:560
 msgid "Access &Key:"
 msgstr "&Khóa truy cập:"
 
@@ -1432,7 +1446,7 @@ msgstr "&Khóa truy cập:"
 msgid "Access to some local directories could not be restored:"
 msgstr "Truy cập vào một số thư mục nội bộ có thể không thể phục hồi lại:"
 
-#: ../src/engine/server.cpp:717 ../src/engine/server.cpp:740
+#: ../src/engine/server.cpp:721 ../src/engine/server.cpp:744
 #: ../src/interface/manual_transfer.cpp:148
 #: ../src/interface/manual_transfer.cpp:149
 #: ../src/interface/manual_transfer.cpp:185
@@ -1492,8 +1506,8 @@ msgstr ""
 msgid "Active mode IP"
 msgstr "Kích hoạt ở chế độ IP"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3453
-#: ../src/interface/resources/xrc/dialogs.xrc:3548
+#: ../src/interface/resources/xrc/dialogs.xrc:3397
+#: ../src/interface/resources/xrc/dialogs.xrc:3492
 msgid "Add files to &queue only"
 msgstr "Chỉ thêm tập tin vào &hàng đợi"
 
@@ -1516,7 +1530,7 @@ msgstr "Thêm vào hàng đợi"
 msgid "Address type not supported"
 msgstr "Kiểu địa chỉ không được hỗ trợ"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:452
+#: ../src/interface/sitemanager_site.cpp:194
 msgid "Advanced"
 msgstr "Cao cấp"
 
@@ -1534,7 +1548,7 @@ msgstr ""
 "thể không làm việc như mong muốn và có thể làm hỏng cả hệ thống của bạn. Bạn "
 "phải tự chịu trách nhiệm khi dùng bản thử nghiệm và bản biên dịch hàng ngày."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3692
+#: ../src/interface/resources/xrc/dialogs.xrc:3636
 msgid "Al&ways perform this action"
 msgstr "&Luôn dùng hành động này"
 
@@ -1566,7 +1580,7 @@ msgstr "Cho phép &quay lại chế độ cũ khi truyền thất bại"
 msgid "Allow fallback to other transfer mode on failure"
 msgstr "Cho phép quay lại chế độ cũ khi truyền thất bại"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3652
+#: ../src/interface/resources/xrc/dialogs.xrc:3596
 msgid "Already connected"
 msgstr "Đã có kết nối sẵn dùng"
 
@@ -1617,13 +1631,13 @@ msgstr ""
 "Đã xảy ra lỗi khi ghi lại hàng đợi thành \"%s\".\n"
 "Một số phần tử hàng đợi có lẽ không được ghi lại."
 
-#: ../src/interface/sitemanager_dialog.cpp:1583
+#: ../src/interface/sitemanager_dialog.cpp:1667
 msgid ""
 "An item with the same name as the dragged item already exists at the target "
 "location."
 msgstr "Một mục cùng tên với mục kéo thả đã sẵn có trong vị trí đích."
 
-#: ../src/engine/server.cpp:742 ../src/interface/manual_transfer.cpp:147
+#: ../src/engine/server.cpp:746 ../src/interface/manual_transfer.cpp:147
 #: ../src/interface/manual_transfer.cpp:188
 #: ../src/interface/manual_transfer.cpp:203
 #: ../src/interface/manual_transfer.cpp:534
@@ -1635,7 +1649,7 @@ msgid ""
 "Another remote operation is already in progress, cannot change directory now."
 msgstr "Thao tác khác đang tiến hành, không thể thay đổi thư mục vào lúc này."
 
-#: ../src/interface/sitemanager_dialog.cpp:742
+#: ../src/interface/sitemanager_dialog.cpp:800
 msgid "Any changes made in the Site Manager could not be saved."
 msgstr ""
 "Bất kỳ thay đổi nào tạo tại Quản Lý Địa Chỉ cũng không thể được ghi lại."
@@ -1653,7 +1667,7 @@ msgid "App&ly to directories only"
 msgstr "Chỉ á&p dụng cho các thư mục"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:304
+#: ../src/interface/sitemanager_site.cpp:578
 msgid "Application &Key:"
 msgstr "&Khóa ứng dụng:"
 
@@ -1689,7 +1703,7 @@ msgstr "Như một tab trong bảng điều khiển của hàng đợi truyền"
 msgid "Ask for action"
 msgstr "Hỏi thao tác"
 
-#: ../src/engine/server.cpp:708 ../src/engine/server.cpp:734
+#: ../src/engine/server.cpp:712 ../src/engine/server.cpp:738
 #: ../src/interface/manual_transfer.cpp:179
 msgid "Ask for password"
 msgstr "Hỏi mật khẩu"
@@ -1743,7 +1757,7 @@ msgstr "Tự động phân loại kiểu tập tin"
 msgid "B <Unit symbol for bytes. Only translate first letter>"
 msgstr "B <Ký hiệu đơn vị cho byte. Chỉ dịch chữ đầu>"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:478
+#: ../src/interface/sitemanager_site.cpp:204
 msgid "B&ypass proxy"
 msgstr "Bằng cách dùng chủ ủ&y nhiệm"
 
@@ -1759,7 +1773,7 @@ msgstr "Cách dùng cơ bản"
 msgid "Behaviour"
 msgstr "Cách xử lý"
 
-#: ../src/interface/edithandler.cpp:1176 ../src/interface/edithandler.cpp:1204
+#: ../src/interface/edithandler.cpp:1229 ../src/interface/edithandler.cpp:1257
 msgid "Being edited"
 msgstr "Đang được sửa chữa"
 
@@ -1775,20 +1789,20 @@ msgstr "Bảng đen"
 msgid "Blue"
 msgstr "Xanh dương"
 
-#: ../src/interface/bookmarks_dialog.cpp:271 ../src/interface/menu_bar.cpp:434
-#: ../src/interface/sitemanager_dialog.cpp:335
+#: ../src/interface/bookmarks_dialog.cpp:272 ../src/interface/menu_bar.cpp:434
+#: ../src/interface/sitemanager_dialog.cpp:408
 msgid "Bookmark"
 msgstr "Dấu trang"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3056
+#: ../src/interface/resources/xrc/dialogs.xrc:3000
 msgid "Bookmark:"
 msgstr "Dấu trang:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3045
+#: ../src/interface/resources/xrc/dialogs.xrc:2989
 msgid "Bookmarks"
 msgstr "Dấu trang"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:334
+#: ../src/interface/sitemanager_site.cpp:162
 msgid "Browse..."
 msgstr "Duyệt…"
 
@@ -1841,6 +1855,10 @@ msgstr "Sa&o chép URL cùng với mật khẩu vào clipboard"
 msgid "C&ustom"
 msgstr "&Người dùng"
 
+#: ../src/interface/sitemanager_site.cpp:298
+msgid "C&ustom KMS ARN:"
+msgstr "KMS ARN &tự chọn:"
+
 #: ../src/interface/resources/xrc/settings.xrc:1854
 msgid "C&ustom filetype associations:"
 msgstr "Ràng buộc xử lý kiể&u tập tin với ứng dụng cụ thể:"
@@ -1883,15 +1901,15 @@ msgstr "Không thể ghi dữ liệu vào tập tin: %s"
 #: ../src/interface/resources/xrc/dialogs.xrc:2435
 #: ../src/interface/resources/xrc/dialogs.xrc:2817
 #: ../src/interface/resources/xrc/dialogs.xrc:2972
-#: ../src/interface/resources/xrc/dialogs.xrc:3140
-#: ../src/interface/resources/xrc/dialogs.xrc:3230
-#: ../src/interface/resources/xrc/dialogs.xrc:3470
-#: ../src/interface/resources/xrc/dialogs.xrc:3565
-#: ../src/interface/resources/xrc/dialogs.xrc:3635
-#: ../src/interface/resources/xrc/dialogs.xrc:3710
-#: ../src/interface/resources/xrc/dialogs.xrc:3973
-#: ../src/interface/resources/xrc/dialogs.xrc:4045
-#: ../src/interface/resources/xrc/sitemanager.xrc:121
+#: ../src/interface/resources/xrc/dialogs.xrc:3084
+#: ../src/interface/resources/xrc/dialogs.xrc:3174
+#: ../src/interface/resources/xrc/dialogs.xrc:3414
+#: ../src/interface/resources/xrc/dialogs.xrc:3509
+#: ../src/interface/resources/xrc/dialogs.xrc:3579
+#: ../src/interface/resources/xrc/dialogs.xrc:3654
+#: ../src/interface/resources/xrc/dialogs.xrc:3917
+#: ../src/interface/resources/xrc/dialogs.xrc:3989
+#: ../src/interface/sitemanager_dialog.cpp:369
 msgid "Cancel"
 msgstr "Thôi"
 
@@ -1944,7 +1962,7 @@ msgstr ""
 msgid "Cannot create new filter"
 msgstr "Không thể tạo bộ lọc mới"
 
-#: ../src/interface/edithandler.cpp:1663 ../src/interface/edithandler.cpp:1712
+#: ../src/interface/edithandler.cpp:1727 ../src/interface/edithandler.cpp:1776
 #: ../src/interface/LocalListView.cpp:1879 ../src/interface/search.cpp:1210
 #: ../src/interface/search.cpp:1529
 msgid "Cannot edit file"
@@ -1978,8 +1996,8 @@ msgstr "Không thể tải thanh công cụ từ tập tin nguồn"
 msgid "Cannot remember password"
 msgstr "Không thể lưu mật khẩu"
 
-#: ../src/interface/bookmarks_dialog.cpp:733
-#: ../src/interface/sitemanager_dialog.cpp:990
+#: ../src/interface/bookmarks_dialog.cpp:734
+#: ../src/interface/sitemanager_dialog.cpp:1034
 msgid "Cannot rename entry"
 msgstr "Không thể đổi tên đề mục"
 
@@ -1995,16 +2013,16 @@ msgstr "Không thể ghi lại bộ lọc"
 msgid "Cannot select filter"
 msgstr "Không thể chọn bộ lọc"
 
-#: ../src/interface/edithandler.cpp:1552 ../src/interface/edithandler.cpp:1556
-#: ../src/interface/edithandler.cpp:1597
+#: ../src/interface/edithandler.cpp:1613 ../src/interface/edithandler.cpp:1617
+#: ../src/interface/edithandler.cpp:1658
 msgid "Cannot set file association"
 msgstr "Không thể đặt ứng dụng ràng buộc xử lý tập tin"
 
-#: ../src/interface/edithandler.cpp:1135
+#: ../src/interface/edithandler.cpp:1187
 msgid "Cannot show dialog"
 msgstr "Không thể hiển thị hộp thoại"
 
-#: ../src/interface/edithandler.cpp:1736
+#: ../src/interface/edithandler.cpp:1800
 msgid "Cannot view/edit selected file"
 msgstr "Không thể xem/sửa tập tin đã chọn"
 
@@ -2065,7 +2083,7 @@ msgstr "Sửa cài đặt tập tin nhật ký cần phải khởi động lại
 msgid "Character encoding issue"
 msgstr "Dạng ký tự mã hóa"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:666
+#: ../src/interface/sitemanager_site.cpp:261
 msgid "Charset"
 msgstr "Tên bảng mã"
 
@@ -2089,7 +2107,7 @@ msgstr "Kiểm tra phiên bản mới hơn của FileZilla"
 msgid "Check for updates failed"
 msgstr "Kiểm tra phiên bản mới gặp lỗi"
 
-#: ../src/engine/ftp/logon.cpp:287
+#: ../src/engine/ftp/logon.cpp:297
 msgid ""
 "Check your login credentials. The entered password starts or ends with a "
 "space character."
@@ -2097,7 +2115,7 @@ msgstr ""
 "Kiểm tra các giấy ủy nhiệm đăng nhập của bạn. Mật khẩu đã nhập vào bắt đầu "
 "hoặc kết thúc bằng ký tự khoảng trắng."
 
-#: ../src/engine/ftp/logon.cpp:283
+#: ../src/engine/ftp/logon.cpp:293
 msgid ""
 "Check your login credentials. The entered username starts or ends with a "
 "space character."
@@ -2113,31 +2131,31 @@ msgstr "Kiểm tra địa chỉ IP"
 msgid "Checking for updates..."
 msgstr "Đang kiểm tra phiên bản mới…"
 
-#: ../src/interface/updater.cpp:817
+#: ../src/interface/updater.cpp:841
 #, c-format
 msgid "Checksum match on file %s\n"
 msgstr "Tổng kiểm trên tập tin %s khớp\n"
 
-#: ../src/interface/updater.cpp:813
+#: ../src/interface/updater.cpp:837
 #, c-format
 msgid "Checksum mismatch on file %s\n"
 msgstr "Tổng kiểm trên tập tin %s không khớp\n"
 
-#: ../src/interface/sitemanager_site.cpp:1049
+#: ../src/interface/sitemanager_site.cpp:1366
 msgid "Choose a key file"
 msgstr "Chọn tập tin khóa"
 
-#: ../src/interface/sitemanager_site.cpp:1040
+#: ../src/interface/sitemanager_site.cpp:1357
 msgid "Choose the default local directory"
 msgstr "Chọn thư mục nội bộ mặc định"
 
 #: ../src/interface/bookmarks_dialog.cpp:134
-#: ../src/interface/bookmarks_dialog.cpp:386
-#: ../src/interface/sitemanager_dialog.cpp:1824
+#: ../src/interface/bookmarks_dialog.cpp:387
+#: ../src/interface/sitemanager_dialog.cpp:1920
 msgid "Choose the local directory"
 msgstr "Chọn thư mục nội bộ"
 
-#: ../src/engine/http/request.cpp:663
+#: ../src/engine/http/request.cpp:670
 msgid "Chunk data improperly terminated"
 msgstr "Tổng kiểm tra dữ liệu tận cùng không đúng"
 
@@ -2215,7 +2233,7 @@ msgstr "Đóng tìm kiếm nhanh và tiếp tục so sánh?"
 msgid "Closes current tab"
 msgstr "Đóng tab hiện hành lại"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:433
+#: ../src/interface/sitemanager_site.cpp:187
 msgid "Co&mments:"
 msgstr "Chú thíc&h:"
 
@@ -2231,8 +2249,8 @@ msgstr "Cài đặt cột"
 msgid "Command and its arguments should be properly quoted."
 msgstr "Lệnh và tham số phải được trích dẫn đúng."
 
-#: ../src/interface/fzputtygen_interface.cpp:211
-#: ../src/interface/fzputtygen_interface.cpp:233
+#: ../src/interface/fzputtygen_interface.cpp:209
+#: ../src/interface/fzputtygen_interface.cpp:231
 #: ../src/interface/storj_key_interface.cpp:95
 #: ../src/interface/storj_key_interface.cpp:117
 msgid "Command failed"
@@ -2305,7 +2323,7 @@ msgid "Concurrent transfers"
 msgstr "Truyền đồng thời"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1525
-#: ../src/interface/resources/xrc/dialogs.xrc:3340
+#: ../src/interface/resources/xrc/dialogs.xrc:3284
 msgid "Conditions are c&ase sensitive"
 msgstr "Điều kiện thì phân biệt HO&A/thường"
 
@@ -2329,7 +2347,7 @@ msgstr "Cấu hình FileZilla và mạng của bạn"
 msgid "Confirm deletion"
 msgstr "Xác nhận khi xóa"
 
-#: ../src/interface/edithandler.cpp:1675 ../src/interface/file_utils.h:47
+#: ../src/interface/edithandler.cpp:1739 ../src/interface/file_utils.h:47
 #: ../src/interface/LocalListView.cpp:1841
 #: ../src/interface/RemoteListView.cpp:1496
 #: ../src/interface/RemoteTreeView.cpp:1117 ../src/interface/search.cpp:1222
@@ -2418,18 +2436,18 @@ msgstr "Kết nối bị lỗi quá thời gian"
 msgid "Connection closed"
 msgstr "Kết nối đã đóng"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:66 ../src/engine/http/request.cpp:298
-#: ../src/engine/http/request.cpp:311 ../src/engine/http/request.cpp:322
-#: ../src/engine/http/request.cpp:333
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:66 ../src/engine/http/request.cpp:305
+#: ../src/engine/http/request.cpp:318 ../src/engine/http/request.cpp:329
+#: ../src/engine/http/request.cpp:340
 msgid "Connection closed by server"
 msgstr "Kết nối đã đóng bởi máy chủ"
 
 #: ../src/engine/ftp/ftpcontrolsocket.cpp:176
-#: ../src/engine/http/httpcontrolsocket.cpp:197
+#: ../src/engine/http/httpcontrolsocket.cpp:199
 msgid "Connection established, initializing TLS..."
 msgstr "Kết nối đã thiết lập, đang khởi tạo TLS…"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:212
+#: ../src/engine/http/httpcontrolsocket.cpp:214
 msgid "Connection established, sending HTTP request"
 msgstr "Kết nối đã thiết lập, đang gửi yêu cầu HTTP"
 
@@ -2496,14 +2514,12 @@ msgstr "Kết nối với máy chủ thử nghiệm gặp lỗi."
 msgid "Convert key file"
 msgstr "Chuyển đổi tập tin khóa"
 
-#: ../src/interface/bookmarks_dialog.cpp:676
-#: ../src/interface/sitemanager_dialog.cpp:1384
+#: ../src/interface/bookmarks_dialog.cpp:677
 #, c-format
 msgid "Copy (%d) of %s"
 msgstr "Sao chép (%d) trên %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:655
-#: ../src/interface/sitemanager_dialog.cpp:1363
+#: ../src/interface/bookmarks_dialog.cpp:656
 #, c-format
 msgid "Copy of %s"
 msgstr "Bản sao của %s"
@@ -2531,7 +2547,7 @@ msgid "Could not access path %s"
 msgstr "Không thể truy cập đường dẫn %s"
 
 #: ../src/interface/bookmarks_dialog.cpp:103
-#: ../src/interface/bookmarks_dialog.cpp:573
+#: ../src/interface/bookmarks_dialog.cpp:574
 msgid "Could not add connection to Site Manager"
 msgstr "Không thể thêm kết nối này vào bộ quản danh bạ"
 
@@ -2555,8 +2571,8 @@ msgstr "Không thể kết nối tới máy chủ: %s"
 msgid "Could not convert command to server encoding"
 msgstr "Không thể chuyển đổi lệnh tới máy chủ mã hóa"
 
-#: ../src/interface/fzputtygen_interface.cpp:128
-#: ../src/interface/fzputtygen_interface.cpp:138
+#: ../src/interface/fzputtygen_interface.cpp:126
+#: ../src/interface/fzputtygen_interface.cpp:136
 msgid "Could not convert private key"
 msgstr "Không thể chuyển đổi khóa riêng"
 
@@ -2579,7 +2595,7 @@ msgstr "Không thể tạo CFURL từ đường dẫn %s"
 msgid "Could not create URI for this transfer."
 msgstr "Không thể tạo URL cho bộ truyền này."
 
-#: ../src/interface/updater.cpp:540
+#: ../src/interface/updater.cpp:541
 #, c-format
 msgid "Could not create local file %s\n"
 msgstr "Không thể tạo tập tin nội bộ %s\n"
@@ -2619,7 +2635,7 @@ msgstr ""
 "Bạn có thể đặt thư mục chứa dữ liệu cho FileZilla bằng cách đặt biến môi "
 "trường FZ_DATADIR."
 
-#: ../src/engine/ftp/logon.cpp:753
+#: ../src/engine/ftp/logon.cpp:763
 msgid "Could not generate custom login sequence."
 msgstr "Không thể tạo ra đăng nhập liên tiếp."
 
@@ -2641,12 +2657,12 @@ msgstr "Không thể nhận đường dẫn tự nhiên từ CFURL"
 msgid "Could not get path from URL"
 msgstr "Không thể lấy đường dẫn từ URL"
 
-#: ../src/interface/fzputtygen_interface.cpp:233
+#: ../src/interface/fzputtygen_interface.cpp:231
 #: ../src/interface/storj_key_interface.cpp:117
 msgid "Could not get reply from fzputtygen."
 msgstr "Không thể nhận trả lời từ fzputtygen."
 
-#: ../src/interface/edithandler.cpp:1663 ../src/interface/search.cpp:1210
+#: ../src/interface/edithandler.cpp:1727 ../src/interface/search.cpp:1210
 msgid "Could not get temporary directory to download file into."
 msgstr "Không thể nhận thư mục tạm thời từ tập tin tải về vào."
 
@@ -2664,13 +2680,13 @@ msgstr ""
 #: ../src/interface/fzputtygen_interface.cpp:66
 #: ../src/interface/fzputtygen_interface.cpp:72
 #: ../src/interface/fzputtygen_interface.cpp:79
-#: ../src/interface/fzputtygen_interface.cpp:145
-#: ../src/interface/fzputtygen_interface.cpp:150
-#: ../src/interface/fzputtygen_interface.cpp:158
+#: ../src/interface/fzputtygen_interface.cpp:143
+#: ../src/interface/fzputtygen_interface.cpp:148
+#: ../src/interface/fzputtygen_interface.cpp:156
 msgid "Could not load key file"
 msgstr "Không thể tải tập tin khóa"
 
-#: ../src/interface/fzputtygen_interface.cpp:112
+#: ../src/interface/fzputtygen_interface.cpp:110
 msgid "Could not load private key"
 msgstr "Không thể tải khóa riêng tập tin"
 
@@ -2704,12 +2720,12 @@ msgstr ""
 "Không có thư mục máy chủ tương đương với thư mục nội bộ “%s”.\n"
 "Chức năng duyệt đồng bộ đã bị tắt."
 
-#: ../src/interface/updater.cpp:783
+#: ../src/interface/updater.cpp:807
 #, c-format
 msgid "Could not obtain size of '%s'"
 msgstr "Không thể lấy kích thước của “%s”"
 
-#: ../src/interface/updater.cpp:796
+#: ../src/interface/updater.cpp:820
 #, c-format
 msgid "Could not open '%s'"
 msgstr "Không thể mở “%s”"
@@ -2735,7 +2751,7 @@ msgstr "Không thể phân tích cú pháp đường dẫn máy chủ."
 msgid "Could not parse server address:"
 msgstr "Không rõ cú pháp địa chỉ máy chủ:"
 
-#: ../src/interface/updater.cpp:805
+#: ../src/interface/updater.cpp:829
 #, c-format
 msgid "Could not read from '%s'"
 msgstr "Không thể đọc từ “%s”"
@@ -2744,10 +2760,10 @@ msgstr "Không thể đọc từ “%s”"
 msgid "Could not read from data socket."
 msgstr "Không thể đọc từ ổ cắm mạng dữ liệu."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:55 ../src/engine/http/request.cpp:370
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:55 ../src/engine/http/request.cpp:377
 #, c-format
 msgid "Could not read from socket: %s"
-msgstr "Không thể đọc gói mạng: %s"
+msgstr "Không thể đọc từ ổ cắm mạng: %s"
 
 #: ../src/interface/sitemanager.cpp:501
 msgid "Could not read server item."
@@ -2779,7 +2795,7 @@ msgstr "Không thể chuyển đến đầu tập tin"
 msgid "Could not seek to the end of the file"
 msgstr "Không thể chuyển đến cuối tập tin"
 
-#: ../src/interface/fzputtygen_interface.cpp:211
+#: ../src/interface/fzputtygen_interface.cpp:209
 msgid "Could not send command to fzputtygen."
 msgstr "Không thể gửi lệnh tới fzputtygen."
 
@@ -2796,7 +2812,7 @@ msgid "Could not start transfer"
 msgstr "Không thể bắt đầu truyền"
 
 #: ../src/interface/sitemanager.cpp:578
-#: ../src/interface/sitemanager_dialog.cpp:765
+#: ../src/interface/sitemanager_dialog.cpp:823
 #, c-format
 msgid ""
 "Could not write \"%s\", any changes to the Site Manager could not be saved: "
@@ -2804,12 +2820,12 @@ msgid ""
 msgstr ""
 "Không thể ghi vào \"%s\", bất kỳ thay đổi Danh bạ không thể lưu lại: %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:886
+#: ../src/interface/bookmarks_dialog.cpp:887
 #, c-format
 msgid "Could not write \"%s\", the bookmark could not be added: %s"
 msgstr "Không thể ghi \"%s\", dấu trang không thể ghi thêm: %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:331
+#: ../src/interface/bookmarks_dialog.cpp:332
 #, c-format
 msgid "Could not write \"%s\", the global bookmarks could no be saved: %s"
 msgstr "Không thể ghi \"%s\", dấu sách toàn cục sẽ không được ghi lại: %s"
@@ -2824,7 +2840,7 @@ msgstr ""
 "%s"
 
 #: ../src/interface/sitemanager.cpp:703 ../src/interface/sitemanager.cpp:760
-#: ../src/interface/sitemanager_dialog.cpp:1802
+#: ../src/interface/sitemanager_dialog.cpp:1903
 #, c-format
 msgid "Could not write \"%s\", the selected sites could not be exported: %s"
 msgstr "Không thể ghi \"%s\", các địa chỉ đã chọn không thể xuất ra: %s"
@@ -2834,7 +2850,7 @@ msgstr "Không thể ghi \"%s\", các địa chỉ đã chọn không thể xu�
 msgid "Could not write \"%s\":"
 msgstr "Không thể ghi \"%s\":"
 
-#: ../src/interface/fzputtygen_interface.cpp:138
+#: ../src/interface/fzputtygen_interface.cpp:136
 #, c-format
 msgid "Could not write key file: %s"
 msgstr "Không thể ghi tập tin khóa: %s"
@@ -2849,10 +2865,10 @@ msgid "Could not write to log file: %s"
 msgstr "Không thể ghi vào tập tin nhật ký: %s"
 
 #: ../src/engine/ControlSocket.cpp:708 ../src/engine/ControlSocket.cpp:806
-#: ../src/engine/http/request.cpp:236
+#: ../src/engine/http/request.cpp:241
 #, c-format
 msgid "Could not write to socket: %s"
-msgstr "Không thể ghi vào gói mạng: %s"
+msgstr "Không thể ghi vào ổ cắm mạng: %s"
 
 #: ../src/interface/verifycertdialog.cpp:646
 msgid "Country:"
@@ -2934,6 +2950,10 @@ msgstr "Lỗi đạt tới tới hạn tập tin"
 msgid "Critical file transfer error after transferring %s in %s"
 msgstr "Lỗi tới hạn tập tin sau khi truyền đi %s trong %s"
 
+#: ../src/interface/sitemanager_site.cpp:301
+msgid "Cu&stomer encryption"
+msgstr "Mã hóa Cu&stomer"
+
 #: ../src/interface/state.cpp:399
 #, c-format
 msgid ""
@@ -2964,6 +2984,14 @@ msgstr "Đường cong:"
 msgid "Cus&tom"
 msgstr "T&ùy chọn của bạn"
 
+#: ../src/interface/sitemanager_site.cpp:305
+msgid "Cus&tomer Key:"
+msgstr "Khóa Cus&tomer:"
+
+#: ../src/interface/sitemanager_site.cpp:296
+msgid "Custom KMS ARN"
+msgstr "KMS ARN tự chọn"
+
 #: ../src/interface/filter.cpp:135
 msgid "Custom filter set"
 msgstr "Đặt bộ lọc của bạn"
@@ -2985,7 +3013,7 @@ msgstr "Kiể&u dữ liệu"
 msgid "D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"
 msgstr "Tiền tố thập phân dùng ký hiệu SI (ví dụ 1 KB = 1000 byt&es)"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:610
+#: ../src/interface/sitemanager_site.cpp:245
 msgid "D&efault"
 msgstr "Mặ&c định"
 
@@ -3003,7 +3031,7 @@ msgstr "So sánh t&hư mục"
 msgid "D&isable all"
 msgstr "Tắt tất &cả"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3848
+#: ../src/interface/resources/xrc/dialogs.xrc:3792
 #: ../src/interface/settings/optionspage_passwords.cpp:177
 msgid "D&o not save passwords"
 msgstr "&Không lưu mật khẩu"
@@ -3013,15 +3041,15 @@ msgid "D&ouble-click action on directories:"
 msgstr "Hành động khi kích đúp chuột trên thư &mục:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1452
-#: ../src/interface/resources/xrc/dialogs.xrc:3091
+#: ../src/interface/resources/xrc/dialogs.xrc:3035
 msgid "D&uplicate"
 msgstr "&Nhân bản"
 
-#: ../src/engine/server.cpp:62
+#: ../src/engine/server.cpp:63
 msgid "DOS-like with virtual paths"
 msgstr "Tương tự DOS với kiểu đường dẫn ảo"
 
-#: ../src/interface/edithandler.cpp:1716
+#: ../src/interface/edithandler.cpp:1780
 msgid "Dangerous filetype"
 msgstr "Kiểu tập tin nguy hiểm"
 
@@ -3032,7 +3060,7 @@ msgstr "Dữ liệu"
 #: ../src/interface/netconfwizard.cpp:989
 #: ../src/interface/netconfwizard.cpp:1053
 msgid "Data socket closed too early."
-msgstr "Gói tin truyền đi bị đóng quá sớm."
+msgstr "Ổ cắm mạng cho dữ liệu bị đóng quá sớm."
 
 #: ../src/interface/filter_conditions_dialog.cpp:121
 msgid "Date"
@@ -3058,11 +3086,15 @@ msgstr "Gỡ lỗi"
 msgid "Debugging settings"
 msgstr "Cài đặt gỡ lỗi"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:490
+#: ../src/interface/sitemanager_site.cpp:208
 msgid "Default &local directory:"
 msgstr "Thư mục mặc định trên máy nội &bộ:"
 
-#: ../src/engine/server.cpp:54
+#: ../src/interface/sitemanager_site.cpp:295
+msgid "Default (AWS/S3)"
+msgstr "Mặc định (AWS/S3)"
+
+#: ../src/engine/server.cpp:55
 msgid "Default (Autodetect)"
 msgstr "Mặc định (Tự dò tìm)"
 
@@ -3076,11 +3108,11 @@ msgstr "Trình biên dịch mặc định không trích dẫn đúng đắn."
 msgid "Default file exists action"
 msgstr "Hành động mặc định với tập tin đã có sẵn"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:515
+#: ../src/interface/sitemanager_site.cpp:216
 msgid "Default r&emote directory:"
 msgstr "Thư mục mặc định trên máy &mạng:"
 
-#: ../src/interface/sitemanager_site.cpp:651
+#: ../src/interface/sitemanager_site.cpp:920
 msgid ""
 "Default remote path cannot be parsed. Make sure it is a valid absolute path "
 "for the selected server type."
@@ -3120,9 +3152,9 @@ msgid_plural ""
 "attempt..."
 msgstr[0] "Làm trễ kết nối %d giây bởi vì cố gắng kết nối lần trước thất bại…"
 
-#: ../src/interface/sitemanager_dialog.cpp:1030
-msgid "Delete Site Manager entry"
-msgstr "&Xóa đề mục trong Danh bạ"
+#: ../src/interface/sitemanager_dialog.cpp:1085
+msgid "Delete Site Manager entries"
+msgstr "Xóa mục trong Quản lý địa chỉ"
 
 #: ../src/interface/LocalTreeView.cpp:1109
 #: ../src/interface/RemoteTreeView.cpp:916
@@ -3144,7 +3176,7 @@ msgstr "Đang xóa \"%s\""
 msgid "Deleting %u files from \"%s\""
 msgstr "Đang xóa bỏ %u tập tin từ “%s”"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3583
+#: ../src/interface/resources/xrc/dialogs.xrc:3527
 msgid "Deleting symbolic link"
 msgstr "Xóa liên kết mềm"
 
@@ -3161,7 +3193,7 @@ msgstr "Chi tiết"
 msgid "Details for new key:"
 msgstr "Chi tiết khóa mới:"
 
-#: ../src/interface/import.cpp:68 ../src/interface/sitemanager_dialog.cpp:685
+#: ../src/interface/import.cpp:68 ../src/interface/sitemanager_dialog.cpp:748
 msgid "Detected newer version of FileZilla"
 msgstr "Tìm thấy phiên bản mới hơn của FileZilla"
 
@@ -3173,7 +3205,7 @@ msgstr "Các &thư mục"
 msgid "Direction"
 msgstr "Hướng"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:4006
+#: ../src/interface/resources/xrc/dialogs.xrc:3950
 msgid "Directories:"
 msgstr "Các thư mục:"
 
@@ -3181,15 +3213,15 @@ msgstr "Các thư mục:"
 msgid "Directory"
 msgstr "Thư mục"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:4055
+#: ../src/interface/resources/xrc/dialogs.xrc:3999
 msgid "Directory access permissions"
 msgstr "Các quyền truy cập thư mục"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3032
 #: ../src/interface/resources/xrc/settings.xrc:1628
-#: ../src/interface/resources/xrc/sitemanager.xrc:534
 #: ../src/interface/filelistctrl.cpp:477 ../src/interface/Mainfrm.cpp:2359
-#: ../src/interface/Mainfrm.cpp:2379 ../src/interface/toolbar.cpp:51
+#: ../src/interface/Mainfrm.cpp:2379
+#: ../src/interface/sitemanager_dialog.cpp:303
+#: ../src/interface/sitemanager_site.cpp:220 ../src/interface/toolbar.cpp:51
 #: ../src/interface/view.cpp:109
 msgid "Directory comparison"
 msgstr "So sánh thư mục"
@@ -3250,13 +3282,13 @@ msgstr "Ngắt kết nối khỏi máy chủ"
 
 #: ../src/engine/ControlSocket.cpp:48 ../src/engine/ControlSocket.cpp:709
 #: ../src/engine/ControlSocket.cpp:808
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:57 ../src/engine/http/request.cpp:237
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:57 ../src/engine/http/request.cpp:242
 #: ../src/interface/queue.cpp:352
 msgid "Disconnected from server"
 msgstr "Đã ngắt kết nối khỏi máy chủ"
 
 #: ../src/engine/ControlSocket.cpp:833
-#: ../src/engine/http/httpcontrolsocket.cpp:295
+#: ../src/engine/http/httpcontrolsocket.cpp:297
 #, c-format
 msgid "Disconnected from server: %s"
 msgstr "Ngắt kết nối từ máy chủ: %s"
@@ -3267,7 +3299,7 @@ msgstr "Đã ngắt kết nối từ máy chủ dịch vụ trước đó"
 
 #: ../src/interface/toolbar.cpp:46
 msgid "Disconnects from the currently visible server"
-msgstr "Đã ngắt kết nối từ máy chủ dịch vụ hiện hành"
+msgstr "Ngắt kết nối từ máy chủ dịch vụ hiện hành"
 
 #: ../src/interface/menu_bar.cpp:174
 msgid "Display about dialog"
@@ -3297,9 +3329,9 @@ msgstr ""
 msgid "Do you really want to delete all Site Manager entries?"
 msgstr "Bạn có thật sự muốn xóa tất cả các đề mục của Danh bạ không?"
 
-#: ../src/interface/sitemanager_dialog.cpp:1032
-msgid "Do you really want to delete selected entry?"
-msgstr "Bạn có thật sự muốn xóa tất cả các đề mục đã chọn không?"
+#: ../src/interface/sitemanager_dialog.cpp:1087
+msgid "Do you really want to delete the selected entries?"
+msgstr "Bạn có thật sự muốn xóa các mục đã chọn không?"
 
 #: ../src/interface/clearprivatedata.cpp:44
 msgid "Do you really want to delete the transfer queue?"
@@ -3334,7 +3366,7 @@ msgstr "Hành động khi kích đúp chuột"
 msgid "Download"
 msgstr "Tải về"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3745
+#: ../src/interface/resources/xrc/dialogs.xrc:3689
 #: ../src/interface/resources/xrc/settings.xrc:906
 msgid "Download &limit:"
 msgstr "&Giới hạn tải xuống:"
@@ -3348,7 +3380,7 @@ msgstr "Giới hạn tải xuống: %s/s"
 msgid "Download limit: none"
 msgstr "Giới hạn tải xuống: không"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3387
+#: ../src/interface/resources/xrc/dialogs.xrc:3331
 #: ../src/interface/search.cpp:927 ../src/interface/search.cpp:932
 msgid "Download search results"
 msgstr "Tải về kết quả tìm kiếm"
@@ -3370,11 +3402,11 @@ msgstr ""
 "Tốc độ tải xuống: %s/s\n"
 "Tốc độ tải lên: %s/s"
 
-#: ../src/interface/edithandler.cpp:1161
+#: ../src/interface/edithandler.cpp:1214
 msgid "Downloading"
 msgstr "Đang tải về"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:224
+#: ../src/engine/http/httpcontrolsocket.cpp:226
 #, c-format
 msgid "Downloading %s"
 msgstr "Đang tải về %s"
@@ -3401,7 +3433,7 @@ msgid "Drag&drop between different servers has not been implemented yet."
 msgstr ""
 "&Kéo thả giữa các cửa sổ máy chủ hiện tại chưa thể thực hiện được được."
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:65
+#: ../src/interface/sitemanager_dialog.cpp:355
 msgid "Dupl&icate"
 msgstr "Nhân &bản"
 
@@ -3427,7 +3459,7 @@ msgstr "Thoát r&a"
 msgid "E&xport..."
 msgstr "&Xuất ra…"
 
-#: ../src/interface/sitemanager_site.cpp:349
+#: ../src/interface/sitemanager_site.cpp:623
 msgid "E-&mail account:"
 msgstr "Tài khoả&n thư:"
 
@@ -3495,7 +3527,7 @@ msgstr "Chưa có tên"
 
 #: ../src/interface/settings/optionspage_edit.cpp:84
 msgid "Empty quoted string."
-msgstr "Mẩu tin trích dẫn rỗng."
+msgstr "Chuỗi trích dẫn rỗng."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1330
 msgid "En&able all"
@@ -3513,13 +3545,10 @@ msgstr "Đã mã hóa"
 msgid "Encryption"
 msgstr "Mã hóa"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:345
-msgid "Encryption &Key:"
-msgstr "Khóa &Mã hóa:"
-
 #: ../src/interface/resources/xrc/dialogs.xrc:347
+#: ../src/interface/sitemanager_site.cpp:165
 msgid "Encryption &key:"
-msgstr "Khóa &Mã hóa:"
+msgstr "Khóa &mã hóa:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2202
 msgid "Encryption details"
@@ -3537,7 +3566,7 @@ msgstr "Kết thúc so sánh và mở tìm kiếm nhanh?"
 msgid "Enter &custom command..."
 msgstr "Nhập vào &lệnh tùy ý…"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3786
+#: ../src/interface/resources/xrc/dialogs.xrc:3730
 msgid "Enter 0 for unlimited speed."
 msgstr "Nhập 0 để không giới hạn tốc độ."
 
@@ -3649,10 +3678,10 @@ msgid "Error loading queue"
 msgstr "Lỗi khi tải hàng đợi"
 
 #: ../src/interface/bookmarks_dialog.cpp:174
-#: ../src/interface/bookmarks_dialog.cpp:296
-#: ../src/interface/bookmarks_dialog.cpp:752
-#: ../src/interface/bookmarks_dialog.cpp:792
-#: ../src/interface/bookmarks_dialog.cpp:845 ../src/interface/filter.cpp:875
+#: ../src/interface/bookmarks_dialog.cpp:297
+#: ../src/interface/bookmarks_dialog.cpp:753
+#: ../src/interface/bookmarks_dialog.cpp:793
+#: ../src/interface/bookmarks_dialog.cpp:846 ../src/interface/filter.cpp:875
 #: ../src/interface/filter.cpp:966 ../src/interface/Options.cpp:253
 #: ../src/interface/osx_sandbox_userdirs.cpp:65
 #: ../src/interface/osx_sandbox_userdirs.cpp:136
@@ -3661,8 +3690,8 @@ msgstr "Lỗi khi tải hàng đợi"
 #: ../src/interface/sitemanager.cpp:470 ../src/interface/sitemanager.cpp:530
 #: ../src/interface/sitemanager.cpp:639 ../src/interface/sitemanager.cpp:727
 #: ../src/interface/sitemanager.cpp:833 ../src/interface/sitemanager.cpp:924
-#: ../src/interface/sitemanager_dialog.cpp:678
-#: ../src/interface/sitemanager_dialog.cpp:743
+#: ../src/interface/sitemanager_dialog.cpp:741
+#: ../src/interface/sitemanager_dialog.cpp:801
 #: ../src/interface/wrapengine.cpp:943
 msgid "Error loading xml file"
 msgstr "Lỗi tải tập tin xml"
@@ -3671,19 +3700,19 @@ msgstr "Lỗi tải tập tin xml"
 msgid "Error saving queue"
 msgstr "Lỗi ghi lại hàng đợi"
 
-#: ../src/interface/fzputtygen_interface.cpp:178
-#: ../src/interface/fzputtygen_interface.cpp:193
+#: ../src/interface/fzputtygen_interface.cpp:176
+#: ../src/interface/fzputtygen_interface.cpp:191
 #: ../src/interface/storj_key_interface.cpp:62
 #: ../src/interface/storj_key_interface.cpp:77
 msgid "Error starting program"
 msgstr "Lỗi khởi động chương trình"
 
-#: ../src/interface/bookmarks_dialog.cpp:332
-#: ../src/interface/bookmarks_dialog.cpp:887
+#: ../src/interface/bookmarks_dialog.cpp:333
+#: ../src/interface/bookmarks_dialog.cpp:888
 #: ../src/interface/QueueView.cpp:1601 ../src/interface/sitemanager.cpp:579
 #: ../src/interface/sitemanager.cpp:704 ../src/interface/sitemanager.cpp:761
-#: ../src/interface/sitemanager_dialog.cpp:766
-#: ../src/interface/sitemanager_dialog.cpp:1803
+#: ../src/interface/sitemanager_dialog.cpp:824
+#: ../src/interface/sitemanager_dialog.cpp:1904
 #: ../src/interface/xmlfunctions.cpp:153
 msgid "Error writing xml file"
 msgstr "Lỗi ghi tập tin xml"
@@ -3739,7 +3768,7 @@ msgstr "Tên bộ &lọc:"
 msgid "FTP"
 msgstr "Giao thức FTP"
 
-#: ../src/interface/sitemanager_site.cpp:130
+#: ../src/interface/sitemanager_site.cpp:53
 msgid "FTP - File Transfer Protocol"
 msgstr "FTP - Giao Thức Truyền Tập tin"
 
@@ -3793,7 +3822,7 @@ msgstr "Giao thức FTPES - FTP ngầm thông qua TLS"
 #: ../src/interface/LocalListView.cpp:955
 #: ../src/interface/LocalListView.cpp:1962
 #: ../src/interface/LocalTreeView.cpp:895
-#: ../src/interface/LocalTreeView.cpp:1197 ../src/interface/viewheader.cpp:499
+#: ../src/interface/LocalTreeView.cpp:1197 ../src/interface/viewheader.cpp:503
 msgid "Failed to change directory"
 msgstr "Đổi thư mục gặp lỗi"
 
@@ -3806,7 +3835,7 @@ msgstr "Đổi ngôn ngữ gặp lỗi"
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Gặp lỗi khi chuyển đổi lệnh sang bộ mã 8 bít"
 
-#: ../src/interface/sitemanager_dialog.cpp:1583
+#: ../src/interface/sitemanager_dialog.cpp:1667
 msgid "Failed to copy or move sites"
 msgstr "Sao chép hay di chuyển địa chỉ gặp lỗi"
 
@@ -3821,7 +3850,7 @@ msgstr "Gặp lỗi khi tạo ổ cắm mạng để lắng nghe trên cổng %d
 
 #: ../src/engine/ftp/rawtransfer.cpp:213 ../src/engine/ftp/rawtransfer.cpp:216
 msgid "Failed to create listening socket for active mode transfer"
-msgstr "Tạo socket để nghe cho chế độ truyền tích cực gặp lỗi"
+msgstr "Tạo ổ cắm mạng để nghe cho chế độ truyền tích cực gặp lỗi"
 
 #: ../src/interface/loginmanager.cpp:116
 msgid "Failed to decrypt server password."
@@ -3852,7 +3881,7 @@ msgstr "Khởi tạo bộ máy FTP gặp lỗi"
 msgid "Failed to load panels, invalid resource files?"
 msgstr "Tải bảng điều khiển gặp lỗi, tập tin tài nguyên không hợp lệ?"
 
-#: ../src/interface/fzputtygen_interface.cpp:111
+#: ../src/interface/fzputtygen_interface.cpp:109
 #, c-format
 msgid "Failed to load private key: %s"
 msgstr "Lỗi tải khóa riêng: %s"
@@ -3979,7 +4008,7 @@ msgstr "Tập tin"
 
 #: ../src/engine/socket_errors.cpp:53
 msgid "File descriptor not a socket"
-msgstr "Bộ mô tả tập tin không phải là một ổ cắm"
+msgstr "Bộ mô tả tập tin không phải là một ổ cắm mạng"
 
 #: ../src/interface/import.cpp:95
 msgid "File does not contain any importable data."
@@ -4006,12 +4035,12 @@ msgid "File lists"
 msgstr "Danh sách các tập tin"
 
 #: ../src/engine/storj/resolve.cpp:111 ../src/engine/storj/resolve.cpp:174
-#: ../src/interface/edithandler.cpp:1638 ../src/interface/FileZilla.cpp:701
+#: ../src/interface/edithandler.cpp:1702 ../src/interface/FileZilla.cpp:701
 #: ../src/interface/settings/optionspage_edit.cpp:124
 msgid "File not found"
 msgstr "Tập tin không tìm thấy"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3383
+#: ../src/interface/resources/xrc/dialogs.xrc:3327
 #: ../src/interface/search.cpp:741 ../src/interface/toolbar.cpp:53
 msgid "File search"
 msgstr "Tìm kiếm tập tin"
@@ -4070,7 +4099,7 @@ msgid ""
 msgstr ""
 "FileZilla bây giờ kiểm tra cấu hình để chắc chắn là mọi sự cấu hình là đúng."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3670
+#: ../src/interface/resources/xrc/dialogs.xrc:3614
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla đã sẵn sàng kết nối tới máy chủ."
 
@@ -4084,9 +4113,9 @@ msgstr "Cập nhật FileZilla"
 
 #: ../src/interface/menu_bar.cpp:98
 msgid "Filelist status &bars"
-msgstr "Danh sách tập tin trên t&hanh trạng thái"
+msgstr "T&hanh trạng thái danh sách tập tin"
 
-#: ../src/interface/edithandler.cpp:1146
+#: ../src/interface/edithandler.cpp:1200
 #: ../src/interface/filter_conditions_dialog.cpp:101
 #: ../src/interface/LocalListView.cpp:283
 #: ../src/interface/RemoteListView.cpp:397 ../src/interface/search.cpp:160
@@ -4112,11 +4141,11 @@ msgstr "Tên tập tin không thể thay đổi"
 msgid "Filename:"
 msgstr "Tên tập tin:"
 
-#: ../src/interface/file_utils.cpp:343
+#: ../src/interface/file_utils.cpp:356
 msgid "Filenames may not contain any of the following characters: / * ? < > |"
 msgstr "Tên tập tin không thể chứa các ký tự sau đây: / * ? < > |"
 
-#: ../src/interface/file_utils.cpp:308
+#: ../src/interface/file_utils.cpp:321
 msgid ""
 "Filenames may not contain any of the following characters: / \\ : * ? \" < > "
 "|"
@@ -4196,11 +4225,11 @@ msgstr "Bộ lọc các danh sách tập tin"
 msgid "Filter validation failed"
 msgstr "Bộ lọc không hợp lệ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3345
+#: ../src/interface/resources/xrc/dialogs.xrc:3289
 msgid "Find &files"
 msgstr "Tìm các tậ&p tin"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3350
+#: ../src/interface/resources/xrc/dialogs.xrc:3294
 msgid "Find d&irectories"
 msgstr "Tìm các t&hư mục"
 
@@ -4242,7 +4271,7 @@ msgstr ""
 "Với phiên làm việc này các cài đặt mặc định sẽ được dùng. Bất kỳ thay đổi "
 "nào tới các cài đặt sẽ không được ghi lại."
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:692
+#: ../src/interface/sitemanager_site.cpp:267
 msgid "Force &UTF-8"
 msgstr "Buộc dùng bộ mã &UTF-8"
 
@@ -4265,7 +4294,7 @@ msgstr ""
 "một cách đúng đắn."
 
 #. @translator: Two examples: Found new nightly 2014-04-03\n, Found new release 3.9.0.1\n
-#: ../src/interface/updater.cpp:751
+#: ../src/interface/updater.cpp:775
 #, c-format
 msgid "Found new %s %s\n"
 msgstr "Tìm thấy %s %s mới\n"
@@ -4279,7 +4308,7 @@ msgstr "Hàm chức năng %s bị lỗi"
 msgid "Further documentation"
 msgstr "Nhiều tài liệu khác"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:134
+#: ../src/interface/sitemanager_site.cpp:98
 msgid "General"
 msgstr "Chung"
 
@@ -4287,7 +4316,7 @@ msgstr "Chung"
 msgid "General SOCKS server failure"
 msgstr "GÓI MẠNG máy chủ chung gặp lỗi"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:364
+#: ../src/interface/sitemanager_site.cpp:170
 msgid "Generate..."
 msgstr "Chung…"
 
@@ -4310,7 +4339,7 @@ msgstr ""
 "Đặt tên bộ lọc trùng với bộ lọc đã tạo ra từ trước, bạn có muốn ghi đè lên "
 "không?"
 
-#: ../src/interface/bookmarks_dialog.cpp:258
+#: ../src/interface/bookmarks_dialog.cpp:260
 msgid "Global bookmarks"
 msgstr "Dấu trang toàn cục"
 
@@ -4374,7 +4403,7 @@ msgid "Host key mismatch"
 msgstr "Khóa máy chủ không khớp"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:295
+#: ../src/interface/sitemanager_site.cpp:569
 msgid "Host name of identity service"
 msgstr "Tên máy của dịch vụ định danh"
 
@@ -4391,7 +4420,7 @@ msgstr "Máy không thể tiếp cận"
 #: ../src/interface/resources/xrc/dialogs.xrc:420
 #: ../src/interface/resources/xrc/dialogs.xrc:1040
 #: ../src/interface/resources/xrc/dialogs.xrc:1161
-#: ../src/interface/verifycertdialog.cpp:740
+#: ../src/interface/verifycertdialog.cpp:763
 msgid "Host:"
 msgstr "Máy chủ:"
 
@@ -4400,7 +4429,7 @@ msgstr "Máy chủ:"
 msgid "Hostkey algorithm:"
 msgstr "Thuật toán trao đổi khóa:"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:568
+#: ../src/interface/sitemanager_site.cpp:230
 msgid "Hours,"
 msgstr "Giờ,"
 
@@ -4418,12 +4447,12 @@ msgid "IPv6 addresses are not supported with SOCKS4 proxy"
 msgstr "Địa chỉ IPv6 không hỗ trợ với máy chủ ủy nhiệm SOCKS4"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:293
+#: ../src/interface/sitemanager_site.cpp:567
 msgid "Identity &host:"
 msgstr "Máy định dan&h:"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:353
+#: ../src/interface/sitemanager_site.cpp:627
 msgid "Identity service path:"
 msgstr "Đường dẫn dịch vụ định danh:"
 
@@ -4497,7 +4526,7 @@ msgstr ""
 "tên tập tin (có thể ghi đè lên những nhật ký cũ hơn) và một tập tin mới được "
 "tạo."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3595
+#: ../src/interface/resources/xrc/dialogs.xrc:3539
 msgid ""
 "If the symlink points to a directory, FileZilla can either delete the "
 "symbolic link or remove the contents of the linked directory."
@@ -4554,7 +4583,7 @@ msgstr ""
 msgid "If you close FileZilla, your changes will be lost."
 msgstr "Nếu bạn đóng FileZilla, những thay đổi của bạn sẽ mất."
 
-#: ../src/interface/verifycertdialog.cpp:735
+#: ../src/interface/verifycertdialog.cpp:758
 msgid ""
 "If you continue, your password and files will be sent in clear over the "
 "internet."
@@ -4685,23 +4714,24 @@ msgid ""
 msgstr ""
 "Không thể lấy về thông tin về phiên bản FileZilla mới nhất. Hãy thử lại sau."
 
-#: ../src/engine/ftp/logon.cpp:261
+#: ../src/engine/ftp/logon.cpp:271
 msgid "Initializing TLS..."
 msgstr "Đang khởi tạo TLS…"
 
-#: ../src/interface/verifycertdialog.cpp:717
-msgid "Insecure FTP connection"
-msgstr "Kết nối FTP không an toàn"
+#: ../src/interface/verifycertdialog.cpp:730
+#, c-format
+msgid "Insecure %s connection"
+msgstr "Kết nối %s không an toàn"
 
 #: ../src/interface/verifycertdialog.cpp:454
 msgid "Insecure algorithm!"
 msgstr "Thuật không an toàn!"
 
-#: ../src/engine/ftp/logon.cpp:244
+#: ../src/engine/ftp/logon.cpp:257
 msgid "Insecure server, it does not support FTP over TLS."
 msgstr "Máy chủ không an toàn, không hỗ trợ FTP thông qua TLS."
 
-#: ../src/engine/server.cpp:714 ../src/engine/server.cpp:738
+#: ../src/engine/server.cpp:718 ../src/engine/server.cpp:742
 #: ../src/interface/manual_transfer.cpp:182
 msgid "Interactive"
 msgstr "Tính tương tác"
@@ -4718,11 +4748,11 @@ msgstr "Bị ngắt bởi tín hiệu"
 msgid "Interrupted by user"
 msgstr "Bị ngắt bởi người dùng"
 
-#: ../src/engine/http/request.cpp:159 ../src/engine/http/request.cpp:575
+#: ../src/engine/http/request.cpp:159 ../src/engine/http/request.cpp:582
 msgid "Invalid Content-Length"
 msgstr "Độ dài của nội dung không hợp lệ"
 
-#: ../src/engine/http/request.cpp:481
+#: ../src/engine/http/request.cpp:488
 msgid "Invalid HTTP Response"
 msgstr "Trả lời HTTP không hợp lệ"
 
@@ -4742,7 +4772,7 @@ msgstr ""
 msgid "Invalid characters in hostname"
 msgstr "Có các ký tự không hợp lệ trong tên máy"
 
-#: ../src/engine/http/request.cpp:698
+#: ../src/engine/http/request.cpp:705
 msgid "Invalid chunk size"
 msgstr "Tổng kiểm tra kích thước không đúng"
 
@@ -4758,11 +4788,11 @@ msgstr "Dữ liệu nhận về không hợp lệ"
 msgid "Invalid date"
 msgstr "Ngày tháng không hợp lệ"
 
-#: ../src/interface/file_utils.cpp:308 ../src/interface/file_utils.cpp:343
+#: ../src/interface/file_utils.cpp:321 ../src/interface/file_utils.cpp:356
 msgid "Invalid filename"
 msgstr "Tên không hợp lệ"
 
-#: ../src/interface/updater.cpp:746
+#: ../src/interface/updater.cpp:770
 #, c-format
 msgid "Invalid hash: %s\n"
 msgstr "Mã băm không hợp lệ: %s\n"
@@ -4785,7 +4815,7 @@ msgstr "Tên máy không hợp lệ: %s"
 msgid "Invalid input"
 msgstr "Nguồn vào không hợp lệ"
 
-#: ../src/engine/http/request.cpp:509
+#: ../src/engine/http/request.cpp:516
 msgid "Invalid line"
 msgstr "Dòng không hợp lệ"
 
@@ -4823,7 +4853,7 @@ msgstr ""
 msgid "Invalid regular expression"
 msgstr "Biểu thức chính quy không hợp lệ"
 
-#: ../src/engine/http/request.cpp:490
+#: ../src/engine/http/request.cpp:497
 msgid "Invalid response code"
 msgstr "Mã đáp ứng sai"
 
@@ -4879,9 +4909,9 @@ msgid ""
 "incorrect listings if this option is enabled. Although FileZilla performs "
 "some tests to check if the server supports this feature, the test may fail."
 msgstr ""
-"Ban hãy hiểu rằng là không phải mọi máy chủ hỗ trợ đặc tính này và có thể "
+"Ban hãy hiểu rằng là không phải mọi máy chủ hỗ trợ tính năng này và có thể "
 "nhận lại những danh sách sai nếu tùy chọn này được bật. Dù FileZilla thực "
-"hiện một số lần thử để kiểm tra xem máy chủ hỗ trợ đặc tính này hay không, "
+"hiện một số lần thử để kiểm tra xem máy chủ hỗ trợ tính năng này hay không, "
 "việc thử có thể thất bại."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2210
@@ -4892,7 +4922,7 @@ msgstr "Trao đổi khóa"
 msgid "Key exchange:"
 msgstr "Trao đổi khóa:"
 
-#: ../src/engine/server.cpp:711 ../src/engine/server.cpp:736
+#: ../src/engine/server.cpp:715 ../src/engine/server.cpp:740
 msgid "Key file"
 msgstr "Tập tin khóa"
 
@@ -4923,13 +4953,13 @@ msgstr "Lần sửa cuối"
 msgid "Layout"
 msgstr "Bố trí"
 
-#: ../src/interface/sitemanager_site.cpp:906
+#: ../src/interface/sitemanager_site.cpp:1201
 msgid "Leave empty to keep existing data."
 msgstr "Để trống nếu muốn giữ lại dữ liệu có sẵn."
 
 #. @translator: Keep this string as short as possible
 #: ../src/interface/settings/optionspage_passwords.cpp:44
-#: ../src/interface/sitemanager_site.cpp:904
+#: ../src/interface/sitemanager_site.cpp:1199
 msgid "Leave empty to keep existing password."
 msgstr "Để trống nếu muốn giữ lại mật khẩu có sẵn."
 
@@ -4953,7 +4983,7 @@ msgstr "Giới hạn kích thước của tập tin nhật ký"
 msgid "Limit:"
 msgstr "Giới hạn:"
 
-#: ../src/engine/http/request.cpp:652
+#: ../src/engine/http/request.cpp:659
 msgid "Line length exceeded"
 msgstr "Vượt quá độ dài dòng"
 
@@ -4963,7 +4993,7 @@ msgstr "Dùng các thư viện"
 
 #: ../src/interface/netconfwizard.cpp:276
 msgid "Listen socket closed"
-msgstr "Gói mạng để nghe bị đóng lại"
+msgstr "Ổ cắm mạng để nghe đã đóng"
 
 #: ../src/engine/logging.cpp:137 ../src/interface/StatusView.cpp:303
 #: ../src/interface/StatusView.cpp:388
@@ -4974,7 +5004,7 @@ msgstr "Danh sách:"
 msgid "Lo&west available port:"
 msgstr "Cổn&g thấp nhất có thể:"
 
-#: ../src/interface/edithandler.cpp:1194 ../src/interface/edithandler.cpp:1438
+#: ../src/interface/edithandler.cpp:1247 ../src/interface/edithandler.cpp:1499
 msgid "Local"
 msgstr "Máy nội bộ"
 
@@ -4994,7 +5024,7 @@ msgstr "Tập tin nội bộ"
 msgid "Local file does not exist."
 msgstr "Tập tin nội bộ không tồn tại."
 
-#: ../src/interface/updater.cpp:452 ../src/interface/updater.cpp:544
+#: ../src/interface/updater.cpp:453 ../src/interface/updater.cpp:545
 #, c-format
 msgid "Local file is %s\n"
 msgstr "Tập tin nội bộ là %s\n"
@@ -5015,15 +5045,15 @@ msgstr "Tìm kiếm tập tin trên máy nội bộ"
 msgid "Local filters:"
 msgstr "Bộ lọc nội bộ:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3518
+#: ../src/interface/resources/xrc/dialogs.xrc:3462
 msgid "Local path handling:"
 msgstr "Xử lý đường dẫn máy nội bộ:"
 
-#: ../src/interface/viewheader.cpp:337
+#: ../src/interface/viewheader.cpp:341
 msgid "Local site:"
 msgstr "Địa chỉ máy nội bộ:"
 
-#: ../src/interface/updater.cpp:787
+#: ../src/interface/updater.cpp:811
 #, c-format
 msgid "Local size of '%s' does not match expected size: %d != %d"
 msgstr "Cỡ nội bộ của “%s” không khớp với cỡ mong chờ: %d != %d"
@@ -5036,7 +5066,7 @@ msgstr "Vị trí:"
 msgid "Log file"
 msgstr "Tập tin nhật ký"
 
-#: ../src/engine/ftp/logon.cpp:420
+#: ../src/engine/ftp/logon.cpp:430
 msgid "Logged in"
 msgstr "Đã đăng nhập"
 
@@ -5045,7 +5075,7 @@ msgstr "Đã đăng nhập"
 msgid "Logging"
 msgstr "Đăng nhập"
 
-#: ../src/engine/ftp/logon.cpp:306
+#: ../src/engine/ftp/logon.cpp:316
 msgid ""
 "Login data contains non-ASCII characters and server might not be UTF-8 "
 "aware. Cannot fall back to local charset since using proxy."
@@ -5054,7 +5084,7 @@ msgstr ""
 "thể không nhận dạng được bộ mã UTF-8. Không thể quay lại dùng bộ ký tự nội "
 "bộ từ khi dùng máy chủ ủy nhiệm."
 
-#: ../src/engine/ftp/logon.cpp:313
+#: ../src/engine/ftp/logon.cpp:323
 msgid ""
 "Login data contains non-ASCII characters and server might not be UTF-8 "
 "aware. Trying local charset."
@@ -5062,7 +5092,7 @@ msgstr ""
 "Dữ liệu đăng nhập chứa các ký tự không nằm trong bộ mã ASCII và máy chủ có "
 "thể không nhận dạng được bộ mã UTF-8. Thử dùng bộ ký tự nội bộ."
 
-#: ../src/engine/ftp/logon.cpp:340
+#: ../src/engine/ftp/logon.cpp:350
 msgid "Login sequence fully executed yet not logged in, aborting."
 msgstr ""
 "Chuỗi đăng nhập thực hiện đầy đủ tuy thế vẫn chưa đăng nhập được, đang bãi "
@@ -5109,9 +5139,9 @@ msgstr ""
 "Hãy chắc chắn rằng tập tin có thể được phép truy cập và hợp chuẩn tài liệu "
 "dạng XML."
 
-#: ../src/engine/http/request.cpp:639 ../src/engine/http/request.cpp:645
-#: ../src/engine/http/request.cpp:652 ../src/engine/http/request.cpp:663
-#: ../src/engine/http/request.cpp:698
+#: ../src/engine/http/request.cpp:646 ../src/engine/http/request.cpp:652
+#: ../src/engine/http/request.cpp:659 ../src/engine/http/request.cpp:670
+#: ../src/engine/http/request.cpp:705
 #, c-format
 msgid "Malformed chunk data: %s"
 msgstr "Mẩu dữ liệu sai dạng: %s"
@@ -5121,15 +5151,15 @@ msgstr "Mẩu dữ liệu sai dạng: %s"
 msgid "Malformed request header: %s"
 msgstr "Phần đầu yêu cầu sai dạng: %s"
 
-#: ../src/engine/http/request.cpp:450 ../src/engine/http/request.cpp:456
-#: ../src/engine/http/request.cpp:509 ../src/engine/http/request.cpp:565
-#: ../src/engine/http/request.cpp:575
+#: ../src/engine/http/request.cpp:457 ../src/engine/http/request.cpp:463
+#: ../src/engine/http/request.cpp:516 ../src/engine/http/request.cpp:572
+#: ../src/engine/http/request.cpp:582
 #, c-format
 msgid "Malformed response header: %s"
 msgstr "Phần đầu trả về sai dạng: %s"
 
-#: ../src/engine/http/request.cpp:397 ../src/engine/http/request.cpp:411
-#: ../src/engine/http/request.cpp:429
+#: ../src/engine/http/request.cpp:404 ../src/engine/http/request.cpp:418
+#: ../src/engine/http/request.cpp:436
 #, c-format
 msgid "Malformed response: %s"
 msgstr "Phần đáp ứng sai dạng: %s"
@@ -5151,24 +5181,24 @@ msgstr "Truyền thủ công"
 msgid "Master &Password:"
 msgstr "Mật khẩ&u chính:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3864
+#: ../src/interface/resources/xrc/dialogs.xrc:3808
 #: ../src/interface/settings/optionspage_passwords.cpp:182
 msgid "Master password:"
 msgstr "Mật khẩu chính:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3306
+#: ../src/interface/resources/xrc/dialogs.xrc:3250
 msgid "Match all of the following"
 msgstr "Tương ứng với tất cả cái như sau"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3307
+#: ../src/interface/resources/xrc/dialogs.xrc:3251
 msgid "Match any of the following"
 msgstr "Tương ứng với tất cả cái như sau"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3308
+#: ../src/interface/resources/xrc/dialogs.xrc:3252
 msgid "Match none of the following"
 msgstr "Không tương ứng với tất cả cái như sau"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3309
+#: ../src/interface/resources/xrc/dialogs.xrc:3253
 msgid "Match not all of the following"
 msgstr "Khớp không phải tất cả cái như sau"
 
@@ -5196,7 +5226,7 @@ msgstr "Thông điệp quá lớn"
 msgid "MiB"
 msgstr "MiB"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:584
+#: ../src/interface/sitemanager_site.cpp:234
 msgid "Minutes"
 msgstr "Phút"
 
@@ -5217,10 +5247,14 @@ msgid "My Documents"
 msgstr "Thư mục My Documents"
 
 #: ../src/interface/sitemanager.cpp:287
-#: ../src/interface/sitemanager_dialog.cpp:664
-#: ../src/interface/sitemanager_dialog.cpp:667
+#: ../src/interface/sitemanager_dialog.cpp:727
+#: ../src/interface/sitemanager_dialog.cpp:730
 msgid "My Sites"
 msgstr "Thư mục My Sites"
+
+#: ../src/interface/sitemanager_site.cpp:285
+msgid "N&o encryption"
+msgstr "&Không mã hóa"
 
 #: ../src/interface/settings/optionspage_themes.cpp:197
 #: ../src/interface/settings/optionspage_themes.cpp:200
@@ -5231,12 +5265,12 @@ msgstr "Không định nghĩa"
 msgid "Name"
 msgstr "Tên"
 
-#: ../src/interface/bookmarks_dialog.cpp:733
-#: ../src/interface/sitemanager_dialog.cpp:990
+#: ../src/interface/bookmarks_dialog.cpp:734
+#: ../src/interface/sitemanager_dialog.cpp:1034
 msgid "Name already exists"
 msgstr "Tên đã có rồi"
 
-#: ../src/interface/bookmarks_dialog.cpp:857
+#: ../src/interface/bookmarks_dialog.cpp:858
 #: ../src/interface/sitemanager.cpp:670
 msgid "Name of bookmark already exists."
 msgstr "Tên dấu trang đã sẵn có."
@@ -5263,7 +5297,7 @@ msgstr "Phải nhập đường dẫn máy nội bộ hợp lệ"
 msgid "Need to enter valid remote path"
 msgstr "Phải nhập đường dẫn máy mạng hợp lệ"
 
-#: ../src/interface/sitemanager_site.cpp:555
+#: ../src/interface/sitemanager_site.cpp:824
 msgid "Need to specify a character encoding"
 msgstr "Cần chỉ rõ bộ mã ký tự"
 
@@ -5285,16 +5319,16 @@ msgstr "Mạng máy tính không kết nối tới"
 msgid "Never"
 msgstr "Không bao giờ"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:41
-msgid "New &Folder"
-msgstr "Thư &mục mới"
+#: ../src/interface/sitemanager_dialog.cpp:351
+msgid "New &folder"
+msgstr "&Thư mục mới"
 
 #: ../src/interface/menu_bar.cpp:53
 msgid "New &tab"
 msgstr "&Tab mới"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3074
-#: ../src/interface/resources/xrc/sitemanager.xrc:47
+#: ../src/interface/resources/xrc/dialogs.xrc:3018
+#: ../src/interface/sitemanager_dialog.cpp:352
 msgid "New Book&mark"
 msgstr "Tạo &mới"
 
@@ -5306,14 +5340,14 @@ msgstr "Tạo &mới"
 #: ../src/interface/bookmarks_dialog.cpp:97
 #: ../src/interface/bookmarks_dialog.cpp:103
 #: ../src/interface/bookmarks_dialog.cpp:111
-#: ../src/interface/bookmarks_dialog.cpp:466
-#: ../src/interface/bookmarks_dialog.cpp:567
-#: ../src/interface/bookmarks_dialog.cpp:573
-#: ../src/interface/bookmarks_dialog.cpp:579
-#: ../src/interface/bookmarks_dialog.cpp:600
-#: ../src/interface/bookmarks_dialog.cpp:857
+#: ../src/interface/bookmarks_dialog.cpp:467
+#: ../src/interface/bookmarks_dialog.cpp:568
+#: ../src/interface/bookmarks_dialog.cpp:574
+#: ../src/interface/bookmarks_dialog.cpp:580
+#: ../src/interface/bookmarks_dialog.cpp:601
+#: ../src/interface/bookmarks_dialog.cpp:858
 #: ../src/interface/sitemanager.cpp:670
-#: ../src/interface/sitemanager_dialog.cpp:1744
+#: ../src/interface/sitemanager_dialog.cpp:1847
 msgid "New bookmark"
 msgstr "Tạo dấu trang mới"
 
@@ -5326,18 +5360,18 @@ msgstr "Thư &mục mới"
 #: ../src/interface/welcome_dialog.cpp:86
 #, c-format
 msgid "New features and improvements in %s"
-msgstr "Các đặc tính mới các sự cải tiến trong phiên bản %s"
+msgstr "Các tính năng mới và các cải tiến trong phiên bản %s"
 
 #: ../src/interface/filteredit.cpp:137
 msgid "New filter"
 msgstr "Bộ lọc mới"
 
-#: ../src/interface/sitemanager_dialog.cpp:850
+#: ../src/interface/sitemanager_dialog.cpp:903
 msgid "New folder"
 msgstr "Thư mục mới"
 
 #: ../src/interface/sitemanager.cpp:550 ../src/interface/sitemanager.cpp:564
-#: ../src/interface/sitemanager_dialog.cpp:1716
+#: ../src/interface/sitemanager_dialog.cpp:1824
 msgid "New site"
 msgstr "Tạo địa chỉ mới"
 
@@ -5365,11 +5399,16 @@ msgstr "Không có lệnh nào được đưa ra nên bãi bỏ."
 msgid "No directory added"
 msgstr "Không thêm thư mục nào"
 
+#: ../src/interface/sitemanager_dialog.cpp:1425
+#, c-format
+msgid "No entries found matching '%s'."
+msgstr ""
+
 #: ../src/engine/ftp/ftpcontrolsocket.cpp:635
 msgid "No external IP address set, trying default."
 msgstr "Không có địa chỉ IP trên Internet được đặt, đang thử mặc định."
 
-#: ../src/interface/edithandler.cpp:1135
+#: ../src/interface/edithandler.cpp:1187
 msgid "No files are currently being edited."
 msgstr "Không có tập tin nào hiện thời đang được biên tập."
 
@@ -5390,11 +5429,11 @@ msgstr "Không có ảnh nào có thể dùng được"
 msgid "No name for the filterset given."
 msgstr "Không có tên cho bộ lọc nhận được."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3241
+#: ../src/interface/resources/xrc/dialogs.xrc:3185
 msgid "No program associated with filetype"
 msgstr "Chưa có chương trình nào ràng buộc xử lý kiểu tập tin này"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3158
+#: ../src/interface/resources/xrc/dialogs.xrc:3102
 #, c-format
 msgid "No program has been associated to edit files with the extension '%s'."
 msgstr ""
@@ -5430,14 +5469,14 @@ msgstr "Không"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2603
 msgid "None selected yet"
-msgstr "Chưa có gì được chọn"
+msgstr "Chưa chọn gì"
 
 #: ../src/engine/socket_errors.cpp:75
 msgid "Nonrecoverable failure in name resolution"
 msgstr "Gặp lỗi nghiêm trọng không thể phục hồi trong phân giải tên"
 
-#: ../src/interface/resources/xrc/settings.xrc:963 ../src/engine/server.cpp:705
-#: ../src/engine/server.cpp:732 ../src/interface/manual_transfer.cpp:148
+#: ../src/interface/resources/xrc/settings.xrc:963 ../src/engine/server.cpp:709
+#: ../src/engine/server.cpp:736 ../src/interface/manual_transfer.cpp:148
 #: ../src/interface/manual_transfer.cpp:176
 #: ../src/interface/manual_transfer.cpp:535 ../src/interface/queue.cpp:995
 #: ../src/interface/queue.cpp:1057
@@ -5471,7 +5510,7 @@ msgstr "Chưa được khởi tạo, cần gọi WSAStartup"
 
 #: ../src/interface/Mainfrm.cpp:718
 msgid "Note that this feature is only supported using the FTP protocol."
-msgstr "Chú ý rằng đặc tính này chỉ hỗ trợ dùng giao thức FTP."
+msgstr "Chú ý rằng tính năng này chỉ hỗ trợ dùng giao thức FTP."
 
 #: ../src/interface/resources/xrc/storj.xrc:27
 msgid "Note: A lost key cannot be recovered."
@@ -5486,7 +5525,7 @@ msgid "Note: Using a generic proxy forces passive mode on FTP connections."
 msgstr ""
 "Chú ý: Dùng máy chủ ủy nhiệm chung áp đặt kết nối FTP trong chế độ thụ động."
 
-#: ../src/engine/http/request.cpp:456 ../src/engine/http/request.cpp:645
+#: ../src/engine/http/request.cpp:463 ../src/engine/http/request.cpp:652
 msgid "Null character in line"
 msgstr "Lọc các ký tự null trong dòng"
 
@@ -5521,14 +5560,13 @@ msgstr "&Mở"
 #: ../src/interface/resources/xrc/dialogs.xrc:2428
 #: ../src/interface/resources/xrc/dialogs.xrc:2811
 #: ../src/interface/resources/xrc/dialogs.xrc:2966
-#: ../src/interface/resources/xrc/dialogs.xrc:3224
-#: ../src/interface/resources/xrc/dialogs.xrc:3464
-#: ../src/interface/resources/xrc/dialogs.xrc:3559
-#: ../src/interface/resources/xrc/dialogs.xrc:3628
-#: ../src/interface/resources/xrc/dialogs.xrc:3803
-#: ../src/interface/resources/xrc/dialogs.xrc:3905
-#: ../src/interface/resources/xrc/dialogs.xrc:4039
-#: ../src/interface/resources/xrc/inputdialog.xrc:34
+#: ../src/interface/resources/xrc/dialogs.xrc:3168
+#: ../src/interface/resources/xrc/dialogs.xrc:3408
+#: ../src/interface/resources/xrc/dialogs.xrc:3503
+#: ../src/interface/resources/xrc/dialogs.xrc:3572
+#: ../src/interface/resources/xrc/dialogs.xrc:3747
+#: ../src/interface/resources/xrc/dialogs.xrc:3849
+#: ../src/interface/resources/xrc/dialogs.xrc:3983
 #: ../src/interface/resources/xrc/settings.xrc:28
 #: ../src/interface/resources/xrc/storj.xrc:37
 #: ../src/interface/welcome_dialog.cpp:114
@@ -5563,7 +5601,7 @@ msgstr "Ngày một lần"
 msgid "Once a week"
 msgstr "Tuần một lần"
 
-#: ../src/interface/sitemanager_site.cpp:158
+#: ../src/interface/sitemanager_site.cpp:57
 msgid "Only use plain FTP (insecure)"
 msgstr "Chỉ dùng FTP thường (không an toàn)"
 
@@ -5607,7 +5645,7 @@ msgstr "Mở hộp thoại cài đặt của FileZilla"
 msgid "Opened as:"
 msgstr "Mở như là:"
 
-#: ../src/interface/edithandler.cpp:1706 ../src/interface/edithandler.cpp:1825
+#: ../src/interface/edithandler.cpp:1770 ../src/interface/edithandler.cpp:1889
 #: ../src/interface/LocalListView.cpp:1874
 #: ../src/interface/LocalListView.cpp:1887 ../src/interface/search.cpp:1524
 #: ../src/interface/search.cpp:1537
@@ -5717,7 +5755,7 @@ msgstr "Ghi đè nếu kích thước &khác biệt"
 msgid "Overwrite if different si&ze or source newer"
 msgstr "Ghi đè nếu nguồn mới hơn hay &kích thước khác biệt"
 
-#: ../src/interface/updater.cpp:271
+#: ../src/interface/updater.cpp:272
 #, c-format
 msgid "Own build type: %s\n"
 msgstr "Kiểu biên dịch chủ thể: %s\n"
@@ -5755,15 +5793,15 @@ msgstr "Thụ độn&g (nên dùng)"
 msgid "Parameter not a valid URL"
 msgstr "Tham số không hợp chuẩn URL"
 
-#: ../src/interface/updater.cpp:628
+#: ../src/interface/updater.cpp:629
 #, c-format
 msgid "Parsing %d bytes of version information.\n"
 msgstr "Đang phân tích %d byte của thông tin phiên bản.\n"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2719
-#: ../src/interface/resources/xrc/sitemanager.xrc:286
 #: ../src/interface/quickconnectbar.cpp:50
-#: ../src/interface/sitemanager_site.cpp:274
+#: ../src/interface/sitemanager_site.cpp:149
+#: ../src/interface/sitemanager_site.cpp:548
 msgid "Pass&word:"
 msgstr "Mật &khẩu:"
 
@@ -5810,7 +5848,7 @@ msgstr "Đường dẫn không thể xây dựng từ thư mục %s và thư m�
 msgid "Path not found:"
 msgstr "Không tìm thấy đường dẫn:"
 
-#: ../src/engine/server.cpp:850
+#: ../src/engine/server.cpp:855
 msgid "Path of identity service"
 msgstr "Đường dẫn của dịch vụ định danh"
 
@@ -5818,8 +5856,8 @@ msgstr "Đường dẫn của dịch vụ định danh"
 msgid "Paths"
 msgstr "Đường dẫn"
 
-#: ../src/interface/edithandler.cpp:1173 ../src/interface/edithandler.cpp:1310
-#: ../src/interface/edithandler.cpp:1407 ../src/interface/edithandler.cpp:1417
+#: ../src/interface/edithandler.cpp:1226 ../src/interface/edithandler.cpp:1369
+#: ../src/interface/edithandler.cpp:1467 ../src/interface/edithandler.cpp:1478
 msgid "Pending removal"
 msgstr "Loại bỏ lệnh còn chờ"
 
@@ -5835,6 +5873,11 @@ msgstr "Không đủ thẩm quyền"
 msgid "Permissions"
 msgstr "Các quyền"
 
+#: ../src/engine/ftp/logon.cpp:126
+msgid "Plain FTP is insecure. Please switch to FTP over TLS."
+msgstr ""
+"FTP thường là không an toàn. Vui lòng chuyển qua dùng FTP thông qua TLS."
+
 #: ../src/interface/resources/xrc/dialogs.xrc:947
 msgid "Platform:"
 msgstr "Nền tảng:"
@@ -5847,7 +5890,7 @@ msgstr ""
 "Bạn cần phải thêm ít nhất một thư mục nơi mà bạn muốn tải các tập tin về đó "
 "hoặc là tải các tập tin từ đó."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3998
+#: ../src/interface/resources/xrc/dialogs.xrc:3942
 msgid "Please add the local directories you want to use FileZilla with."
 msgstr "Vui lòng thêm các thư mục nội bộ mà bạn muốn dùng FileZilla với."
 
@@ -6121,7 +6164,7 @@ msgstr ""
 "Vui lòng lưu khóa này ở một vị trí an toàn. Không có tập tin khóa khớp với "
 "khóa bạn tải lên thì không thể truy cập được nữa."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3600
+#: ../src/interface/resources/xrc/dialogs.xrc:3544
 msgid "Please select an action:"
 msgstr "Hãy chọn tác động:"
 
@@ -6170,7 +6213,7 @@ msgstr ""
 "chế độ “DMZ” hay “game”. Những điều giống như kiểm duyệt nghi thức hay "
 "“fixups” phải bị tắt đi"
 
-#: ../src/interface/verifycertdialog.cpp:742
+#: ../src/interface/verifycertdialog.cpp:765
 msgid "Port:"
 msgstr "Cổng:"
 
@@ -6187,7 +6230,7 @@ msgid "Preallocation"
 msgstr "Cấp phát trước"
 
 #: ../src/interface/sitemanager.cpp:286
-#: ../src/interface/sitemanager_dialog.cpp:1442
+#: ../src/interface/sitemanager_dialog.cpp:1513
 msgid "Predefined Sites"
 msgstr "Giới hạn trước các địa chỉ"
 
@@ -6228,15 +6271,15 @@ msgstr ""
 msgid "Private &keys:"
 msgstr "Khóa &riêng:"
 
-#: ../src/interface/sitemanager_site.cpp:289
+#: ../src/interface/sitemanager_site.cpp:563
 msgid "Pro&ject ID:"
 msgstr "Mã số &dự án:"
 
-#: ../src/interface/sitemanager_site.cpp:296
+#: ../src/interface/sitemanager_site.cpp:570
 msgid "Pro&ject:"
 msgstr "&Dự án:"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:142
+#: ../src/interface/sitemanager_site.cpp:108
 msgid "Pro&tocol:"
 msgstr "Giao &thức:"
 
@@ -6260,7 +6303,7 @@ msgid "Processed %s in %s."
 msgstr "Đã xử lý %s trong %s."
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:298
+#: ../src/interface/sitemanager_site.cpp:572
 msgid "Project (or tenant) name or ID"
 msgstr "Tên dự án (hoặc tenant) hoặc ID"
 
@@ -6270,7 +6313,7 @@ msgstr "Giao thức không được hỗ trợ"
 
 #: ../src/engine/socket_errors.cpp:101
 msgid "Protocol not supported on given socket type"
-msgstr "Giao thức không hỗ trợ trên kiểu ổ cắm đã cho"
+msgstr "Giao thức không hỗ trợ trên kiểu ổ cắm mạng đã cho"
 
 #: ../src/interface/resources/xrc/certificate.xrc:192
 msgid "Protocol:"
@@ -6361,8 +6404,8 @@ msgstr "Hàng đợi: rỗng"
 msgid "Queued files"
 msgstr "Hàng đợi các tập tin"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3441
-#: ../src/interface/resources/xrc/dialogs.xrc:3536
+#: ../src/interface/resources/xrc/dialogs.xrc:3385
+#: ../src/interface/resources/xrc/dialogs.xrc:3480
 msgid "Queueing:"
 msgstr "Đang đợi:"
 
@@ -6486,11 +6529,11 @@ msgstr "Nhận được vượt quá 10000 ký tự một dòng, đang bãi bỏ
 msgid "Received data tainted"
 msgstr "Xác nhận dữ liệu bị hỏng"
 
-#: ../src/interface/updater.cpp:605
+#: ../src/interface/updater.cpp:606
 msgid "Received invalid character in version information"
 msgstr "Có ký tự không hợp lệ trong thông tin về phiên bản"
 
-#: ../src/interface/updater.cpp:596
+#: ../src/interface/updater.cpp:597
 msgid "Received version information is too large"
 msgstr "Thông tin về phiên bản nhận được là quá dài"
 
@@ -6540,11 +6583,11 @@ msgstr "Đổi hướng tới địa chỉ không hợp lệ hoặc không đư�
 msgid "Refresh the file and folder lists"
 msgstr "Làm mới lại danh sách tập tin và thư mục"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3925
+#: ../src/interface/resources/xrc/dialogs.xrc:3869
 msgid "Remember passwords?"
 msgstr "Nhớ mật khẩu?"
 
-#: ../src/interface/edithandler.cpp:1157
+#: ../src/interface/edithandler.cpp:1210
 msgid "Remote"
 msgstr "Máy trên mạng"
 
@@ -6561,11 +6604,11 @@ msgstr "Tìm kiếm tập tin máy mạng"
 msgid "Remote filters:"
 msgstr "Bộ lọc máy mạng:"
 
-#: ../src/interface/edithandler.cpp:1148
+#: ../src/interface/edithandler.cpp:1202
 msgid "Remote path"
 msgstr "Đường dẫn máy mạng"
 
-#: ../src/interface/bookmarks_dialog.cpp:442
+#: ../src/interface/bookmarks_dialog.cpp:443
 #, c-format
 msgid ""
 "Remote path cannot be parsed. Make sure it is a valid absolute path and is "
@@ -6574,7 +6617,7 @@ msgstr ""
 "Không thể phân tích đường dẫn máy mạng. Hãy chắc chắn là nó hợp lệ và được "
 "hỗ trợ bởi kiểu máy chủ (%s)."
 
-#: ../src/interface/sitemanager_dialog.cpp:902
+#: ../src/interface/sitemanager_dialog.cpp:950
 #, c-format
 msgid ""
 "Remote path cannot be parsed. Make sure it is a valid absolute path and is "
@@ -6583,9 +6626,9 @@ msgstr ""
 "Không thể phân tích đường dẫn máy mạng. Hãy chắc chắn là nó hợp lệ và được "
 "hỗ trợ bởi kiểu máy chủ (%s) được chọn bởi trang mẹ."
 
-#: ../src/interface/bookmarks_dialog.cpp:445
-#: ../src/interface/bookmarks_dialog.cpp:450
-#: ../src/interface/sitemanager_dialog.cpp:905
+#: ../src/interface/bookmarks_dialog.cpp:446
+#: ../src/interface/bookmarks_dialog.cpp:451
+#: ../src/interface/sitemanager_dialog.cpp:953
 msgid "Remote path cannot be parsed. Make sure it is a valid absolute path."
 msgstr "Không thể phân tích đường dẫn máy mạng. Hãy chắc chắn là nó hợp lệ."
 
@@ -6593,7 +6636,7 @@ msgstr "Không thể phân tích đường dẫn máy mạng. Hãy chắc chắn
 msgid "Remote path could not be parsed."
 msgstr "Đường dẫn máy mạng không thể phân tách được."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3423
+#: ../src/interface/resources/xrc/dialogs.xrc:3367
 msgid "Remote path handling:"
 msgstr "Đường dẫn máy mạng đang xử lý:"
 
@@ -6601,7 +6644,7 @@ msgstr "Đường dẫn máy mạng đang xử lý:"
 msgid "Remote path:"
 msgstr "Đường dẫn máy mạng:"
 
-#: ../src/interface/viewheader.cpp:529
+#: ../src/interface/viewheader.cpp:533
 msgid "Remote site:"
 msgstr "Địa chỉ máy mạng:"
 
@@ -6639,14 +6682,14 @@ msgstr "Đổi tên tập tin và thư mục đã chọn"
 msgid "Renaming '%s' to '%s'"
 msgstr "Đổi tên từ “%s” thành “%s”"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3876
+#: ../src/interface/resources/xrc/dialogs.xrc:3820
 #: ../src/interface/settings/optionspage_passwords.cpp:185
 msgid "Repeat password:"
 msgstr "Lặp lại mật khẩu:"
 
 #: ../src/interface/welcome_dialog.cpp:96
 msgid "Reporting bugs and feature requests"
-msgstr "Cách báo cáo lỗi và yêu cầu các đặc tính mới"
+msgstr "Cách báo cáo lỗi và yêu cầu các tính năng mới"
 
 #: ../src/engine/proxy.cpp:326
 msgid ""
@@ -6665,16 +6708,16 @@ msgstr ""
 msgid "Request rejected or failed"
 msgstr "Yêu cầu bị từ chối hay gặp lỗi"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:234
+#: ../src/engine/http/httpcontrolsocket.cpp:236
 #, c-format
 msgid "Requesting %s"
 msgstr "Đang yêu cầu %s"
 
-#: ../src/interface/sitemanager_site.cpp:156
+#: ../src/interface/sitemanager_site.cpp:55
 msgid "Require explicit FTP over TLS"
 msgstr "Yêu cầu FTP thông qua TLS tường minh"
 
-#: ../src/interface/sitemanager_site.cpp:157
+#: ../src/interface/sitemanager_site.cpp:56
 msgid "Require implicit FTP over TLS"
 msgstr "Yêu cầu FTP thông qua TLS ngầm định"
 
@@ -6704,7 +6747,7 @@ msgstr "Trả về:"
 msgid "Restore ta&bs and reconnect"
 msgstr "Phục hồi lại ta&b và kết nối lại"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3369
+#: ../src/interface/resources/xrc/dialogs.xrc:3313
 msgid "Results:"
 msgstr "Kết quả:"
 
@@ -6758,7 +6801,7 @@ msgstr "Tắt &hệ thống một lần"
 msgid "S&tart normally"
 msgstr "Khởi chạy bình &thường"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3293
+#: ../src/interface/resources/xrc/dialogs.xrc:3237
 msgid "S&top"
 msgstr "&Dừng lại"
 
@@ -6796,12 +6839,12 @@ msgstr "SOCKS5 không hỗ trợ tài khoản và mật khẩu dài hơn 255 ký
 msgid "SQLite:"
 msgstr "SQLite:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3853
+#: ../src/interface/resources/xrc/dialogs.xrc:3797
 #: ../src/interface/settings/optionspage_passwords.cpp:178
 msgid "Sa&ve passwords protected by a master password"
 msgstr "Lư&u các mật khẩu được bảo vệ bằng mật khẩu chính"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3843
+#: ../src/interface/resources/xrc/dialogs.xrc:3787
 #: ../src/interface/settings/optionspage_passwords.cpp:176
 msgid "Sav&e passwords"
 msgstr "Lư&u các mật khẩu"
@@ -6811,12 +6854,12 @@ msgid "Save settings?"
 msgstr "Lưu lại các cài đặt không?"
 
 #: ../src/interface/manual_transfer.cpp:429
-#: ../src/interface/sitemanager_site.cpp:515
+#: ../src/interface/sitemanager_site.cpp:784
 msgid "Saving of password has been disabled by your system administrator."
 msgstr "Việc lưu mật khẩu đã được tắt bởi người quản trị hệ thống."
 
 #: ../src/interface/manual_transfer.cpp:432
-#: ../src/interface/sitemanager_site.cpp:518
+#: ../src/interface/sitemanager_site.cpp:787
 msgid "Saving of passwords has been disabled by you."
 msgstr "Việc lưu mật khẩu đã được tắt bởi chính bạn."
 
@@ -6824,28 +6867,40 @@ msgstr "Việc lưu mật khẩu đã được tắt bởi chính bạn."
 msgid "Scale factor:"
 msgstr "Hệ số tỷ lệ giãn:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3299
+#: ../src/interface/resources/xrc/dialogs.xrc:3243
 msgid "Search &conditions:"
 msgstr "Điều &kiện tìm kiếm:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3281
+#: ../src/interface/resources/xrc/dialogs.xrc:3225
 msgid "Search &directory:"
 msgstr "&Thư mục tìm kiếm:"
+
+#: ../src/interface/sitemanager_dialog.cpp:1394
+msgid "Search for entries containing the entered text."
+msgstr ""
 
 #: ../src/interface/toolbar.cpp:53
 msgid "Search for files recursively."
 msgstr "Tìm kiếm đệ qui tập tin."
 
+#: ../src/interface/sitemanager_dialog.cpp:1425
+msgid "Search result"
+msgstr ""
+
 #: ../src/interface/menu_bar.cpp:146
 msgid "Search server for files"
 msgstr "Tìm kiếm tập tin trên máy chủ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3250
+#: ../src/interface/sitemanager_dialog.cpp:1394
+msgid "Search sites"
+msgstr ""
+
+#: ../src/interface/resources/xrc/dialogs.xrc:3194
 msgid "Search type:"
 msgstr "Kiểu tìm:"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:280
+#: ../src/interface/sitemanager_site.cpp:554
 msgid "Secret Access &Key:"
 msgstr "&Khóa truy cập bí mật:"
 
@@ -6877,7 +6932,7 @@ msgstr ""
 "Chọn hành động thực thi mặc định nếu tập tin đích của việc truyền tập tin đã "
 "sẵn có từ trước."
 
-#: ../src/interface/edithandler.cpp:1617
+#: ../src/interface/edithandler.cpp:1681
 #: ../src/interface/settings/optionspage_edit.cpp:104
 msgid "Select default editor"
 msgstr "Chọn trình soạn thảo mặc định"
@@ -6918,7 +6973,7 @@ msgstr "Chọn tập tin cho hàng đợi xuất ra"
 msgid "Select file for exported settings"
 msgstr "Chọn tập tin để xuất ra thông tin cài đặt"
 
-#: ../src/interface/export.cpp:36 ../src/interface/sitemanager_dialog.cpp:1786
+#: ../src/interface/export.cpp:36 ../src/interface/sitemanager_dialog.cpp:1887
 msgid "Select file for exported sites"
 msgstr "Chọn tập tin cho địa chỉ xuất ra"
 
@@ -6930,11 +6985,11 @@ msgstr "Chọn tập tin để nhập thông tin cài đặt"
 msgid "Select file to upload"
 msgstr "Chọn tập tin để tải lên"
 
-#: ../src/interface/fzputtygen_interface.cpp:116
+#: ../src/interface/fzputtygen_interface.cpp:114
 msgid "Select filename for converted key file"
 msgstr "Chọn tập tin để chuyển đổi tập tin khóa"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3163
+#: ../src/interface/resources/xrc/dialogs.xrc:3107
 msgid "Select how these files should be opened."
 msgstr "Chọn cách mở tập tin."
 
@@ -6999,7 +7054,7 @@ msgstr "Chọn %s và %s. Kích thước tổng cộng: %s"
 msgid "Selected %s and %s. Total size: At least %s"
 msgstr "Đã chọn %s và %s. Kích thước tổng cộng ít nhất là: %s"
 
-#: ../src/interface/edithandler.cpp:1556 ../src/interface/edithandler.cpp:1638
+#: ../src/interface/edithandler.cpp:1617 ../src/interface/edithandler.cpp:1702
 #: ../src/interface/settings/optionspage_edit.cpp:124
 msgid "Selected editor does not exist."
 msgstr "Trình soạn thảo bạn chọn không sẵn có."
@@ -7013,11 +7068,11 @@ msgstr "Tập tin bạn chọn đang bị biên tập"
 msgid "Selected file is already loaded"
 msgstr "Tập tin đã chọn đã được tải"
 
-#: ../src/interface/edithandler.cpp:1740
+#: ../src/interface/edithandler.cpp:1804
 msgid "Selected file is already opened"
 msgstr "Tập tin đã chọn đã được mở"
 
-#: ../src/interface/edithandler.cpp:1812
+#: ../src/interface/edithandler.cpp:1876
 msgid "Selected file is still being edited"
 msgstr "Tập tin đã chọn vẫn còn bị chỉnh sửa"
 
@@ -7054,11 +7109,15 @@ msgstr "Đang gửi lệnh duy trì"
 msgid "Serial number:"
 msgstr "Số sê-ri:"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:461
-msgid "Server &Type:"
+#: ../src/interface/sitemanager_site.cpp:201
+msgid "Server &type:"
 msgstr "&Kiểu máy chủ:"
 
-#: ../src/engine/ftp/logon.cpp:400 ../src/engine/ftp/logon.cpp:460
+#: ../src/interface/sitemanager_site.cpp:283
+msgid "Server Side Encryption:"
+msgstr "Mã hóa phía máy chủ:"
+
+#: ../src/engine/ftp/logon.cpp:410 ../src/engine/ftp/logon.cpp:470
 msgid "Server does not support non-ASCII characters."
 msgstr "Máy chủ không hỗ trợ các ký tự không phải ASCII."
 
@@ -7097,7 +7156,7 @@ msgstr ""
 "Máy chủ có thể không hỗ trợ phục hồi tập tin > %d GB. Kết thúc truyền từ lúc "
 "kích thước tập tin tương ứng."
 
-#: ../src/engine/ftp/logon.cpp:342
+#: ../src/engine/ftp/logon.cpp:352
 msgid ""
 "Server might require an account. Try specifying an account using the Site "
 "Manager"
@@ -7105,7 +7164,7 @@ msgstr ""
 "Máy chủ có thể yêu cầu tài khoản dùng. Thử ghi rõ một tài khoản dùng trong "
 "Danh bạ"
 
-#: ../src/engine/http/request.cpp:450
+#: ../src/engine/http/request.cpp:457
 msgid "Server not sending proper line endings"
 msgstr "Máy chủ không gửi ký tự xuống dòng thích hợp"
 
@@ -7131,7 +7190,7 @@ msgid ""
 msgstr ""
 "Máy chủ gửi một lời nhắc đăng nhập. Bạn cần dùng đăng nhập kiểu tương tác."
 
-#: ../src/engine/http/request.cpp:302
+#: ../src/engine/http/request.cpp:309
 msgid "Server sent data even before request headers were sent"
 msgstr "Máy phục vụ gửi dữ liệu trước cả khi phần đầu yêu cầu được gửi"
 
@@ -7149,8 +7208,8 @@ msgstr ""
 "Máy chủ gửi trả lời thụ động với địa chỉ không đầy đủ. Dùng địa chỉ máy chủ "
 "để thay thế."
 
-#: ../src/engine/http/request.cpp:397 ../src/engine/http/request.cpp:411
-#: ../src/engine/http/request.cpp:429
+#: ../src/engine/http/request.cpp:404 ../src/engine/http/request.cpp:418
+#: ../src/engine/http/request.cpp:436
 msgid "Server sent too much data."
 msgstr "Máy phục vụ gửi quá nhiều dữ liệu."
 
@@ -7168,7 +7227,7 @@ msgstr "Máy chủ gửi trả lời không hợp lệ."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2329
 msgid "Server to client MAC:"
-msgstr "Máy chủ tới máy khách MAC:"
+msgstr "Máy chủ tới MAC máy khách:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2319
 msgid "Server to client cipher:"
@@ -7255,7 +7314,7 @@ msgstr "Tắt ngay bây giờ"
 msgid "Signature algorithm:"
 msgstr "Thuật toán ký:"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:207
+#: ../src/interface/sitemanager_site.cpp:127
 msgid "Signup"
 msgstr "Đăng ký"
 
@@ -7263,11 +7322,11 @@ msgstr "Đăng ký"
 msgid "Site &Manager entries"
 msgstr "Các đề &mục Danh bạ"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:7
+#: ../src/interface/sitemanager_dialog.cpp:323
 msgid "Site Manager"
 msgstr "Danh bạ"
 
-#: ../src/interface/sitemanager_site.cpp:525
+#: ../src/interface/sitemanager_site.cpp:794
 msgid "Site Manager - Cannot remember password"
 msgstr "Quản lý địa chỉ - Không thể lưu mật khẩu"
 
@@ -7275,28 +7334,28 @@ msgstr "Quản lý địa chỉ - Không thể lưu mật khẩu"
 msgid "Site Manager - Generated key"
 msgstr "Quản lý địa chỉ - Khóa đã tạo"
 
-#: ../src/interface/sitemanager_dialog.cpp:907
-#: ../src/interface/sitemanager_dialog.cpp:916
-#: ../src/interface/sitemanager_dialog.cpp:923
-#: ../src/interface/sitemanager_site.cpp:491
-#: ../src/interface/sitemanager_site.cpp:504
-#: ../src/interface/sitemanager_site.cpp:538
-#: ../src/interface/sitemanager_site.cpp:555
-#: ../src/interface/sitemanager_site.cpp:568
-#: ../src/interface/sitemanager_site.cpp:583
-#: ../src/interface/sitemanager_site.cpp:593
-#: ../src/interface/sitemanager_site.cpp:601
-#: ../src/interface/sitemanager_site.cpp:626
-#: ../src/interface/sitemanager_site.cpp:635
-#: ../src/interface/sitemanager_site.cpp:651
-#: ../src/interface/sitemanager_site.cpp:660
-#: ../src/interface/sitemanager_site.cpp:676
+#: ../src/interface/sitemanager_dialog.cpp:955
+#: ../src/interface/sitemanager_dialog.cpp:964
+#: ../src/interface/sitemanager_dialog.cpp:971
+#: ../src/interface/sitemanager_site.cpp:760
+#: ../src/interface/sitemanager_site.cpp:773
+#: ../src/interface/sitemanager_site.cpp:807
+#: ../src/interface/sitemanager_site.cpp:824
+#: ../src/interface/sitemanager_site.cpp:837
+#: ../src/interface/sitemanager_site.cpp:852
+#: ../src/interface/sitemanager_site.cpp:862
+#: ../src/interface/sitemanager_site.cpp:870
+#: ../src/interface/sitemanager_site.cpp:895
+#: ../src/interface/sitemanager_site.cpp:904
+#: ../src/interface/sitemanager_site.cpp:920
+#: ../src/interface/sitemanager_site.cpp:929
+#: ../src/interface/sitemanager_site.cpp:950
 msgid "Site Manager - Invalid data"
 msgstr "Quản lý địa chỉ - Dữ liệu không hợp lệ"
 
-#: ../src/interface/sitemanager_dialog.cpp:281
+#: ../src/interface/sitemanager_dialog.cpp:313
 msgid "Site Manager already open"
-msgstr "Danh bạ đã mở"
+msgstr "Danh bạ đã mở sẵn rồi"
 
 #: ../src/interface/sitemanager.cpp:434 ../src/interface/sitemanager.cpp:462
 #: ../src/interface/sitemanager.cpp:476 ../src/interface/sitemanager.cpp:488
@@ -7313,12 +7372,12 @@ msgstr "Đường dẫn địa chỉ phải bắt đầu với 0 hoặc 1."
 msgid "Site path is malformed."
 msgstr "Địa chỉ trang mạng không hợp lệ."
 
-#: ../src/interface/bookmarks_dialog.cpp:262
+#: ../src/interface/bookmarks_dialog.cpp:264
 msgid "Site-specific bookmarks"
 msgstr "Dấu trang gắn với trang mạng"
 
 #: ../src/interface/bookmarks_dialog.cpp:97
-#: ../src/interface/bookmarks_dialog.cpp:567
+#: ../src/interface/bookmarks_dialog.cpp:568
 msgid ""
 "Site-specific bookmarks require the server to be stored in the Site "
 "Manager.\n"
@@ -7373,7 +7432,7 @@ msgstr "Ổ cắm đã sẵn được kết nối"
 
 #: ../src/engine/socket_errors.cpp:59
 msgid "Socket has been shut down"
-msgstr "Ổ cắm bị tắt"
+msgstr "Ổ cắm mạng vừa bị tắt"
 
 #: ../src/engine/socket_errors.cpp:56
 msgid "Socket not connected"
@@ -7416,7 +7475,7 @@ msgstr "Chế độ &xắp xếp:"
 msgid "Source and path of the drop operation are identical"
 msgstr "Nguồn và đường dẫn của lệnh “thả” là trùng nhau"
 
-#: ../src/interface/fzputtygen_interface.cpp:128
+#: ../src/interface/fzputtygen_interface.cpp:126
 msgid "Source and target file may not be the same"
 msgstr "Tập tin nguồn và đường dẫn của nó không thể giống nhau"
 
@@ -7428,7 +7487,7 @@ msgstr "Nguồn và đích của lệnh “thả” là trùng nhau"
 msgid "Source file:"
 msgstr "Tập tin nguồn:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3821
+#: ../src/interface/resources/xrc/dialogs.xrc:3765
 #: ../src/interface/speedlimits_dialog.cpp:64
 #: ../src/interface/speedlimits_dialog.cpp:72
 msgid "Speed Limits"
@@ -7466,7 +7525,7 @@ msgstr "Bắt đầu truyền ngay lậ&p tức"
 msgid "Start with opened Site Manager"
 msgstr "Bắt đầu bằng việc mở Danh bạ"
 
-#: ../src/interface/updater.cpp:264
+#: ../src/interface/updater.cpp:265
 #, c-format
 msgid "Started update check on %s\n"
 msgstr "Tự động kiểm tra cập nhật phiên bản mới vào %s\n"
@@ -7491,7 +7550,7 @@ msgstr "Bắt đầu địa chỉ trong đường dẫn đã cho"
 msgid "State or province:"
 msgstr "Bang hoặc tỉnh:"
 
-#: ../src/interface/edithandler.cpp:1149 ../src/interface/queue.cpp:1275
+#: ../src/interface/edithandler.cpp:1203 ../src/interface/queue.cpp:1275
 msgid "Status"
 msgstr "Tình trạng"
 
@@ -7509,7 +7568,7 @@ msgid "Stop recursive operation"
 msgstr "Dừng thao tác đệ quy"
 
 #. @translator: Keep short
-#: ../src/interface/sitemanager_site.cpp:285
+#: ../src/interface/sitemanager_site.cpp:559
 msgid "Storage &account:"
 msgstr "Tà&i khoản lưu trữ:"
 
@@ -7541,7 +7600,7 @@ msgstr "Tổng hợp kết quả kiểm tra:"
 msgid "Suspend now"
 msgstr "Ngừng ngay bây giờ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3617
+#: ../src/interface/resources/xrc/dialogs.xrc:3561
 msgid ""
 "Symlinks to files are not affected by this choice, such symlinks are always "
 "deleted."
@@ -7549,7 +7608,7 @@ msgstr ""
 "Liên kết mềm tới các tập tin không bị tác động bởi việc chọn này, như vậy "
 "liên kết mềm luôn bị xóa."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3928
+#: ../src/interface/resources/xrc/dialogs.xrc:3872
 #: ../src/interface/state.cpp:270 ../src/interface/state.cpp:285
 #: ../src/interface/state.cpp:292 ../src/interface/state.cpp:303
 #: ../src/interface/state.cpp:402 ../src/interface/state.cpp:410
@@ -7600,7 +7659,7 @@ msgstr "Hệ thống mạng con hệ thống bị lỗi"
 msgid "T&oolbar"
 msgstr "Thanh côn&g cụ"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:207
+#: ../src/engine/http/httpcontrolsocket.cpp:209
 msgid "TLS connection established, sending HTTP request"
 msgstr "Kết nối TLS đã được thiết lập, đang gửi yêu cầu HTTP"
 
@@ -7656,11 +7715,11 @@ msgstr "Kiểm tra khả năng phục hồi của máy chủ"
 msgid "The &following files are currently being edited:"
 msgstr "Các tập tin sa&u đây hiện tại đang được sửa:"
 
-#: ../src/interface/sitemanager_dialog.cpp:677
+#: ../src/interface/sitemanager_dialog.cpp:740
 msgid "The Site Manager cannot be used unless the file gets repaired."
 msgstr "Quản lý địa chỉ không thể được dùng trừ phi tập tin được sửa chữa."
 
-#: ../src/interface/sitemanager_dialog.cpp:280
+#: ../src/interface/sitemanager_dialog.cpp:312
 msgid ""
 "The Site Manager is opened in another instance of FileZilla 3.\n"
 "Do you want to continue? Any changes made in the Site Manager won't be saved "
@@ -7691,7 +7750,7 @@ msgstr "Thành viên ai_family không được hỗ trợ"
 msgid "The ai_socktype member is not supported"
 msgstr "Thành viên ai_socktype không được hỗ trợ"
 
-#: ../src/interface/bookmarks_dialog.cpp:844
+#: ../src/interface/bookmarks_dialog.cpp:845
 #: ../src/interface/sitemanager.cpp:638
 msgid "The bookmark could not be added."
 msgstr "Dấu trang không thể đặt thêm."
@@ -7727,12 +7786,12 @@ msgstr ""
 msgid "The data connection could not be established: %s"
 msgstr "Không thể thiết lập kết nối dữ liệu: %s"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3181
-#: ../src/interface/edithandler.cpp:1597
+#: ../src/interface/resources/xrc/dialogs.xrc:3125
+#: ../src/interface/edithandler.cpp:1658
 msgid "The default editor for text files could not be found."
 msgstr "Không tìm thấy trình soạn thảo mặc định cho tập tin văn bản."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3174
+#: ../src/interface/resources/xrc/dialogs.xrc:3118
 #, c-format
 msgid "The default editor for text files is '%s'."
 msgstr "Trình soạn thảo mặc định cho tập tin văn bản là “%s”."
@@ -7741,7 +7800,7 @@ msgstr "Trình soạn thảo mặc định cho tập tin văn bản là “%s”
 #: ../src/interface/filteredit.cpp:261
 msgid "The entered filter name already exists, please choose a different name."
 msgstr ""
-"Tên bộ lọc nhập vào đã sẵn có từ trước rồi, xin hãy chọn một cái tên khác"
+"Tên bộ lọc nhập vào đã sẵn có từ trước rồi, xin hãy chọn một cái tên khác."
 
 #: ../src/interface/asksavepassworddialog.cpp:41
 #: ../src/interface/settings/optionspage_passwords.cpp:150
@@ -7763,7 +7822,7 @@ msgstr ""
 "Tập tin %s sẵn có trước rồi.\n"
 "Xin hãy nhập một cái tên mới:"
 
-#: ../src/interface/edithandler.cpp:1711
+#: ../src/interface/edithandler.cpp:1775
 #: ../src/interface/LocalListView.cpp:1878 ../src/interface/search.cpp:1528
 #, c-format
 msgid ""
@@ -7794,7 +7853,7 @@ msgstr "Tập tin “%s” không thể tải được hoặc không chứa khó
 msgid "The file '%s' could not be loaded."
 msgstr "Tập tin “%s” không thể tải lên được."
 
-#: ../src/interface/edithandler.cpp:1706
+#: ../src/interface/edithandler.cpp:1770
 #: ../src/interface/LocalListView.cpp:1874 ../src/interface/search.cpp:1524
 #, c-format
 msgid ""
@@ -7804,7 +7863,7 @@ msgstr ""
 "Tập tin “%s” không thể mở được:\n"
 "Không có chương trình ràng xử lý kiểu tập tin này trong hệ điều hành của bạn."
 
-#: ../src/interface/edithandler.cpp:1825
+#: ../src/interface/edithandler.cpp:1889
 #: ../src/interface/LocalListView.cpp:1887 ../src/interface/search.cpp:1537
 #, c-format
 msgid ""
@@ -7814,7 +7873,7 @@ msgstr ""
 "Tập tin “%s” không thể mở được:\n"
 "Lệnh ràng buộc xử lý gặp lỗi"
 
-#: ../src/interface/import.cpp:67 ../src/interface/sitemanager_dialog.cpp:684
+#: ../src/interface/import.cpp:67 ../src/interface/sitemanager_dialog.cpp:747
 #, c-format
 msgid ""
 "The file '%s' has been created by a more recent version of FileZilla.\n"
@@ -7865,7 +7924,7 @@ msgstr "Giải pháp FTP nguồn mở miễn phí"
 msgid "The generated encryption key is:"
 msgstr "Khóa mã hóa đã tạo là:"
 
-#: ../src/interface/bookmarks_dialog.cpp:295
+#: ../src/interface/bookmarks_dialog.cpp:296
 msgid "The global bookmarks could not be saved."
 msgstr "Dấu trang toàn cục không thể ghi lại được."
 
@@ -7954,13 +8013,13 @@ msgstr "Tập tin đã chọn chứa dữ liệu có thể nhập vào cho thể
 msgid "The selected file is already being edited:"
 msgstr "Tập tin đã chọn đang sửa:"
 
-#: ../src/interface/edithandler.cpp:1812
+#: ../src/interface/edithandler.cpp:1876
 msgid ""
 "The selected file is still opened in some other program, please close it."
 msgstr ""
 "Tập tin đã chọn vẫn đang mở ở chương trình khác, xin hãy đóng chúng lại."
 
-#: ../src/interface/edithandler.cpp:1716
+#: ../src/interface/edithandler.cpp:1780
 msgid ""
 "The selected file would be executed directly.\n"
 "This can be dangerous and might damage your system.\n"
@@ -7978,7 +8037,7 @@ msgstr "Máy chủ không thể được đặt thêm."
 msgid "The server sent an unexpected or unrecognized reply."
 msgstr "Máy chủ gửi trả lời không như mong đợi hay trả lời được công nhận."
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:674
+#: ../src/interface/sitemanager_site.cpp:264
 msgid "The server uses following charset encoding for filenames:"
 msgstr "Máy chủ dùng bộ mã ký tự sau đây cho tên tập tin:"
 
@@ -8066,7 +8125,7 @@ msgstr "Bộ lọc này không thể xóa."
 msgid "This filter set cannot be renamed."
 msgstr "Không thể đổi tên bộ lọc này."
 
-#: ../src/interface/verifycertdialog.cpp:730
+#: ../src/interface/verifycertdialog.cpp:744
 msgid ""
 "This may be the result of a downgrade attack, only continue after you have "
 "spoken to the server administrator or server hosting provider."
@@ -8089,7 +8148,7 @@ msgstr ""
 "Nó chỉ thực sự làm việc nếu bạn không ở đằng sau bộ định tuyến router, nếu "
 "không hệ thống của bạn chỉ coi như trả về địa chỉ mạng của bạn."
 
-#: ../src/interface/verifycertdialog.cpp:733
+#: ../src/interface/verifycertdialog.cpp:752
 msgid "This server does not support FTP over TLS."
 msgstr "Máy chủ không không hỗ trợ FTP thông qua TLS."
 
@@ -8170,11 +8229,11 @@ msgstr ""
 
 #: ../src/interface/toolbar.cpp:44
 msgid "Toggles processing of the transfer queue"
-msgstr "Bật tắt quá trình của hàng đợi truyền"
+msgstr "Bật tắt việc đang xử lý của hàng đợi truyền"
 
 #: ../src/interface/toolbar.cpp:38
 msgid "Toggles the display of the local directory tree"
-msgstr "Bật tắt việc hiển thị của cây thư mục máy nội bộ"
+msgstr "Bật tắt hiển thị cây thư mục máy nội bộ"
 
 #: ../src/interface/toolbar.cpp:37
 msgid "Toggles the display of the message log"
@@ -8188,7 +8247,7 @@ msgstr "Bật tắt việc hiển thị của cây thư mục máy mạng"
 msgid "Toggles the display of the transfer queue"
 msgstr "Bật tắt việc hiển thị của hàng đợi truyền"
 
-#: ../src/engine/http/request.cpp:463
+#: ../src/engine/http/request.cpp:470
 msgid "Too long header line"
 msgstr "Đầu đề quá dài"
 
@@ -8222,7 +8281,7 @@ msgstr "Chế độ truyền"
 msgid "Transfer Queue"
 msgstr "Hàng đợi &Truyền"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:594
+#: ../src/interface/sitemanager_site.cpp:239
 msgid "Transfer Settings"
 msgstr "Cài đặt chế độ truyền"
 
@@ -8281,7 +8340,7 @@ msgid "Try again"
 msgstr "Thử lại"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2840
-#: ../src/interface/edithandler.cpp:1147
+#: ../src/interface/edithandler.cpp:1201
 msgid "Type"
 msgstr "Kiểu"
 
@@ -8297,7 +8356,7 @@ msgstr "Kiểu máy chủ ủy nhiệm chung:"
 msgid "U&pload"
 msgstr "Tải &lên"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3762
+#: ../src/interface/resources/xrc/dialogs.xrc:3706
 #: ../src/interface/resources/xrc/settings.xrc:931
 msgid "U&pload limit:"
 msgstr "Giới hạn tải &lên:"
@@ -8330,11 +8389,11 @@ msgstr "Đơn vị:"
 #: ../src/interface/resources/xrc/dialogs.xrc:2268
 #: ../src/interface/resources/xrc/dialogs.xrc:2278
 #: ../src/engine/sizeformatting_base.cpp:61
-#: ../src/interface/edithandler.cpp:1179 ../src/interface/edithandler.cpp:1207
+#: ../src/interface/edithandler.cpp:1232 ../src/interface/edithandler.cpp:1260
 msgid "Unknown"
 msgstr "Không rõ"
 
-#: ../src/engine/ftp/logon.cpp:758
+#: ../src/engine/ftp/logon.cpp:768
 msgid "Unknown FTP proxy type, cannot generate login sequence."
 msgstr ""
 "Không rõ máy chủ ủy nhiệm cho giao thức FTP, không thể tạo đăng nhập liên "
@@ -8349,7 +8408,7 @@ msgstr "Không rõ phiên bản giao thức SOCKS: %d"
 msgid "Unknown certificate"
 msgstr "Không rõ giấy phép"
 
-#: ../src/engine/misc.cpp:71 ../src/engine/misc.cpp:84
+#: ../src/engine/misc.cpp:78
 #, c-format
 msgid "Unknown error %d"
 msgstr "Lỗi chưa biết %d"
@@ -8377,7 +8436,7 @@ msgid ""
 "Unknown root element, the file does not appear to be generated by FileZilla."
 msgstr "Không hiểu nút gốc, tập tin không được tạo ra bởi FileZilla."
 
-#: ../src/engine/http/request.cpp:565
+#: ../src/engine/http/request.cpp:572
 msgid "Unknown transfer encoding"
 msgstr "Không hiểu bộ mã bộ truyền"
 
@@ -8415,7 +8474,7 @@ msgstr "Cập nhật"
 msgid "Upload"
 msgstr "Tải lên"
 
-#: ../src/interface/edithandler.cpp:1170
+#: ../src/interface/edithandler.cpp:1223
 msgid "Upload failed"
 msgstr "Tải lên gặp lỗi"
 
@@ -8428,7 +8487,7 @@ msgstr "Giới hạn tải lên: %s/s"
 msgid "Upload limit: none"
 msgstr "Giới hạn tải lên: không"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3488
+#: ../src/interface/resources/xrc/dialogs.xrc:3432
 #: ../src/interface/search.cpp:941
 msgid "Upload search results"
 msgstr "Tải lên kết quả tìm kiếm"
@@ -8449,20 +8508,20 @@ msgstr "Tải lên tập tin này lại cho máy chủ không?"
 msgid "Upload this file to the server?"
 msgstr "Bạn muốn tải tập tin lên máy chủ phải không?"
 
-#: ../src/interface/edithandler.cpp:1164 ../src/interface/edithandler.cpp:1198
-#: ../src/interface/edithandler.cpp:1357
+#: ../src/interface/edithandler.cpp:1217 ../src/interface/edithandler.cpp:1251
+#: ../src/interface/edithandler.cpp:1417
 msgid "Uploading"
 msgstr "Đang tải lên"
 
-#: ../src/interface/edithandler.cpp:1167 ../src/interface/edithandler.cpp:1360
+#: ../src/interface/edithandler.cpp:1220 ../src/interface/edithandler.cpp:1420
 msgid "Uploading and pending removal"
 msgstr "Đang tải lên và đang chờ bị bỏ đi"
 
-#: ../src/interface/edithandler.cpp:1201 ../src/interface/edithandler.cpp:1363
+#: ../src/interface/edithandler.cpp:1254 ../src/interface/edithandler.cpp:1423
 msgid "Uploading and unediting"
 msgstr "Đang tải lên và không biên tập"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:697
+#: ../src/interface/sitemanager_site.cpp:268
 msgid "Use &custom charset"
 msgstr "Bộ mã ký tự người &dùng"
 
@@ -8470,12 +8529,12 @@ msgstr "Bộ mã ký tự người &dùng"
 msgid "Use &custom editor:"
 msgstr "Dùng trình soạn thảo &riêng:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3168
+#: ../src/interface/resources/xrc/dialogs.xrc:3112
 msgid "Use &default editor for text files"
 msgstr "&Dùng trình soạn thảo mặc định cho tập tin văn bản"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2946
-#: ../src/interface/resources/xrc/dialogs.xrc:3027
+#: ../src/interface/sitemanager_dialog.cpp:302
 msgid "Use &synchronized browsing"
 msgstr "Dùng &duyệt đồng bộ"
 
@@ -8483,16 +8542,12 @@ msgstr "Dùng &duyệt đồng bộ"
 msgid "Use Regular Expressions"
 msgstr "Dùng biểu thức chính quy"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:685
-msgid "Use UTF-8 if the server supports it, else use local charset."
-msgstr "Dùng UTF-8 nếu máy chủ có hỗ trợ, nếu không dùng bộ mã ký tự nội bộ."
-
 #: ../src/interface/resources/xrc/dialogs.xrc:1614
 #: ../src/interface/resources/xrc/dialogs.xrc:1637
 msgid "Use default action"
 msgstr "Dùng hành động mặc định"
 
-#: ../src/interface/sitemanager_site.cpp:155
+#: ../src/interface/sitemanager_site.cpp:54
 msgid "Use explicit FTP over TLS if available"
 msgstr "Dùng FTP thông qua TLS tường minh nếu được"
 
@@ -8544,11 +8599,29 @@ msgid "User:"
 msgstr "Tài khoản:"
 
 #: ../src/interface/manual_transfer.cpp:491
-#: ../src/interface/sitemanager_site.cpp:583
+#: ../src/interface/sitemanager_site.cpp:852
 msgid "Username cannot be a series of spaces"
 msgstr "Tên người dùng không thể là một chuỗi khoảng trắng"
 
-#: ../src/interface/resources/xrc/sitemanager.xrc:725
+#: ../src/interface/sitemanager_site.cpp:266
+msgid "Uses UTF-8 if the server supports it, else uses local charset."
+msgstr ""
+"Dùng UTF-8 nếu máy chủ có hỗ trợ, nếu không thì dùng bộ mã ký tự nội bộ."
+
+#: ../src/interface/sitemanager_site.cpp:63
+msgid "Using insecure HTTP"
+msgstr ""
+
+#: ../src/interface/verifycertdialog.cpp:755
+#, c-format
+msgid "Using plain %s is insecure."
+msgstr "Dùng %s thường là không an toàn."
+
+#: ../src/interface/sitemanager_site.cpp:62
+msgid "Using secure HTTPS"
+msgstr ""
+
+#: ../src/interface/sitemanager_site.cpp:274
 msgid ""
 "Using the wrong charset can result in filenames not displaying properly."
 msgstr ""
@@ -8603,13 +8676,19 @@ msgstr "Việc chờ truyền bị hủy"
 msgid "Waiting to retry..."
 msgstr "Đang thử lại xin chờ…"
 
-#: ../src/interface/verifycertdialog.cpp:729
+#: ../src/interface/verifycertdialog.cpp:743
 msgid ""
 "Warning! You have previously connected to this server using FTP over TLS, "
 "yet the server has now rejected FTP over TLS."
 msgstr ""
 "Cảnh báo! Bạn có kết nối trước đây đến máy chủ này sử dụng FTP thông qua "
 "TLS, thế mà máy chủ giờ lại từ chối FTP thông qua TLS."
+
+#: ../src/interface/verifycertdialog.cpp:747
+msgid "Warning! You have previously connected to this server using TLS."
+msgstr ""
+"Cảnh báo! Trước đây bạn từng kết nối đến máy chủ này sử dụng FTP thông qua "
+"TLS."
 
 #: ../src/interface/netconfwizard.cpp:977
 msgid "Warning, ignoring data connection from wrong IP."
@@ -8623,19 +8702,31 @@ msgid ""
 "\n"
 "Do you really want to check for nightly builds?"
 msgstr ""
-"Cảnh báo, dùng bản trong ngày bạn phải chịu rủi ro .\n"
+"Cảnh báo, dùng bản biên dịch trong ngày bạn phải chịu rủi ro.\n"
 "Không có hỗ trợ gì cho bản này.\n"
 "Bản này có thể không làm việc tốt và cũng có thể phá hỏng hệ thống của bạn.\n"
 "\n"
-"Bạn có thực sự muốn kiểm tra bản trong ngày không?"
+"Bạn có thực sự muốn kiểm tra bản biên dịch trong ngày không?"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1135
 msgid "Warning: Potential security breach!"
 msgstr "Cảnh báo: Lỗ thủng an ninh tiềm tàng!"
 
+#: ../src/interface/sitemanager_site.cpp:61
+msgid "WebDAV"
+msgstr ""
+
+#: ../src/engine/server.cpp:39
+msgid "WebDAV using HTTP (insecure)"
+msgstr ""
+
+#: ../src/engine/server.cpp:29
+msgid "WebDAV using HTTPS"
+msgstr ""
+
 #: ../src/interface/welcome_dialog.cpp:50
 msgid "Welcome to FileZilla"
-msgstr "Chào các bạn đến với FileZilla"
+msgstr "Hoan nghênh bạn dùng FileZilla"
 
 #: ../src/interface/welcome_dialog.cpp:83
 msgid "What's new"
@@ -8645,7 +8736,7 @@ msgstr "Các điểm mới"
 msgid "What's new:"
 msgstr "Các điểm mới:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3836
+#: ../src/interface/resources/xrc/dialogs.xrc:3780
 msgid ""
 "When allowing FileZilla to remember passwords, you can reconnect without "
 "having to re-enter a password after restarting FileZilla."
@@ -8669,7 +8760,7 @@ msgstr "Khi &bắt đầu một kết nối mới trong khi đã có kết nối
 msgid "Widescreen"
 msgstr "Màn hình rộng"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3831
+#: ../src/interface/resources/xrc/dialogs.xrc:3775
 msgid "Would you like FileZilla to remember passwords?"
 msgstr "Bạn có muốn FileZilla ghi nhớ mật khẩu?"
 
@@ -8682,7 +8773,7 @@ msgstr "&Ghi"
 msgid "Wrong external IP address"
 msgstr "Sai địa chỉ IP"
 
-#: ../src/engine/http/request.cpp:639
+#: ../src/engine/http/request.cpp:646
 msgid "Wrong line endings"
 msgstr "Xuống dòng sai"
 
@@ -8744,7 +8835,7 @@ msgstr ""
 "Bạn có thể dùng dấu x tại bất kỳ vị trí nào để giữ nguyên quyền truy cập của "
 "tập tin gốc."
 
-#: ../src/interface/sitemanager_site.cpp:626
+#: ../src/interface/sitemanager_site.cpp:895
 msgid ""
 "You cannot change password and encryption key individually if using a master "
 "password."
@@ -8772,11 +8863,11 @@ msgstr "Bạn không thể tải lên các tập tin vào thư mục root."
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr "Bạn đã không nhập tên mới cho tập tin. Ghi đè lên tập tin thay thế?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3590
+#: ../src/interface/resources/xrc/dialogs.xrc:3534
 msgid "You have selected at least one symbolic link."
 msgstr "Bạn phải chọn ít nhất một liên kết mềm."
 
-#: ../src/interface/edithandler.cpp:1676 ../src/interface/search.cpp:1223
+#: ../src/interface/edithandler.cpp:1740 ../src/interface/search.cpp:1223
 msgid ""
 "You have selected more than 10 files for editing, do you really want to "
 "continue?"
@@ -8791,11 +8882,11 @@ msgstr ""
 "Bạn đã chọn hơn 10 tập tin hay thư mục, bạn có thực sự muốn tiếp tục không?"
 
 #: ../src/interface/manual_transfer.cpp:407
-#: ../src/interface/sitemanager_site.cpp:491
+#: ../src/interface/sitemanager_site.cpp:760
 msgid "You have to enter a hostname."
 msgstr "Bạn phải nhập tên máy chủ."
 
-#: ../src/interface/sitemanager_site.cpp:601
+#: ../src/interface/sitemanager_site.cpp:870
 msgid "You have to enter a key file path"
 msgstr "Bạn phải nhập vào một đường dẫn đến tập tin khóa"
 
@@ -8812,7 +8903,7 @@ msgstr "Bạn phải nhập thư mục máy mạng."
 msgid "You have to enter a valid IPv4 address."
 msgstr "Bạn phải nhập một địa chỉ IPv4 hợp lệ."
 
-#: ../src/interface/sitemanager_site.cpp:635
+#: ../src/interface/sitemanager_site.cpp:904
 msgid "You have to enter a valid encryption key"
 msgstr "Bạn phải nhập vào một khóa mã hóa hợp lệ"
 
@@ -8821,12 +8912,12 @@ msgid "You have to enter a writable local directory."
 msgstr "Bạn phải nhập thư mục được phép ghi."
 
 #: ../src/interface/manual_transfer.cpp:502
-#: ../src/interface/sitemanager_site.cpp:593
+#: ../src/interface/sitemanager_site.cpp:862
 msgid "You have to enter an account name"
 msgstr "Bạn phải nhập tài khoản của bạn"
 
 #: ../src/interface/manual_transfer.cpp:476
-#: ../src/interface/sitemanager_site.cpp:568
+#: ../src/interface/sitemanager_site.cpp:837
 msgid "You have to specify a user name"
 msgstr "Bạn phải ghi rõ tên tài khoản người dùng"
 
@@ -8850,7 +8941,7 @@ msgstr "Bạn cần nhập tên dấu trang."
 msgid "You need to enter a name for the log file."
 msgstr "Bạn cần nhập tên tập tin nhật ký."
 
-#: ../src/interface/edithandler.cpp:1552
+#: ../src/interface/edithandler.cpp:1613
 msgid "You need to enter a properly quoted command."
 msgstr "Bạn cần nhập lệnh được đóng mở ngoặc chính xác."
 
@@ -8863,19 +8954,19 @@ msgstr "Bạn cần nhập tên máy chủ ủy nhiệm."
 msgid "You need to enter a proxy port in the range from 1 to 65535"
 msgstr "Bạn cần nhập giá trị cổng máy chủ ủy nhiệm trong khoảng từ 1 tới 65535"
 
-#: ../src/interface/sitemanager_site.cpp:676
+#: ../src/interface/sitemanager_site.cpp:950
 msgid "You need to enter a value."
 msgstr "Bạn cần nhập vào một giá trị."
 
 #: ../src/interface/bookmarks_dialog.cpp:79
-#: ../src/interface/bookmarks_dialog.cpp:460
-#: ../src/interface/sitemanager_dialog.cpp:916
+#: ../src/interface/bookmarks_dialog.cpp:461
+#: ../src/interface/sitemanager_dialog.cpp:964
 msgid "You need to enter at least one path, empty bookmarks are not supported."
 msgstr "Bạn cần nhập ít nhất một đường dẫn, dấu trang rỗng không được hỗ trợ."
 
 #: ../src/interface/bookmarks_dialog.cpp:85
-#: ../src/interface/bookmarks_dialog.cpp:466
-#: ../src/interface/sitemanager_dialog.cpp:923
+#: ../src/interface/bookmarks_dialog.cpp:467
+#: ../src/interface/sitemanager_dialog.cpp:971
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this bookmark."
@@ -8883,7 +8974,7 @@ msgstr ""
 "Bạn cần phải nhập vào cả đường dẫn máy nội bộ và máy mạng để bật chế độ "
 "duyệt đồng bộ cho dấu trang này."
 
-#: ../src/interface/sitemanager_site.cpp:660
+#: ../src/interface/sitemanager_site.cpp:929
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this site."
@@ -8891,7 +8982,7 @@ msgstr ""
 "Bạn cần phải nhập vào cả đường dẫn máy nội bộ và máy mạng để bật chế độ "
 "duyệt đồng bộ cho địa chỉ này."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3993
+#: ../src/interface/resources/xrc/dialogs.xrc:3937
 msgid ""
 "You need to grant FileZilla access to the directories you want to download "
 "files into or to upload files from."
@@ -8948,7 +9039,7 @@ msgstr "byte"
 msgid "contains"
 msgstr "có chứa"
 
-#: ../src/interface/updater.cpp:269
+#: ../src/interface/updater.cpp:270
 msgid "custom"
 msgstr "tùy chỉnh"
 
@@ -8975,8 +9066,8 @@ msgstr "bằng"
 msgid "file"
 msgstr "tập tin"
 
-#: ../src/interface/fzputtygen_interface.cpp:178
-#: ../src/interface/fzputtygen_interface.cpp:193
+#: ../src/interface/fzputtygen_interface.cpp:176
+#: ../src/interface/fzputtygen_interface.cpp:191
 msgid ""
 "fzputtygen could not be started.\n"
 "Please make sure this executable exists in the same directory as the main "
@@ -9088,3 +9179,598 @@ msgstr "ai cũng được phép ghi"
 #: ../src/interface/resources/xrc/dialogs.xrc:890
 msgid "wxWidgets:"
 msgstr "wxWidgets:"
+
+#~ msgid "Encryption &Key:"
+#~ msgstr "Khóa &Mã hóa:"
+
+#~ msgid "Server &Type:"
+#~ msgstr "&Kiểu máy chủ:"
+
+#~ msgid "&New Site"
+#~ msgstr "Địa chỉ &mới"
+
+#~ msgid "New &Folder"
+#~ msgstr "Thư &mục mới"
+
+#~ msgid "A certificate in the chain was signed using an insecure algorithm"
+#~ msgstr ""
+#~ "Giấy chứng nhận trong chuỗi xích đã được ký bằng một thuật toán không an "
+#~ "toàn"
+
+#~ msgid "An issuer in the certificate chain is not a certificate authority"
+#~ msgstr ""
+#~ "Một người phát hành trong chuỗi móc xích không phải là người có quyền "
+#~ "chứng nhận"
+
+#~ msgid "Beware! Certificate has been revoked"
+#~ msgstr "Cẩn thận! Giấy chứng nhận đã bị thu hồi"
+
+#~ msgid "Certificate of connection does not match expected certificate."
+#~ msgstr "Chứng chỉ của kết nối không phù hợp với chứng chỉ mong muốn."
+
+#~ msgid "Certificate signature verification failed"
+#~ msgstr "Gặp lỗi khi thẩm tra chữ ký chứng nhận"
+
+#~ msgid "Could not add certificate to temporary trust list"
+#~ msgstr "Không thể thêm giấy chứng nhận vào danh sách đáng tin tạm thời"
+
+#~ msgid "Could not copy certificate"
+#~ msgstr "Không thể sao chép giấy chứng nhận"
+
+#~ msgid ""
+#~ "Could not get distinguished name of certificate issuer, "
+#~ "gnutls_x509_get_issuer_dn failed"
+#~ msgstr ""
+#~ "Không thể lấy tên được ghi trong giấy phép đã xuất ra, "
+#~ "gnutls_x509_get_issuer_dn gặp lỗi"
+
+#~ msgid ""
+#~ "Could not get distinguished name of certificate subject, "
+#~ "gnutls_x509_get_dn failed"
+#~ msgstr ""
+#~ "Không thể lấy tên được ghi trong nội dung giấy phép, gnutls_x509_get_dn "
+#~ "gặp lỗi"
+
+#~ msgid "Could not sort peer certificates"
+#~ msgstr "Không thể sắp xếp giấy chứng nhận ngang hàng"
+
+#~ msgid "Failed to verify peer certificate"
+#~ msgstr "Xác nhận dữ liệu giấy phép ngang hàng gặp lỗi"
+
+#~ msgid "GnuTLS error %d"
+#~ msgstr "Lỗi GnuTLS %d"
+
+#~ msgid "GnuTLS error %d in %s"
+#~ msgstr "Lỗi GnuTLS %d trong %s"
+
+#~ msgid "GnuTLS error %d in %s: %s"
+#~ msgstr "Lỗi GnuTLS %d trong %s: %s"
+
+#~ msgid "GnuTLS error %d: %s"
+#~ msgstr "Lỗi GnuTLS %d : %s"
+
+#~ msgid "Received TLS alert from the server: %s (%d)"
+#~ msgstr "Nhận được cảnh báo TLS từ máy phục vụ: %s (%d)"
+
+#~ msgid ""
+#~ "Received certificate chain could not be verified. Verification status is "
+#~ "%d."
+#~ msgstr ""
+#~ "Không thể xác minh chuỗi móc xích chứng nhận đã nhận. Tình trạng thẩm tra "
+#~ "là %d."
+
+#~ msgid "Received unknown TLS alert %d from the server"
+#~ msgstr "Nhận được cảnh báo TLS chưa biết %d từ máy chủ"
+
+#~ msgid "Remote certificate not trusted."
+#~ msgstr "Thông tin xác nhận máy mạng không tin cậy."
+
+#~ msgid "Server did not properly shut down TLS connection"
+#~ msgstr "Máy chủ không tắt kết nối TLS một cách đúng đắn"
+
+#~ msgid ""
+#~ "Server sent unsorted certificate chain in violation of the TLS "
+#~ "specifications"
+#~ msgstr "Máy phục vụ gửi chuỗi chứng nhận chưa sắp xếp là vi phạm đặc tả TLS"
+
+#~ msgid ""
+#~ "The certificate requires the server to include an OCSP status in its "
+#~ "response, but the OCSP status is missing."
+#~ msgstr ""
+#~ "Giấy chứng nhận yêu cầu máy phục vụ bao gồm một thiếu trạng thái OCSP "
+#~ "trong phần đáp ứng của nó, nhưng còn thiếu trạng thái OCSP."
+
+#~ msgid "The server's hostname does not match the certificate's hostname"
+#~ msgstr "Tên máy của máy chủ không khớp với tên máy trong chứng nhận"
+
+#~ msgid "Unsupported certificate type"
+#~ msgstr "Kiểu giấy chứng nhận không được hỗ trợ"
+
+#~ msgid "Verifying certificate..."
+#~ msgstr "Đang xác minh giấy phép…"
+
+#~ msgid "gnutls_certificate_get_peers returned no certificates"
+#~ msgstr "gnutls_certificate_get_peers không trả về chứng nhận nào cả"
+
+#~ msgid "gnutls_pem_base64_encode2 failed"
+#~ msgstr "gnutls_pem_base64_encode2 gặp lỗi"
+
+#~ msgid "?"
+#~ msgstr "?"
+
+#~ msgid "Cannot resolve hostname to IPv4 address for use with SOCKS4 proxy."
+#~ msgstr ""
+#~ "Không thể phân giải tên máy chủ sang địa chỉ IPv4 để dùng cho máy chủ ủy "
+#~ "nhiệm SOCKS4."
+
+#~ msgid "Could not initialize Winsock (%d): %s"
+#~ msgstr "Không thể khởi tạo Winsock (%d): %s"
+
+#~ msgid "Could not start proxy handshake: %s"
+#~ msgstr "Không thể bắt đầu truyền bắt tay tới máy chủ ủy nhiệm: %s"
+
+#~ msgid "Failed to initialize TLS."
+#~ msgstr "Gặp lỗi khi khởi tạo TLS."
+
+#~ msgid "Failed to initialize networking"
+#~ msgstr "Gặp lỗi khi khởi tạo mạng"
+
+#~ msgid "Import data from older version"
+#~ msgstr "Nhập dữ liệu từ phiên bản cũ"
+
+#~ msgid "Primary connection and data connection certificates don't match."
+#~ msgstr "Kết nối gốc và xác nhận dữ liệu kết nối không khớp nhau."
+
+#~ msgid ""
+#~ "The file you have selected contains site manager data from a previous "
+#~ "version of FileZilla.\n"
+#~ "Due to differences in the storage format, only host, port, username and "
+#~ "password will be imported.\n"
+#~ "Continue with the import?"
+#~ msgstr ""
+#~ "Tập tin mà bạn đã chọn chứa dữ liệu của Danh bạ từ phiên bản trước của "
+#~ "FileZilla.\n"
+#~ "Bởi vì sự bất đồng trong định dạng lưu trữ, chỉ có máy chủ, cổng, tên "
+#~ "người dùng và mật khẩu sẽ được nhập vào.\n"
+#~ "Bạn có muốn tiếp tục nhập vào không?"
+
+#~ msgid ""
+#~ "%s could not be found. Without this component of FileZilla, %s will not "
+#~ "work.\n"
+#~ "\n"
+#~ "Please download FileZilla again. If this problem persists, please submit "
+#~ "a bug report."
+#~ msgstr ""
+#~ "Không tìm thấy %s. Không có thành phần này của FileZilla, %s sẽ không thể "
+#~ "hoạt động.\n"
+#~ "\n"
+#~ "Làm ơn tải lại FileZilla. Nếu vấn đề không được giải quyết, hãy báo lỗi "
+#~ "tới chúng tôi."
+
+#~ msgid "Invalid regular expression in search conditions."
+#~ msgstr "Biểu thức chính quy trong điều kiện tìm kiếm không hợp lệ."
+
+#~ msgid "fz3temp-lockfile"
+#~ msgstr "fz3temp-lockfile"
+
+#~ msgid "Positio&n of the message log:"
+#~ msgstr "&Vị trí của nhật ký:"
+
+#~ msgid ""
+#~ "Malformed response: Server sent response body with a request verb or "
+#~ "response code that disallows a response body."
+#~ msgstr ""
+#~ "Đáp ứng trả về sai dạng: Máy chủ gửi phần thân với một động từ yêu cầu "
+#~ "hoặc một mã đáp ứng cái mà không cho phép ở phần thân đáp ứng."
+
+#~ msgid "&Do not remember passwords (recommended)"
+#~ msgstr "&Không lưu mật khẩu (nên dùng)"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+
+#~ msgid "Timezone offset of server is %d seconds."
+#~ msgstr "Khoảng chênh múi giờ của của máy chủ dịch vụ là %d giây."
+
+#~ msgid "Host key fingerprint:"
+#~ msgstr "Dấu vân tay máy chủ:"
+
+#~ msgid "Available sizes"
+#~ msgstr "Kích thước cho phép"
+
+#~ msgid "Cannot load Quickconnect bar from resource file"
+#~ msgstr "Không thể tải thanh công cụ Kết Nối Nhanh từ tập tin nguồn"
+
+#~ msgid "SetSocketBufferSize called without socket"
+#~ msgstr "SetSocketBufferSize được gọi mà không có gói mạng nào"
+
+#~ msgid "Filename &filters..."
+#~ msgstr "Các &bộ lọc tên tập tin…"
+
+#~ msgid "Could not add trust"
+#~ msgstr "Không thể thêm tin cậy"
+
+#~ msgid "%d files added to queue"
+#~ msgstr "%d tập tin được thêm vào hàng đợi"
+
+#~ msgid "Could not import peer certificates, gnutls_x509_crt_import failed"
+#~ msgstr ""
+#~ "Không thể nhập giấy chứng nhận ngang hàng, gnutls_x509_crt_import gặp lỗi"
+
+#~ msgid ""
+#~ "Could not initialize structure for peer certificates, "
+#~ "gnutls_x509_crt_init failed"
+#~ msgstr ""
+#~ "Không thể khởi tạo cấu trúc cho giấy chứng nhận ngang hàng, "
+#~ "gnutls_x509_crt_init gặp lỗi"
+
+#~ msgid "Scanning for files to add to queue"
+#~ msgstr "Quét toàn bộ các tập tin để thêm vào hàng đợi"
+
+#~ msgid "Scanning for files to upload"
+#~ msgstr "Quét toàn bộ các tập tin để tải lên"
+
+#~ msgid "Waiting"
+#~ msgstr "Đang chờ"
+
+#~ msgid "&Disconnect from server"
+#~ msgstr "Máy chủ &ngắt kết nối"
+
+#~ msgid "&Show message"
+#~ msgstr "&Hiển thị thông điệp"
+
+#~ msgid "Do &nothing"
+#~ msgstr "Khô&ng làm gì cả"
+
+#~ msgid "No more files in the queue!"
+#~ msgstr "Không thể thêm tập tin vào hàng đợi nữa!"
+
+#~ msgid "Connected"
+#~ msgstr "Đã kết nối"
+
+#~ msgid "Deleting multiple unrelated directories is not yet supported"
+#~ msgstr "Việc bội xóa không liên quan đến thư mục vẫn chưa được hỗ trợ"
+
+#~ msgid "Downloading multiple unrelated directories is not yet supported"
+#~ msgstr "Việc bội tải xuống không liên quan đến thư mục vẫn chưa được hỗ trợ"
+
+#~ msgid "Downloading search results"
+#~ msgstr "Đang tải về kết quả tìm kiếm"
+
+#~ msgid "U&se system defaults"
+#~ msgstr "&Dùng hệ thống mặc định"
+
+#~ msgid "Use system &defaults"
+#~ msgstr "Sử &dụng hệ thống mặc định"
+
+#~ msgid ""
+#~ "The file '%s' is not in a format supported by FileZilla.\n"
+#~ "The file is also password protected. Password protected key files are not "
+#~ "supported by FileZilla yet.\n"
+#~ "Would you like to convert it into a supported, unprotected format?"
+#~ msgstr ""
+#~ "Tập tin “%s” không có trong định dạng mà FileZilla hỗ trợ.\n"
+#~ "Tập tin cũng được bảo vệ bằng mật khẩu. Các tập tin khóa được bảo vệ bằng "
+#~ "mật khẩu vệ vẫn chưa được FileZilla hỗ trợ.\n"
+#~ "Bạn có muốn chuyển đổi nó thành dạng được hỗ trợ, không được bảo vệ?"
+
+#~ msgid ""
+#~ "The file '%s' is password protected. Password protected key files are not "
+#~ "supported by FileZilla yet.\n"
+#~ "Would you like to convert it into an unprotected file?"
+#~ msgstr ""
+#~ "Tập tin “%s” được bảo vệ bằng mật khẩu. Tập tin được bảo vệ bằng mật khẩu "
+#~ "vẫn chưa được FileZilla hỗ trợ.\n"
+#~ "Bạn có muốn chuyển đổi nó thành dạng không được bảo vệ?"
+
+#~ msgid "The XML document is not well-formed: %s"
+#~ msgstr "Tài liệu dạng XML không hợp chuẩn: %s"
+
+#~ msgid ""
+#~ "Unknown error opening the file. Make sure the file can be accessed and is "
+#~ "a well-formed XML document."
+#~ msgstr ""
+#~ "Không rõ lỗi mở tập tin. Hãy chắc chắn là tập tin có thể truy cập và hợp "
+#~ "chuẩn tài liệu dạng XML."
+
+#~ msgid "Using proxy %s"
+#~ msgstr "Đang dùng máy chủ ủy nhiệm %s"
+
+#~ msgid ""
+#~ "Any changes made in the Site Manager will not be saved unless you repair "
+#~ "the file."
+#~ msgstr ""
+#~ "Tất cả các thay đổi tạo trong Quản Lý Địa Chỉ sẽ không được ghi lại trừ "
+#~ "khi bạn sửa chữ tập tin."
+
+#~ msgid "Cannot compare directories, not connected to a server."
+#~ msgstr "Không thể so sánh thư mục, không có kết nối tới máy chủ."
+
+#~ msgid "Clear &Site Manager entries"
+#~ msgstr "&Xóa các đề mục Danh bạ"
+
+#~ msgid "Clear &transfer queue"
+#~ msgstr "Xóa hàng đợi &truyền"
+
+#~ msgid "Operating system problem detected"
+#~ msgstr "Trục trặc của hệ điều hành đã tìm ra"
+
+#~ msgid ""
+#~ "Timezone offsets: Server: %d seconds. Local: %d seconds. Difference: %d "
+#~ "seconds."
+#~ msgstr ""
+#~ "Khoảng cách múi thời gian: Máy chủ: %d giây. Máy nội bộ: %d giây. Khác "
+#~ "biệt: %d giây."
+
+#~ msgid ""
+#~ "Warning!\n"
+#~ "\n"
+#~ "A bug in Windows causes problems with FileZilla\n"
+#~ "\n"
+#~ "The bug occurs if you have\n"
+#~ "- Windows Server 2003 or XP 64\n"
+#~ "- Windows Firewall enabled\n"
+#~ "- Application Layer Gateway service enabled\n"
+#~ "See http://support.microsoft.com/kb/931130 for background information.\n"
+#~ "\n"
+#~ "Unless you either disable Windows Firewall or the Application Layer "
+#~ "Gateway service,\n"
+#~ "FileZilla will timeout on big transfers."
+#~ msgstr ""
+#~ "Cảnh báo!\n"
+#~ "\n"
+#~ "Lỗi trong Windows là nguyên nhân sự cố với FileZilla\n"
+#~ "\n"
+#~ "Các lỗi mà bạn có thể gặp\n"
+#~ "-Windows Server 2003 hay XP64\n"
+#~ "-Tường lửa của Windows được bật\n"
+#~ "-Các ứng dụng dịch vụ Lớp Cổng được bật\n"
+#~ "Xem tại: http://support.microsoft.com/kb/931130 để có thông tin cơ bản.\n"
+#~ "\n"
+#~ "Trừ khi bạn tắt chức năng Tường lửa của Windows hay Các ứng dụng dịch vụ "
+#~ "Lớp Cổng ,\n"
+#~ "nếu không FileZilla sẽ không thể truyền được dữ liệu lớn."
+
+#~ msgid "&Crash"
+#~ msgstr "Hỏn&g"
+
+#~ msgid ""
+#~ "A file with that name is already being edited. Do you want to reopen '%s'?"
+#~ msgstr ""
+#~ "Tập tin với tên đó đang được soạn thảo. Bạn có muốn mở lại “%s” không?"
+
+#~ msgid "Certificate details"
+#~ msgstr "Chi tiết chứng thực"
+
+#~ msgid "Connection timed out"
+#~ msgstr "Kết nối bị lỗi quá thời gian"
+
+#~ msgid ""
+#~ "Crashes FileZilla instantly. Only used to debug the exception handler"
+#~ msgstr ""
+#~ "FileZilla bị ngừng ngay. Chỉ có thể dùng trình gỡ lỗi để làm sáng tỏ "
+#~ "nguyên nhân"
+
+#~ msgid "Fingerprint (MD5):"
+#~ msgstr "Dấu vân tay (MD5):"
+
+#~ msgid "Benchmark string coalescer"
+#~ msgstr "Đánh giá chương trình xử lý xâu chữ coalescer"
+
+#~ msgid "Clear string coalescer"
+#~ msgstr "Xóa bộ xử lý chuỗi coalescer"
+
+#~ msgid ""
+#~ "Filename may not contain any of the following characters: / \\ : * ? \" < "
+#~ "> |"
+#~ msgstr "Tên tập tin không thể chứa các ký tự sau đây: / \\ : * ? \" < > |"
+
+#~ msgid "Use plain FTP"
+#~ msgstr "Giao thức FTP thường"
+
+#~ msgid "Failed to parse trusted root cert."
+#~ msgstr "Phân tích xác thực giấy phép gốc gặp lỗi."
+
+#~ msgid "Cannot load file, not a valid XML file."
+#~ msgstr "Không thể tải tập tin, tập tin XML không hợp lệ."
+
+#~ msgid "%s bytes"
+#~ msgstr "%s bytes"
+
+#~ msgid "%s bytes (%s/s)"
+#~ msgstr "%s byte (%s/s)"
+
+#~ msgid "&Check for beta versions of FileZilla"
+#~ msgstr "&Kiểm tra phiên bản thử nghiệm của FileZilla"
+
+#~ msgid "&Finish"
+#~ msgstr "&Hoàn thành"
+
+#~ msgid ", %H:%M:%S left"
+#~ msgstr ", còn %H:%M:%S"
+
+#~ msgid ", --:--:-- left"
+#~ msgstr ", còn --:--:--"
+
+#~ msgid "- Broken router and/or firewall"
+#~ msgstr "-Bộ định tuyến và/hoặc tường lửa hỏng"
+
+#~ msgid "- File corrupted on mirror"
+#~ msgstr "-Tập tin bị ngắt trên máy ảnh"
+
+#~ msgid "- Malware on your system"
+#~ msgstr "- Có Malware trong máy của bạn"
+
+#~ msgid "Advanced options:"
+#~ msgstr "Tùy chọn cao cấp:"
+
+#~ msgid ""
+#~ "Alternatively, visit http://filezilla-project.org to download the most "
+#~ "recent version."
+#~ msgstr ""
+#~ "Bạn có thể có lựa chọn khác là tải về bản mới từ http://filezilla-project."
+#~ "org."
+
+#~ msgid "C&heck for nightly builds of FileZilla"
+#~ msgstr "&Kiểm tra phiên bản hàng ngày của FileZilla"
+
+#~ msgid "Click on next to download the new version."
+#~ msgstr "Bấm vào Tiếp tục để tải về phiên bản mới."
+
+#~ msgid "Connecting to server"
+#~ msgstr "Đang kết nối tới máy chủ dịch vụ"
+
+#~ msgid ""
+#~ "Do you really want to check for beta versions?\n"
+#~ "Unless you want to test new features, keep using stable versions."
+#~ msgstr ""
+#~ "Bạn có thực sự muốn kiểm tra phiên bản thử nghiệm?\n"
+#~ "Trừ khi bạn muốn kiểm tra các đặc tính mới nếu không hãy dùng phiên bản "
+#~ "ổn định."
+
+#~ msgid "Error, file name cannot be parsed."
+#~ msgstr "Lỗi, tập tin không thể phân tích."
+
+#~ msgid "Error, local file exists but cannot be removed"
+#~ msgstr "Lỗi, tập tin trên máy có sẵn nhưng không thể xóa"
+
+#~ msgid "Every month"
+#~ msgstr "Mỗi tháng một lần"
+
+#~ msgid "Every two weeks"
+#~ msgstr "Hai tuần một lần"
+
+#~ msgid "Executable"
+#~ msgstr "Có thể thực thi"
+
+#~ msgid "Failed to check for newer version of FileZilla."
+#~ msgstr "Kiểm tra phiên bản mới của FileZilla gặp lỗi."
+
+#~ msgid ""
+#~ "In case you prefer automatic updates, you can enable automatic update "
+#~ "checks in the settings dialog."
+#~ msgstr ""
+#~ "Trong trường hợp bạn thích tự động cập nhật phiên bản mới, bạn hãy bật tự "
+#~ "động kiểm tra phiên bản mới trong hộp thoại cài đặt."
+
+#~ msgid "Log of update check:"
+#~ msgstr "Nhật ký kiểm tra cập nhật phiên bản mới:"
+
+#~ msgid "Package"
+#~ msgstr "Đóng gói"
+
+#~ msgid ""
+#~ "Please check http://filezilla-project.org for the most recent version of "
+#~ "FileZilla."
+#~ msgstr ""
+#~ "Xin hãy kiểm tra phiên bản mới của FileZila tại http://filezilla-project."
+#~ "org."
+
+#~ msgid ""
+#~ "Please check the package manager of your system for an updated package or "
+#~ "visit http://filezilla-project.org to download the source code of "
+#~ "FileZilla."
+#~ msgstr ""
+#~ "Xin kiểm tra lại chương trình quản lý đóng gói trong hệ thống của bạn cho "
+#~ "gói cập nhật hay truy cập http://filezilla-project.org để tải về mã nguồn "
+#~ "của FileZilla."
+
+#~ msgid ""
+#~ "Please retry downloading the update. Possible reasons if the problem "
+#~ "persists (listed in order of decreasing probability):"
+#~ msgstr ""
+#~ "Hãy thử tải về bản cập nhật. Có thể là lý do vấn đề này vẫn tiếp tục "
+#~ "(liệt kê theo thứ tự khả năng giảm dần):"
+
+#~ msgid ""
+#~ "Please visit http://filezilla-project.org for more information about "
+#~ "FileZilla."
+#~ msgstr ""
+#~ "Mời bạn truy cập http://filezilla-project.org để tìm thêm thông tin về "
+#~ "FileZilla."
+
+#~ msgid ""
+#~ "Please visit http://filezilla-project.org to download the most recent "
+#~ "version."
+#~ msgstr ""
+#~ "Mời bạn truy cập http://filezilla-project.org để tải phiên bản mới nhất "
+#~ "của FileZilla."
+
+#~ msgid "Resolving hostname"
+#~ msgstr "Phân giải tên máy chủ"
+
+#~ msgid "Select download location for package"
+#~ msgstr "Chọn vị trí tải về cho gói tin"
+
+#~ msgid ""
+#~ "The most recent version has been downloaded. Click on Finish to close "
+#~ "FileZilla and to start the installation."
+#~ msgstr ""
+#~ "Phiên bản mới nhất đã được tải về. Bấm vào nút Hoàn tất để đóng FileZilla "
+#~ "và bắt đầu việc cài đặt."
+
+#~ msgid ""
+#~ "The most recent version has been downloaded. Please install it the same "
+#~ "way you installed this version."
+#~ msgstr ""
+#~ "Phiên bản mới nhất đã được tải về. Xin hãy cài đặt nó giống như cách bạn "
+#~ "đã cài đặt phiên bản này."
+
+#~ msgid "Update wizard"
+#~ msgstr "Giúp bạn tải về bản mới nhất"
+
+#~ msgid "Using this wizard you can check for available updates to FileZilla."
+#~ msgstr ""
+#~ "Dùng chương trình thuật sĩ này bạn có thể kiểm tra cập nhật bản mới cho "
+#~ "FileZilla."
+
+#~ msgid ""
+#~ "You are already using the most recent version of FileZilla. Please check "
+#~ "again in future."
+#~ msgstr "Bạn đã dùng bản mới nhất của FileZilla. Hãy kiểm tra lại sau."
+
+#~ msgid "&Copy"
+#~ msgstr "Sao &chép"
+
+#~ msgid "Cop&y"
+#~ msgstr "&Sao chép"
+
+#~ msgid "&Enable automatic update check"
+#~ msgstr "&Bật tự động kiểm tra phiên bản mới"
+
+#~ msgid "&Number of days between update checks:"
+#~ msgstr "Số &ngày giữa các lần cập nhật:"
+
+#~ msgid "(At least 7 days)"
+#~ msgstr "(Ít nhất là 7 ngày)"
+
+#~ msgid "Check for &beta versions and release candidates"
+#~ msgstr "Kiểm tra phiên &bản tiền phát hành của FileZilla"
+
+#~ msgid "Please enter an update interval of at least 7 days"
+#~ msgstr "Hãy nhập khoảng thời gian giữa các lần cập nhật ít nhất là 7 ngày"
+
+#~ msgid "Privacy policy:"
+#~ msgstr "Chính sách riêng tư:"
+
+#~ msgid "%s (%d.%d KB/s)"
+#~ msgstr "%s (%d.%d KB/s)"
+
+#~ msgid "%s (%d.%d MB/s)"
+#~ msgstr "%s (%d.%d MB/s)"
+
+#~ msgid "%s bytes (%d.%d KB/s)"
+#~ msgstr "%s bytes (%d.%d KB/s)"
+
+#~ msgid "%s bytes (%d.%d MB/s)"
+#~ msgstr "%s bytes (%d.%d MB/s)"
+
+#~ msgid "Wrong opState: %d"
+#~ msgstr "Sai opState: %d"
+
+#~ msgid "Duplicate filter name"
+#~ msgstr "Sao bản tên bộ lọc"
