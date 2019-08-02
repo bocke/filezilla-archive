@@ -10,6 +10,14 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.44.0-rc1 (2019-08-02)
+
++ Multiple items can now be selected in the Site Manager
++ Pressing F3 in the Site Manager opens a search dialog
++ Add a reminder to the message log to switch to FTP over TLS each time a plain FTP connection is used
+- Fix loading of confirmed, known insecure hosts
+- Building and running FileZilla now depends on libfilezilla >= 0.18.0 (https://lib.filezilla-project.org/)
+
 3.43.0 (2019-06-27)
 
 ! Filenames containing double-quotation marks were not escaped correctly when selected for opening/editing. Depending on the associated program, parts of the filename could be interpreted as commands.
