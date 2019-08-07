@@ -50,7 +50,7 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
 	SetParent(pMainFrame);
-	if (!Load(GetParent(), _T("ID_SETTINGS"))) {
+	if (!Load(GetParent(), _T("ID_SETTINGS"), L"settings.xrc")) {
 		return false;
 	}
 

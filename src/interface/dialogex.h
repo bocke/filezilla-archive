@@ -36,7 +36,7 @@ protected:
 class wxDialogEx : public wxDialog, public CWrapEngine
 {
 public:
-	bool Load(wxWindow *pParent, const wxString& name);
+	bool Load(wxWindow *pParent, wxString const& name, std::wstring const& file = std::wstring());
 
 	bool SetChildLabel(int id, const wxString& label, unsigned long maxLength = 0);
 	bool SetChildLabel(char const* id, const wxString& label, unsigned long maxLength = 0);

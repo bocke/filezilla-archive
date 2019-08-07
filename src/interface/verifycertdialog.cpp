@@ -469,7 +469,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	fz::tls_session_info& info = notification.info_;
 
 	m_pDlg = new wxDialogEx;
-	if (!m_pDlg->Load(0, L"ID_VERIFYCERT")) {
+	if (!m_pDlg->Load(0, L"ID_VERIFYCERT", L"certificate.xrc")) {
 		wxBell();
 		delete m_pDlg;
 		m_pDlg = 0;

@@ -54,11 +54,11 @@ void wxDialogEx::OnChar(wxKeyEvent& event)
 	}
 }
 
-bool wxDialogEx::Load(wxWindow* pParent, const wxString& name)
+bool wxDialogEx::Load(wxWindow* pParent, wxString const& name, std::wstring const& file)
 {
 	SetParent(pParent);
 
-	InitXrc();
+	InitXrc(file);
 	if (!wxXmlResource::Get()->LoadDialog(this, pParent, name)) {
 		return false;
 	}

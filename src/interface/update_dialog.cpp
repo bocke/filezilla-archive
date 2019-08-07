@@ -90,7 +90,7 @@ int CUpdateDialog::ShowModal()
 	buttons->Add(new wxButton(this, XRCID("ID_DEBUGLOG"), L"show log"))->Show(debug);
 	buttons->Add(new wxButton(this, wxID_CANCEL, _("&Close")));
 
-	InitXrc();
+	InitXrc(L"update.xrc");
 	LoadPanel(_T("ID_CHECKING_PANEL"));
 	LoadPanel(_T("ID_FAILURE_PANEL"));
 	LoadPanel(_T("ID_NEWVERSION_PANEL"));

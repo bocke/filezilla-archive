@@ -62,7 +62,7 @@ void xrc_call(wxWindow const& parent, S&& name, void (Control::* ptr)(Args...) c
 }
 
 // Init the handlers for the global XRC and loads the resource files
-void InitXrc();
+void InitXrc(std::wstring const& file = std::wstring());
 
 void InitHandlers(wxXmlResource& res);
 
