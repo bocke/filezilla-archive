@@ -74,28 +74,55 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 	assert(site.credentials.encrypted_);
 
 	wxDialogEx pwdDlg;
-	if (!pwdDlg.Load(wxGetApp().GetTopWindow(), _T("ID_ENTERMASTERPASSWORD"))) {
+	if (!pwdDlg.Create(wxGetApp().GetTopWindow(), -1, _("Enter master password"))) {
 		return false;
 	}
+	auto & lay = pwdDlg.layout();
+	auto * main = lay.createMain(&pwdDlg, 1);
 
+	main->Add(new wxStaticText(&pwdDlg, -1, _("Please enter your master password to decrypt the password for this server:")));
+
+	auto* inner = lay.createFlex(2);
+	main->Add(inner);
+	
 	std::wstring const& name = site.server.GetName();
-	if (name.empty()) {
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAMELABEL", wxStaticText), false, true);
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAME", wxStaticText), false, true);
-	}
-	else {
-		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, LabelEscape(name));
+	if (!name.empty()) {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("Name:")));
+		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));
 	}
 
-	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Host:")));
+	inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.Format(ServerFormat::with_optional_port))));
 
-	XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(LabelEscape(site.server.GetUser()));
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("User:")));
+	inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.server.GetUser())));
 
-	XRCCTRL(pwdDlg, "wxID_OK", wxButton)->SetId(wxID_OK);
-	XRCCTRL(pwdDlg, "wxID_CANCEL", wxButton)->SetId(wxID_CANCEL);
+	inner = lay.createFlex(2);
+	main->Add(inner);
 
-	xrc_call(pwdDlg, "ID_KEY_IDENTIFIER", &wxStaticText::SetLabel, site.credentials.encrypted_.to_base64().substr(0, 8));
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Key identifier:")));
+	inner->Add(new wxStaticText(&pwdDlg, -1, fz::to_wstring(site.credentials.encrypted_.to_base64().substr(0, 8))));
 
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Master &Password:")), lay.valign);
+
+	auto* password = new wxTextCtrl(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	password->SetMinSize(wxSize(150, -1));
+	password->SetFocus();
+	inner->Add(password, lay.valign);
+
+	main->Add(new wxCheckBox(&pwdDlg, XRCID("ID_REMEMBER"), _("&Remember master password until FileZilla is closed")));
+
+	auto* buttons = lay.createButtonSizer(&pwdDlg, main, true);
+
+	auto ok = new wxButton(&pwdDlg, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(&pwdDlg, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
+	
 	pwdDlg.GetSizer()->Fit(&pwdDlg);
 	pwdDlg.GetSizer()->SetSizeHints(&pwdDlg);
 
@@ -104,7 +131,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 			return false;
 		}
 
-		auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring());
+		auto pass = fz::to_utf8(password->GetValue().ToStdWstring());
 		auto key = fz::private_key::from_password(pass, site.credentials.encrypted_.salt_);
 
 		if (key.pubkey() != site.credentials.encrypted_) {
@@ -130,71 +157,111 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 {
 	assert(!site.credentials.encrypted_);
 
+	wxString title;
+	wxString header;
+	if (site.server.GetUser().empty()) {
+		if (site.credentials.logonType_ == LogonType::interactive) {
+			title = _("Enter username");
+			header = _("Please enter a username for this server:");
+
+			canRemember = false;
+		}
+		else {
+			title = _("Enter username and password");
+			header = _("Please enter username and password for this server:");
+		}
+	}
+	else {
+		title = _("Enter password");
+		header = _("Please enter a password for this server:");
+	}
+
 	wxDialogEx pwdDlg;
-	if (!pwdDlg.Load(wxGetApp().GetTopWindow(), _T("ID_ENTERPASSWORD"))) {
+	if (!pwdDlg.Create(wxGetApp().GetTopWindow(), -1, title)) {
 		return false;
 	}
+	auto& lay = pwdDlg.layout();
+	auto* main = lay.createMain(&pwdDlg, 1);
+	
+	main->Add(new wxStaticText(&pwdDlg, -1, header));
+
+	auto* inner = lay.createFlex(2);
+	main->Add(inner);
 
 	std::wstring const& name = site.server.GetName();
-	if (name.empty()) {
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAMELABEL", wxStaticText), false, true);
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_NAME", wxStaticText), false, true);
-	}
-	else {
-		xrc_call(pwdDlg, "ID_NAME", &wxStaticText::SetLabel, LabelEscape(name));
+	if (!name.empty()) {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("Name:")));
+		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));
 	}
 
-	if (challenge.empty()) {
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_CHALLENGELABEL", wxStaticText), false, true);
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_CHALLENGE", wxTextCtrl), false, true);
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Host:")));
+	inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.Format(ServerFormat::with_optional_port))));
 
+	if (!site.server.GetUser().empty()) {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("User:")));
+		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.server.GetUser())));
 	}
-	else {
+
+	if (!challenge.empty()) {
 		std::wstring displayChallenge = LabelEscape(fz::trimmed(challenge));
 #ifdef FZ_WINDOWS
 		fz::replace_substrings(displayChallenge, L"\n", L"\r\n");
 #endif
-		XRCCTRL(pwdDlg, "ID_CHALLENGE", wxTextCtrl)->ChangeValue(displayChallenge);
-		pwdDlg.GetSizer()->Show(XRCCTRL(pwdDlg, "ID_REMEMBER", wxCheckBox), canRemember, true);
-		XRCCTRL(pwdDlg, "ID_CHALLENGE", wxTextCtrl)->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+		main->AddSpacer(0);
+		main->Add(new wxStaticText(&pwdDlg, -1, _("Challenge:")));
+		auto* challengeText = new wxTextCtrl(&pwdDlg, -1, displayChallenge, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+		challengeText->SetMinSize(wxSize(lay.dlgUnits(160), lay.dlgUnits(50)));
+		challengeText->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+		main->Add(challengeText, lay.grow);
 	}
-	XRCCTRL(pwdDlg, "ID_HOST", wxStaticText)->SetLabel(site.Format(ServerFormat::with_optional_port));
 
+	main->AddSpacer(0);
+
+	inner = lay.createFlex(2);
+	main->Add(inner);
+
+	wxTextCtrl* newUser{};
 	if (site.server.GetUser().empty()) {
-		XRCCTRL(pwdDlg, "ID_OLD_USER_LABEL", wxStaticText)->Hide();
-		XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->Hide();
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("&User:")), lay.valign);
+		newUser = new wxTextCtrl(&pwdDlg, -1, wxString());
+		newUser->SetMinSize(wxSize(150, -1));
+		newUser->SetFocus();
+		inner->Add(newUser, lay.valign);
+	}
 
-		XRCCTRL(pwdDlg, "ID_HEADER_PASS", wxStaticText)->Hide();
-		if (site.credentials.logonType_ == LogonType::interactive) {
-			pwdDlg.SetTitle(_("Enter username"));
-			XRCCTRL(pwdDlg, "ID_PASSWORD_LABEL", wxStaticText)->Hide();
-			XRCCTRL(pwdDlg, "ID_PASSWORD", wxTextCtrl)->Hide();
-			XRCCTRL(pwdDlg, "ID_HEADER_BOTH", wxStaticText)->Hide();
-
-			canRemember = false;
-			XRCCTRL(pwdDlg, "ID_REMEMBER", wxCheckBox)->Hide();
+	wxTextCtrl* password{};
+	if (!site.server.GetUser().empty() || site.credentials.logonType_ != LogonType::interactive) {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("&Password:")), lay.valign);
+		password = new wxTextCtrl(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+		password->SetMinSize(wxSize(150, -1));
+		if (!newUser) {
+			password->SetFocus();
 		}
-		else {
-			pwdDlg.SetTitle(_("Enter username and password"));
-			XRCCTRL(pwdDlg, "ID_HEADER_USER", wxStaticText)->Hide();
+		inner->Add(password, lay.valign);
+
+		if (site.server.GetProtocol() == STORJ) {
+			inner->Add(new wxStaticText(&pwdDlg, -1, _("Encryption &key:")), lay.valign);
+			auto * key = new wxTextCtrl(&pwdDlg, XRCID("ID_ENCRYPTIONKEY"));
+			key->SetMinSize(wxSize(150, -1));
+			inner->Add(key, lay.valign);
 		}
-		XRCCTRL(pwdDlg, "ID_NEW_USER", wxTextCtrl)->SetFocus();
-	}
-	else {
-		XRCCTRL(pwdDlg, "ID_OLD_USER", wxStaticText)->SetLabel(site.server.GetUser());
-		XRCCTRL(pwdDlg, "ID_NEW_USER_LABEL", wxStaticText)->Hide();
-		XRCCTRL(pwdDlg, "ID_NEW_USER", wxTextCtrl)->Hide();
-		XRCCTRL(pwdDlg, "ID_HEADER_USER", wxStaticText)->Hide();
-		xrc_call(pwdDlg, "ID_HEADER_BOTH", &wxStaticText::Hide);
 	}
 
-	if (site.server.GetProtocol() == STORJ) {
-		XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY_LABEL", wxStaticText)->Show();
-		XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY", wxTextCtrl)->Show();
+	if (canRemember) {
+		main->Add(new wxCheckBox(&pwdDlg, XRCID("ID_REMEMBER"), _("&Remember password until FileZilla is closed")));
 	}
 
-	XRCCTRL(pwdDlg, "wxID_OK", wxButton)->SetId(wxID_OK);
-	XRCCTRL(pwdDlg, "wxID_CANCEL", wxButton)->SetId(wxID_CANCEL);
+	auto* buttons = lay.createButtonSizer(&pwdDlg, main, true);
+
+	auto ok = new wxButton(&pwdDlg, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(&pwdDlg, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
+
 	pwdDlg.GetSizer()->Fit(&pwdDlg);
 	pwdDlg.GetSizer()->SetSizeHints(&pwdDlg);
 
@@ -203,8 +270,8 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 			return false;
 		}
 
-		if (site.server.GetUser().empty()) {
-			auto user = xrc_call(pwdDlg, "ID_NEW_USER", &wxTextCtrl::GetValue).ToStdWstring();
+		if (newUser) {
+			auto user = newUser->GetValue().ToStdWstring();
 			if (user.empty()) {
 				wxMessageBoxEx(_("No username given."), _("Invalid input"), wxICON_EXCLAMATION);
 				continue;
@@ -221,12 +288,14 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 		}
 	}
 */
-		std::wstring pass = xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
-		if (site.server.GetProtocol() == STORJ) {
-			std::wstring encryptionKey = xrc_call(pwdDlg, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
-			pass += L"|" + encryptionKey;
+		if (password) {
+			std::wstring pass = password->GetValue().ToStdWstring();
+			if (site.server.GetProtocol() == STORJ) {
+				std::wstring encryptionKey = xrc_call(pwdDlg, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
+				pass += L"|" + encryptionKey;
+			}
+			site.credentials.SetPass(pass);
 		}
-		site.credentials.SetPass(pass);
 
 		if (canRemember && xrc_call(pwdDlg, "ID_REMEMBER", &wxCheckBox::IsChecked)) {
 			RememberPassword(site, challenge);
