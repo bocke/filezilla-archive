@@ -30,6 +30,7 @@
 void InitHandlers(wxXmlResource& res)
 {
 	res.AddHandler(new wxSizerXmlHandler);
+	res.AddHandler(new wxStaticTextXmlHandler);
 	res.AddHandler(new wxButtonXmlHandler);
 	res.AddHandler(new wxRadioButtonXmlHandler);
 	res.AddHandler(new wxTextCtrlXmlHandlerEx);
@@ -41,7 +42,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxChoiceXmlHandler);
 	res.AddHandler(new wxStaticLineXmlHandler);
 	res.AddHandler(new wxBitmapButtonXmlHandler);
-	res.AddHandler(new wxStaticTextXmlHandler);
 	res.AddHandler(new wxStaticBitmapXmlHandler);
 	res.AddHandler(new wxTreeCtrlXmlHandler);
 	res.AddHandler(new wxListCtrlXmlHandler);
