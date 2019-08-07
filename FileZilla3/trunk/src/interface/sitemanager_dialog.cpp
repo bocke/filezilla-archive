@@ -1547,7 +1547,19 @@ bool CSiteManagerDialog::IsPredefinedItem(wxTreeItemId item)
 
 void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 {
+#ifdef __WXMSW__
+	// On a multi-selection tree control, if vetoing a selection change,
+	// wxWidgets doesn't reset the drag source. Next time mouse is moved
+	// drag is started even if mouse if up again...
+	wxMouseState mouseState = wxGetMouseState();
+	if (!mouseState.LeftIsDown()) {
+		event.Veto();
+		return;
+	}
+#endif
+
 	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+		event.Veto();
 		return;
 	}
 
