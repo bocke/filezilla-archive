@@ -89,8 +89,6 @@ protected:
 
 	std::vector<wxTreeItemId> draggedItems_;
 
-	wxTreeItemId m_contextMenuItem;
-
 	wxTreeItemId MoveItems(wxTreeItemId source, wxTreeItemId target, bool copy, bool use_existing_name);
 
 	wxTreeCtrlEx* tree_{};

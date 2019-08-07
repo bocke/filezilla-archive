@@ -1869,10 +1869,13 @@ void CSiteManagerDialog::RememberLastSelected()
 
 void CSiteManagerDialog::OnContextMenu(wxTreeEvent& event)
 {
+	if (!Verify()) {
+		return;
+	}
+	UpdateItem();
+
 	wxMenu menu;
 	menu.Append(XRCID("ID_EXPORT"), _("&Export..."));
-
-	m_contextMenuItem = event.GetItem();
 
 	PopupMenu(&menu);
 }
@@ -1897,7 +1900,25 @@ void CSiteManagerDialog::OnExportSelected(wxCommandEvent&)
 	auto exportRoot = xml.CreateEmpty();
 
 	auto servers = exportRoot.append_child("Servers");
-	SaveChild(servers, m_contextMenuItem);
+
+	auto selections = tree_->GetSelections();
+
+	wxTreeItemId ancestor;
+	for (auto const& item : selections) {
+		if (!item.IsOk() || item == tree_->GetRootItem()) {
+			return;
+		}
+
+		// Only keep items that do not have an ancestor that is already being copied
+		auto parent = tree_->GetItemParent(item);
+		while (parent && parent != ancestor) {
+			parent = tree_->GetItemParent(parent);
+		}
+		if (!parent) {
+			ancestor = item;
+			SaveChild(servers, item);
+		}
+	}
 
 	if (!xml.Save(false)) {
 		wxString msg = wxString::Format(_("Could not write \"%s\", the selected sites could not be exported: %s"), xml.GetFileName(), xml.GetError());
