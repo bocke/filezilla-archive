@@ -21,6 +21,7 @@ protected:
 	void OnBrowse(wxCommandEvent&);
 };
 
+class wxTreeCtrlEx;
 class CBookmarksDialog final : public wxDialogEx
 {
 public:
@@ -43,11 +44,11 @@ protected:
 	void SaveSiteSpecificBookmarks();
 	void SaveGlobalBookmarks();
 
-	wxWindow* m_parent;
+	wxWindow* m_parent{};
 	std::wstring &m_site_path;
-	Site const* site_;
+	Site const* site_{};
 
-	wxTreeCtrl *m_pTree{};
+	wxTreeCtrlEx* tree_{};
 	wxTreeItemId m_bookmarks_global;
 	wxTreeItemId m_bookmarks_site;
 

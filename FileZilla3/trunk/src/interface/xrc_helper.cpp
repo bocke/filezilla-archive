@@ -14,7 +14,6 @@
 #include <wx/xrc/xh_gauge.h>
 #include <wx/xrc/xh_listb.h>
 #include <wx/xrc/xh_listc.h>
-#include <wx/xrc/xh_notbk.h>
 #include <wx/xrc/xh_panel.h>
 #include <wx/xrc/xh_radbt.h>
 #include <wx/xrc/xh_scwin.h>
@@ -48,7 +47,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxListCtrlXmlHandler);
 	res.AddHandler(new wxCheckListBoxXmlHandler);
 	res.AddHandler(new wxSpinCtrlXmlHandler);
-	res.AddHandler(new wxNotebookXmlHandler);
 	res.AddHandler(new wxListBoxXmlHandler);
 	res.AddHandler(new wxScrolledWindowXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);
