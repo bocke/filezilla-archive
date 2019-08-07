@@ -27,6 +27,8 @@
 #include <wx/xrc/xh_tree.h>
 #include <wx/xrc/xh_hyperlink.h>
 
+#include <unordered_set>
+
 void InitHandlers(wxXmlResource& res)
 {
 	res.AddHandler(new wxSizerXmlHandler);
@@ -53,28 +55,41 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxAnimationCtrlXmlHandler);
 }
 
-void InitXrc()
+namespace {
+void LoadXrcFile(std::wstring const& file)
+{
+	static std::unordered_set<std::wstring> seen;
+
+	if (seen.insert(file).second) {
+		std::wstring dir = wxGetApp().GetResourceDir().GetPath() + L"xrc/";
+		wxXmlResource* pResource = wxXmlResource::Get();
+		pResource->LoadFile(wxString(dir + file));
+	}
+}
+}
+
+void InitXrc(std::wstring const& file)
 {
 	static bool initialized = false;
-	if (initialized) {
-		return;
-	}
-	initialized = true;
+	if (!initialized) {
+		initialized = true;
 
-	wxXmlResource *pResource = wxXmlResource::Get();
+		wxXmlResource* pResource = wxXmlResource::Get();
 
 #ifndef __WXDEBUG__
-	pResource->SetFlags(pResource->GetFlags() | wxXRC_NO_RELOADING);
+		pResource->SetFlags(pResource->GetFlags() | wxXRC_NO_RELOADING);
 #endif
 
-	InitHandlers(*pResource);
+		InitHandlers(*pResource);
+	}
 
 	fz::local_filesys fs;
 	std::wstring dir = wxGetApp().GetResourceDir().GetPath() + L"xrc/";
-	pResource->LoadFile(wxString(dir + L"certificate.xrc"));
-	pResource->LoadFile(wxString(dir + L"dialogs.xrc"));
-	pResource->LoadFile(wxString(dir + L"netconfwizard.xrc"));
-	pResource->LoadFile(wxString(dir + L"settings.xrc"));
-	pResource->LoadFile(wxString(dir + L"update.xrc"));
-	pResource->LoadFile(wxString(dir + L"storj.xrc"));
+	if (file.empty()) {
+		LoadXrcFile(L"dialogs.xrc");
+		LoadXrcFile(L"storj.xrc");
+	}
+	else {
+		LoadXrcFile(file);
+	}
 }

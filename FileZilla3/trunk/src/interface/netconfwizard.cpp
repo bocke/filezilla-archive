@@ -58,7 +58,7 @@ bool CNetConfWizard::Load()
 
 	wxSize minPageSize = GetPageAreaSizer()->GetMinSize();
 
-	InitXrc();
+	InitXrc(L"netconfwizard.xrc");
 	for (int i = 1; i <= 7; ++i) {
 		wxWizardPageSimple* page = new wxWizardPageSimple();
 		bool res = wxXmlResource::Get()->LoadPanel(page, this, wxString::Format(_T("NETCONF_PANEL%d"), i));
@@ -76,8 +76,9 @@ bool CNetConfWizard::Load()
 	GetPageAreaSizer()->Add(m_pages[0]);
 
 	std::vector<wxWindow*> windows;
-	for (unsigned int i = 0; i < m_pages.size(); i++)
+	for (unsigned int i = 0; i < m_pages.size(); ++i) {
 		windows.push_back(m_pages[i]);
+	}
 	wxGetApp().GetWrapEngine()->WrapRecursive(windows, 1.7, "Netconf", wxSize(), minPageSize);
 
 	CenterOnParent();
