@@ -320,7 +320,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	}
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-	if (!wxDialogEx::Create(parent, XRCID("ID_SITEMANAGER"), _("Site Manager"), wxDefaultPosition, wxDefaultSize, wxCAPTION | wxSYSTEM_MENU | wxRESIZE_BORDER | wxCLOSE_BOX)) {
+	if (!wxDialogEx::Create(parent, -1, _("Site Manager"), wxDefaultPosition, wxDefaultSize, wxCAPTION | wxSYSTEM_MENU | wxRESIZE_BORDER | wxCLOSE_BOX)) {
 		return false;
 	}
 
