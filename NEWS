@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.44.0 (2019-08-08)
+
+- Fixed export in context menu of Site Manager to handle multiple selected items
+
 3.44.0-rc1 (2019-08-02)
 
 + Multiple items can now be selected in the Site Manager
