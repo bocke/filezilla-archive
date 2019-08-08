@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Filezilla italian translation v. 31.07.2019\n"
+"Project-Id-Version: Filezilla italian translation v. 03.08.2019\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-08-02 13:34+0200\n"
-"PO-Revision-Date: 2019-07-31 11:45+0200\n"
+"POT-Creation-Date: 2019-08-08 08:41+0200\n"
+"PO-Revision-Date: 2019-08-03 08:41+0200\n"
 "Last-Translator: bovirus <bovirus@gmail.com>\n"
 "Language-Team: bovirus - Andrea Sanavia - Vincenzo Reale - Riccardo Vianello "
 "<bovirus@gmail.com>\n"
@@ -189,7 +189,7 @@ msgstr "%w - Password proxy"
 msgid "&AWS S3 encryption"
 msgstr "Criptazione &AW S3"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3626
+#: ../src/interface/resources/xrc/dialogs.xrc:3260
 msgid "&Abort previous connection and connect in current tab"
 msgstr "Interrompi connessione precedente e connetti nella sched&a attuale"
 
@@ -207,7 +207,7 @@ msgstr "ID chiave &accesso:"
 msgid "&Account ID:"
 msgstr "ID &account:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2734
+#: ../src/interface/resources/xrc/dialogs.xrc:2476
 #: ../src/interface/sitemanager_site.cpp:153
 msgid "&Account:"
 msgstr "&Account:"
@@ -222,7 +222,7 @@ msgstr "&Attiva"
 msgid "&Add bookmark..."
 msgstr "&Aggiungi preferito..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3964
+#: ../src/interface/resources/xrc/dialogs.xrc:3598
 msgid "&Add directory..."
 msgstr "&Aggiungi cartella..."
 
@@ -254,7 +254,7 @@ msgstr ""
 msgid "&Always trust certificate in future sessions."
 msgstr "&Considera sempre sicuro il certificato nelle sessioni future."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1087
+#: ../src/interface/resources/xrc/dialogs.xrc:829
 msgid "&Always trust this host, add this key to the cache"
 msgstr ""
 "Considera sempre sicuro questo host, &aggiungi questa chiave alla cache"
@@ -263,7 +263,7 @@ msgstr ""
 msgid "&Always use default editor"
 msgstr "&Utilizza sempre l'editor predefinito"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3157
+#: ../src/interface/resources/xrc/dialogs.xrc:2791
 msgid "&Always use selection for unassociated files"
 msgstr "Us&a sempre la selezione per i file non associati"
 
@@ -301,10 +301,10 @@ msgstr "Prefissi &binari utilizzando i simboli del SI (es. 1KB = 1024 byte)"
 msgid "&Bookmarks"
 msgstr "&Preferiti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2507
-#: ../src/interface/resources/xrc/dialogs.xrc:2918
-#: ../src/interface/resources/xrc/dialogs.xrc:3144
-#: ../src/interface/resources/xrc/dialogs.xrc:3357
+#: ../src/interface/resources/xrc/dialogs.xrc:2249
+#: ../src/interface/resources/xrc/dialogs.xrc:2660
+#: ../src/interface/resources/xrc/dialogs.xrc:2778
+#: ../src/interface/resources/xrc/dialogs.xrc:2991
 #: ../src/interface/resources/xrc/settings.xrc:1788
 #: ../src/interface/resources/xrc/settings.xrc:2003
 #: ../src/interface/sitemanager_dialog.cpp:297
@@ -316,11 +316,9 @@ msgstr "&Sfoglia..."
 msgid "&Burst tolerance:"
 msgstr "Tolleranza &burst:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:386
-#: ../src/interface/resources/xrc/dialogs.xrc:494
-#: ../src/interface/resources/xrc/dialogs.xrc:1227
-#: ../src/interface/resources/xrc/dialogs.xrc:3753
-#: ../src/interface/resources/xrc/dialogs.xrc:3855
+#: ../src/interface/resources/xrc/dialogs.xrc:969
+#: ../src/interface/resources/xrc/dialogs.xrc:3387
+#: ../src/interface/resources/xrc/dialogs.xrc:3489
 #: ../src/interface/resources/xrc/settings.xrc:35
 #: ../src/interface/inputdialog.cpp:33
 #: ../src/interface/verifycertdialog.cpp:780
@@ -359,7 +357,7 @@ msgstr "&Connetti"
 msgid "&Copy current connection to Site Manager..."
 msgstr "&Copia connessione corrente nel Gestore siti..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:985
+#: ../src/interface/resources/xrc/dialogs.xrc:727
 #: ../src/interface/StatusView.cpp:435
 msgid "&Copy to clipboard"
 msgstr "&Copia negli Appunti"
@@ -395,16 +393,16 @@ msgstr "Azione &predefinita per i file esistenti..."
 msgid "&Delay between failed login attempts:"
 msgstr "Ritar&do tra i tentativi di login falliti:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1271
-#: ../src/interface/resources/xrc/dialogs.xrc:1440
-#: ../src/interface/resources/xrc/dialogs.xrc:3029
+#: ../src/interface/resources/xrc/dialogs.xrc:1013
+#: ../src/interface/resources/xrc/dialogs.xrc:1182
+#: ../src/interface/bookmarks_dialog.cpp:274
 #: ../src/interface/LocalListView.cpp:802
 #: ../src/interface/LocalTreeView.cpp:1109
 #: ../src/interface/sitemanager_dialog.cpp:354
 msgid "&Delete"
 msgstr "&Elimina"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3549
+#: ../src/interface/resources/xrc/dialogs.xrc:3183
 msgid "&Delete symlink"
 msgstr "&Elimina collegamento simbolico"
 
@@ -430,7 +428,7 @@ msgstr ""
 "&Disabilita la navigazione sincronizzata e continua le modifica nella "
 "cartella remota"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2030
+#: ../src/interface/resources/xrc/dialogs.xrc:1772
 msgid "&Discard local file then download and edit file anew"
 msgstr "&Abbandona il file locale quindi scarica e modifica un nuovo file"
 
@@ -464,7 +462,7 @@ msgstr "Azione &doppio clic sui file:"
 msgid "&Download"
 msgstr "&Scarica"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3343
+#: ../src/interface/resources/xrc/dialogs.xrc:2977
 msgid "&Download to:"
 msgstr "&Download in:"
 
@@ -472,7 +470,7 @@ msgstr "&Download in:"
 msgid "&Download..."
 msgstr "&Download..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1607
+#: ../src/interface/resources/xrc/dialogs.xrc:1349
 #: ../src/interface/resources/xrc/settings.xrc:1180
 msgid "&Downloads:"
 msgstr "&Download:"
@@ -481,7 +479,7 @@ msgstr "&Download:"
 msgid "&Edit"
 msgstr "&Modifica"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1367
+#: ../src/interface/resources/xrc/dialogs.xrc:1109
 msgid "&Edit filter rules..."
 msgstr "&Modifica regole filtri..."
 
@@ -494,7 +492,7 @@ msgstr "&Abilita"
 msgid "&Enable compression"
 msgstr "Abilita compr&essione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3681
+#: ../src/interface/resources/xrc/dialogs.xrc:3315
 #: ../src/interface/resources/xrc/settings.xrc:897
 msgid "&Enable speed limits"
 msgstr "&Abilita Limiti di velocità"
@@ -511,20 +509,20 @@ msgstr "&Criptazione:"
 msgid "&Enter custom command..."
 msgstr "&Esegui comando personalizzato..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3619
+#: ../src/interface/resources/xrc/dialogs.xrc:3253
 msgid "&Establish connection in a new tab"
 msgstr "Stabilisci conn&essione in una nuova scheda"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:606
+#: ../src/interface/resources/xrc/dialogs.xrc:348
 msgid "&Execute"
 msgstr "&Esegui"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1781
+#: ../src/interface/resources/xrc/dialogs.xrc:1523
 msgid "&Export Site Manager entries"
 msgstr "&Esporta le voci del Gestore siti"
 
 #: ../src/interface/menu_bar.cpp:57
-#: ../src/interface/sitemanager_dialog.cpp:1873
+#: ../src/interface/sitemanager_dialog.cpp:1890
 msgid "&Export..."
 msgstr "&Esporta..."
 
@@ -544,31 +542,31 @@ msgstr "&Attributi file..."
 msgid "&File permissions..."
 msgstr "Permessi &file..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2495
+#: ../src/interface/resources/xrc/dialogs.xrc:2237
 msgid "&File:"
 msgstr "&File:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1492
+#: ../src/interface/resources/xrc/dialogs.xrc:1234
 msgid "&Filter conditions:"
 msgstr "Condizioni di &filtro:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1248
+#: ../src/interface/resources/xrc/dialogs.xrc:990
 msgid "&Filter sets:"
 msgstr "Gruppi di &filtri:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1856
+#: ../src/interface/resources/xrc/dialogs.xrc:1598
 msgid "&Filters"
 msgstr "&Filtri"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1418
+#: ../src/interface/resources/xrc/dialogs.xrc:1160
 msgid "&Filters:"
 msgstr "&Filtri:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1969
+#: ../src/interface/resources/xrc/dialogs.xrc:1711
 msgid "&Finish editing and delete local file"
 msgstr "&Termina le modifiche ed elimina il file locale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3474
+#: ../src/interface/resources/xrc/dialogs.xrc:3108
 msgid ""
 "&Flatten local paths, upload all contained files directly into target "
 "directory"
@@ -576,7 +574,7 @@ msgstr ""
 "&Percorso locale non strutturato, invio di tutti i file contenuti "
 "direttamente nella cartella destinazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3379
+#: ../src/interface/resources/xrc/dialogs.xrc:3013
 msgid ""
 "&Flatten remote paths, download all contained files directly into target "
 "directory"
@@ -584,7 +582,7 @@ msgstr ""
 "&Percorso remoto non strutturato, download di tutti i file contenuti "
 "direttamente nella cartella destinazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3556
+#: ../src/interface/resources/xrc/dialogs.xrc:3190
 msgid "&Follow symlink, delete target directory contents"
 msgstr ""
 "&Seguire i collegamenti simbolici, eliminare il contenuto della cartella "
@@ -598,7 +596,7 @@ msgstr "Ottieni l'indirizzo &IP esterno dal seguente URL:"
 msgid "&Getting help..."
 msgstr "&Ottieni aiuto..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2847
+#: ../src/interface/resources/xrc/dialogs.xrc:2589
 msgid "&Global bookmark"
 msgstr "Preferito &globale"
 
@@ -622,7 +620,7 @@ msgstr "&Massima"
 msgid "&Highest available port:"
 msgstr "&Massima porta disponibile:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2642
+#: ../src/interface/resources/xrc/dialogs.xrc:2384
 #: ../src/interface/quickconnectbar.cpp:41
 #: ../src/interface/sitemanager_site.cpp:112
 #: ../src/interface/sitemanager_site.cpp:544
@@ -649,11 +647,11 @@ msgstr "Eredita le assoc&iazioni dal sistema"
 msgid "&Install new version"
 msgstr "&Installa nuova versione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3467
+#: ../src/interface/resources/xrc/dialogs.xrc:3101
 msgid "&Keep local path structure relative to search root"
 msgstr "&Conserva struttura percorso locale relativa alla ricerca principale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3372
+#: ../src/interface/resources/xrc/dialogs.xrc:3006
 msgid "&Keep remote path structure relative to search root"
 msgstr "&Mantieni struttura percorso remoto nella radice di ricerca"
 
@@ -677,12 +675,12 @@ msgstr "&Limita il numero di connessioni simultanee"
 msgid "&Local directory tree"
 msgstr "Struttura cartella &locale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2903
+#: ../src/interface/resources/xrc/dialogs.xrc:2645
 #: ../src/interface/sitemanager_dialog.cpp:291
 msgid "&Local directory:"
 msgstr "Cartella &locale:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3203
+#: ../src/interface/resources/xrc/dialogs.xrc:2837
 msgid "&Local search"
 msgstr "Ricerca &locale"
 
@@ -694,7 +692,7 @@ msgstr "&Log nel file"
 msgid "&Logon Type:"
 msgstr "&Tipo di accesso:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2697
+#: ../src/interface/resources/xrc/dialogs.xrc:2439
 msgid "&Logontype:"
 msgstr "&Tipo di accesso:"
 
@@ -730,7 +728,7 @@ msgstr "&Minimizza nella barra"
 msgid "&Name sorting mode:"
 msgstr "Modalità ordinamento &nome:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2874
+#: ../src/interface/resources/xrc/dialogs.xrc:2616
 msgid "&Name:"
 msgstr "&Nome:"
 
@@ -738,7 +736,7 @@ msgstr "&Nome:"
 msgid "&Network configuration wizard..."
 msgstr "Configurazione guidata &rete..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1434
+#: ../src/interface/resources/xrc/dialogs.xrc:1176
 msgid "&New"
 msgstr "&Nuovo"
 
@@ -754,8 +752,8 @@ msgstr "&Nuova versione disponibile!"
 msgid "&Next >"
 msgstr "&Avanti >"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1982
-#: ../src/interface/resources/xrc/dialogs.xrc:2105
+#: ../src/interface/resources/xrc/dialogs.xrc:1724
+#: ../src/interface/resources/xrc/dialogs.xrc:1847
 msgid "&No"
 msgstr "&No"
 
@@ -769,14 +767,13 @@ msgstr "&Nessuno"
 msgid "&Normal"
 msgstr "&Normale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:692
+#: ../src/interface/resources/xrc/dialogs.xrc:434
 msgid "&Numeric value:"
 msgstr "&Valore numerico:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:378
-#: ../src/interface/resources/xrc/dialogs.xrc:486
-#: ../src/interface/resources/xrc/dialogs.xrc:3078
-#: ../src/interface/inputdialog.cpp:29
+#: ../src/interface/bookmarks_dialog.cpp:279
+#: ../src/interface/inputdialog.cpp:29 ../src/interface/loginmanager.cpp:117
+#: ../src/interface/loginmanager.cpp:256
 #: ../src/interface/sitemanager_dialog.cpp:366
 #: ../src/interface/verifycertdialog.cpp:773
 msgid "&OK"
@@ -799,7 +796,7 @@ msgstr "&Sovrascrivi"
 msgid "&Passive"
 msgstr "&Passiva"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:334
+#: ../src/interface/loginmanager.cpp:234
 msgid "&Password:"
 msgstr "&Password:"
 
@@ -807,7 +804,7 @@ msgstr "&Password:"
 msgid "&Play sound"
 msgstr "&Riproduci suono"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2655
+#: ../src/interface/resources/xrc/dialogs.xrc:2397
 #: ../src/interface/quickconnectbar.cpp:54
 #: ../src/interface/sitemanager_site.cpp:117
 msgid "&Port:"
@@ -817,7 +814,7 @@ msgstr "&Porta:"
 msgid "&Preserve timestamps of transferred files"
 msgstr "&Preserva data e ora dei file trasferiti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1850
+#: ../src/interface/resources/xrc/dialogs.xrc:1592
 msgid "&Queue"
 msgstr "&Coda"
 
@@ -829,11 +826,11 @@ msgstr "&Connessione rapida"
 msgid "&Quickconnect bar"
 msgstr "Barra &connessione rapida"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1714
+#: ../src/interface/resources/xrc/dialogs.xrc:1456
 msgid "&Quickconnect history"
 msgstr "Cronologia &connessione rapida"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:594
+#: ../src/interface/resources/xrc/dialogs.xrc:336
 msgid "&Read"
 msgstr "&Lettura"
 
@@ -841,7 +838,7 @@ msgstr "&Lettura"
 msgid "&Reconnect"
 msgstr "&Riconnetti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1721
+#: ../src/interface/resources/xrc/dialogs.xrc:1463
 msgid "&Reconnect information"
 msgstr "Informazioni &riconnessione"
 
@@ -849,24 +846,24 @@ msgstr "Informazioni &riconnessione"
 msgid "&Refresh"
 msgstr "Aggio&rna"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:475
+#: ../src/interface/loginmanager.cpp:113
 msgid "&Remember master password until FileZilla is closed"
 msgstr "&Ricorda la password principale fino alla chiusura di Filezilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:367
+#: ../src/interface/loginmanager.cpp:251
 msgid "&Remember password until FileZilla is closed"
 msgstr "&Ricorda la password fino a che Filezilla non viene chiuso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2930
+#: ../src/interface/resources/xrc/dialogs.xrc:2672
 #: ../src/interface/sitemanager_dialog.cpp:299
 msgid "&Remote directory:"
 msgstr "Cartella &remota:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2531
+#: ../src/interface/resources/xrc/dialogs.xrc:2273
 msgid "&Remote path:"
 msgstr "Percorso &remoto:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3210
+#: ../src/interface/resources/xrc/dialogs.xrc:2844
 msgid "&Remote search"
 msgstr "Ricerca &remota"
 
@@ -878,13 +875,13 @@ msgstr "&Rimuovi"
 msgid "&Remove key"
 msgstr "&Rimuovi chiave"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3969
+#: ../src/interface/resources/xrc/dialogs.xrc:3603
 #: ../src/interface/QueueView.cpp:1819
 msgid "&Remove selected"
 msgstr "&Rimuovi selezionato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1446
-#: ../src/interface/resources/xrc/dialogs.xrc:3023
+#: ../src/interface/resources/xrc/dialogs.xrc:1188
+#: ../src/interface/bookmarks_dialog.cpp:273
 #: ../src/interface/LocalListView.cpp:803
 #: ../src/interface/LocalTreeView.cpp:1110
 #: ../src/interface/RemoteListView.cpp:1139
@@ -893,11 +890,11 @@ msgstr "&Rimuovi selezionato"
 msgid "&Rename"
 msgstr "&Rinomina"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1266
+#: ../src/interface/resources/xrc/dialogs.xrc:1008
 msgid "&Rename..."
 msgstr "&Rinomina..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2023
+#: ../src/interface/resources/xrc/dialogs.xrc:1765
 msgid "&Reopen local file"
 msgstr "&Riapri file locale"
 
@@ -945,11 +942,11 @@ msgstr "&SITE"
 msgid "&SOCKS 5"
 msgstr "&SOCK5"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1260
+#: ../src/interface/resources/xrc/dialogs.xrc:1002
 msgid "&Save as..."
 msgstr "&Salva come..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3218
+#: ../src/interface/resources/xrc/dialogs.xrc:2852
 msgid "&Search"
 msgstr "&Trova"
 
@@ -969,16 +966,16 @@ msgstr "&Seleziona elemento:"
 msgid "&Select language:"
 msgstr "&Seleziona la lingua:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2383
+#: ../src/interface/resources/xrc/dialogs.xrc:2125
 msgid "&Select the columns that should be displayed:"
 msgstr "&Seleziona la colonna che deve essere visualizzata:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2570
+#: ../src/interface/resources/xrc/dialogs.xrc:2312
 #: ../src/interface/menu_bar.cpp:136
 msgid "&Server"
 msgstr "&Server"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1844
+#: ../src/interface/resources/xrc/dialogs.xrc:1586
 msgid "&Settings"
 msgstr "&Impostazioni"
 
@@ -998,7 +995,7 @@ msgstr "Vi&sualizza registro dettagliato"
 msgid "&Show timestamps in message log"
 msgstr "Vi&sualizza data e ora nel log messaggi"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1727
+#: ../src/interface/resources/xrc/dialogs.xrc:1469
 msgid "&Site Manager entries"
 msgstr "Elementi &Gestore siti"
 
@@ -1006,7 +1003,7 @@ msgstr "Elementi &Gestore siti"
 msgid "&Site Manager..."
 msgstr "Gestore &siti..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2855
+#: ../src/interface/resources/xrc/dialogs.xrc:2597
 msgid "&Site-specific bookmark"
 msgstr "Preferiti &specifici per sito"
 
@@ -1018,8 +1015,8 @@ msgstr "&Salta"
 msgid "&Speed limits"
 msgstr "&Limiti di velocità"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3390
-#: ../src/interface/resources/xrc/dialogs.xrc:3485
+#: ../src/interface/resources/xrc/dialogs.xrc:3024
+#: ../src/interface/resources/xrc/dialogs.xrc:3119
 msgid "&Start transfer immediately"
 msgstr "Avvia &immediatamente il trasferimento"
 
@@ -1031,7 +1028,7 @@ msgstr "Inverti vi&sualizzazione locale/remota"
 msgid "&TLS Ciphers"
 msgstr "Crittografie &TLS"
 
-#: ../src/interface/netconfwizard.cpp:237
+#: ../src/interface/netconfwizard.cpp:238
 msgid "&Test"
 msgstr "&Test"
 
@@ -1047,7 +1044,7 @@ msgstr "&Trasferimento"
 msgid "&Transfer mode:"
 msgstr "Modalità di &trasferimento:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1733
+#: ../src/interface/resources/xrc/dialogs.xrc:1475
 #: ../src/interface/menu_bar.cpp:105
 msgid "&Transfer queue"
 msgstr "Coda di &trasferimento"
@@ -1061,11 +1058,11 @@ msgid "&Trust this certificate on the listed alternative hostnames."
 msgstr ""
 "Considera attendibile questo certificato nell'elenco alternativo nomi host."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2145
+#: ../src/interface/resources/xrc/dialogs.xrc:1887
 msgid "&Unedit"
 msgstr "Ann&ulla modifiche"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1208
+#: ../src/interface/resources/xrc/dialogs.xrc:950
 msgid "&Update cached key for this host"
 msgstr "&Aggiorna la chiave in cache per questo host"
 
@@ -1074,7 +1071,7 @@ msgstr "&Aggiorna la chiave in cache per questo host"
 msgid "&Upload"
 msgstr "&Upload"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3444
+#: ../src/interface/resources/xrc/dialogs.xrc:3078
 msgid "&Upload to:"
 msgstr "&Invia in:"
 
@@ -1082,12 +1079,12 @@ msgstr "&Invia in:"
 msgid "&Upload..."
 msgstr "&Invia..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1630
+#: ../src/interface/resources/xrc/dialogs.xrc:1372
 #: ../src/interface/resources/xrc/settings.xrc:1201
 msgid "&Uploads:"
 msgstr "&Upload:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3132
+#: ../src/interface/resources/xrc/dialogs.xrc:2766
 msgid "&Use custom program"
 msgstr "&Usa programma personalizzato"
 
@@ -1111,8 +1108,8 @@ msgstr "&Usa l'indirizzo IP esterno del server"
 msgid "&Use thousands separator"
 msgstr "Usa &separatore delle migliaia"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:323
-#: ../src/interface/resources/xrc/dialogs.xrc:2709
+#: ../src/interface/resources/xrc/dialogs.xrc:2451
+#: ../src/interface/loginmanager.cpp:225
 #: ../src/interface/sitemanager_site.cpp:141
 #: ../src/interface/sitemanager_site.cpp:547
 #: ../src/interface/sitemanager_site.cpp:630
@@ -1145,12 +1142,12 @@ msgstr ""
 msgid "&When checking for updates, check for:"
 msgstr "&Quando controlli gli aggiornamenti, verifica:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:600
+#: ../src/interface/resources/xrc/dialogs.xrc:342
 msgid "&Write"
 msgstr "&Scrittura"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1976
-#: ../src/interface/resources/xrc/dialogs.xrc:2099
+#: ../src/interface/resources/xrc/dialogs.xrc:1718
+#: ../src/interface/resources/xrc/dialogs.xrc:1841
 msgid "&Yes"
 msgstr "&Sì"
 
@@ -1249,8 +1246,8 @@ msgstr "(esempio: %H:%M)"
 msgid "(example: %Y-%m-%d)"
 msgstr "(esempio: %Y-%m-%d)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3700
-#: ../src/interface/resources/xrc/dialogs.xrc:3717
+#: ../src/interface/resources/xrc/dialogs.xrc:3334
+#: ../src/interface/resources/xrc/dialogs.xrc:3351
 #: ../src/interface/resources/xrc/settings.xrc:920
 #: ../src/interface/resources/xrc/settings.xrc:945
 #, c-format
@@ -1313,7 +1310,7 @@ msgstr "Sistema a 64bit"
 msgid "< &Back"
 msgstr "< &Indietro"
 
-#: ../src/interface/bookmarks_dialog.cpp:111
+#: ../src/interface/bookmarks_dialog.cpp:114
 msgid ""
 "A bookmark with the entered name already exists. Please enter an unused name."
 msgstr ""
@@ -1340,7 +1337,7 @@ msgstr ""
 "questi casi è necessario utilizzare la modalità attiva. In modalità attiva, "
 "FileZilla apre una porta e chiede al server di connettersi ad essa."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1895
+#: ../src/interface/resources/xrc/dialogs.xrc:1637
 msgid "A file previously opened has been changed."
 msgstr "Un file precedentemente aperto è stato modificato."
 
@@ -1368,7 +1365,7 @@ msgstr ""
 "negli elenchi.\n"
 "Durante questa sessione non saranno visualizzati altri avvisi."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3836
+#: ../src/interface/resources/xrc/dialogs.xrc:3470
 #: ../src/interface/settings/optionspage_passwords.cpp:189
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
@@ -1427,7 +1424,7 @@ msgstr "A&pplica solo ai download"
 msgid "A&pply only to uploads"
 msgstr "A&pplica solo agli upload"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:726
+#: ../src/interface/resources/xrc/dialogs.xrc:468
 msgid "A&pply to all files and directories"
 msgstr "A&pplica a tutti i file e cartelle"
 
@@ -1435,7 +1432,7 @@ msgstr "A&pplica a tutti i file e cartelle"
 msgid "A&utomatically remove successful transfers"
 msgstr "Rimuovi a&utomaticamente i trasferimenti completati"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2786
+#: ../src/interface/resources/xrc/dialogs.xrc:2528
 msgid "ASCII"
 msgstr "ASCII"
 
@@ -1443,7 +1440,7 @@ msgstr "ASCII"
 msgid "AWS &KMS encryption"
 msgstr "Criptazione AVM &KMS"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:767
+#: ../src/interface/resources/xrc/dialogs.xrc:509
 msgid "About FileZilla"
 msgstr "Informazioni su FileZilla"
 
@@ -1472,11 +1469,11 @@ msgstr "Account"
 msgid "Action after queue &completion"
 msgstr "&Azione dopo il complemento della coda"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2138
+#: ../src/interface/resources/xrc/dialogs.xrc:1880
 msgid "Action on selected file:"
 msgstr "Azione sul file selezionato:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2018
+#: ../src/interface/resources/xrc/dialogs.xrc:1760
 msgid "Action to perform:"
 msgstr "Azione da eseguire:"
 
@@ -1488,7 +1485,7 @@ msgstr "Azione:"
 msgid "Active mode"
 msgstr "Modalità attiva"
 
-#: ../src/interface/netconfwizard.cpp:625
+#: ../src/interface/netconfwizard.cpp:626
 msgid ""
 "Active mode FTP test failed. FileZilla does not know the correct external IP "
 "address."
@@ -1496,7 +1493,7 @@ msgstr ""
 "Test della modalità attiva non riuscito. Non è stato fornito l'indirizzo IP "
 "corretto."
 
-#: ../src/interface/netconfwizard.cpp:612
+#: ../src/interface/netconfwizard.cpp:613
 msgid ""
 "Active mode FTP test failed. FileZilla does not know the correct external IP "
 "address. In addition to that, your router has modified the sent address."
@@ -1504,7 +1501,7 @@ msgstr ""
 "Test della modalità attiva non riuscito. Non è stato fornito l'indirizzo IP "
 "corretto. Inoltre, il vostro router ha modificato l'indirizzo inviato."
 
-#: ../src/interface/netconfwizard.cpp:600
+#: ../src/interface/netconfwizard.cpp:601
 msgid ""
 "Active mode FTP test failed. FileZilla knows the correct external IP "
 "address, but your router or firewall has misleadingly modified the sent "
@@ -1517,8 +1514,8 @@ msgstr ""
 msgid "Active mode IP"
 msgstr "IP in modalità attiva"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3397
-#: ../src/interface/resources/xrc/dialogs.xrc:3492
+#: ../src/interface/resources/xrc/dialogs.xrc:3031
+#: ../src/interface/resources/xrc/dialogs.xrc:3126
 msgid "Add files to &queue only"
 msgstr "&Aggiungi solo i file alla coda"
 
@@ -1559,12 +1556,12 @@ msgstr ""
 "come ti aspetti e anche danneggiare il tuo sistema. Puoi usare le versioni "
 "beta e i rilasci notturni a tuo rischio."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3636
+#: ../src/interface/resources/xrc/dialogs.xrc:3270
 msgid "Al&ways perform this action"
 msgstr "&Esegui sempre questa azione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2217
-#: ../src/interface/resources/xrc/dialogs.xrc:2263
+#: ../src/interface/resources/xrc/dialogs.xrc:1959
+#: ../src/interface/resources/xrc/dialogs.xrc:2005
 msgid "Algorithm:"
 msgstr "Algoritmo:"
 
@@ -1599,7 +1596,7 @@ msgstr ""
 "Permetti il passaggio ad altra modalità di trasferimento in caso di "
 "fallimento"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3596
+#: ../src/interface/resources/xrc/dialogs.xrc:3230
 msgid "Already connected"
 msgstr "Già connesso"
 
@@ -1653,7 +1650,7 @@ msgstr ""
 "\".\n"
 "Alcuni elementi della coda potrebebro non essere stati ripristinati."
 
-#: ../src/interface/sitemanager_dialog.cpp:1667
+#: ../src/interface/sitemanager_dialog.cpp:1679
 msgid ""
 "An item with the same name as the dragged item already exists at the target "
 "location."
@@ -1686,7 +1683,7 @@ msgstr "Qualsiasi modifica relativa ai filtri non sarà salvata."
 msgid "Any changes made to the filters will not be saved."
 msgstr "Qualsiasi modifica ai filtri non verrà salvata."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:740
+#: ../src/interface/resources/xrc/dialogs.xrc:482
 msgid "App&ly to directories only"
 msgstr "App&lica solo alle cartelle"
 
@@ -1695,7 +1692,7 @@ msgstr "App&lica solo alle cartelle"
 msgid "Application &Key:"
 msgstr "Chiave applicazione:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1393
+#: ../src/interface/resources/xrc/dialogs.xrc:1135
 msgid "Apply"
 msgstr "Applica"
 
@@ -1703,7 +1700,7 @@ msgstr "Applica"
 msgid "Apply to &current queue only"
 msgstr "Applica solo alla &coda attiva"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:733
+#: ../src/interface/resources/xrc/dialogs.xrc:475
 msgid "Apply to &files only"
 msgstr "Applica solo ai &file"
 
@@ -1719,8 +1716,8 @@ msgstr "Buffer argomenti pieno"
 msgid "As tab in the transfer queue pane"
 msgstr "Come scheda nel pannello coda trasferimento"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1615
-#: ../src/interface/resources/xrc/dialogs.xrc:1638
+#: ../src/interface/resources/xrc/dialogs.xrc:1357
+#: ../src/interface/resources/xrc/dialogs.xrc:1380
 #: ../src/interface/resources/xrc/settings.xrc:1187
 #: ../src/interface/resources/xrc/settings.xrc:1208
 #: ../src/interface/settings/optionspage_interface.cpp:159
@@ -1768,7 +1765,7 @@ msgstr "Autenticazione non riuscita."
 msgid "Author:"
 msgstr "Autore:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2764
+#: ../src/interface/resources/xrc/dialogs.xrc:2506
 msgid "Auto"
 msgstr "Automatico"
 
@@ -1801,7 +1798,7 @@ msgstr "Per conto"
 msgid "Being edited"
 msgstr "Modifiche in corso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2791
+#: ../src/interface/resources/xrc/dialogs.xrc:2533
 msgid "Binary"
 msgstr "Binario"
 
@@ -1813,16 +1810,16 @@ msgstr "Lavagna"
 msgid "Blue"
 msgstr "Blu"
 
-#: ../src/interface/bookmarks_dialog.cpp:272 ../src/interface/menu_bar.cpp:434
+#: ../src/interface/bookmarks_dialog.cpp:313 ../src/interface/menu_bar.cpp:434
 #: ../src/interface/sitemanager_dialog.cpp:408
 msgid "Bookmark"
 msgstr "Preferito"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3000
+#: ../src/interface/bookmarks_dialog.cpp:262
 msgid "Bookmark:"
 msgstr "Preferito:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2989
+#: ../src/interface/bookmarks_dialog.cpp:244
 msgid "Bookmarks"
 msgstr "Preferiti"
 
@@ -1835,11 +1832,11 @@ msgstr "Sfoglia..."
 msgid "Bucket not found"
 msgstr "Bucket non trovato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:851
+#: ../src/interface/resources/xrc/dialogs.xrc:593
 msgid "Build date:"
 msgstr "Data di creazione:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:828
+#: ../src/interface/resources/xrc/dialogs.xrc:570
 msgid "Build information"
 msgstr "Modalità compilazione programma Filezilla"
 
@@ -1888,7 +1885,7 @@ msgstr "KMS ARN personali&zzata:"
 msgid "C&ustom filetype associations:"
 msgstr "Associazioni &personalizzate:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:955
+#: ../src/interface/resources/xrc/dialogs.xrc:697
 msgid "CPU features:"
 msgstr "Funzioni CPU:"
 
@@ -1913,27 +1910,28 @@ msgstr "Impossibile scrivere nel file: %s"
 
 #: ../src/interface/resources/xrc/certificate.xrc:288
 #: ../src/interface/resources/xrc/dialogs.xrc:239
-#: ../src/interface/resources/xrc/dialogs.xrc:565
-#: ../src/interface/resources/xrc/dialogs.xrc:757
-#: ../src/interface/resources/xrc/dialogs.xrc:1106
-#: ../src/interface/resources/xrc/dialogs.xrc:1387
-#: ../src/interface/resources/xrc/dialogs.xrc:1575
-#: ../src/interface/resources/xrc/dialogs.xrc:1682
-#: ../src/interface/resources/xrc/dialogs.xrc:1753
-#: ../src/interface/resources/xrc/dialogs.xrc:1811
-#: ../src/interface/resources/xrc/dialogs.xrc:1876
-#: ../src/interface/resources/xrc/dialogs.xrc:2050
-#: ../src/interface/resources/xrc/dialogs.xrc:2435
-#: ../src/interface/resources/xrc/dialogs.xrc:2817
-#: ../src/interface/resources/xrc/dialogs.xrc:2972
-#: ../src/interface/resources/xrc/dialogs.xrc:3084
-#: ../src/interface/resources/xrc/dialogs.xrc:3174
-#: ../src/interface/resources/xrc/dialogs.xrc:3414
-#: ../src/interface/resources/xrc/dialogs.xrc:3509
-#: ../src/interface/resources/xrc/dialogs.xrc:3579
-#: ../src/interface/resources/xrc/dialogs.xrc:3654
-#: ../src/interface/resources/xrc/dialogs.xrc:3917
-#: ../src/interface/resources/xrc/dialogs.xrc:3989
+#: ../src/interface/resources/xrc/dialogs.xrc:307
+#: ../src/interface/resources/xrc/dialogs.xrc:499
+#: ../src/interface/resources/xrc/dialogs.xrc:848
+#: ../src/interface/resources/xrc/dialogs.xrc:1129
+#: ../src/interface/resources/xrc/dialogs.xrc:1317
+#: ../src/interface/resources/xrc/dialogs.xrc:1424
+#: ../src/interface/resources/xrc/dialogs.xrc:1495
+#: ../src/interface/resources/xrc/dialogs.xrc:1553
+#: ../src/interface/resources/xrc/dialogs.xrc:1618
+#: ../src/interface/resources/xrc/dialogs.xrc:1792
+#: ../src/interface/resources/xrc/dialogs.xrc:2177
+#: ../src/interface/resources/xrc/dialogs.xrc:2559
+#: ../src/interface/resources/xrc/dialogs.xrc:2714
+#: ../src/interface/resources/xrc/dialogs.xrc:2808
+#: ../src/interface/resources/xrc/dialogs.xrc:3048
+#: ../src/interface/resources/xrc/dialogs.xrc:3143
+#: ../src/interface/resources/xrc/dialogs.xrc:3213
+#: ../src/interface/resources/xrc/dialogs.xrc:3288
+#: ../src/interface/resources/xrc/dialogs.xrc:3551
+#: ../src/interface/resources/xrc/dialogs.xrc:3623
+#: ../src/interface/bookmarks_dialog.cpp:283
+#: ../src/interface/loginmanager.cpp:121 ../src/interface/loginmanager.cpp:260
 #: ../src/interface/sitemanager_dialog.cpp:369
 msgid "Cancel"
 msgstr "Annulla"
@@ -2023,7 +2021,7 @@ msgstr "Non è possibile caricare la barra strumenti dal file risorse"
 msgid "Cannot remember password"
 msgstr "Impossibile memorizzare le password"
 
-#: ../src/interface/bookmarks_dialog.cpp:734
+#: ../src/interface/bookmarks_dialog.cpp:775
 #: ../src/interface/sitemanager_dialog.cpp:1034
 msgid "Cannot rename entry"
 msgstr "Non è possibile rinominare la voce"
@@ -2073,7 +2071,7 @@ msgstr "Controllo maiuscolo/minuscolo"
 msgid "Case sensitive (default)"
 msgstr "Controllo maiuscolo/minuscolo (predefinito)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1707
+#: ../src/interface/resources/xrc/dialogs.xrc:1449
 msgid "Categories to clear"
 msgstr "Categorie da azzerare"
 
@@ -2089,11 +2087,11 @@ msgstr "Certificato collegato:"
 msgid "Certificate issuer"
 msgstr "Ente emissione certificato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:306
+#: ../src/interface/loginmanager.cpp:211
 msgid "Challenge:"
 msgstr "Eccezione:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:575
+#: ../src/interface/resources/xrc/dialogs.xrc:317
 msgid "Change file attributes"
 msgstr "Cambia gli attributi del file"
 
@@ -2150,7 +2148,7 @@ msgstr ""
 "Verifica le credenziali di accesso. Il nome inserito inizia o finisce con "
 "uno spazio."
 
-#: ../src/interface/netconfwizard.cpp:776
+#: ../src/interface/netconfwizard.cpp:777
 msgid "Checking for correct external IP address"
 msgstr "Controllo di correttezza dell'IP esterno"
 
@@ -2176,9 +2174,9 @@ msgstr "Scegli un file chiave"
 msgid "Choose the default local directory"
 msgstr "Selezionare la cartella locale predefinita"
 
-#: ../src/interface/bookmarks_dialog.cpp:134
-#: ../src/interface/bookmarks_dialog.cpp:387
-#: ../src/interface/sitemanager_dialog.cpp:1920
+#: ../src/interface/bookmarks_dialog.cpp:137
+#: ../src/interface/bookmarks_dialog.cpp:428
+#: ../src/interface/sitemanager_dialog.cpp:1953
 msgid "Choose the local directory"
 msgstr "Selezionare la cartella locale"
 
@@ -2210,7 +2208,7 @@ msgstr "Azzera dati aggiornamento a&utomatico"
 msgid "Clear history"
 msgstr "Azzera cronologia"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1695
+#: ../src/interface/resources/xrc/dialogs.xrc:1437
 #: ../src/interface/clearprivatedata.cpp:38
 #: ../src/interface/clearprivatedata.cpp:44
 #: ../src/interface/clearprivatedata.cpp:50
@@ -2223,15 +2221,15 @@ msgstr "Elimina i dati personali"
 msgid "Clear quickconnect bar"
 msgstr "Azzera la lista della barra di Connessione rapida"
 
-#: ../src/interface/netconfwizard.cpp:591
+#: ../src/interface/netconfwizard.cpp:592
 msgid "Click on Finish to save your configuration."
 msgstr "Fai clic su [Fine] per salvare la configurazione."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2309
+#: ../src/interface/resources/xrc/dialogs.xrc:2051
 msgid "Client to server MAC:"
 msgstr "Client a server MAC:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2299
+#: ../src/interface/resources/xrc/dialogs.xrc:2041
 msgid "Client to server cipher:"
 msgstr "Client a server cipher:"
 
@@ -2268,7 +2266,7 @@ msgstr "Co&mmenti:"
 msgid "Column properties"
 msgstr "Proprietà colonna"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2368
+#: ../src/interface/resources/xrc/dialogs.xrc:2110
 msgid "Column setup"
 msgstr "Impostazione colonna"
 
@@ -2304,8 +2302,8 @@ msgstr "Commento"
 msgid "Common name:"
 msgstr "Nome comune:"
 
-#: ../src/interface/netconfwizard.cpp:447
-#: ../src/interface/netconfwizard.cpp:460
+#: ../src/interface/netconfwizard.cpp:448
+#: ../src/interface/netconfwizard.cpp:461
 msgid "Communication tainted by router or firewall"
 msgstr "Comunicazione corrotta dal router"
 
@@ -2325,19 +2323,19 @@ msgstr "Soglia di confron&to (in minuti):"
 msgid "Comparison threshold needs to be between 0 and 1440 minutes."
 msgstr "La soglia di confronto deve essere tra 0 e 1440 minuti."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:835
+#: ../src/interface/resources/xrc/dialogs.xrc:577
 msgid "Compiled for:"
 msgstr "Compilata per:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:843
+#: ../src/interface/resources/xrc/dialogs.xrc:585
 msgid "Compiled on:"
 msgstr "Compilato su:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:859
+#: ../src/interface/resources/xrc/dialogs.xrc:601
 msgid "Compiled with:"
 msgstr "Compilato con:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:867
+#: ../src/interface/resources/xrc/dialogs.xrc:609
 msgid "Compiler flags:"
 msgstr "Opzioni compilazione:"
 
@@ -2349,8 +2347,8 @@ msgstr "Compresso"
 msgid "Concurrent transfers"
 msgstr "Trasferimenti concorrenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1525
-#: ../src/interface/resources/xrc/dialogs.xrc:3284
+#: ../src/interface/resources/xrc/dialogs.xrc:1267
+#: ../src/interface/resources/xrc/dialogs.xrc:2918
 msgid "Conditions are c&ase sensitive"
 msgstr "Le condizioni f&anno distinzione tra maiuscole e minuscole"
 
@@ -2382,7 +2380,7 @@ msgstr "Conferma cancellazione"
 msgid "Confirmation needed"
 msgstr "Richiedi conferma"
 
-#: ../src/interface/netconfwizard.cpp:587
+#: ../src/interface/netconfwizard.cpp:588
 msgid "Congratulations, your configuration seems to be working."
 msgstr "Congratulazioni, la configurazione sembra funzionante."
 
@@ -2390,7 +2388,7 @@ msgstr "Congratulazioni, la configurazione sembra funzionante."
 msgid "Connect bypassing proxy settings"
 msgstr "Connetti ignorando le impostazioni proxy"
 
-#: ../src/interface/netconfwizard.cpp:225
+#: ../src/interface/netconfwizard.cpp:226
 #, c-format
 msgid "Connect failed: %s"
 msgstr "Connessione fallita: %s"
@@ -2411,7 +2409,7 @@ msgstr "Connetti al sito specificato nel Gestore siti"
 msgid "Connecting"
 msgstr "Connessione"
 
-#: ../src/interface/netconfwizard.cpp:219
+#: ../src/interface/netconfwizard.cpp:220
 #: ../src/interface/statuslinectrl.cpp:268
 #, c-format
 msgid "Connecting to %s"
@@ -2461,7 +2459,7 @@ msgstr "Tentativo di connessione interrotto dall'utente"
 msgid "Connection attempt timed out"
 msgstr "Scaduto tentativo connessione"
 
-#: ../src/interface/netconfwizard.cpp:560
+#: ../src/interface/netconfwizard.cpp:561
 msgid "Connection closed"
 msgstr "Connessione chiusa"
 
@@ -2480,7 +2478,7 @@ msgstr "Connessione stabilita, inizializzazione TLS in corso..."
 msgid "Connection established, sending HTTP request"
 msgstr "Connessione stabilita, invio richiesta HTTP"
 
-#: ../src/interface/netconfwizard.cpp:341
+#: ../src/interface/netconfwizard.cpp:342
 msgid "Connection established, waiting for welcome message."
 msgstr "Connessione stabilita. In attesa del messaggio di benvenuto."
 
@@ -2488,7 +2486,7 @@ msgstr "Connessione stabilita. In attesa del messaggio di benvenuto."
 msgid "Connection established, waiting for welcome message..."
 msgstr "Connessione stabilita, in attesa del messaggio di benvenuto..."
 
-#: ../src/interface/netconfwizard.cpp:358
+#: ../src/interface/netconfwizard.cpp:359
 msgid "Connection lost"
 msgstr "Connessione persa"
 
@@ -2519,7 +2517,7 @@ msgid_plural "Connection timed out after %d seconds of inactivity"
 msgstr[0] "Timeout connessione dopo %d secondo di inattività"
 msgstr[1] "Timeout connessione dopo %d secondi di inattività"
 
-#: ../src/interface/netconfwizard.cpp:1070
+#: ../src/interface/netconfwizard.cpp:1071
 msgid "Connection timed out."
 msgstr "Tempo scaduto per la connessione."
 
@@ -2532,11 +2530,11 @@ msgid "Connection with proxy established, performing handshake..."
 msgstr ""
 "Connessione con il proxy stabilita, in attesa del messaggio di benvenuto..."
 
-#: ../src/interface/netconfwizard.cpp:580
+#: ../src/interface/netconfwizard.cpp:581
 msgid "Connection with server got closed prematurely."
 msgstr "La connessione con il server è stata chiusa prematuramente."
 
-#: ../src/interface/netconfwizard.cpp:571
+#: ../src/interface/netconfwizard.cpp:572
 msgid "Connection with the test server failed."
 msgstr "Connessione con il server di test non riuscita."
 
@@ -2544,12 +2542,12 @@ msgstr "Connessione con il server di test non riuscita."
 msgid "Convert key file"
 msgstr "Converti file della chiave"
 
-#: ../src/interface/bookmarks_dialog.cpp:677
+#: ../src/interface/bookmarks_dialog.cpp:718
 #, c-format
 msgid "Copy (%d) of %s"
 msgstr "Copia (%d) di %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:656
+#: ../src/interface/bookmarks_dialog.cpp:697
 #, c-format
 msgid "Copy of %s"
 msgstr "Copia di %s"
@@ -2575,8 +2573,8 @@ msgstr "Impossibile accettare la connessione: %s"
 msgid "Could not access path %s"
 msgstr "Impossibile accedere al percorso %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:103
-#: ../src/interface/bookmarks_dialog.cpp:574
+#: ../src/interface/bookmarks_dialog.cpp:106
+#: ../src/interface/bookmarks_dialog.cpp:615
 msgid "Could not add connection to Site Manager"
 msgstr "Impossibile aggiungere il sito al Gestore siti"
 
@@ -2777,7 +2775,7 @@ msgstr "Impossibile aprire gli appunti"
 msgid "Could not open log file: %s"
 msgstr "Impossibile aprire il file log: %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:73
+#: ../src/interface/bookmarks_dialog.cpp:76
 msgid "Could not parse remote path."
 msgstr "Impossibile analizzare il percorso remoto."
 
@@ -2790,7 +2788,7 @@ msgstr "Impossibile analizzare l'indirizzo del server:"
 msgid "Could not read from '%s'"
 msgstr "Impossibile leggere dal '%s'"
 
-#: ../src/interface/netconfwizard.cpp:995
+#: ../src/interface/netconfwizard.cpp:996
 msgid "Could not read from data socket."
 msgstr "Impossibile leggere dal socket dati."
 
@@ -2803,7 +2801,7 @@ msgstr "Impossibile leggere dal socket: %s"
 msgid "Could not read server item."
 msgstr "Impossibile leggere l'elemento del server."
 
-#: ../src/interface/netconfwizard.cpp:352
+#: ../src/interface/netconfwizard.cpp:353
 msgid "Could not receive data from server."
 msgstr "Impossibile ricevere dati dal server."
 
@@ -2855,12 +2853,12 @@ msgstr ""
 "Impossibile scrivere \"%s\", le modifiche effettuate nel Gestore siti non "
 "saranno salvate: %s"
 
-#: ../src/interface/bookmarks_dialog.cpp:887
+#: ../src/interface/bookmarks_dialog.cpp:928
 #, c-format
 msgid "Could not write \"%s\", the bookmark could not be added: %s"
 msgstr "Impossibile scrivere \"%s\", il preferito %s non potrà essere aggiunto"
 
-#: ../src/interface/bookmarks_dialog.cpp:332
+#: ../src/interface/bookmarks_dialog.cpp:373
 #, c-format
 msgid "Could not write \"%s\", the global bookmarks could no be saved: %s"
 msgstr ""
@@ -2876,7 +2874,7 @@ msgstr ""
 "%s"
 
 #: ../src/interface/sitemanager.cpp:703 ../src/interface/sitemanager.cpp:760
-#: ../src/interface/sitemanager_dialog.cpp:1903
+#: ../src/interface/sitemanager_dialog.cpp:1936
 #, c-format
 msgid "Could not write \"%s\", the selected sites could not be exported: %s"
 msgstr ""
@@ -3016,7 +3014,7 @@ msgstr "Trasferimento corrente impostato su rilevamento automatico."
 msgid "Current transfer type is set to binary."
 msgstr "Trasferimento corrente impostato su trasferimento binario."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2227
+#: ../src/interface/resources/xrc/dialogs.xrc:1969
 msgid "Curve:"
 msgstr "Curva:"
 
@@ -3037,8 +3035,8 @@ msgstr "KMS ARN personalizzata"
 msgid "Custom filter set"
 msgstr "Set di filtri personalizzato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2621
-#: ../src/interface/resources/xrc/dialogs.xrc:2635
+#: ../src/interface/resources/xrc/dialogs.xrc:2363
+#: ../src/interface/resources/xrc/dialogs.xrc:2377
 msgid "Custom server"
 msgstr "Server personalizzato"
 
@@ -3046,7 +3044,7 @@ msgstr "Server personalizzato"
 msgid "Cyan"
 msgstr "Ciano"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2755
+#: ../src/interface/resources/xrc/dialogs.xrc:2497
 msgid "D&ata type"
 msgstr "Tipo &trasferimento"
 
@@ -3064,15 +3062,15 @@ msgstr "Pred&efinita"
 msgid "D&elete"
 msgstr "&Elimina"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2953
+#: ../src/interface/resources/xrc/dialogs.xrc:2695
 msgid "D&irectory comparison"
 msgstr "Comparazione cartella"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1302
+#: ../src/interface/resources/xrc/dialogs.xrc:1044
 msgid "D&isable all"
 msgstr "D&isabilita tutto"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3792
+#: ../src/interface/resources/xrc/dialogs.xrc:3426
 #: ../src/interface/settings/optionspage_passwords.cpp:177
 msgid "D&o not save passwords"
 msgstr "N&on salvare la password"
@@ -3081,8 +3079,8 @@ msgstr "N&on salvare la password"
 msgid "D&ouble-click action on directories:"
 msgstr "Azione d&oppio clic sulle cartelle:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1452
-#: ../src/interface/resources/xrc/dialogs.xrc:3035
+#: ../src/interface/resources/xrc/dialogs.xrc:1194
+#: ../src/interface/bookmarks_dialog.cpp:275
 msgid "D&uplicate"
 msgstr "D&uplica"
 
@@ -3098,8 +3096,8 @@ msgstr "File pericoloso"
 msgid "Data"
 msgstr "Data"
 
-#: ../src/interface/netconfwizard.cpp:989
-#: ../src/interface/netconfwizard.cpp:1053
+#: ../src/interface/netconfwizard.cpp:990
+#: ../src/interface/netconfwizard.cpp:1054
 msgid "Data socket closed too early."
 msgstr "Data socket chiuso troppo presto."
 
@@ -3143,8 +3141,8 @@ msgstr "Predefinito (rilevamento automatico)"
 msgid "Default editor not properly quoted."
 msgstr "L'editor predefinito non è stato specificato correttamente."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1587
-#: ../src/interface/resources/xrc/dialogs.xrc:1657
+#: ../src/interface/resources/xrc/dialogs.xrc:1329
+#: ../src/interface/resources/xrc/dialogs.xrc:1399
 #: ../src/interface/resources/xrc/settings.xrc:1227
 msgid "Default file exists action"
 msgstr "Imposta azione predefinita per i file esistenti"
@@ -3224,7 +3222,7 @@ msgstr "Eliminazione di \"%s\""
 msgid "Deleting %u files from \"%s\""
 msgstr "Eliminazione di %u file da \"%s\""
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3527
+#: ../src/interface/resources/xrc/dialogs.xrc:3161
 msgid "Deleting symbolic link"
 msgstr "Elimina collegamento simbolico"
 
@@ -3233,11 +3231,11 @@ msgid "Desktop"
 msgstr "Desktop"
 
 #: ../src/interface/resources/xrc/certificate.xrc:42
-#: ../src/interface/resources/xrc/dialogs.xrc:1033
+#: ../src/interface/resources/xrc/dialogs.xrc:775
 msgid "Details"
 msgstr "Dettagli"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1154
+#: ../src/interface/resources/xrc/dialogs.xrc:896
 msgid "Details for new key:"
 msgstr "Dettagli per la nuova chiave:"
 
@@ -3245,7 +3243,7 @@ msgstr "Dettagli per la nuova chiave:"
 msgid "Detected newer version of FileZilla"
 msgstr "Rilevata una nuova versione di Filezilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1544
+#: ../src/interface/resources/xrc/dialogs.xrc:1286
 msgid "Dire&ctories"
 msgstr "&Cartelle"
 
@@ -3253,7 +3251,7 @@ msgstr "&Cartelle"
 msgid "Direction"
 msgstr "Direzione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3950
+#: ../src/interface/resources/xrc/dialogs.xrc:3584
 msgid "Directories:"
 msgstr "Cartelle:"
 
@@ -3261,7 +3259,7 @@ msgstr "Cartelle:"
 msgid "Directory"
 msgstr "Cartella"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3999
+#: ../src/interface/resources/xrc/dialogs.xrc:3633
 msgid "Directory access permissions"
 msgstr "Permessi accesso cartella"
 
@@ -3296,7 +3294,7 @@ msgstr "Lettura cartella annullata dall'utente"
 msgid "Directory listing failed"
 msgstr "Lettura cartella non riuscita"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1237
+#: ../src/interface/resources/xrc/dialogs.xrc:979
 msgid "Directory listing filters"
 msgstr "Filtri di lettura contenuto cartella"
 
@@ -3309,7 +3307,7 @@ msgstr "Elenco cartella di \"%s\" completato"
 msgid "Directory listing successful"
 msgstr "Contenuto cartella letto correttamente"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1337
+#: ../src/interface/resources/xrc/dialogs.xrc:1079
 msgid "Disa&ble all"
 msgstr "Disa&bilita tutto"
 
@@ -3361,8 +3359,8 @@ msgstr "Visualizza la finestra informazioni"
 msgid "Do &not use default editor"
 msgstr "&Non usare il programma predefinito"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2037
-#: ../src/interface/resources/xrc/dialogs.xrc:2092
+#: ../src/interface/resources/xrc/dialogs.xrc:1779
+#: ../src/interface/resources/xrc/dialogs.xrc:1834
 msgid "Do the same with &all selected files already being edited"
 msgstr "Fai lo stesso con &tutti i file selezionati già modificati"
 
@@ -3393,7 +3391,7 @@ msgstr "Svuotare la coda di trasferimento?"
 msgid "Do you really want to send '%s' to the server?"
 msgstr "Inviare '%s' al server?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2085
+#: ../src/interface/resources/xrc/dialogs.xrc:1827
 msgid "Do you want to reopen this file?"
 msgstr "Vuoi riaprire questo file?"
 
@@ -3413,11 +3411,11 @@ msgstr "I file punto sono i file che iniziano con un punto, es. .htaccess"
 msgid "Double-click action"
 msgstr "Azione doppio clic"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2464
+#: ../src/interface/resources/xrc/dialogs.xrc:2206
 msgid "Download"
 msgstr "Download"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3689
+#: ../src/interface/resources/xrc/dialogs.xrc:3323
 #: ../src/interface/resources/xrc/settings.xrc:906
 msgid "Download &limit:"
 msgstr "Limite di &download:"
@@ -3431,7 +3429,7 @@ msgstr "Limite di download: %s/s"
 msgid "Download limit: none"
 msgstr "Limite di download: nessuno"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3331
+#: ../src/interface/resources/xrc/dialogs.xrc:2965
 #: ../src/interface/search.cpp:927 ../src/interface/search.cpp:932
 msgid "Download search results"
 msgstr "Download risultati ricerca"
@@ -3490,7 +3488,7 @@ msgstr ""
 msgid "Dupl&icate"
 msgstr "Dupl&ica"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1295
+#: ../src/interface/resources/xrc/dialogs.xrc:1037
 msgid "E&nable all"
 msgstr "A&bilita tutto"
 
@@ -3499,7 +3497,7 @@ msgstr "A&bilita tutto"
 msgid "E&nter directory"
 msgstr "I&nserire cartella"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:640
+#: ../src/interface/resources/xrc/dialogs.xrc:382
 msgid "E&xecute"
 msgstr "Ese&cuzione"
 
@@ -3524,7 +3522,7 @@ msgstr "Email:"
 msgid "Each filter needs at least one condition."
 msgstr "Ogni filtro richiede almeno una condizione."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1583
+#: ../src/interface/resources/xrc/dialogs.xrc:1325
 msgid "Edit filters"
 msgstr "Modifica filtri"
 
@@ -3583,7 +3581,7 @@ msgstr "Nome vuoto"
 msgid "Empty quoted string."
 msgstr "Stringa vuota."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1330
+#: ../src/interface/resources/xrc/dialogs.xrc:1072
 msgid "En&able all"
 msgstr "&Abilita tutto"
 
@@ -3595,16 +3593,16 @@ msgstr "Abiliita &filtro caratteri non validi"
 msgid "Encrypted"
 msgstr "Cifrato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2292
+#: ../src/interface/resources/xrc/dialogs.xrc:2034
 msgid "Encryption"
 msgstr "Cifratura"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:347
+#: ../src/interface/loginmanager.cpp:243
 #: ../src/interface/sitemanager_site.cpp:165
 msgid "Encryption &key:"
 msgstr "C&hiave criptazione:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2202
+#: ../src/interface/resources/xrc/dialogs.xrc:1944
 msgid "Encryption details"
 msgstr "Dettagli di cifratura"
 
@@ -3620,7 +3618,7 @@ msgstr "Vuoi chiudere la comparazione e aprire la ricerca rapida?"
 msgid "Enter &custom command..."
 msgstr "&Esegui comando personalizzato..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3730
+#: ../src/interface/resources/xrc/dialogs.xrc:3364
 msgid "Enter 0 for unlimited speed."
 msgstr "Inserisci 0 per velocità illimitata."
 
@@ -3641,8 +3639,8 @@ msgstr "Digita nome cartella"
 msgid "Enter filter name"
 msgstr "Inserisci il nome filtro"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:397
-#: ../src/interface/resources/xrc/dialogs.xrc:505
+#: ../src/interface/resources/xrc/dialogs.xrc:247
+#: ../src/interface/loginmanager.cpp:77
 msgid "Enter master password"
 msgstr "Inserisci password principale"
 
@@ -3654,7 +3652,7 @@ msgstr "Inserisci il nome per il set di filtri"
 msgid "Enter new name for filterset"
 msgstr "Inserisci il nome per il gruppo di filtri"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:247
+#: ../src/interface/loginmanager.cpp:175
 msgid "Enter password"
 msgstr "Inserisci password"
 
@@ -3707,11 +3705,11 @@ msgstr ""
 "Inserisci la porta di ascolto del server. Il valore predefinito per FTP è "
 "21, per SFTP è 22."
 
-#: ../src/interface/loginmanager.cpp:169
+#: ../src/interface/loginmanager.cpp:164
 msgid "Enter username"
 msgstr "Inserisci nome utente"
 
-#: ../src/interface/loginmanager.cpp:178
+#: ../src/interface/loginmanager.cpp:170
 msgid "Enter username and password"
 msgstr "Inserisci nome utente e password"
 
@@ -3732,11 +3730,11 @@ msgstr "Errore di importazione"
 msgid "Error loading queue"
 msgstr "Errore nel caricamento della coda"
 
-#: ../src/interface/bookmarks_dialog.cpp:174
-#: ../src/interface/bookmarks_dialog.cpp:297
-#: ../src/interface/bookmarks_dialog.cpp:753
-#: ../src/interface/bookmarks_dialog.cpp:793
-#: ../src/interface/bookmarks_dialog.cpp:846 ../src/interface/filter.cpp:875
+#: ../src/interface/bookmarks_dialog.cpp:176
+#: ../src/interface/bookmarks_dialog.cpp:338
+#: ../src/interface/bookmarks_dialog.cpp:794
+#: ../src/interface/bookmarks_dialog.cpp:834
+#: ../src/interface/bookmarks_dialog.cpp:887 ../src/interface/filter.cpp:875
 #: ../src/interface/filter.cpp:966 ../src/interface/Options.cpp:253
 #: ../src/interface/osx_sandbox_userdirs.cpp:65
 #: ../src/interface/osx_sandbox_userdirs.cpp:136
@@ -3762,12 +3760,12 @@ msgstr "Errore nel salvataggio della coda"
 msgid "Error starting program"
 msgstr "Errore nell'avvio del programma"
 
-#: ../src/interface/bookmarks_dialog.cpp:333
-#: ../src/interface/bookmarks_dialog.cpp:888
+#: ../src/interface/bookmarks_dialog.cpp:374
+#: ../src/interface/bookmarks_dialog.cpp:929
 #: ../src/interface/QueueView.cpp:1601 ../src/interface/sitemanager.cpp:579
 #: ../src/interface/sitemanager.cpp:704 ../src/interface/sitemanager.cpp:761
 #: ../src/interface/sitemanager_dialog.cpp:824
-#: ../src/interface/sitemanager_dialog.cpp:1904
+#: ../src/interface/sitemanager_dialog.cpp:1937
 #: ../src/interface/xmlfunctions.cpp:153
 msgid "Error writing xml file"
 msgstr "Errore di scrittura file xml"
@@ -3785,7 +3783,7 @@ msgstr "Esempio: png \"C:\\Programmi\\Paint\\Paint.exe\" -open"
 msgid "Examples"
 msgstr "Esempi"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:674
+#: ../src/interface/resources/xrc/dialogs.xrc:416
 msgid "Exe&cute"
 msgstr "Esecu&zione"
 
@@ -3799,23 +3797,23 @@ msgstr ""
 msgid "Explorer"
 msgstr "Explorer"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1797
+#: ../src/interface/resources/xrc/dialogs.xrc:1539
 msgid "Export &Filters"
 msgstr "Esporta &filtri"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1792
+#: ../src/interface/resources/xrc/dialogs.xrc:1534
 msgid "Export &Queue"
 msgstr "&Coda di esportazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1787
+#: ../src/interface/resources/xrc/dialogs.xrc:1529
 msgid "Export &Settings"
 msgstr "Impostazioni di e&sportazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1768
+#: ../src/interface/resources/xrc/dialogs.xrc:1510
 msgid "Export settings"
 msgstr "Impostazioni di esportazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1471
+#: ../src/interface/resources/xrc/dialogs.xrc:1213
 msgid "F&ilter name:"
 msgstr "Nome f&iltro:"
 
@@ -3890,7 +3888,7 @@ msgstr "Errore durante il cambio di lingua"
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Impossibile convertire il comando nel set caratteri 8bit"
 
-#: ../src/interface/sitemanager_dialog.cpp:1667
+#: ../src/interface/sitemanager_dialog.cpp:1679
 msgid "Failed to copy or move sites"
 msgstr "Impossibile copiare o spostare siti"
 
@@ -3898,7 +3896,7 @@ msgstr "Impossibile copiare o spostare siti"
 msgid "Failed to create backup copy of xml file"
 msgstr "Non è stato possibile creare una copia di backup del file xml"
 
-#: ../src/interface/netconfwizard.cpp:808
+#: ../src/interface/netconfwizard.cpp:809
 #, c-format
 msgid "Failed to create listen socket on port %d, aborting."
 msgstr "Impossibile creare socket ascolto sulla porta %d. Annullamento."
@@ -3909,7 +3907,7 @@ msgstr ""
 "Non è stato possibile creare un socket per la modalità di trasferimento "
 "attiva"
 
-#: ../src/interface/loginmanager.cpp:116
+#: ../src/interface/loginmanager.cpp:143
 msgid "Failed to decrypt server password."
 msgstr "Decriptazione fallita password server."
 
@@ -3921,13 +3919,13 @@ msgstr "Non è possibile recuperare il percorso 'Documenti'"
 msgid "Failed to get desktop path"
 msgstr "Non è stato possibile recuperare il percorso del desktop"
 
-#: ../src/interface/netconfwizard.cpp:965
+#: ../src/interface/netconfwizard.cpp:966
 msgid "Failed to get peer address of control connection, connection closed."
 msgstr ""
 "Non è stato possibile recuperare l'indirizzo esterno del controllo "
 "connessione, connessione terminata."
 
-#: ../src/interface/netconfwizard.cpp:971
+#: ../src/interface/netconfwizard.cpp:972
 msgid "Failed to get peer address of data connection, connection closed."
 msgstr ""
 "Non è stato possibile recuperare l'indirizzo esterno della connessione dati, "
@@ -3966,7 +3964,7 @@ msgstr "Non è stato possibile aprire \"%s\" in scrittura"
 msgid "Failed to parse returned path."
 msgstr "Impossibile analizzare il percorso ritornato."
 
-#: ../src/interface/netconfwizard.cpp:1021
+#: ../src/interface/netconfwizard.cpp:1022
 msgid "Failed to receive data"
 msgstr "Non è stato possibile ricevere i dati"
 
@@ -3974,7 +3972,7 @@ msgstr "Non è stato possibile ricevere i dati"
 msgid "Failed to retrieve directory listing"
 msgstr "Non è stato possibile leggere il contenuto della cartella"
 
-#: ../src/interface/netconfwizard.cpp:733
+#: ../src/interface/netconfwizard.cpp:734
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "Impossibile ottenere l'indirizzo IP esterno. Annullamento."
 
@@ -3982,7 +3980,7 @@ msgstr "Impossibile ottenere l'indirizzo IP esterno. Annullamento."
 msgid "Failed to retrieve external IP address, using local address"
 msgstr "Impossibile ottenere l'indirizzo IP esterno. Uso indirizzo locale"
 
-#: ../src/interface/netconfwizard.cpp:708
+#: ../src/interface/netconfwizard.cpp:709
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "Impossibile ottenere l'indirizzo IP locale. Annulllamento."
 
@@ -3990,11 +3988,11 @@ msgstr "Impossibile ottenere l'indirizzo IP locale. Annulllamento."
 msgid "Failed to retrieve local IP address."
 msgstr "Impossibile ottenere l'indirizzo IP locale."
 
-#: ../src/interface/netconfwizard.cpp:636
+#: ../src/interface/netconfwizard.cpp:637
 msgid "Failed to retrieve the external IP address."
 msgstr "Non è stato possibile leggere l'indirizzo IP esterno."
 
-#: ../src/interface/netconfwizard.cpp:320
+#: ../src/interface/netconfwizard.cpp:321
 msgid "Failed to send command."
 msgstr "Non è stato possibile inviare il comando."
 
@@ -4062,11 +4060,11 @@ msgstr "Trasferimenti non completati"
 msgid "Fall back to active mode"
 msgstr "Prova la modalità attiva"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2543
+#: ../src/interface/resources/xrc/dialogs.xrc:2285
 msgid "Fil&e:"
 msgstr "Fil&e:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1539
+#: ../src/interface/resources/xrc/dialogs.xrc:1281
 msgid "Fil&es"
 msgstr "Fil&e"
 
@@ -4094,7 +4092,7 @@ msgstr "Il file esiste"
 msgid "File exists action"
 msgstr "Azione per file esistenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1890
+#: ../src/interface/resources/xrc/dialogs.xrc:1632
 msgid "File has changed"
 msgstr "File modificato"
 
@@ -4108,7 +4106,7 @@ msgstr "Elenchi file"
 msgid "File not found"
 msgstr "File non trovato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3327
+#: ../src/interface/resources/xrc/dialogs.xrc:2961
 #: ../src/interface/search.cpp:741 ../src/interface/toolbar.cpp:53
 msgid "File search"
 msgstr "Ricerca file"
@@ -4149,11 +4147,11 @@ msgstr "Trasferimento file completato; trasferiti %s in %s"
 msgid "File transfers still in progress."
 msgstr "Trasferimento file ancora in corso."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2774
+#: ../src/interface/resources/xrc/dialogs.xrc:2516
 msgid "File would transfer with ASCII data type."
 msgstr "Il file dovrebbe essere trasferito in modo ASCII."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2779
+#: ../src/interface/resources/xrc/dialogs.xrc:2521
 msgid "File would transfer with binary data type."
 msgstr "Il file dovrebbe essere trasferito in modo binario."
 
@@ -4169,7 +4167,7 @@ msgstr ""
 "FileZilla può testare le impostazioni per assicurare che tutto sia "
 "configurato in modo corretto."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3614
+#: ../src/interface/resources/xrc/dialogs.xrc:3248
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla è già connesso a un server."
 
@@ -4207,7 +4205,7 @@ msgstr "Nome file non valido"
 msgid "Filename unchanged"
 msgstr "Nome file non modificato"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1907
+#: ../src/interface/resources/xrc/dialogs.xrc:1649
 #: ../src/interface/resources/xrc/settings.xrc:1991
 msgid "Filename:"
 msgstr "Nome file:"
@@ -4223,7 +4221,7 @@ msgid ""
 msgstr ""
 "Il nome del file non può contenere caratteri quali: / \\ : * ? \" < > |"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2198
+#: ../src/interface/resources/xrc/dialogs.xrc:1940
 msgid "Files currently being edited"
 msgstr "File in corso di modifica"
 
@@ -4257,7 +4255,7 @@ msgstr "Tipo file"
 msgid "Filetype associations"
 msgstr "Associazioni tipi di file"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1532
+#: ../src/interface/resources/xrc/dialogs.xrc:1274
 msgid "Filter applies to:"
 msgstr "Il filtro si applica a:"
 
@@ -4270,19 +4268,19 @@ msgstr "Filtro caratteri non validi nel nome file"
 msgid "Filter name already exists"
 msgstr "Un filtro con questo nome è già presente"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1499
+#: ../src/interface/resources/xrc/dialogs.xrc:1241
 msgid "Filter out items matching all of the following"
 msgstr "Nascondi elementi corrispondenti a tutte le seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1500
+#: ../src/interface/resources/xrc/dialogs.xrc:1242
 msgid "Filter out items matching any of the following"
 msgstr "Nascondi elementi corrispondenti ad una delle seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1501
+#: ../src/interface/resources/xrc/dialogs.xrc:1243
 msgid "Filter out items matching none of the following"
 msgstr "Nascondi elementi non corrispondenti alle seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1502
+#: ../src/interface/resources/xrc/dialogs.xrc:1244
 msgid "Filter out items matching not all of the following"
 msgstr "Filtra elementi corrispondenti ad eccezione dei seguenti"
 
@@ -4299,11 +4297,11 @@ msgstr "Filtra il contenuto della cartella"
 msgid "Filter validation failed"
 msgstr "Validazione filtri non riuscita"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3289
+#: ../src/interface/resources/xrc/dialogs.xrc:2923
 msgid "Find &files"
 msgstr "Trova &file"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3294
+#: ../src/interface/resources/xrc/dialogs.xrc:2928
 msgid "Find d&irectories"
 msgstr "Trova &cartelle"
 
@@ -4315,9 +4313,9 @@ msgstr "Fingerprint (SHA-1):"
 msgid "Fingerprint (SHA-256):"
 msgstr "Fingerprint (SHA-256):"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1060
-#: ../src/interface/resources/xrc/dialogs.xrc:1181
-#: ../src/interface/resources/xrc/dialogs.xrc:2273
+#: ../src/interface/resources/xrc/dialogs.xrc:802
+#: ../src/interface/resources/xrc/dialogs.xrc:923
+#: ../src/interface/resources/xrc/dialogs.xrc:2015
 msgid "Fingerprints:"
 msgstr "Impronte digitali:"
 
@@ -4412,11 +4410,11 @@ msgstr "Ottieni aiuto"
 msgid "Given filterset name already exists, overwrite filter set?"
 msgstr "Un set di filtri con questo nome è già presente. Vuoi sovrascriverlo?"
 
-#: ../src/interface/bookmarks_dialog.cpp:260
+#: ../src/interface/bookmarks_dialog.cpp:303
 msgid "Global bookmarks"
 msgstr "Preferiti globali"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:898
+#: ../src/interface/resources/xrc/dialogs.xrc:640
 msgid "GnuTLS:"
 msgstr "GnuTLS:"
 
@@ -4424,7 +4422,7 @@ msgstr "GnuTLS:"
 msgid "Green"
 msgstr "Verde"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:621
+#: ../src/interface/resources/xrc/dialogs.xrc:363
 msgid "Group permissions"
 msgstr "Permessi di gruppo"
 
@@ -4436,7 +4434,7 @@ msgstr "&Alto"
 msgid "HTTPS - HTTP over TLS"
 msgstr "HTTPS - HTTP su TLS"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2237
+#: ../src/interface/resources/xrc/dialogs.xrc:1979
 msgid "Hash:"
 msgstr "Hash:"
 
@@ -4458,14 +4456,14 @@ msgid "Highest available port has to be a number between 1024 and 65535."
 msgstr ""
 "La massima porta disponibile deve essere un numero compreso tra 1024 e 65535."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1353
+#: ../src/interface/resources/xrc/dialogs.xrc:1095
 msgid ""
 "Hold the shift key to toggle the filter state on both sides simultaneously."
 msgstr ""
 "Tenere premuto il tasto FISSA MAIUSC per cambiare lo stato del filtro da "
 "entrambe le parti simultaneamente."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:803
+#: ../src/interface/resources/xrc/dialogs.xrc:545
 msgid "Homepage:"
 msgstr "Sito web:"
 
@@ -4473,7 +4471,7 @@ msgstr "Sito web:"
 msgid "Host is down"
 msgstr "Host non attivo"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1116
+#: ../src/interface/resources/xrc/dialogs.xrc:858
 msgid "Host key mismatch"
 msgstr "La chiave dell'host non corrisponde"
 
@@ -4492,16 +4490,15 @@ msgid "Host unreachable"
 msgstr "Host non raggiungibile"
 
 #: ../src/interface/resources/xrc/certificate.xrc:179
-#: ../src/interface/resources/xrc/dialogs.xrc:284
-#: ../src/interface/resources/xrc/dialogs.xrc:420
-#: ../src/interface/resources/xrc/dialogs.xrc:1040
-#: ../src/interface/resources/xrc/dialogs.xrc:1161
+#: ../src/interface/resources/xrc/dialogs.xrc:782
+#: ../src/interface/resources/xrc/dialogs.xrc:903
+#: ../src/interface/loginmanager.cpp:94 ../src/interface/loginmanager.cpp:197
 #: ../src/interface/verifycertdialog.cpp:763
 msgid "Host:"
 msgstr "Host:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1050
-#: ../src/interface/resources/xrc/dialogs.xrc:1171
+#: ../src/interface/resources/xrc/dialogs.xrc:792
+#: ../src/interface/resources/xrc/dialogs.xrc:913
 msgid "Hostkey algorithm:"
 msgstr "Algoritmo chiave host:"
 
@@ -4509,7 +4506,7 @@ msgstr "Algoritmo chiave host:"
 msgid "Hours,"
 msgstr "Ore,"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:550
+#: ../src/interface/resources/xrc/dialogs.xrc:292
 msgid ""
 "I &forgot my master password. Delete all passwords stored with this key."
 msgstr ""
@@ -4571,7 +4568,7 @@ msgstr ""
 "Se l'opzione di fallback è abilitata, è possibile connettersi a server mal "
 "configurati che rifiutano la modalità di trasferimento selezionata."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1149
+#: ../src/interface/resources/xrc/dialogs.xrc:891
 msgid ""
 "If the host key change was not expected, please contact the server "
 "administrator."
@@ -4579,13 +4576,13 @@ msgstr ""
 "Se il cambiamento della chiave dell'host non era previsto, contattare "
 "l'amministratore del server."
 
-#: ../src/interface/netconfwizard.cpp:573
+#: ../src/interface/netconfwizard.cpp:574
 msgid ""
 "If the problem persists, some router and/or firewall keeps blocking "
 "FileZilla."
 msgstr "Se il problema persiste, alcuni router/firewall bloccano FileZilla."
 
-#: ../src/interface/netconfwizard.cpp:582
+#: ../src/interface/netconfwizard.cpp:583
 msgid ""
 "If the problem persists, some router and/or firewall keeps interrupting the "
 "connection."
@@ -4602,7 +4599,7 @@ msgstr ""
 "aggiungendo \".1\" alla fine del nome file (possibilmente sovrascrivendo i "
 "vecchi file di Log) e un nuovo file verrà creato."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3539
+#: ../src/interface/resources/xrc/dialogs.xrc:3173
 msgid ""
 "If the symlink points to a directory, FileZilla can either delete the "
 "symbolic link or remove the contents of the linked directory."
@@ -4610,7 +4607,7 @@ msgstr ""
 "Se il collegamento simbolico punta a una cartella, FileZilla può eliminare "
 "il collegamento simbolico o rimuovere il contenuto della cartella collegata."
 
-#: ../src/interface/netconfwizard.cpp:644
+#: ../src/interface/netconfwizard.cpp:645
 msgid ""
 "If this problem persists, please contact your router or firewall "
 "manufacturer for a solution."
@@ -4618,11 +4615,11 @@ msgstr ""
 "Se il problema persiste, contattare il produttore del vostro router o "
 "firewall per una soluzione."
 
-#: ../src/interface/netconfwizard.cpp:602
+#: ../src/interface/netconfwizard.cpp:603
 msgid "If this problem stays, please contact your router manufacturer."
 msgstr "Se il problema persiste, contattare il produttore del vostro router."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1666
+#: ../src/interface/resources/xrc/dialogs.xrc:1408
 #: ../src/interface/resources/xrc/settings.xrc:1240
 msgid ""
 "If using 'overwrite if newer', your system time has to be synchronized with "
@@ -4685,7 +4682,7 @@ msgstr ""
 "trasferimento di file, provare a modificare la modalità di trasferimento "
 "predefinita."
 
-#: ../src/interface/netconfwizard.cpp:589
+#: ../src/interface/netconfwizard.cpp:590
 msgid ""
 "If you keep having problems with a specific server, the server itself or a "
 "remote router or firewall might be misconfigured. In this case try to toggle "
@@ -4721,14 +4718,14 @@ msgstr ""
 "Se si utilizza un router, assicurarsi che queste porte siano inoltrate alla "
 "macchina su cui gira FileZilla."
 
-#: ../src/interface/netconfwizard.cpp:615
+#: ../src/interface/netconfwizard.cpp:616
 msgid ""
 "If your router keeps changing the IP address, please contact your router "
 "manufacturer."
 msgstr ""
 "Se il router continua a cambiare IP, contattare il produttore del router."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1825
+#: ../src/interface/resources/xrc/dialogs.xrc:1567
 msgid "Import settings"
 msgstr "Importa configurazione"
 
@@ -4851,10 +4848,10 @@ msgstr "Caratteri non validi nel nome host"
 msgid "Invalid chunk size"
 msgstr "Dimensione blocco non valido"
 
-#: ../src/interface/netconfwizard.cpp:371
-#: ../src/interface/netconfwizard.cpp:380
-#: ../src/interface/netconfwizard.cpp:388
-#: ../src/interface/netconfwizard.cpp:405
+#: ../src/interface/netconfwizard.cpp:372
+#: ../src/interface/netconfwizard.cpp:381
+#: ../src/interface/netconfwizard.cpp:389
+#: ../src/interface/netconfwizard.cpp:406
 msgid "Invalid data received"
 msgstr "Ricevuti dati non validi"
 
@@ -4885,8 +4882,8 @@ msgstr "Nome host non valido: %s"
 
 #: ../src/interface/asksavepassworddialog.cpp:41
 #: ../src/interface/asksavepassworddialog.cpp:46
-#: ../src/interface/loginmanager.cpp:111 ../src/interface/loginmanager.cpp:116
-#: ../src/interface/loginmanager.cpp:209 ../src/interface/loginmanager.cpp:311
+#: ../src/interface/loginmanager.cpp:138 ../src/interface/loginmanager.cpp:143
+#: ../src/interface/loginmanager.cpp:276 ../src/interface/loginmanager.cpp:380
 msgid "Invalid input"
 msgstr "Input non valido"
 
@@ -4991,7 +4988,7 @@ msgstr ""
 "Anche se FileZilla effettua alcune verifiche per vedere se il server "
 "supporta questa funzionalità, la prova potrebbe non avere successo."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2210
+#: ../src/interface/resources/xrc/dialogs.xrc:1952
 msgid "Key exchange"
 msgstr "Scambio chiave"
 
@@ -5003,8 +5000,8 @@ msgstr "Scambio chiave:"
 msgid "Key file"
 msgstr "File chiave"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:444
-#: ../src/interface/resources/xrc/dialogs.xrc:519
+#: ../src/interface/resources/xrc/dialogs.xrc:261
+#: ../src/interface/loginmanager.cpp:103
 msgid "Key identifier:"
 msgstr "Identificatore chiave:"
 
@@ -5064,11 +5061,11 @@ msgstr "Limite:"
 msgid "Line length exceeded"
 msgstr "Lunghezza riga in eccesso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:918
+#: ../src/interface/resources/xrc/dialogs.xrc:660
 msgid "Linked against"
 msgstr "Librerie collegate"
 
-#: ../src/interface/netconfwizard.cpp:276
+#: ../src/interface/netconfwizard.cpp:277
 msgid "Listen socket closed"
 msgstr "Socket di ascolto chiuso"
 
@@ -5093,7 +5090,7 @@ msgstr "Indirizzo locale in uso"
 msgid "Local endpoint has been closed"
 msgstr "Il punto di chiusura locale è stato chiuso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2487
+#: ../src/interface/resources/xrc/dialogs.xrc:2229
 msgid "Local file"
 msgstr "File locale"
 
@@ -5118,11 +5115,11 @@ msgstr "Il file locale non ha un nome file valido."
 msgid "Local file search"
 msgstr "Ricerca file locale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1281
+#: ../src/interface/resources/xrc/dialogs.xrc:1023
 msgid "Local filters:"
 msgstr "Filtri locali:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3462
+#: ../src/interface/resources/xrc/dialogs.xrc:3096
 msgid "Local path handling:"
 msgstr "Gestione percorso locale:"
 
@@ -5237,7 +5234,7 @@ msgstr "Intestazione risposta mal formattata: %s"
 msgid "Malformed response: %s"
 msgstr "Risposta non corertta: %s"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2829
+#: ../src/interface/resources/xrc/dialogs.xrc:2571
 #: ../src/interface/manual_transfer.cpp:288
 #: ../src/interface/manual_transfer.cpp:294
 #: ../src/interface/manual_transfer.cpp:300
@@ -5249,29 +5246,29 @@ msgstr "Risposta non corertta: %s"
 msgid "Manual transfer"
 msgstr "Trasferimento manuale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:455
-#: ../src/interface/resources/xrc/dialogs.xrc:530
+#: ../src/interface/resources/xrc/dialogs.xrc:272
+#: ../src/interface/loginmanager.cpp:106
 msgid "Master &Password:"
 msgstr "&Password principale:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3808
+#: ../src/interface/resources/xrc/dialogs.xrc:3442
 #: ../src/interface/settings/optionspage_passwords.cpp:182
 msgid "Master password:"
 msgstr "Password principale:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3250
+#: ../src/interface/resources/xrc/dialogs.xrc:2884
 msgid "Match all of the following"
 msgstr "Accetta tutti i seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3251
+#: ../src/interface/resources/xrc/dialogs.xrc:2885
 msgid "Match any of the following"
 msgstr "Corrispondenza trovata per tutti i seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3252
+#: ../src/interface/resources/xrc/dialogs.xrc:2886
 msgid "Match none of the following"
 msgstr "Nessuna corrispondenza trovata per i seguenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3253
+#: ../src/interface/resources/xrc/dialogs.xrc:2887
 msgid "Match not all of the following"
 msgstr "Non controllare corrispondenza dei seguneti"
 
@@ -5303,11 +5300,11 @@ msgstr "MiB"
 msgid "Minutes"
 msgstr "Minuti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2402
+#: ../src/interface/resources/xrc/dialogs.xrc:2144
 msgid "Move &down"
 msgstr "Sposta &giù"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2396
+#: ../src/interface/resources/xrc/dialogs.xrc:2138
 msgid "Move &up"
 msgstr "Sposta &su"
 
@@ -5334,22 +5331,21 @@ msgstr "Nessuna criptazi&one"
 msgid "N/a"
 msgstr "N/d"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2867
+#: ../src/interface/resources/xrc/dialogs.xrc:2609
 msgid "Name"
 msgstr "Nome"
 
-#: ../src/interface/bookmarks_dialog.cpp:734
+#: ../src/interface/bookmarks_dialog.cpp:775
 #: ../src/interface/sitemanager_dialog.cpp:1034
 msgid "Name already exists"
 msgstr "Nome già presente"
 
-#: ../src/interface/bookmarks_dialog.cpp:858
+#: ../src/interface/bookmarks_dialog.cpp:899
 #: ../src/interface/sitemanager.cpp:670
 msgid "Name of bookmark already exists."
 msgstr "Nome del segnalibro già presente."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:276
-#: ../src/interface/resources/xrc/dialogs.xrc:412
+#: ../src/interface/loginmanager.cpp:90 ../src/interface/loginmanager.cpp:193
 #: ../src/interface/verifycertdialog.cpp:654
 msgid "Name:"
 msgstr "Nome:"
@@ -5402,27 +5398,27 @@ msgstr "Nuova cartella"
 msgid "New &tab"
 msgstr "Nuova &scheda"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3018
+#: ../src/interface/bookmarks_dialog.cpp:272
 #: ../src/interface/sitemanager_dialog.cpp:352
 msgid "New Book&mark"
 msgstr "Nuovo &preferito"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2832
-#: ../src/interface/bookmarks_dialog.cpp:60
-#: ../src/interface/bookmarks_dialog.cpp:73
-#: ../src/interface/bookmarks_dialog.cpp:79
-#: ../src/interface/bookmarks_dialog.cpp:85
-#: ../src/interface/bookmarks_dialog.cpp:97
-#: ../src/interface/bookmarks_dialog.cpp:103
-#: ../src/interface/bookmarks_dialog.cpp:111
-#: ../src/interface/bookmarks_dialog.cpp:467
-#: ../src/interface/bookmarks_dialog.cpp:568
-#: ../src/interface/bookmarks_dialog.cpp:574
-#: ../src/interface/bookmarks_dialog.cpp:580
-#: ../src/interface/bookmarks_dialog.cpp:601
-#: ../src/interface/bookmarks_dialog.cpp:858
+#: ../src/interface/resources/xrc/dialogs.xrc:2574
+#: ../src/interface/bookmarks_dialog.cpp:63
+#: ../src/interface/bookmarks_dialog.cpp:76
+#: ../src/interface/bookmarks_dialog.cpp:82
+#: ../src/interface/bookmarks_dialog.cpp:88
+#: ../src/interface/bookmarks_dialog.cpp:100
+#: ../src/interface/bookmarks_dialog.cpp:106
+#: ../src/interface/bookmarks_dialog.cpp:114
+#: ../src/interface/bookmarks_dialog.cpp:508
+#: ../src/interface/bookmarks_dialog.cpp:609
+#: ../src/interface/bookmarks_dialog.cpp:615
+#: ../src/interface/bookmarks_dialog.cpp:621
+#: ../src/interface/bookmarks_dialog.cpp:642
+#: ../src/interface/bookmarks_dialog.cpp:899
 #: ../src/interface/sitemanager.cpp:670
-#: ../src/interface/sitemanager_dialog.cpp:1847
+#: ../src/interface/sitemanager_dialog.cpp:1859
 msgid "New bookmark"
 msgstr "Nuovo preferito"
 
@@ -5446,7 +5442,7 @@ msgid "New folder"
 msgstr "Nuova cartella"
 
 #: ../src/interface/sitemanager.cpp:550 ../src/interface/sitemanager.cpp:564
-#: ../src/interface/sitemanager_dialog.cpp:1824
+#: ../src/interface/sitemanager_dialog.cpp:1836
 msgid "New site"
 msgstr "Nuovo sito"
 
@@ -5477,7 +5473,7 @@ msgstr "Nessuna cartella aggiunta"
 #: ../src/interface/sitemanager_dialog.cpp:1425
 #, c-format
 msgid "No entries found matching '%s'."
-msgstr ""
+msgstr "Nessun elemento corrispondente '%s'."
 
 #: ../src/engine/ftp/ftpcontrolsocket.cpp:635
 msgid "No external IP address set, trying default."
@@ -5504,11 +5500,11 @@ msgstr "Nessuna immagine disponibile"
 msgid "No name for the filterset given."
 msgstr "Nessun nome è stato fornito per il gruppo di filtri."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3185
+#: ../src/interface/resources/xrc/dialogs.xrc:2819
 msgid "No program associated with filetype"
 msgstr "Nessun programma associato con il tipo di file"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3102
+#: ../src/interface/resources/xrc/dialogs.xrc:2736
 #, c-format
 msgid "No program has been associated to edit files with the extension '%s'."
 msgstr ""
@@ -5531,7 +5527,7 @@ msgstr "Nessun sito disponibile"
 msgid "No supported SOCKS5 auth method"
 msgstr "Metodo autenticazione SOCKS5 non supportato"
 
-#: ../src/interface/loginmanager.cpp:209
+#: ../src/interface/loginmanager.cpp:276
 msgid "No username given."
 msgstr "Nessun nome fornito."
 
@@ -5542,7 +5538,7 @@ msgstr "Nessun nome fornito."
 msgid "None"
 msgstr "Nessuno"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2603
+#: ../src/interface/resources/xrc/dialogs.xrc:2345
 msgid "None selected yet"
 msgstr "Nessun elemento selezionato"
 
@@ -5621,37 +5617,37 @@ msgstr "A&pri"
 
 #: ../src/interface/resources/xrc/certificate.xrc:282
 #: ../src/interface/resources/xrc/dialogs.xrc:233
-#: ../src/interface/resources/xrc/dialogs.xrc:559
-#: ../src/interface/resources/xrc/dialogs.xrc:751
-#: ../src/interface/resources/xrc/dialogs.xrc:994
-#: ../src/interface/resources/xrc/dialogs.xrc:1100
-#: ../src/interface/resources/xrc/dialogs.xrc:1221
-#: ../src/interface/resources/xrc/dialogs.xrc:1380
-#: ../src/interface/resources/xrc/dialogs.xrc:1569
-#: ../src/interface/resources/xrc/dialogs.xrc:1676
-#: ../src/interface/resources/xrc/dialogs.xrc:1747
-#: ../src/interface/resources/xrc/dialogs.xrc:1805
-#: ../src/interface/resources/xrc/dialogs.xrc:1870
-#: ../src/interface/resources/xrc/dialogs.xrc:2044
-#: ../src/interface/resources/xrc/dialogs.xrc:2181
-#: ../src/interface/resources/xrc/dialogs.xrc:2353
-#: ../src/interface/resources/xrc/dialogs.xrc:2428
-#: ../src/interface/resources/xrc/dialogs.xrc:2811
-#: ../src/interface/resources/xrc/dialogs.xrc:2966
-#: ../src/interface/resources/xrc/dialogs.xrc:3168
-#: ../src/interface/resources/xrc/dialogs.xrc:3408
-#: ../src/interface/resources/xrc/dialogs.xrc:3503
-#: ../src/interface/resources/xrc/dialogs.xrc:3572
-#: ../src/interface/resources/xrc/dialogs.xrc:3747
-#: ../src/interface/resources/xrc/dialogs.xrc:3849
-#: ../src/interface/resources/xrc/dialogs.xrc:3983
+#: ../src/interface/resources/xrc/dialogs.xrc:301
+#: ../src/interface/resources/xrc/dialogs.xrc:493
+#: ../src/interface/resources/xrc/dialogs.xrc:736
+#: ../src/interface/resources/xrc/dialogs.xrc:842
+#: ../src/interface/resources/xrc/dialogs.xrc:963
+#: ../src/interface/resources/xrc/dialogs.xrc:1122
+#: ../src/interface/resources/xrc/dialogs.xrc:1311
+#: ../src/interface/resources/xrc/dialogs.xrc:1418
+#: ../src/interface/resources/xrc/dialogs.xrc:1489
+#: ../src/interface/resources/xrc/dialogs.xrc:1547
+#: ../src/interface/resources/xrc/dialogs.xrc:1612
+#: ../src/interface/resources/xrc/dialogs.xrc:1786
+#: ../src/interface/resources/xrc/dialogs.xrc:1923
+#: ../src/interface/resources/xrc/dialogs.xrc:2095
+#: ../src/interface/resources/xrc/dialogs.xrc:2170
+#: ../src/interface/resources/xrc/dialogs.xrc:2553
+#: ../src/interface/resources/xrc/dialogs.xrc:2708
+#: ../src/interface/resources/xrc/dialogs.xrc:2802
+#: ../src/interface/resources/xrc/dialogs.xrc:3042
+#: ../src/interface/resources/xrc/dialogs.xrc:3137
+#: ../src/interface/resources/xrc/dialogs.xrc:3206
+#: ../src/interface/resources/xrc/dialogs.xrc:3381
+#: ../src/interface/resources/xrc/dialogs.xrc:3483
+#: ../src/interface/resources/xrc/dialogs.xrc:3617
 #: ../src/interface/resources/xrc/settings.xrc:28
 #: ../src/interface/resources/xrc/storj.xrc:37
 #: ../src/interface/welcome_dialog.cpp:114
 msgid "OK"
 msgstr "OK"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:939
+#: ../src/interface/resources/xrc/dialogs.xrc:681
 msgid "OS version:"
 msgstr "Versione S.O.:"
 
@@ -5683,7 +5679,7 @@ msgstr "Una volta la settimana"
 msgid "Only use plain FTP (insecure)"
 msgstr "Usa solo FTP in chiaro (non sicuro)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2166
+#: ../src/interface/resources/xrc/dialogs.xrc:1908
 msgid "Op&en file"
 msgstr "Apri fil&e"
 
@@ -5719,7 +5715,7 @@ msgstr "Apri file."
 msgid "Open the settings dialog of FileZilla"
 msgstr "Apri la finestra impostazioni di FileZilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1917
+#: ../src/interface/resources/xrc/dialogs.xrc:1659
 msgid "Opened as:"
 msgstr "Aperto come:"
 
@@ -5745,7 +5741,7 @@ msgstr ""
 "Apri la finestra di dialogo elenco cartella. Clic tasto destro per "
 "abilitazione/disabilitazione filtri."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:931
+#: ../src/interface/resources/xrc/dialogs.xrc:673
 msgid "Operating System:"
 msgstr "Sistema operativo:"
 
@@ -5797,30 +5793,30 @@ msgstr "Descrizione generale"
 msgid "Overwrite &if source newer"
 msgstr "Sovrascr&ivi se più recente"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1616
-#: ../src/interface/resources/xrc/dialogs.xrc:1639
+#: ../src/interface/resources/xrc/dialogs.xrc:1358
+#: ../src/interface/resources/xrc/dialogs.xrc:1381
 #: ../src/interface/resources/xrc/settings.xrc:1188
 #: ../src/interface/resources/xrc/settings.xrc:1209
 msgid "Overwrite file"
 msgstr "Sovrascrivi file"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1618
-#: ../src/interface/resources/xrc/dialogs.xrc:1641
+#: ../src/interface/resources/xrc/dialogs.xrc:1360
+#: ../src/interface/resources/xrc/dialogs.xrc:1383
 #: ../src/interface/resources/xrc/settings.xrc:1190
 #: ../src/interface/resources/xrc/settings.xrc:1211
 msgid "Overwrite file if size differs"
 msgstr "Sovrascrivi file se la dimensione è differente"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1619
-#: ../src/interface/resources/xrc/dialogs.xrc:1642
+#: ../src/interface/resources/xrc/dialogs.xrc:1361
+#: ../src/interface/resources/xrc/dialogs.xrc:1384
 #: ../src/interface/resources/xrc/settings.xrc:1191
 #: ../src/interface/resources/xrc/settings.xrc:1212
 msgid "Overwrite file if size differs or source file is newer"
 msgstr ""
 "Sovrascrivi file se la dimensione è differente o il sorgente più recente"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1617
-#: ../src/interface/resources/xrc/dialogs.xrc:1640
+#: ../src/interface/resources/xrc/dialogs.xrc:1359
+#: ../src/interface/resources/xrc/dialogs.xrc:1382
 #: ../src/interface/resources/xrc/settings.xrc:1189
 #: ../src/interface/resources/xrc/settings.xrc:1210
 msgid "Overwrite file if source file newer"
@@ -5839,7 +5835,7 @@ msgstr "Sovrascrivi se dimensione dif&ferente o sorgente più recente"
 msgid "Own build type: %s\n"
 msgstr "Tipo build proprietario: %s\n"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:587
+#: ../src/interface/resources/xrc/dialogs.xrc:329
 msgid "Owner permissions"
 msgstr "Permessi proprietario"
 
@@ -5860,7 +5856,7 @@ msgstr ""
 msgid "P&roxy host:"
 msgstr "Host p&roxy:"
 
-#: ../src/interface/netconfwizard.cpp:505
+#: ../src/interface/netconfwizard.cpp:506
 msgid "PORT command tainted by router or firewall."
 msgstr "Comando PORT corrotto dal router."
 
@@ -5877,7 +5873,7 @@ msgstr "Il parametro non è una URL valida"
 msgid "Parsing %d bytes of version information.\n"
 msgstr "Analisi %d byte informazione versione.\n"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2719
+#: ../src/interface/resources/xrc/dialogs.xrc:2461
 #: ../src/interface/quickconnectbar.cpp:50
 #: ../src/interface/sitemanager_site.cpp:149
 #: ../src/interface/sitemanager_site.cpp:548
@@ -5893,9 +5889,9 @@ msgstr "Passiva (consigliata)"
 msgid "Passive mode"
 msgstr "Modalità passiva"
 
-#: ../src/interface/netconfwizard.cpp:608
-#: ../src/interface/netconfwizard.cpp:621
-#: ../src/interface/netconfwizard.cpp:632
+#: ../src/interface/netconfwizard.cpp:609
+#: ../src/interface/netconfwizard.cpp:622
+#: ../src/interface/netconfwizard.cpp:633
 msgid "Passive mode has been set as default transfer mode."
 msgstr ""
 "La modalità passiva è stata impostata come modalità di trasferimento "
@@ -5934,7 +5930,7 @@ msgstr "Percorso non trovato:"
 msgid "Path of identity service"
 msgstr "Percorso servizio identità"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2896
+#: ../src/interface/resources/xrc/dialogs.xrc:2638
 msgid "Paths"
 msgstr "Percorso"
 
@@ -5959,7 +5955,7 @@ msgstr "Permessi"
 msgid "Plain FTP is insecure. Please switch to FTP over TLS."
 msgstr "L'FTP in chiaro non è sicuro. Passa a FTP su TLS."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:947
+#: ../src/interface/resources/xrc/dialogs.xrc:689
 msgid "Platform:"
 msgstr "Piattaforma:"
 
@@ -5971,11 +5967,11 @@ msgstr ""
 "Aggiungi almeno una cartella da cui vuoi scaricare file o in cui vuoi "
 "uploadare file."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3942
+#: ../src/interface/resources/xrc/dialogs.xrc:3576
 msgid "Please add the local directories you want to use FileZilla with."
 msgstr "Aggiungi le cartelle locali che vuoi suare con Filezilla."
 
-#: ../src/interface/netconfwizard.cpp:572
+#: ../src/interface/netconfwizard.cpp:573
 msgid ""
 "Please check on https://filezilla-project.org/probe.php that the server is "
 "running and carefully check your settings again."
@@ -5999,11 +5995,11 @@ msgstr ""
 "Firewall e router devono essere configurati in modo da consentire a "
 "FileZilla di stabilire connessioni in uscita su porte scelte arbitrariamente."
 
-#: ../src/interface/netconfwizard.cpp:643
+#: ../src/interface/netconfwizard.cpp:644
 msgid "Please disable settings like 'DMZ mode' or 'Game mode' on your router."
 msgstr "Disabilitare le impostazioni come 'DMZ mode' o 'Game mode' sul router."
 
-#: ../src/interface/netconfwizard.cpp:581
+#: ../src/interface/netconfwizard.cpp:582
 msgid ""
 "Please ensure you have a stable internet connection and carefully check your "
 "settings again."
@@ -6066,7 +6062,7 @@ msgid ""
 msgstr ""
 "Inserisci un numero tra 1 e 10 per il numero di trasferimenti concorrenti."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:252
+#: ../src/interface/loginmanager.cpp:176
 msgid "Please enter a password for this server:"
 msgstr "Inserisci una password per questo server:"
 
@@ -6080,15 +6076,15 @@ msgstr ""
 msgid "Please enter a unique name for this filter set"
 msgstr "Inserisci un nome univoco per questo set di filtri"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:259
+#: ../src/interface/loginmanager.cpp:165
 msgid "Please enter a username for this server:"
 msgstr "Inserisci un nome utente per questo server:"
 
-#: ../src/interface/netconfwizard.cpp:190
+#: ../src/interface/netconfwizard.cpp:191
 msgid "Please enter a valid portrange."
 msgstr "Inserisci un intervallo di porte valido."
 
-#: ../src/interface/netconfwizard.cpp:171
+#: ../src/interface/netconfwizard.cpp:172
 msgid "Please enter an URL where to get your external address from"
 msgstr "Inserisci l'URL da cui ricavare l'indirizzo IP esterno"
 
@@ -6132,22 +6128,22 @@ msgstr "Inserisci il nome della cartella che deve essere creata:"
 msgid "Please enter the name of the file which should be created:"
 msgstr "Insersci il nome del file che deve essere creato:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:266
+#: ../src/interface/loginmanager.cpp:171
 msgid "Please enter username and password for this server:"
 msgstr "Inserisci nome utente e password per questo server:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:510
+#: ../src/interface/resources/xrc/dialogs.xrc:252
 msgid ""
 "Please enter your current master password to change the password settings."
 msgstr ""
 "Inserisci la password principale per modificare le impostazioni password."
 
-#: ../src/interface/netconfwizard.cpp:155
+#: ../src/interface/netconfwizard.cpp:156
 msgid "Please enter your external IP address"
 msgstr "Inserisci l'indirizzo IP esterno"
 
-#: ../src/interface/netconfwizard.cpp:613
-#: ../src/interface/netconfwizard.cpp:626
+#: ../src/interface/netconfwizard.cpp:614
+#: ../src/interface/netconfwizard.cpp:627
 msgid ""
 "Please enter your external IP address on the active mode page of this "
 "wizard. In case you have a dynamic address or don't know your external "
@@ -6157,7 +6153,7 @@ msgstr ""
 "di questa procedura guidata. Se l'indirizzo è dinamico o non lo conosci, usa "
 "l'opzione del risolutore esterno."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:402
+#: ../src/interface/loginmanager.cpp:83
 msgid ""
 "Please enter your master password to decrypt the password for this server:"
 msgstr ""
@@ -6172,7 +6168,7 @@ msgstr ""
 "Seguire attentamente le istruzioni, in quanto una configurazione errata può "
 "impedire la riuscita delle connessioni FTP."
 
-#: ../src/interface/netconfwizard.cpp:637
+#: ../src/interface/netconfwizard.cpp:638
 msgid ""
 "Please make sure FileZilla is allowed to establish outgoing connections and "
 "make sure you typed the address of the address resolver correctly."
@@ -6185,7 +6181,7 @@ msgid "Please make sure the requested locale is installed on your system."
 msgstr ""
 "Assicuratevi che la lingua richiesta sia installata nel vostro sistema."
 
-#: ../src/interface/netconfwizard.cpp:614
+#: ../src/interface/netconfwizard.cpp:615
 msgid ""
 "Please make sure your router is using the latest available firmware. "
 "Furthermore, your router has to be configured properly. You will have to use "
@@ -6225,7 +6221,7 @@ msgstr ""
 "NOTA: alcuni server potrebbero bloccare i client se i tentativi di "
 "riconnessione sono troppi o gli intervalli tra i tentativi troppo brevi."
 
-#: ../src/interface/netconfwizard.cpp:590
+#: ../src/interface/netconfwizard.cpp:591
 msgid ""
 "Please run this wizard again should you change your network environment or "
 "in case you suddenly encounter problems with servers that did work "
@@ -6243,11 +6239,11 @@ msgstr ""
 "Salva questa chiave in un posto sicuro. Senza la chiave corretta i tuoi file "
 "uploadati non saranno più accessibili."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3544
+#: ../src/interface/resources/xrc/dialogs.xrc:3178
 msgid "Please select an action:"
 msgstr "Selezionare un'azione:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1863
+#: ../src/interface/resources/xrc/dialogs.xrc:1605
 msgid "Please select the categories you would like to import."
 msgstr "Selezionare le categorie da importare."
 
@@ -6278,7 +6274,7 @@ msgstr "Impostare i nuovi attributi per le cartelle e i file selezionati."
 msgid "Please select the new attributes for the selected files."
 msgstr "Impostare i nuovi attributi per i file selezionati."
 
-#: ../src/interface/netconfwizard.cpp:601
+#: ../src/interface/netconfwizard.cpp:602
 msgid ""
 "Please update your firewall and make sure your router is using the latest "
 "available firmware. Furthermore, your router has to be configured properly. "
@@ -6460,7 +6456,7 @@ msgstr "Autenticazione con chiave pubblica"
 msgid "Public key algorithm:"
 msgstr "Algoritmo chiave pubblica:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:655
+#: ../src/interface/resources/xrc/dialogs.xrc:397
 msgid "Public permissions"
 msgstr "Permessi pubblici"
 
@@ -6486,8 +6482,8 @@ msgstr "Coda: vuota"
 msgid "Queued files"
 msgstr "File in coda"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3385
-#: ../src/interface/resources/xrc/dialogs.xrc:3480
+#: ../src/interface/resources/xrc/dialogs.xrc:3019
+#: ../src/interface/resources/xrc/dialogs.xrc:3114
 msgid "Queueing:"
 msgstr "In coda:"
 
@@ -6517,7 +6513,7 @@ msgstr "Ripristina e m&etti in coda i file selezionati"
 msgid "Raw FTP command"
 msgstr "Comando FTP"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:628
+#: ../src/interface/resources/xrc/dialogs.xrc:370
 msgid "Re&ad"
 msgstr "Le&ttura"
 
@@ -6530,7 +6526,7 @@ msgstr "Aggio&rna"
 msgid "Re&name"
 msgstr "Ri&nomina"
 
-#: ../src/interface/netconfwizard.cpp:596
+#: ../src/interface/netconfwizard.cpp:597
 msgid ""
 "Re-run the wizard and carefully check your settings and configure all "
 "routers and firewalls accordingly."
@@ -6538,7 +6534,7 @@ msgstr ""
 "Riavviare la configurazione e verificare attentamente le impostazioni e "
 "configurare in accordo tutti i router/firewall."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:662
+#: ../src/interface/resources/xrc/dialogs.xrc:404
 msgid "Rea&d"
 msgstr "Lettur&a"
 
@@ -6590,7 +6586,7 @@ msgstr "Motivo"
 msgid "Reboot now"
 msgstr "Riavvia adesso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:716
+#: ../src/interface/resources/xrc/dialogs.xrc:458
 msgid "Rec&urse into subdirectories"
 msgstr "&Includi sottocartelle"
 
@@ -6603,9 +6599,9 @@ msgstr "Ricevuto un elenco di cartella che appare codificato in EBCDIC."
 msgid "Received a line exceeding 10000 characters, aborting."
 msgstr "Ricevuta una linea eccedente i 10000 caratteri, interruzione."
 
-#: ../src/interface/netconfwizard.cpp:1007
-#: ../src/interface/netconfwizard.cpp:1015
-#: ../src/interface/netconfwizard.cpp:1036
+#: ../src/interface/netconfwizard.cpp:1008
+#: ../src/interface/netconfwizard.cpp:1016
+#: ../src/interface/netconfwizard.cpp:1037
 msgid "Received data tainted"
 msgstr "Ricevuti dati corrotti"
 
@@ -6664,7 +6660,7 @@ msgstr "Redirezione ad un indirizzo non valido o non supportato: %s"
 msgid "Refresh the file and folder lists"
 msgstr "Aggiorna l'elenco file e cartelle"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3869
+#: ../src/interface/resources/xrc/dialogs.xrc:3503
 msgid "Remember passwords?"
 msgstr "Memorizzare la password?"
 
@@ -6672,7 +6668,7 @@ msgstr "Memorizzare la password?"
 msgid "Remote"
 msgstr "Remoto"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2522
+#: ../src/interface/resources/xrc/dialogs.xrc:2264
 #: ../src/interface/queue.cpp:1275
 msgid "Remote file"
 msgstr "File remoto"
@@ -6681,7 +6677,7 @@ msgstr "File remoto"
 msgid "Remote file search"
 msgstr "Ricerca file remota"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1316
+#: ../src/interface/resources/xrc/dialogs.xrc:1058
 msgid "Remote filters:"
 msgstr "File remoti:"
 
@@ -6689,7 +6685,7 @@ msgstr "File remoti:"
 msgid "Remote path"
 msgstr "Percorso remoto"
 
-#: ../src/interface/bookmarks_dialog.cpp:443
+#: ../src/interface/bookmarks_dialog.cpp:484
 #, c-format
 msgid ""
 "Remote path cannot be parsed. Make sure it is a valid absolute path and is "
@@ -6708,8 +6704,8 @@ msgstr ""
 "Il percorso remoto non può essere analizzato. Assicurarsi che sia un "
 "percorso assoluto valido e supportato dal tipo di server (%s) selezionato."
 
-#: ../src/interface/bookmarks_dialog.cpp:446
-#: ../src/interface/bookmarks_dialog.cpp:451
+#: ../src/interface/bookmarks_dialog.cpp:487
+#: ../src/interface/bookmarks_dialog.cpp:492
 #: ../src/interface/sitemanager_dialog.cpp:953
 msgid "Remote path cannot be parsed. Make sure it is a valid absolute path."
 msgstr ""
@@ -6720,11 +6716,11 @@ msgstr ""
 msgid "Remote path could not be parsed."
 msgstr "Il percorso remoto non ha potuto essere analizzato."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3367
+#: ../src/interface/resources/xrc/dialogs.xrc:3001
 msgid "Remote path handling:"
 msgstr "Gestione percorso remoto:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1937
+#: ../src/interface/resources/xrc/dialogs.xrc:1679
 msgid "Remote path:"
 msgstr "Percorso remoto:"
 
@@ -6742,8 +6738,8 @@ msgstr "Rimuovi &tutto"
 msgid "Remove &selected"
 msgstr "Rimuovi gli elementi &selezionati"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1621
-#: ../src/interface/resources/xrc/dialogs.xrc:1644
+#: ../src/interface/resources/xrc/dialogs.xrc:1363
+#: ../src/interface/resources/xrc/dialogs.xrc:1386
 #: ../src/interface/resources/xrc/settings.xrc:1193
 #: ../src/interface/resources/xrc/settings.xrc:1214
 #: ../src/interface/asyncrequestqueue.cpp:350
@@ -6766,7 +6762,7 @@ msgstr "Rinomina i file e cartelle selezionate"
 msgid "Renaming '%s' to '%s'"
 msgstr "Rinomina da '%s' a '%s'"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3820
+#: ../src/interface/resources/xrc/dialogs.xrc:3454
 #: ../src/interface/settings/optionspage_passwords.cpp:185
 msgid "Repeat password:"
 msgstr "Ripeti password:"
@@ -6822,7 +6818,7 @@ msgstr "Risoluzione dell'indirizzo IP %s in corso"
 msgid "Resource temporarily unavailable"
 msgstr "Risorsa temporaneamente non disponibile"
 
-#: ../src/engine/logging.cpp:132 ../src/interface/netconfwizard.cpp:419
+#: ../src/engine/logging.cpp:132 ../src/interface/netconfwizard.cpp:420
 #: ../src/interface/StatusView.cpp:297 ../src/interface/StatusView.cpp:367
 msgid "Response:"
 msgstr "Risposta:"
@@ -6831,12 +6827,12 @@ msgstr "Risposta:"
 msgid "Restore ta&bs and reconnect"
 msgstr "Ripristina schede e riconnetti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3313
+#: ../src/interface/resources/xrc/dialogs.xrc:2947
 msgid "Results:"
 msgstr "Risultati:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1620
-#: ../src/interface/resources/xrc/dialogs.xrc:1643
+#: ../src/interface/resources/xrc/dialogs.xrc:1362
+#: ../src/interface/resources/xrc/dialogs.xrc:1385
 #: ../src/interface/resources/xrc/settings.xrc:1192
 #: ../src/interface/resources/xrc/settings.xrc:1213
 msgid "Resume file transfer"
@@ -6864,7 +6860,7 @@ msgid "Retrieving directory listing..."
 msgstr "Lettura elenco cartelle..."
 
 #: ../src/engine/ftp/ftpcontrolsocket.cpp:650
-#: ../src/interface/netconfwizard.cpp:721
+#: ../src/interface/netconfwizard.cpp:722
 #, c-format
 msgid "Retrieving external IP address from %s"
 msgstr "È in corso la lettura dell'indirizzo IP esterno da %s"
@@ -6885,7 +6881,7 @@ msgstr "&Arresta il sistema"
 msgid "S&tart normally"
 msgstr "Avvia normalmen&te"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3237
+#: ../src/interface/resources/xrc/dialogs.xrc:2871
 msgid "S&top"
 msgstr "&Ferma"
 
@@ -6920,21 +6916,21 @@ msgid ""
 msgstr ""
 "SOCKS5 non supporta nomi utente o password più lunghi di 255 caratteri."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:906
+#: ../src/interface/resources/xrc/dialogs.xrc:648
 msgid "SQLite:"
 msgstr "SQLite:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3797
+#: ../src/interface/resources/xrc/dialogs.xrc:3431
 #: ../src/interface/settings/optionspage_passwords.cpp:178
 msgid "Sa&ve passwords protected by a master password"
 msgstr "Sal&va le password protette dalla password principale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3787
+#: ../src/interface/resources/xrc/dialogs.xrc:3421
 #: ../src/interface/settings/optionspage_passwords.cpp:176
 msgid "Sav&e passwords"
 msgstr "Sal&va password"
 
-#: ../src/interface/netconfwizard.cpp:863
+#: ../src/interface/netconfwizard.cpp:864
 msgid "Save settings?"
 msgstr "Salvare le impostazioni?"
 
@@ -6953,17 +6949,17 @@ msgstr "Il salvataggio password è stato disabilitato dall'utente."
 msgid "Scale factor:"
 msgstr "Fattore di scala:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3243
+#: ../src/interface/resources/xrc/dialogs.xrc:2877
 msgid "Search &conditions:"
 msgstr "Cerca &condizioni:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3225
+#: ../src/interface/resources/xrc/dialogs.xrc:2859
 msgid "Search &directory:"
 msgstr "Cerca &cartella:"
 
 #: ../src/interface/sitemanager_dialog.cpp:1394
 msgid "Search for entries containing the entered text."
-msgstr ""
+msgstr "Ricerca elementi contenenti il testo inserito."
 
 #: ../src/interface/toolbar.cpp:53
 msgid "Search for files recursively."
@@ -6971,7 +6967,7 @@ msgstr "Ricerca ricorsiva file."
 
 #: ../src/interface/sitemanager_dialog.cpp:1425
 msgid "Search result"
-msgstr ""
+msgstr "Risultati ricerca"
 
 #: ../src/interface/menu_bar.cpp:146
 msgid "Search server for files"
@@ -6979,9 +6975,9 @@ msgstr "Cerca nei server i file"
 
 #: ../src/interface/sitemanager_dialog.cpp:1394
 msgid "Search sites"
-msgstr ""
+msgstr "Siti ricerca"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3194
+#: ../src/interface/resources/xrc/dialogs.xrc:2828
 msgid "Search type:"
 msgstr "Tipo ricerca::"
 
@@ -6994,12 +6990,12 @@ msgstr "C&hiave segreta accesso:"
 msgid "Security information"
 msgstr "Informazioni sicurezza"
 
-#: ../src/interface/netconfwizard.cpp:583
-#: ../src/interface/netconfwizard.cpp:597
+#: ../src/interface/netconfwizard.cpp:584
+#: ../src/interface/netconfwizard.cpp:598
 msgid "See also: https://wiki.filezilla-project.org/Network_Configuration"
 msgstr "Vedi anche: https://wiki.filezilla-project.org/Network_Configuration"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2610
+#: ../src/interface/resources/xrc/dialogs.xrc:2352
 msgid "Sele&ct server"
 msgstr "Sele&ziona server"
 
@@ -7057,7 +7053,7 @@ msgstr "Selezionare il file per l'esportazione delle code"
 msgid "Select file for exported settings"
 msgstr "Selezionare il file per l'esportazione delle impostazioni"
 
-#: ../src/interface/export.cpp:36 ../src/interface/sitemanager_dialog.cpp:1887
+#: ../src/interface/export.cpp:36 ../src/interface/sitemanager_dialog.cpp:1902
 msgid "Select file for exported sites"
 msgstr "Selezionare il file per l'esportazione dei siti"
 
@@ -7073,7 +7069,7 @@ msgstr "Seleziona il file da inviare"
 msgid "Select filename for converted key file"
 msgstr "Seleziona il nome per il file convertito della chiave"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3107
+#: ../src/interface/resources/xrc/dialogs.xrc:2741
 msgid "Select how these files should be opened."
 msgstr "Seleziona come questi file devono essere aperti."
 
@@ -7085,11 +7081,11 @@ msgstr "Seleziona cartella per il download"
 msgid "Select target filename"
 msgstr "Selezionare il nome file destinazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1776
+#: ../src/interface/resources/xrc/dialogs.xrc:1518
 msgid "Select the categories to export:"
 msgstr "Selezionare le categorie da esportare:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1702
+#: ../src/interface/resources/xrc/dialogs.xrc:1444
 msgid "Select the private data you would like to delete."
 msgstr "Selezionare gli elementi privati da eliminare."
 
@@ -7148,8 +7144,8 @@ msgstr "Selezionati %s e %s. Dimensione totale: almeno %s"
 msgid "Selected editor does not exist."
 msgstr "Il programma selezionato non esiste."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1996
-#: ../src/interface/resources/xrc/dialogs.xrc:2063
+#: ../src/interface/resources/xrc/dialogs.xrc:1738
+#: ../src/interface/resources/xrc/dialogs.xrc:1805
 msgid "Selected file already being edited"
 msgstr "Si sta già modificando il file selezionato"
 
@@ -7234,7 +7230,7 @@ msgstr "Il server non supporta il ripristino di file > 2GB."
 msgid "Server does not support resume of files > 4GB."
 msgstr "Il server non supporta il ripristino di file > 4GB."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2256
+#: ../src/interface/resources/xrc/dialogs.xrc:1998
 msgid "Server host key"
 msgstr "Chiave server host"
 
@@ -7307,27 +7303,27 @@ msgstr ""
 msgid "Server sent too much data."
 msgstr "Il server ha inviato troppi dati."
 
-#: ../src/interface/netconfwizard.cpp:426
-#: ../src/interface/netconfwizard.cpp:432
-#: ../src/interface/netconfwizard.cpp:467
-#: ../src/interface/netconfwizard.cpp:476
-#: ../src/interface/netconfwizard.cpp:488
-#: ../src/interface/netconfwizard.cpp:511
-#: ../src/interface/netconfwizard.cpp:518
-#: ../src/interface/netconfwizard.cpp:527
-#: ../src/interface/netconfwizard.cpp:538
+#: ../src/interface/netconfwizard.cpp:427
+#: ../src/interface/netconfwizard.cpp:433
+#: ../src/interface/netconfwizard.cpp:468
+#: ../src/interface/netconfwizard.cpp:477
+#: ../src/interface/netconfwizard.cpp:489
+#: ../src/interface/netconfwizard.cpp:512
+#: ../src/interface/netconfwizard.cpp:519
+#: ../src/interface/netconfwizard.cpp:528
+#: ../src/interface/netconfwizard.cpp:539
 msgid "Server sent unexpected reply."
 msgstr "Il server ha inviato una risposta non prevista."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2329
+#: ../src/interface/resources/xrc/dialogs.xrc:2071
 msgid "Server to client MAC:"
 msgstr "Server a client MAC:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2319
+#: ../src/interface/resources/xrc/dialogs.xrc:2061
 msgid "Server to client cipher:"
 msgstr "Server a client cipher:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2673
+#: ../src/interface/resources/xrc/dialogs.xrc:2415
 msgid "Server&type:"
 msgstr "&Tipo di server:"
 
@@ -7335,8 +7331,8 @@ msgstr "&Tipo di server:"
 msgid "Server/Local file"
 msgstr "File server/locale"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1927
-#: ../src/interface/resources/xrc/dialogs.xrc:2596
+#: ../src/interface/resources/xrc/dialogs.xrc:1669
+#: ../src/interface/resources/xrc/dialogs.xrc:2338
 msgid "Server:"
 msgstr "Server:"
 
@@ -7358,7 +7354,7 @@ msgstr "Impostazione permessi di '%s' a '%s'"
 msgid "Settings"
 msgstr "Impostazioni"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:963
+#: ../src/interface/resources/xrc/dialogs.xrc:705
 msgid "Settings directory:"
 msgstr "Cartella impostazioni:"
 
@@ -7412,7 +7408,7 @@ msgstr "Algoritmo firma:"
 msgid "Signup"
 msgstr "Registrazione"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1838
+#: ../src/interface/resources/xrc/dialogs.xrc:1580
 msgid "Site &Manager entries"
 msgstr "Voci del &Gestore siti"
 
@@ -7466,12 +7462,12 @@ msgstr "Il percorso del sito deve iniziare con 0 o 1."
 msgid "Site path is malformed."
 msgstr "Percorso sito non valido."
 
-#: ../src/interface/bookmarks_dialog.cpp:264
+#: ../src/interface/bookmarks_dialog.cpp:307
 msgid "Site-specific bookmarks"
 msgstr "Preferiti specifici per sito"
 
-#: ../src/interface/bookmarks_dialog.cpp:97
-#: ../src/interface/bookmarks_dialog.cpp:568
+#: ../src/interface/bookmarks_dialog.cpp:100
+#: ../src/interface/bookmarks_dialog.cpp:609
 msgid ""
 "Site-specific bookmarks require the server to be stored in the Site "
 "Manager.\n"
@@ -7493,8 +7489,8 @@ msgstr "Formato Dimensione"
 msgid "Size unknown"
 msgstr "Dimensione sconosciuta"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1622
-#: ../src/interface/resources/xrc/dialogs.xrc:1645
+#: ../src/interface/resources/xrc/dialogs.xrc:1364
+#: ../src/interface/resources/xrc/dialogs.xrc:1387
 #: ../src/interface/resources/xrc/settings.xrc:1194
 #: ../src/interface/resources/xrc/settings.xrc:1215
 msgid "Skip file"
@@ -7586,7 +7582,7 @@ msgstr "Sorgente e destinazione dell'operazione trascina e rilascia coincidono"
 msgid "Source file:"
 msgstr "File sorgente:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3765
+#: ../src/interface/resources/xrc/dialogs.xrc:3399
 #: ../src/interface/speedlimits_dialog.cpp:64
 #: ../src/interface/speedlimits_dialog.cpp:72
 msgid "Speed Limits"
@@ -7616,7 +7612,7 @@ msgstr "Solo versioni stabili"
 msgid "Stable, beta and nightly versions"
 msgstr "Versioni stabili, beta e build notturne"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2804
+#: ../src/interface/resources/xrc/dialogs.xrc:2546
 msgid "Start transfer &immediately"
 msgstr "Avvia &immediatamente il trasferimento"
 
@@ -7699,7 +7695,7 @@ msgstr "Riepilogo dei risultati del test:"
 msgid "Suspend now"
 msgstr "Sospendi ora"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3561
+#: ../src/interface/resources/xrc/dialogs.xrc:3195
 msgid ""
 "Symlinks to files are not affected by this choice, such symlinks are always "
 "deleted."
@@ -7707,7 +7703,7 @@ msgstr ""
 "I collegamenti simbolici non sono affetti dalla selezione, così i "
 "collegamenti simbolici saranno eliminati."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3872
+#: ../src/interface/resources/xrc/dialogs.xrc:3506
 #: ../src/interface/state.cpp:270 ../src/interface/state.cpp:285
 #: ../src/interface/state.cpp:292 ../src/interface/state.cpp:303
 #: ../src/interface/state.cpp:402 ../src/interface/state.cpp:410
@@ -7742,7 +7738,7 @@ msgstr "Errore di sintassi nella linea di comando"
 msgid "System"
 msgstr "Sistema"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:975
+#: ../src/interface/resources/xrc/dialogs.xrc:717
 msgid "System details"
 msgstr "Dettagli sistema"
 
@@ -7798,7 +7794,7 @@ msgstr "Numero di telefono:"
 msgid "Temporary failure in name resolution"
 msgstr "Fallimento temporaneo nella risoluzione nomi"
 
-#: ../src/interface/netconfwizard.cpp:586
+#: ../src/interface/netconfwizard.cpp:587
 msgid "Test finished successfully"
 msgstr "Test completato correttamente"
 
@@ -7810,7 +7806,7 @@ msgstr "Risultati del test"
 msgid "Testing resume capabilities of server"
 msgstr "Verifica del supporto al ripristino trasferimenti sul server"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2124
+#: ../src/interface/resources/xrc/dialogs.xrc:1866
 msgid "The &following files are currently being edited:"
 msgstr "Sono in corso modifiche ai seguenti &file remoti:"
 
@@ -7836,7 +7832,7 @@ msgstr ""
 "Il Gestore siti è aperto in un'altra istanza di FileZilla 3.\n"
 "Se non viene chiusa i dati non possono essere eliminati."
 
-#: ../src/interface/netconfwizard.cpp:638
+#: ../src/interface/netconfwizard.cpp:639
 #, c-format
 msgid "The address you entered was: %s"
 msgstr "L'indirizzo inserito è: %s"
@@ -7849,7 +7845,7 @@ msgstr "Il membro ai_familty non è supportato"
 msgid "The ai_socktype member is not supported"
 msgstr "Il membro asock_type non è supportato"
 
-#: ../src/interface/bookmarks_dialog.cpp:845
+#: ../src/interface/bookmarks_dialog.cpp:886
 #: ../src/interface/sitemanager.cpp:638
 msgid "The bookmark could not be added."
 msgstr "Il preferito non può essere aggiunto."
@@ -7885,12 +7881,12 @@ msgstr ""
 msgid "The data connection could not be established: %s"
 msgstr "La connessione dati non può essere stabilita. %s"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3125
+#: ../src/interface/resources/xrc/dialogs.xrc:2759
 #: ../src/interface/edithandler.cpp:1658
 msgid "The default editor for text files could not be found."
 msgstr "Il programma predefinito per i file di testo non è disponibile."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3118
+#: ../src/interface/resources/xrc/dialogs.xrc:2752
 #, c-format
 msgid "The default editor for text files is '%s'."
 msgstr "Il programma predefinito per i file di testo è '%s'."
@@ -8024,7 +8020,7 @@ msgstr "La soluzione FTP open source gratuita"
 msgid "The generated encryption key is:"
 msgstr "La chiave di criptazione generata è:"
 
-#: ../src/interface/bookmarks_dialog.cpp:296
+#: ../src/interface/bookmarks_dialog.cpp:337
 msgid "The global bookmarks could not be saved."
 msgstr "I preferiti globali non possono essere salvati."
 
@@ -8108,14 +8104,14 @@ msgstr ""
 msgid "The selected categories have been imported."
 msgstr "Le categorie selezionate sono state importate."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1833
+#: ../src/interface/resources/xrc/dialogs.xrc:1575
 msgid ""
 "The selected file contains importable data for the following categories:"
 msgstr ""
 "Il file selezionato contiene dati importabili per le seguenti categorie:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2003
-#: ../src/interface/resources/xrc/dialogs.xrc:2070
+#: ../src/interface/resources/xrc/dialogs.xrc:1745
+#: ../src/interface/resources/xrc/dialogs.xrc:1812
 msgid "The selected file is already being edited:"
 msgstr "Si sta già modificando il file selezionato:"
 
@@ -8138,7 +8134,7 @@ msgstr ""
 msgid "The server could not be added."
 msgstr "Il server non può essere aggiunto."
 
-#: ../src/interface/netconfwizard.cpp:594
+#: ../src/interface/netconfwizard.cpp:595
 msgid "The server sent an unexpected or unrecognized reply."
 msgstr "Il server ha inviato una risposta inaspettata o sconosciuta."
 
@@ -8154,7 +8150,7 @@ msgstr ""
 "Il certificato del server è sconosciuto. Esaminare attentamente il "
 "certificato per assicurarsi che il server sia affidabile."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1142
+#: ../src/interface/resources/xrc/dialogs.xrc:884
 msgid ""
 "The server's host key does not match the key that has been cached. This "
 "means that either the administrator has changed the host key, or you are "
@@ -8164,7 +8160,7 @@ msgstr ""
 "Questo può verificarsi se la chiave è stata modificata dall'amministratore o "
 "se si è collegati a un computer che finge di essere il server."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1026
+#: ../src/interface/resources/xrc/dialogs.xrc:768
 msgid ""
 "The server's host key is unknown. You have no guarantee that the server is "
 "the computer you think it is."
@@ -8208,7 +8204,7 @@ msgstr ""
 "Il file destinazione esiste già.\n"
 "Scegliere un'azione."
 
-#: ../src/interface/netconfwizard.cpp:863
+#: ../src/interface/netconfwizard.cpp:864
 msgid "The test did not succeed. Do you really want to save the settings?"
 msgstr "Il test ha avuto esito negativo. Salvare comunque le impostazioni?"
 
@@ -8238,7 +8234,7 @@ msgstr ""
 "solo dopo aver parlato con l'amministratore del server o con il provider di "
 "hosting del server."
 
-#: ../src/interface/netconfwizard.cpp:595
+#: ../src/interface/netconfwizard.cpp:596
 msgid ""
 "This means that some router and/or firewall is still interfering with "
 "FileZilla."
@@ -8377,7 +8373,7 @@ msgstr "Trace:"
 msgid "Transfer"
 msgstr "Trasferisci"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2460
+#: ../src/interface/resources/xrc/dialogs.xrc:2202
 msgid "Transfer &direction"
 msgstr "&Direzione trasferimento"
 
@@ -8402,7 +8398,7 @@ msgstr "Impostazioni di trasferimento"
 msgid "Transfer connection interrupted: %s"
 msgstr "Connessione interrotta: %s"
 
-#: ../src/interface/netconfwizard.cpp:641
+#: ../src/interface/netconfwizard.cpp:642
 msgid "Transferred data got tainted."
 msgstr "I dati trasferiti sono stati alterati."
 
@@ -8434,7 +8430,7 @@ msgstr "Conferma chiave host modificata:"
 msgid "Trust new Hostkey:"
 msgstr "Conferma nuova chiave host:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1201
+#: ../src/interface/resources/xrc/dialogs.xrc:943
 msgid "Trust the new key and carry on connecting?"
 msgstr ""
 "Considerare come attendibile la nuova chiave e procedere con la connessione?"
@@ -8445,7 +8441,7 @@ msgstr ""
 "Considerare come attendibile questo certificato e procedere con la "
 "connessione?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1080
+#: ../src/interface/resources/xrc/dialogs.xrc:822
 msgid "Trust this host and carry on connecting?"
 msgstr ""
 "Considerare come attendibile questo computer e procedere con la connessione?"
@@ -8455,7 +8451,7 @@ msgstr ""
 msgid "Try again"
 msgstr "Riprova"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2840
+#: ../src/interface/resources/xrc/dialogs.xrc:2582
 #: ../src/interface/edithandler.cpp:1201
 msgid "Type"
 msgstr "Tipo"
@@ -8468,11 +8464,11 @@ msgstr "Tipo proxy FTP:"
 msgid "Type of generic proxy:"
 msgstr "Tipo di proxy generico:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2151
+#: ../src/interface/resources/xrc/dialogs.xrc:1893
 msgid "U&pload"
 msgstr "&Invia"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3706
+#: ../src/interface/resources/xrc/dialogs.xrc:3340
 #: ../src/interface/resources/xrc/settings.xrc:931
 msgid "U&pload limit:"
 msgstr "Limite di &upload:"
@@ -8498,12 +8494,12 @@ msgstr "Codice errore non assegnato %d"
 msgid "Unit:"
 msgstr "Unità:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1055
-#: ../src/interface/resources/xrc/dialogs.xrc:1065
-#: ../src/interface/resources/xrc/dialogs.xrc:1176
-#: ../src/interface/resources/xrc/dialogs.xrc:1186
-#: ../src/interface/resources/xrc/dialogs.xrc:2268
-#: ../src/interface/resources/xrc/dialogs.xrc:2278
+#: ../src/interface/resources/xrc/dialogs.xrc:797
+#: ../src/interface/resources/xrc/dialogs.xrc:807
+#: ../src/interface/resources/xrc/dialogs.xrc:918
+#: ../src/interface/resources/xrc/dialogs.xrc:928
+#: ../src/interface/resources/xrc/dialogs.xrc:2010
+#: ../src/interface/resources/xrc/dialogs.xrc:2020
 #: ../src/engine/sizeformatting_base.cpp:61
 #: ../src/interface/edithandler.cpp:1232 ../src/interface/edithandler.cpp:1260
 msgid "Unknown"
@@ -8532,7 +8528,7 @@ msgstr "Errore sconosciuto %d"
 msgid "Unknown error %u"
 msgstr "Errore sconosciuto %u"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1007
+#: ../src/interface/resources/xrc/dialogs.xrc:749
 msgid "Unknown host key"
 msgstr "Chiave host sconosciuta"
 
@@ -8553,8 +8549,8 @@ msgstr "Elemento root sconosciuto, il file non sembra generato da FileZilla."
 msgid "Unknown transfer encoding"
 msgstr "Codifica trasferimento sconosciuta"
 
-#: ../src/interface/netconfwizard.cpp:616
-#: ../src/interface/netconfwizard.cpp:627
+#: ../src/interface/netconfwizard.cpp:617
+#: ../src/interface/netconfwizard.cpp:628
 msgid ""
 "Unless these problems get fixed, active mode FTP will not work and passive "
 "mode has to be used."
@@ -8562,7 +8558,7 @@ msgstr ""
 "Finché non saranno risolti questi problemi, la modalità FTP attiva non "
 "funzionerà e dovrà essere utilizzata la modalità passiva."
 
-#: ../src/interface/netconfwizard.cpp:603
+#: ../src/interface/netconfwizard.cpp:604
 msgid ""
 "Unless this problem gets fixed, active mode FTP will not work and passive "
 "mode has to be used."
@@ -8574,7 +8570,7 @@ msgstr ""
 msgid "Unsupported redirect"
 msgstr "Redirezione non supportata"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2157
+#: ../src/interface/resources/xrc/dialogs.xrc:1899
 msgid "Up&load and unedit"
 msgstr "Invia e annulla le modifi&che"
 
@@ -8583,7 +8579,7 @@ msgstr "Invia e annulla le modifi&che"
 msgid "Updates"
 msgstr "Aggiornamenti"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2474
+#: ../src/interface/resources/xrc/dialogs.xrc:2216
 msgid "Upload"
 msgstr "Invia"
 
@@ -8600,7 +8596,7 @@ msgstr "Limite di upload: %s/s"
 msgid "Upload limit: none"
 msgstr "Limite di upload: nessuno"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3432
+#: ../src/interface/resources/xrc/dialogs.xrc:3066
 #: ../src/interface/search.cpp:941
 msgid "Upload search results"
 msgstr "Carica risultati ricerca"
@@ -8613,11 +8609,11 @@ msgstr "Invia le cartelle selezionate"
 msgid "Upload selected files and directories"
 msgstr "Invia file e cartelle selezionate"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1962
+#: ../src/interface/resources/xrc/dialogs.xrc:1704
 msgid "Upload this file back to the server?"
 msgstr "Inviare il file modificato al server?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1957
+#: ../src/interface/resources/xrc/dialogs.xrc:1699
 msgid "Upload this file to the server?"
 msgstr "Inviare questo file al server?"
 
@@ -8642,11 +8638,11 @@ msgstr "Utilizza un set di &caratteri personalizzato"
 msgid "Use &custom editor:"
 msgstr "Usa &programma personalizzato:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3112
+#: ../src/interface/resources/xrc/dialogs.xrc:2746
 msgid "Use &default editor for text files"
 msgstr "Usa programma pre&definito per i file di testo"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2946
+#: ../src/interface/resources/xrc/dialogs.xrc:2688
 #: ../src/interface/sitemanager_dialog.cpp:302
 msgid "Use &synchronized browsing"
 msgstr "Usa navigazione &sincronizzata"
@@ -8655,8 +8651,8 @@ msgstr "Usa navigazione &sincronizzata"
 msgid "Use Regular Expressions"
 msgstr "Usa un'espressione regolare"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1614
-#: ../src/interface/resources/xrc/dialogs.xrc:1637
+#: ../src/interface/resources/xrc/dialogs.xrc:1356
+#: ../src/interface/resources/xrc/dialogs.xrc:1379
 msgid "Use default action"
 msgstr "Usa azione predefinita"
 
@@ -8664,11 +8660,11 @@ msgstr "Usa azione predefinita"
 msgid "Use explicit FTP over TLS if available"
 msgstr "Usa se disponibile FTP esplicito su TLS"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2579
+#: ../src/interface/resources/xrc/dialogs.xrc:2321
 msgid "Use server currently connected to"
 msgstr "Usa il server attualmente connesso"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2585
+#: ../src/interface/resources/xrc/dialogs.xrc:2327
 msgid "Use server from site manager"
 msgstr "Usa server dal Gestore siti"
 
@@ -8707,8 +8703,7 @@ msgstr ""
 "sarà richiesta una connessione in modalità attiva. L'unica informazione che "
 "viene trasmessa è la versione di FileZilla."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:292
-#: ../src/interface/resources/xrc/dialogs.xrc:428
+#: ../src/interface/loginmanager.cpp:97 ../src/interface/loginmanager.cpp:201
 msgid "User:"
 msgstr "Utente:"
 
@@ -8724,7 +8719,7 @@ msgstr ""
 
 #: ../src/interface/sitemanager_site.cpp:63
 msgid "Using insecure HTTP"
-msgstr ""
+msgstr "Usa HTTP non sicuro"
 
 #: ../src/interface/verifycertdialog.cpp:755
 #, c-format
@@ -8733,7 +8728,7 @@ msgstr "L'uso di %s in chiaro non è sicuro."
 
 #: ../src/interface/sitemanager_site.cpp:62
 msgid "Using secure HTTPS"
-msgstr ""
+msgstr "Usa HTTPS sicuro"
 
 #: ../src/interface/sitemanager_site.cpp:274
 msgid ""
@@ -8766,11 +8761,11 @@ msgstr "L'opzione 'visualizza file nascosti' non è supportata dal server"
 msgid "View/Edit"
 msgstr "Visualizza/modifica"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2376
+#: ../src/interface/resources/xrc/dialogs.xrc:2118
 msgid "Visible columns"
 msgstr "Colonne visibili"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:634
+#: ../src/interface/resources/xrc/dialogs.xrc:376
 msgid "W&rite"
 msgstr "S&crittura"
 
@@ -8804,7 +8799,7 @@ msgstr ""
 "Attenzione! In precedenza hai effettuato una connessione a questo server "
 "usando TLS."
 
-#: ../src/interface/netconfwizard.cpp:977
+#: ../src/interface/netconfwizard.cpp:978
 msgid "Warning, ignoring data connection from wrong IP."
 msgstr "Avvertimento, connessione dati da IP sbagliato ignorata."
 
@@ -8823,21 +8818,21 @@ msgstr ""
 "\n"
 "Includere le nightly build?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1135
+#: ../src/interface/resources/xrc/dialogs.xrc:877
 msgid "Warning: Potential security breach!"
 msgstr "Attenzione: Potenziale falla di sicurezza!"
 
 #: ../src/interface/sitemanager_site.cpp:61
 msgid "WebDAV"
-msgstr ""
+msgstr "WebDAV"
 
 #: ../src/engine/server.cpp:39
 msgid "WebDAV using HTTP (insecure)"
-msgstr ""
+msgstr "WebDAV usa HTTP (non sicuro)"
 
 #: ../src/engine/server.cpp:29
 msgid "WebDAV using HTTPS"
-msgstr ""
+msgstr "WebDAV usa HTTPS"
 
 #: ../src/interface/welcome_dialog.cpp:50
 msgid "Welcome to FileZilla"
@@ -8851,7 +8846,7 @@ msgstr "Novità"
 msgid "What's new:"
 msgstr "Novità:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3780
+#: ../src/interface/resources/xrc/dialogs.xrc:3414
 msgid ""
 "When allowing FileZilla to remember passwords, you can reconnect without "
 "having to re-enter a password after restarting FileZilla."
@@ -8876,16 +8871,16 @@ msgstr "Qu&ando avvi una nuova connessione mentre sei già connesso:"
 msgid "Widescreen"
 msgstr "Widescreen"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3775
+#: ../src/interface/resources/xrc/dialogs.xrc:3409
 msgid "Would you like FileZilla to remember passwords?"
 msgstr "Filezilla deve memorizzare la password?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:668
+#: ../src/interface/resources/xrc/dialogs.xrc:410
 msgid "Wr&ite"
 msgstr "Scr&ittura"
 
-#: ../src/interface/netconfwizard.cpp:453
-#: ../src/interface/netconfwizard.cpp:459
+#: ../src/interface/netconfwizard.cpp:454
+#: ../src/interface/netconfwizard.cpp:460
 msgid "Wrong external IP address"
 msgstr "Indirizzo IP esterno non valido"
 
@@ -8893,7 +8888,7 @@ msgstr "Indirizzo IP esterno non valido"
 msgid "Wrong line endings"
 msgstr "Terminazioni di riga non corrette"
 
-#: ../src/interface/loginmanager.cpp:311
+#: ../src/interface/loginmanager.cpp:380
 msgid ""
 "Wrong master password entered, it cannot be used to decrypt the stored "
 "passwords."
@@ -8901,7 +8896,7 @@ msgstr ""
 "Password principale errata. Non può essere usata per decriptare le password "
 "memorizzate."
 
-#: ../src/interface/loginmanager.cpp:111
+#: ../src/interface/loginmanager.cpp:138
 msgid "Wrong master password entered, it cannot be used to decrypt this item."
 msgstr ""
 "Password principale errata. Non può essere usata per decriptare questo "
@@ -8915,7 +8910,7 @@ msgstr "Giallo"
 msgid "Yes"
 msgstr "Sì"
 
-#: ../src/interface/netconfwizard.cpp:782
+#: ../src/interface/netconfwizard.cpp:783
 msgid ""
 "You appear to be using an IPv6-only host. This wizard does not support this "
 "environment."
@@ -8942,7 +8937,7 @@ msgid "You can leave the port field empty to use the default port."
 msgstr ""
 "Potete lasciare vuoto il valore della porta per usare la porta predefinita."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:709
+#: ../src/interface/resources/xrc/dialogs.xrc:451
 msgid ""
 "You can use an x at any position to keep the permission the original files "
 "have."
@@ -8978,7 +8973,7 @@ msgstr "Non puoi caricare i file nella cartella root."
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr "Non è stato inserito un nuovo nome per il file. Sovrascrivere il file?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3534
+#: ../src/interface/resources/xrc/dialogs.xrc:3168
 msgid "You have selected at least one symbolic link."
 msgstr "È necessario selezionare almeno un collegamento simbolico."
 
@@ -9013,7 +9008,7 @@ msgstr "Inserisci il nome di una cartella locale."
 msgid "You have to enter a remote directory."
 msgstr "Devi indicare una cartella remota."
 
-#: ../src/interface/netconfwizard.cpp:161
+#: ../src/interface/netconfwizard.cpp:162
 #: ../src/interface/settings/optionspage_connection_active.cpp:91
 msgid "You have to enter a valid IPv4 address."
 msgstr "Devi inserire un indirizzo IP v4 valido."
@@ -9036,7 +9031,7 @@ msgstr "Inserisci un nome account"
 msgid "You have to specify a user name"
 msgstr "Specificare un nome utente"
 
-#: ../src/interface/netconfwizard.cpp:642
+#: ../src/interface/netconfwizard.cpp:643
 msgid ""
 "You likely have a router or firewall which erroneously modified the "
 "transferred data."
@@ -9047,7 +9042,7 @@ msgstr ""
 msgid "You need to enter a master password."
 msgstr "Devi inserire la password principale."
 
-#: ../src/interface/bookmarks_dialog.cpp:60
+#: ../src/interface/bookmarks_dialog.cpp:63
 msgid "You need to enter a name for the bookmark."
 msgstr "Inserisci il nome per il preferito."
 
@@ -9072,16 +9067,16 @@ msgstr "Inserisci un valore nell'intervallo 1-65535 per la porta proxy"
 msgid "You need to enter a value."
 msgstr "Devi inserire un valore."
 
-#: ../src/interface/bookmarks_dialog.cpp:79
-#: ../src/interface/bookmarks_dialog.cpp:461
+#: ../src/interface/bookmarks_dialog.cpp:82
+#: ../src/interface/bookmarks_dialog.cpp:502
 #: ../src/interface/sitemanager_dialog.cpp:964
 msgid "You need to enter at least one path, empty bookmarks are not supported."
 msgstr ""
 "È necessario inserire almeno un percorso, i preferiti vuoti non sono "
 "supportati."
 
-#: ../src/interface/bookmarks_dialog.cpp:85
-#: ../src/interface/bookmarks_dialog.cpp:467
+#: ../src/interface/bookmarks_dialog.cpp:88
+#: ../src/interface/bookmarks_dialog.cpp:508
 #: ../src/interface/sitemanager_dialog.cpp:971
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
@@ -9098,7 +9093,7 @@ msgstr ""
 "È necessario inserire sia il percorso locale che quello remoto per abilitare "
 "la navigazione sincronizzata per questo sito."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3937
+#: ../src/interface/resources/xrc/dialogs.xrc:3571
 msgid ""
 "You need to grant FileZilla access to the directories you want to download "
 "files into or to upload files from."
@@ -9122,7 +9117,7 @@ msgstr "È necessario specificare un percorso remoto."
 msgid "You need to specify a server."
 msgstr "È necessario specificare il nome di un server."
 
-#: ../src/interface/netconfwizard.cpp:588
+#: ../src/interface/netconfwizard.cpp:589
 msgid ""
 "You should have no problems connecting to other servers, file transfers "
 "should work properly."
@@ -9292,7 +9287,7 @@ msgstr "leggibile per gli altri"
 msgid "world writeable"
 msgstr "scrivibile per gli altri"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:890
+#: ../src/interface/resources/xrc/dialogs.xrc:632
 msgid "wxWidgets:"
 msgstr "wxWidgets:"
 
