@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.44.1 (2019-08-09)
+
+- Fixed a regression introduced in 3.44.0-rc1 breaking support for insecure servers
+
 3.44.0 (2019-08-08)
 
 - Fixed export in context menu of Site Manager to handle multiple selected items
