@@ -258,7 +258,7 @@ int CFtpLogonOpData::ParseResponse()
 					neededCommands[LOGON_PBSZ] = 0;
 					neededCommands[LOGON_PROT] = 0;
 					opState = LOGON_SECURITY;
-					return FZ_REPLY_WOULDBLOCK;
+					return FZ_REPLY_CONTINUE;
 				}
 				else {
 					return FZ_REPLY_DISCONNECTED | (code == 5 ? FZ_REPLY_CRITICALERROR : FZ_REPLY_ERROR);
