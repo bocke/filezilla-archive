@@ -110,7 +110,9 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 	password->SetFocus();
 	inner->Add(password, lay.valign);
 
-	main->Add(new wxCheckBox(&pwdDlg, XRCID("ID_REMEMBER"), _("&Remember master password until FileZilla is closed")));
+	auto* remember = new wxCheckBox(&pwdDlg, -1, _("&Remember master password until FileZilla is closed"));
+	remember->SetValue(true);
+	main->Add(remember);
 
 	auto* buttons = lay.createButtonSizer(&pwdDlg, main, true);
 
@@ -144,7 +146,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 			continue;
 		}
 
-		if (xrc_call(pwdDlg, "ID_REMEMBER", &wxCheckBox::IsChecked)) {
+		if (remember->IsChecked()) {
 			Remember(key);
 		}
 		break;
@@ -247,8 +249,11 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 		}
 	}
 
+	wxCheckBox* remember{};
 	if (canRemember) {
-		main->Add(new wxCheckBox(&pwdDlg, XRCID("ID_REMEMBER"), _("&Remember password until FileZilla is closed")));
+		remember = new wxCheckBox(&pwdDlg, -1, _("&Remember password until FileZilla is closed"));
+		remember->SetValue(true);
+		main->Add(remember);
 	}
 
 	auto* buttons = lay.createButtonSizer(&pwdDlg, main, true);
@@ -297,7 +302,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 			site.credentials.SetPass(pass);
 		}
 
-		if (canRemember && xrc_call(pwdDlg, "ID_REMEMBER", &wxCheckBox::IsChecked)) {
+		if (remember && remember->IsChecked()) {
 			RememberPassword(site, challenge);
 		}
 		break;
