@@ -759,13 +759,30 @@ void CFileZillaApp::ShowStartupProfile()
 	if (m_profile_start && m_pCommandLine && m_pCommandLine->HasSwitch(CCommandLine::debug_startup)) {
 		AddStartupProfileRecord("CFileZillaApp::ShowStartupProfile");
 		wxString msg = _T("Profile:\n");
+
+		size_t const max_digits = fz::to_string((m_startupProfile.back().first - m_profile_start).get_milliseconds()).size();
+		
+		int64_t prev{};
 		for (auto const& p : m_startupProfile) {
 			auto const diff = p.first - m_profile_start;
+			auto absolute = std::to_wstring(diff.get_milliseconds());
+			if (absolute.size() < max_digits) {
+				msg.append(max_digits - absolute.size(), wchar_t(0x2007)); // FIGURE SPACE
+			}
+			msg += absolute;
+			msg += L" ";
 
-			msg += std::to_wstring(diff.get_milliseconds());
-			msg += _T(" ");
+			auto relative = std::to_wstring(diff.get_milliseconds() - prev);
+			if (relative.size() < max_digits) {
+				msg.append(max_digits - relative.size(), wchar_t(0x2007)); // FIGURE SPACE
+			}
+			msg += relative;
+			msg += L" ";
+
 			msg += fz::to_wstring(p.second);
-			msg += _T("\n");
+			msg += L"\n";
+
+			prev = diff.get_milliseconds();
 		}
 		wxMessageBoxEx(msg);
 	}
