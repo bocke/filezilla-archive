@@ -34,9 +34,9 @@ enum class loginCommandType
 
 struct t_loginCommand
 {
-	bool optional;
-	bool hide_arguments;
-	loginCommandType type;
+	bool optional{};
+	bool hide_arguments{};
+	loginCommandType type{};
 
 	std::wstring command;
 };
@@ -66,7 +66,7 @@ private:
 
 	unsigned int customCommandIndex{};
 
-	int neededCommands[LOGON_DONE];
+	int neededCommands[LOGON_DONE]{};
 
 	std::deque<t_loginCommand> loginSequence;
 
