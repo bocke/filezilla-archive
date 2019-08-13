@@ -1,8 +1,6 @@
 #include <filezilla.h>
 #include "treectrlex.h"
 
-IMPLEMENT_DYNAMIC_CLASS(wxTreeCtrlEx, wxNavigationEnabled<wxTreeCtrl>)
-
 #ifdef __WXMAC__
 BEGIN_EVENT_TABLE(wxTreeCtrlEx, wxNavigationEnabled<wxTreeCtrl>)
 EVT_CHAR(wxTreeCtrlEx::OnChar)
@@ -59,6 +57,9 @@ std::vector<wxTreeItemId> wxTreeCtrlEx::GetSelections() const
 	//
 	// Traverse the tree ourselves, in a nice, deterministic depth-first approach.
 	wxTreeItemId item = GetRootItem();
+	if (item && HasFlag(wxTR_HIDE_ROOT)) {
+		item = GetNextItemSimple(item, true);
+	}
 	while (item) {
 		if (IsSelected(item)) {
 			ret.push_back(item);
@@ -179,6 +180,9 @@ wxTreeItemId wxTreeCtrlEx::GetNextItemSimple(wxTreeItemId const& item, bool incl
 		while (!next.IsOk() && cur.IsOk()) {
 			cur = GetItemParent(cur);
 			if (cur.IsOk()) {
+				if (HasFlag(wxTR_HIDE_ROOT) && cur == GetRootItem()) {
+					break;
+				}
 				next = GetNextSibling(cur);
 			}
 		}
