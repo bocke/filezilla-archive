@@ -24,7 +24,6 @@
 #include <wx/xrc/xh_stlin.h>
 #include <wx/xrc/xh_sttxt.h>
 #include "xh_text_ex.h"
-#include <wx/xrc/xh_tree.h>
 #include <wx/xrc/xh_hyperlink.h>
 
 #include <unordered_set>
@@ -45,7 +44,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxStaticLineXmlHandler);
 	res.AddHandler(new wxBitmapButtonXmlHandler);
 	res.AddHandler(new wxStaticBitmapXmlHandler);
-	res.AddHandler(new wxTreeCtrlXmlHandler);
 	res.AddHandler(new wxListCtrlXmlHandler);
 	res.AddHandler(new wxCheckListBoxXmlHandler);
 	res.AddHandler(new wxSpinCtrlXmlHandler);
