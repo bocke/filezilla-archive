@@ -46,10 +46,13 @@ void CFtpControlSocket::OnReceive()
 {
 	log(logmsg::debug_verbose, L"CFtpControlSocket::OnReceive()");
 
+	size_t const max = 65536;
+
 	for (;;) {
 		int error;
-		int read = active_layer_->read(m_receiveBuffer + m_bufferLen, RECVBUFFERSIZE - m_bufferLen, error);
 
+		size_t const toRead = max - receiveBuffer_.size();
+		int read = active_layer_->read(receiveBuffer_.get(toRead), toRead, error);
 		if (read < 0) {
 			if (error != EAGAIN) {
 				log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
@@ -68,38 +71,40 @@ void CFtpControlSocket::OnReceive()
 			return;
 		}
 
+		size_t i = receiveBuffer_.size();
+		receiveBuffer_.add(read);
+
 		SetActive(CFileZillaEngine::recv);
 
-		char* start = m_receiveBuffer;
-		m_bufferLen += read;
-
-		for (int i = start - m_receiveBuffer; i < m_bufferLen; ++i) {
-			char const& p = m_receiveBuffer[i];
+		while (i < receiveBuffer_.size()) {
+			auto const& p = receiveBuffer_[i];
 			if (p == '\r' ||
 				p == '\n' ||
 				p == 0)
 			{
-				int len = i - (start - m_receiveBuffer);
-				if (!len) {
-					++start;
-					continue;
+				if (!i) {
+					receiveBuffer_.consume(1);
 				}
+				else {
+					std::wstring line = ConvToLocal(reinterpret_cast<char const*>(receiveBuffer_.get()), i);
+					receiveBuffer_.consume(i + 1);
+					i = 0;
 
-				std::wstring line = ConvToLocal(start, i - (start - m_receiveBuffer));
-				start = m_receiveBuffer + i + 1;
+					ParseLine(line);
 
-				ParseLine(line);
-
-				// Abort if connection got closed
-				if (!currentServer_) {
-					return;
+					// Abort if connection got closed
+					if (!currentServer_) {
+						return;
+					}
 				}
 			}
+			else {
+				++i;
+			}
 		}
-		memmove(m_receiveBuffer, start, m_bufferLen - (start - m_receiveBuffer));
-		m_bufferLen -= (start -m_receiveBuffer);
-		if (m_bufferLen > MAXLINELEN) {
-			m_bufferLen = MAXLINELEN;
+		if (receiveBuffer_.size() == max) {
+			log(fz::logmsg::error, _("Received too long response line from server, closing connection."));
+			DoClose();
 		}
 	}
 }
@@ -209,7 +214,7 @@ void CFtpControlSocket::ParseResponse()
 
 	if (m_Response[0] != '1') {
 		if (m_pendingReplies > 0) {
-			m_pendingReplies--;
+			--m_pendingReplies;
 		}
 		else {
 			log(logmsg::debug_warning, L"Unexpected reply, no reply was pending.");
@@ -843,6 +848,7 @@ void CFtpControlSocket::operator()(fz::event_base const& ev)
 
 void CFtpControlSocket::ResetSocket()
 {
+	receiveBuffer_.clear();
 	tls_layer_.reset();
 	CRealControlSocket::ResetSocket();
 }
