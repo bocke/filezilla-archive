@@ -57,15 +57,17 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 
 	auto & lay = layout();
 	auto * main = lay.createMain(this, 2);
+	main->AddGrowableRow(0);
 
 	auto* left = lay.createFlex(1);
-	main->Add(left);
+	left->AddGrowableRow(1);
+	main->Add(left, 1, wxGROW);
 
 	left->Add(new wxStaticText(this, -1, _("Select &page:")));
 
 	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT | wxTR_HIDE_ROOT);
 	tree_->SetFocus();
-	left->Add(tree_, lay.grow);
+	left->Add(tree_, 1, wxGROW);
 
 	auto ok = new wxButton(this, wxID_OK, _("OK"));
 	ok->SetDefault();
