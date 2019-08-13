@@ -13,9 +13,6 @@ auto const cwd = Command::private1;
 auto const rawtransfer = Command::private2;
 }
 
-#define RECVBUFFERSIZE 4096
-#define MAXLINELEN 2000
-
 class CTransferSocket;
 class CFtpTransferOpData;
 class CFtpRawTransferOpData;
@@ -91,8 +88,7 @@ protected:
 	// So we always sent a REST 0 for a normal transfer following a restarted one
 	bool m_sentRestartOffset{};
 
-	char m_receiveBuffer[RECVBUFFERSIZE];
-	int m_bufferLen{};
+	fz::buffer receiveBuffer_;
 	int m_repliesToSkip{}; // Set to the amount of pending replies if cancelling an action
 
 	int m_pendingReplies{1};
