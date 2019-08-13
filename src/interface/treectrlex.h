@@ -6,8 +6,6 @@
 
 class wxTreeCtrlEx : public wxNavigationEnabled<wxTreeCtrl>
 {
-	DECLARE_DYNAMIC_CLASS(wxTreeCtrlEx)
-
 public:
 	typedef wxTreeItemId Item;
 
