@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-08-08 08:41+0200\n"
+"POT-Creation-Date: 2019-08-14 14:26+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Pgase <pgase.filezilla@free.fr>\n"
 "Language-Team: Pgase, William GATHOYE <pgase.filezilla@free.fr, "
@@ -26,7 +26,7 @@ msgstr "%H:%M:%S écoulée(s)"
 msgid "%H:%M:%S left"
 msgstr "%H:%M:%S restante(s)"
 
-#: ../src/interface/resources/xrc/settings.xrc:525
+#: ../src/interface/resources/xrc/settings.xrc:469
 #, c-format
 msgid ""
 "%a - Account (Lines containing this will be omitted if not using Account "
@@ -83,7 +83,7 @@ msgid_plural "%d seconds"
 msgstr[0] "%d seconde"
 msgstr[1] "%d secondes"
 
-#: ../src/interface/resources/xrc/settings.xrc:502
+#: ../src/interface/resources/xrc/settings.xrc:446
 msgid "%h - Host"
 msgstr "%h - Hôte"
 
@@ -101,7 +101,7 @@ msgid_plural "%llu files"
 msgstr[0] "%llu fichier"
 msgstr[1] "%llu fichiers"
 
-#: ../src/interface/resources/xrc/settings.xrc:518
+#: ../src/interface/resources/xrc/settings.xrc:462
 #, c-format
 msgid "%p - Password"
 msgstr "%p - Mot de passe"
@@ -126,7 +126,7 @@ msgstr "%s - Certificat expiré !"
 msgid "%s - Not yet valid!"
 msgstr "%s - Pas encore valide !"
 
-#: ../src/interface/resources/xrc/settings.xrc:533
+#: ../src/interface/resources/xrc/settings.xrc:477
 #, c-format
 msgid "%s - Proxy user"
 msgstr "%s - Identifiant Proxy"
@@ -175,12 +175,12 @@ msgstr "%s avec %d bits"
 msgid "%s:%d - Hostname does not match certificate"
 msgstr "%s:%d - Le nom d'hôte ne correspond pas au certificat"
 
-#: ../src/interface/resources/xrc/settings.xrc:510
+#: ../src/interface/resources/xrc/settings.xrc:454
 #, c-format
 msgid "%u - Username"
 msgstr "%u - Identifiant"
 
-#: ../src/interface/resources/xrc/settings.xrc:541
+#: ../src/interface/resources/xrc/settings.xrc:485
 msgid "%w - Proxy password"
 msgstr "%w - Mot de passe Proxy"
 
@@ -213,7 +213,7 @@ msgid "&Account:"
 msgstr "C&ompte :"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:80
-#: ../src/interface/resources/xrc/settings.xrc:209
+#: ../src/interface/resources/xrc/settings.xrc:153
 #: ../src/interface/sitemanager_site.cpp:246
 msgid "&Active"
 msgstr "&Actif"
@@ -231,7 +231,7 @@ msgstr "&Ajouter un dossier..."
 msgid "&Add files to queue"
 msgstr "&Ajouter les fichiers à la file d'attente"
 
-#: ../src/interface/resources/xrc/settings.xrc:646
+#: ../src/interface/resources/xrc/settings.xrc:590
 msgid "&Add key file..."
 msgstr "&Ajouter un fichier de clé..."
 
@@ -258,7 +258,7 @@ msgstr ""
 msgid "&Always trust this host, add this key to the cache"
 msgstr "Toujours f&aire confiance à cet hôte, ajouter cette clé au cache"
 
-#: ../src/interface/resources/xrc/settings.xrc:1816
+#: ../src/interface/resources/xrc/settings.xrc:1760
 msgid "&Always use default editor"
 msgstr "Toujours utiliser l'éditeur p&ar défaut"
 
@@ -272,11 +272,11 @@ msgstr ""
 msgid "&Always use this action"
 msgstr "Toujours effectuer cette &action"
 
-#: ../src/interface/resources/xrc/settings.xrc:342
+#: ../src/interface/resources/xrc/settings.xrc:286
 msgid "&Ask your operating system for the external IP address"
 msgstr "L&aisser le système d'exploitation identifier l'adresse IP externe"
 
-#: ../src/interface/resources/xrc/settings.xrc:1055
+#: ../src/interface/resources/xrc/settings.xrc:999
 #: ../src/interface/menu_bar.cpp:118 ../src/interface/statusbar.cpp:563
 msgid "&Auto"
 msgstr "&Automatique"
@@ -289,12 +289,12 @@ msgstr "Détection &automatique"
 msgid "&Background color:"
 msgstr "Couleu&r de fond :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1070
+#: ../src/interface/resources/xrc/settings.xrc:1014
 #: ../src/interface/menu_bar.cpp:120 ../src/interface/statusbar.cpp:565
 msgid "&Binary"
 msgstr "&Binaire"
 
-#: ../src/interface/resources/xrc/settings.xrc:1479
+#: ../src/interface/resources/xrc/settings.xrc:1423
 msgid "&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"
 msgstr ""
 "Préfixes &binaires du Système International (SI) (ex. 1 Ko = 1024 octets)"
@@ -307,22 +307,22 @@ msgstr "Fa&voris"
 #: ../src/interface/resources/xrc/dialogs.xrc:2660
 #: ../src/interface/resources/xrc/dialogs.xrc:2778
 #: ../src/interface/resources/xrc/dialogs.xrc:2991
-#: ../src/interface/resources/xrc/settings.xrc:1788
-#: ../src/interface/resources/xrc/settings.xrc:2003
+#: ../src/interface/resources/xrc/settings.xrc:1732
+#: ../src/interface/resources/xrc/settings.xrc:1947
 #: ../src/interface/sitemanager_dialog.cpp:297
 #: ../src/interface/sitemanager_site.cpp:214
 msgid "&Browse..."
 msgstr "P&arcourir..."
 
-#: ../src/interface/resources/xrc/settings.xrc:956
+#: ../src/interface/resources/xrc/settings.xrc:900
 msgid "&Burst tolerance:"
 msgstr "&Tolérance de dépassement :"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:969
 #: ../src/interface/resources/xrc/dialogs.xrc:3387
 #: ../src/interface/resources/xrc/dialogs.xrc:3489
-#: ../src/interface/resources/xrc/settings.xrc:35
 #: ../src/interface/inputdialog.cpp:33
+#: ../src/interface/settings/settingsdialog.cpp:75
 #: ../src/interface/verifycertdialog.cpp:780
 msgid "&Cancel"
 msgstr "Ann&uler"
@@ -379,11 +379,11 @@ msgstr "Ouvrir un nouvel ongle&t"
 msgid "&Debug"
 msgstr "&Débogage"
 
-#: ../src/interface/resources/xrc/settings.xrc:2092
+#: ../src/interface/resources/xrc/settings.xrc:2036
 msgid "&Debug information in message log:"
 msgstr "Niveau de &débogage du journal des événements :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1758
+#: ../src/interface/resources/xrc/settings.xrc:1702
 msgid "&Default editor:"
 msgstr "Éditeur par &défaut :"
 
@@ -391,7 +391,7 @@ msgstr "Éditeur par &défaut :"
 msgid "&Default file exists action..."
 msgstr "Action par &défaut sur les fichiers existants..."
 
-#: ../src/interface/resources/xrc/settings.xrc:156
+#: ../src/interface/resources/xrc/settings.xrc:100
 msgid "&Delay between failed login attempts:"
 msgstr "&Délai entre chaque tentative :"
 
@@ -443,7 +443,7 @@ msgstr "&Déconnexion"
 msgid "&Display momentary transfer speed instead of average speed"
 msgstr "&Afficher temporairement le taux de transfert à la place du taux moyen"
 
-#: ../src/interface/resources/xrc/settings.xrc:1466
+#: ../src/interface/resources/xrc/settings.xrc:1410
 msgid "&Display size in bytes"
 msgstr "&Afficher la taille en octets"
 
@@ -451,11 +451,11 @@ msgstr "&Afficher la taille en octets"
 msgid "&Don't show this dialog again."
 msgstr "Ne plus afficher ce &dialogue."
 
-#: ../src/interface/resources/xrc/settings.xrc:390
+#: ../src/interface/resources/xrc/settings.xrc:334
 msgid "&Don't use external IP address on local connections."
 msgstr "Ne pas utiliser l'a&dresse IP externe pour les connexions locales."
 
-#: ../src/interface/resources/xrc/settings.xrc:1673
+#: ../src/interface/resources/xrc/settings.xrc:1617
 msgid "&Double-click action on files:"
 msgstr "Action du &double-clic sur les fichiers :"
 
@@ -473,7 +473,7 @@ msgid "&Download..."
 msgstr "&Télécharger..."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1349
-#: ../src/interface/resources/xrc/settings.xrc:1180
+#: ../src/interface/resources/xrc/settings.xrc:1124
 msgid "&Downloads:"
 msgstr "&Téléchargements :"
 
@@ -490,12 +490,12 @@ msgstr "Éditer l&es règles de filtrage..."
 msgid "&Enable"
 msgstr "Activ&er"
 
-#: ../src/interface/resources/xrc/settings.xrc:688
+#: ../src/interface/resources/xrc/settings.xrc:632
 msgid "&Enable compression"
 msgstr "&Activer la compression"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:3315
-#: ../src/interface/resources/xrc/settings.xrc:897
+#: ../src/interface/resources/xrc/settings.xrc:841
 msgid "&Enable speed limits"
 msgstr "&Activer la limitation des taux de transfert"
 
@@ -528,7 +528,7 @@ msgstr "&Exporter les entrées du Gestionnaire de Sites"
 msgid "&Export..."
 msgstr "&Exporter les paramètres..."
 
-#: ../src/interface/resources/xrc/settings.xrc:427
+#: ../src/interface/resources/xrc/settings.xrc:371
 msgid "&Fall back to active mode"
 msgstr "Retour en mode acti&f"
 
@@ -588,7 +588,7 @@ msgstr ""
 msgid "&Follow symlink, delete target directory contents"
 msgstr "Sui&vre le lien symbolique, supprimer le contenu du dossier cible"
 
-#: ../src/interface/resources/xrc/settings.xrc:368
+#: ../src/interface/resources/xrc/settings.xrc:312
 msgid "&Get external IP address from the following URL:"
 msgstr "Obtenir l'adresse IP e&xterne à partir de l'URL suivante :"
 
@@ -600,7 +600,7 @@ msgstr "&Obtenir de l'aide..."
 msgid "&Global bookmark"
 msgstr "Favori &global"
 
-#: ../src/interface/resources/xrc/settings.xrc:725
+#: ../src/interface/resources/xrc/settings.xrc:669
 msgid "&HTTP/1.1 using CONNECT method"
 msgstr "&HTTP/1.1 utilisant la méthode CONNECT"
 
@@ -616,7 +616,7 @@ msgstr "Masquer les fic&hiers identiques"
 msgid "&Highest"
 msgstr "&La plus élevée"
 
-#: ../src/interface/resources/xrc/settings.xrc:306
+#: ../src/interface/resources/xrc/settings.xrc:250
 msgid "&Highest available port:"
 msgstr "&Port le plus élevé disponible :"
 
@@ -627,13 +627,13 @@ msgstr "&Port le plus élevé disponible :"
 msgid "&Host:"
 msgstr "&Hôte :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1474
+#: ../src/interface/resources/xrc/settings.xrc:1418
 msgid "&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"
 msgstr ""
 "Préfixes binaires de la Commission Electrotechnique &Internationale (IEC) "
 "(ex. 1 Kio = 1024 octets)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1360
+#: ../src/interface/resources/xrc/settings.xrc:1304
 msgid "&ISO 8601 (example: 2007-09-15)"
 msgstr "&ISO 8601 (exemple : 2007-09-15)"
 
@@ -641,7 +641,7 @@ msgstr "&ISO 8601 (exemple : 2007-09-15)"
 msgid "&Import..."
 msgstr "&Importer les paramètres..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1849
+#: ../src/interface/resources/xrc/settings.xrc:1793
 msgid "&Inherit system's filetype associations"
 msgstr ""
 "Ut&iliser les préférences d'associations par type de fichier du système"
@@ -668,7 +668,7 @@ msgstr "&Fichier de clé :"
 msgid "&Layout of file and directory panes:"
 msgstr "&Disposition des arborescences des fichiers et dossiers :"
 
-#: ../src/interface/resources/xrc/settings.xrc:269
+#: ../src/interface/resources/xrc/settings.xrc:213
 msgid "&Limit local ports used by FileZilla"
 msgstr "&Limiter les ports locaux utilisés par FileZilla"
 
@@ -689,7 +689,7 @@ msgstr "Dossier &local :"
 msgid "&Local search"
 msgstr "&Recherche locale"
 
-#: ../src/interface/resources/xrc/settings.xrc:1980
+#: ../src/interface/resources/xrc/settings.xrc:1924
 msgid "&Log to file"
 msgstr "Sauvegarder &le journal des événements dans un fichier"
 
@@ -717,7 +717,7 @@ msgstr "Transfert &manuel..."
 msgid "&Maximum number of connections:"
 msgstr "Nombre &maximum de connexions :"
 
-#: ../src/interface/resources/xrc/settings.xrc:138
+#: ../src/interface/resources/xrc/settings.xrc:82
 msgid "&Maximum number of retries:"
 msgstr "Nombre &maximum d'essais :"
 
@@ -729,7 +729,7 @@ msgstr "Journal des événe&ments"
 msgid "&Minimize to tray"
 msgstr "&Minimiser dans la zone de notification"
 
-#: ../src/interface/resources/xrc/settings.xrc:1600
+#: ../src/interface/resources/xrc/settings.xrc:1544
 msgid "&Name sorting mode:"
 msgstr "&Nom de la méthode de tri :"
 
@@ -762,8 +762,8 @@ msgstr "&Suivant >"
 msgid "&No"
 msgstr "&Non"
 
-#: ../src/interface/resources/xrc/settings.xrc:459
-#: ../src/interface/resources/xrc/settings.xrc:720
+#: ../src/interface/resources/xrc/settings.xrc:403
+#: ../src/interface/resources/xrc/settings.xrc:664
 #: ../src/interface/QueueView.cpp:1832
 msgid "&None"
 msgstr "Aucu&ne"
@@ -777,14 +777,14 @@ msgid "&Numeric value:"
 msgstr "Valeur &numérique :"
 
 #: ../src/interface/bookmarks_dialog.cpp:279
-#: ../src/interface/inputdialog.cpp:29 ../src/interface/loginmanager.cpp:117
-#: ../src/interface/loginmanager.cpp:256
+#: ../src/interface/inputdialog.cpp:29 ../src/interface/loginmanager.cpp:119
+#: ../src/interface/loginmanager.cpp:261
 #: ../src/interface/sitemanager_dialog.cpp:366
 #: ../src/interface/verifycertdialog.cpp:773
 msgid "&OK"
 msgstr "O&K"
 
-#: ../src/interface/resources/xrc/settings.xrc:474
+#: ../src/interface/resources/xrc/settings.xrc:418
 msgid "&OPEN"
 msgstr "OU&VERT"
 
@@ -801,7 +801,7 @@ msgstr "&Remplacer"
 msgid "&Passive"
 msgstr "&Passif"
 
-#: ../src/interface/loginmanager.cpp:234
+#: ../src/interface/loginmanager.cpp:236
 msgid "&Password:"
 msgstr "Mot de &passe :"
 
@@ -855,7 +855,7 @@ msgstr "Actualise&r"
 msgid "&Remember master password until FileZilla is closed"
 msgstr "Mémorise&r le mot de passe principal jusqu'à la fermeture de FileZilla"
 
-#: ../src/interface/loginmanager.cpp:251
+#: ../src/interface/loginmanager.cpp:254
 msgid "&Remember password until FileZilla is closed"
 msgstr "Mémorise&r le mot de passe jusqu'à la fermeture de FileZilla"
 
@@ -872,11 +872,11 @@ msgstr "&Chemin distant :"
 msgid "&Remote search"
 msgstr "&Recherche distante"
 
-#: ../src/interface/resources/xrc/settings.xrc:1118
+#: ../src/interface/resources/xrc/settings.xrc:1062
 msgid "&Remove"
 msgstr "&Retirer"
 
-#: ../src/interface/resources/xrc/settings.xrc:651
+#: ../src/interface/resources/xrc/settings.xrc:595
 msgid "&Remove key"
 msgstr "&Retirer la clé"
 
@@ -903,7 +903,7 @@ msgstr "&Renommer..."
 msgid "&Reopen local file"
 msgstr "Ouvri&r à nouveau le fichier local"
 
-#: ../src/interface/resources/xrc/settings.xrc:1000
+#: ../src/interface/resources/xrc/settings.xrc:944
 msgid "&Replace invalid characters with:"
 msgstr "Rempla&cer les caractères invalides par :"
 
@@ -931,19 +931,19 @@ msgstr "&Reprendre"
 msgid "&Run command..."
 msgstr "Exécute&r une commande..."
 
-#: ../src/interface/resources/xrc/settings.xrc:77
+#: ../src/interface/resources/xrc/settings.xrc:21
 msgid "&Run configuration wizard now..."
 msgstr "Utilise&r l'assistant de configuration..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1942
+#: ../src/interface/resources/xrc/settings.xrc:1886
 msgid "&Run update check now..."
 msgstr "&Rechercher des mises à jour..."
 
-#: ../src/interface/resources/xrc/settings.xrc:469
+#: ../src/interface/resources/xrc/settings.xrc:413
 msgid "&SITE"
 msgstr "&SITE"
 
-#: ../src/interface/resources/xrc/settings.xrc:735
+#: ../src/interface/resources/xrc/settings.xrc:679
 msgid "&SOCKS 5"
 msgstr "&SOCKS 5"
 
@@ -967,7 +967,7 @@ msgstr "&Selectionnez une clé :"
 msgid "&Select entry:"
 msgstr "&Selectionnez une entrée :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1725
+#: ../src/interface/resources/xrc/settings.xrc:1669
 msgid "&Select language:"
 msgstr "&Sélectionnez une langue :"
 
@@ -988,7 +988,7 @@ msgstr "Paramètre&s"
 msgid "&Settings..."
 msgstr "Paramètre&s..."
 
-#: ../src/interface/resources/xrc/settings.xrc:2081
+#: ../src/interface/resources/xrc/settings.xrc:2025
 msgid "&Show debug menu"
 msgstr "&Afficher le menu de débogage"
 
@@ -996,7 +996,7 @@ msgstr "&Afficher le menu de débogage"
 msgid "&Show detailed log"
 msgstr "Afficher les détail&s du journal"
 
-#: ../src/interface/resources/xrc/settings.xrc:1975
+#: ../src/interface/resources/xrc/settings.xrc:1919
 msgid "&Show timestamps in message log"
 msgstr "Afficher l'horodatage dan&s le journal des événements"
 
@@ -1037,7 +1037,7 @@ msgstr "Chiffrement &TLS"
 msgid "&Test"
 msgstr "&Tester"
 
-#: ../src/interface/resources/xrc/settings.xrc:1278
+#: ../src/interface/resources/xrc/settings.xrc:1222
 msgid "&Theme:"
 msgstr "&Thème :"
 
@@ -1054,7 +1054,7 @@ msgstr "Mode de &transfert :"
 msgid "&Transfer queue"
 msgstr "File d'a&ttente"
 
-#: ../src/interface/resources/xrc/settings.xrc:1142
+#: ../src/interface/resources/xrc/settings.xrc:1086
 msgid "&Treat dotfiles as ASCII files"
 msgstr ""
 "&Traiter les fichiers dont le nom commence par un point comme des fichiers "
@@ -1087,7 +1087,7 @@ msgid "&Upload..."
 msgstr "&Envoyer..."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1372
-#: ../src/interface/resources/xrc/settings.xrc:1201
+#: ../src/interface/resources/xrc/settings.xrc:1145
 msgid "&Uploads:"
 msgstr "&Envois :"
 
@@ -1099,24 +1099,24 @@ msgstr "&Utiliser un programme personnalisé"
 msgid "&Use synchronized browsing"
 msgstr "Utiliser la navi&gation synchronisée"
 
-#: ../src/interface/resources/xrc/settings.xrc:1769
+#: ../src/interface/resources/xrc/settings.xrc:1713
 msgid "&Use system's default editor for text files"
 msgstr "&Utiliser l'éditeur par défaut du système pour les fichiers texte"
 
-#: ../src/interface/resources/xrc/settings.xrc:348
+#: ../src/interface/resources/xrc/settings.xrc:292
 msgid "&Use the following IP address:"
 msgstr "&Utiliser l'adresse IP suivante :"
 
-#: ../src/interface/resources/xrc/settings.xrc:421
+#: ../src/interface/resources/xrc/settings.xrc:365
 msgid "&Use the server's external IP address instead"
 msgstr "&Utiliser l'adresse IP externe des serveurs à la place"
 
-#: ../src/interface/resources/xrc/settings.xrc:1489
+#: ../src/interface/resources/xrc/settings.xrc:1433
 msgid "&Use thousands separator"
 msgstr "&Utiliser un séparateur pour distinguer les milliers"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2451
-#: ../src/interface/loginmanager.cpp:225
+#: ../src/interface/loginmanager.cpp:227
 #: ../src/interface/sitemanager_site.cpp:141
 #: ../src/interface/sitemanager_site.cpp:547
 #: ../src/interface/sitemanager_site.cpp:630
@@ -1140,13 +1140,13 @@ msgstr "&Affichage"
 msgid "&View/Edit"
 msgstr "A&fficher / Éditer"
 
-#: ../src/interface/resources/xrc/settings.xrc:1826
+#: ../src/interface/resources/xrc/settings.xrc:1770
 msgid "&Watch locally edited files and prompt to upload modifications"
 msgstr ""
 "&Afficher les fichiers édités localement et inviter à envoyer les "
 "modifications"
 
-#: ../src/interface/resources/xrc/settings.xrc:1918
+#: ../src/interface/resources/xrc/settings.xrc:1862
 msgid "&When checking for updates, check for:"
 msgstr "Lors de la recherche des mises à jour, vérifier les :"
 
@@ -1222,24 +1222,24 @@ msgstr[1] "(%d objets filtrés)"
 msgid "(%u%% downloaded)"
 msgstr "(%u%% téléchargé)"
 
-#: ../src/interface/resources/xrc/settings.xrc:859
-#: ../src/interface/resources/xrc/settings.xrc:880
+#: ../src/interface/resources/xrc/settings.xrc:803
+#: ../src/interface/resources/xrc/settings.xrc:824
 msgid "(0 for no limit)"
 msgstr "(0 pour aucune limite)"
 
-#: ../src/interface/resources/xrc/settings.xrc:150
+#: ../src/interface/resources/xrc/settings.xrc:94
 msgid "(0-99)"
 msgstr "(0-99)"
 
-#: ../src/interface/resources/xrc/settings.xrc:168
+#: ../src/interface/resources/xrc/settings.xrc:112
 msgid "(0-999 seconds)"
 msgstr "(0-999 secondes)"
 
-#: ../src/interface/resources/xrc/settings.xrc:838
+#: ../src/interface/resources/xrc/settings.xrc:782
 msgid "(1-10)"
 msgstr "(1-10)"
 
-#: ../src/interface/resources/xrc/settings.xrc:110
+#: ../src/interface/resources/xrc/settings.xrc:54
 msgid "(10-9999, 0 to disable)"
 msgstr "(10-9999, 0 pour désactiver)"
 
@@ -1248,18 +1248,18 @@ msgstr "(10-9999, 0 pour désactiver)"
 msgid "(app-compat is set to %d.%d)"
 msgstr "(app-compat est défini sur %d.%d)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1427
+#: ../src/interface/resources/xrc/settings.xrc:1371
 msgid "(example: %H:%M)"
 msgstr "(exemple : %H:%M)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1378
+#: ../src/interface/resources/xrc/settings.xrc:1322
 msgid "(example: %Y-%m-%d)"
 msgstr "(exemple : %Y-%m-%d)"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:3334
 #: ../src/interface/resources/xrc/dialogs.xrc:3351
-#: ../src/interface/resources/xrc/settings.xrc:920
-#: ../src/interface/resources/xrc/settings.xrc:945
+#: ../src/interface/resources/xrc/settings.xrc:864
+#: ../src/interface/resources/xrc/settings.xrc:889
 #, c-format
 msgid "(in %s/s)"
 msgstr "(en %s/s)"
@@ -1288,19 +1288,19 @@ msgstr "-s et -c ne peuvent pas être présents en même temps."
 msgid "-s cannot be used together with an FTP URL."
 msgstr "-s ne peut pas être utilisé conjointement avec une URL FTP."
 
-#: ../src/interface/resources/xrc/settings.xrc:2102
+#: ../src/interface/resources/xrc/settings.xrc:2046
 msgid "0 - None"
 msgstr "0 - Aucun"
 
-#: ../src/interface/resources/xrc/settings.xrc:2103
+#: ../src/interface/resources/xrc/settings.xrc:2047
 msgid "1 - Warning"
 msgstr "1 - Alarmer"
 
-#: ../src/interface/resources/xrc/settings.xrc:2104
+#: ../src/interface/resources/xrc/settings.xrc:2048
 msgid "2 - Info"
 msgstr "2 - Informer"
 
-#: ../src/interface/resources/xrc/settings.xrc:2105
+#: ../src/interface/resources/xrc/settings.xrc:2049
 msgid "3 - Verbose"
 msgstr "3 - Détailler"
 
@@ -1308,7 +1308,7 @@ msgstr "3 - Détailler"
 msgid "32-bit system"
 msgstr "Système 32 bits"
 
-#: ../src/interface/resources/xrc/settings.xrc:2106
+#: ../src/interface/resources/xrc/settings.xrc:2050
 msgid "4 - Debug"
 msgstr "4 - Déboguer"
 
@@ -1396,7 +1396,7 @@ msgstr ""
 "certains serveurs cachent des fichiers à l'utilisateur. Utilisez cette "
 "option pour forcer le serveur à afficher tous les fichiers."
 
-#: ../src/interface/resources/xrc/settings.xrc:246
+#: ../src/interface/resources/xrc/settings.xrc:190
 msgid ""
 "A proper server does not require this. Contact the server administrator if "
 "you need this."
@@ -1413,16 +1413,16 @@ msgstr ""
 "synchronisée est activée.\n"
 "Désactiver la navigation synchronisée et continuer le changement de dossier ?"
 
-#: ../src/interface/resources/xrc/settings.xrc:1063
+#: ../src/interface/resources/xrc/settings.xrc:1007
 #: ../src/interface/menu_bar.cpp:119 ../src/interface/statusbar.cpp:564
 msgid "A&SCII"
 msgstr "A&SCII"
 
-#: ../src/interface/resources/xrc/settings.xrc:1111
+#: ../src/interface/resources/xrc/settings.xrc:1055
 msgid "A&dd"
 msgstr "&Ajouter"
 
-#: ../src/interface/resources/xrc/settings.xrc:1248
+#: ../src/interface/resources/xrc/settings.xrc:1192
 msgid "A&llow resume of ASCII files"
 msgstr "Autoriser &la reprise du transfert des fichiers ASCII"
 
@@ -1491,7 +1491,7 @@ msgstr "Action à exécuter :"
 msgid "Action:"
 msgstr "Action :"
 
-#: ../src/interface/settings/settingsdialog.cpp:98
+#: ../src/interface/settings/settingsdialog.cpp:120
 msgid "Active mode"
 msgstr "Mode actif"
 
@@ -1521,7 +1521,7 @@ msgstr ""
 "correcte, mais votre routeur ou pare-feu a modifié de manière erronée "
 "l'adresse envoyée."
 
-#: ../src/interface/resources/xrc/settings.xrc:399
+#: ../src/interface/resources/xrc/settings.xrc:343
 msgid "Active mode IP"
 msgstr "Mode IP actif"
 
@@ -1540,8 +1540,8 @@ msgstr "Ajouter le dossier sélectionné à la file d'attente"
 msgid "Add selected files and folders to the transfer queue"
 msgstr "Ajouter les fichiers et dossiers sélectionnés à la file d'attente"
 
-#: ../src/interface/resources/xrc/settings.xrc:1681
-#: ../src/interface/resources/xrc/settings.xrc:1701
+#: ../src/interface/resources/xrc/settings.xrc:1625
+#: ../src/interface/resources/xrc/settings.xrc:1645
 msgid "Add to queue"
 msgstr "Ajouter à la file d'attente"
 
@@ -1553,7 +1553,7 @@ msgstr "Type d'adresse non supportée"
 msgid "Advanced"
 msgstr "Avancé"
 
-#: ../src/interface/resources/xrc/settings.xrc:1933
+#: ../src/interface/resources/xrc/settings.xrc:1877
 msgid ""
 "Advice: Unless you want to test new features, please keep using stable "
 "versions only. Beta versions and nightly builds are development versions "
@@ -1596,7 +1596,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Tous les transferts sont terminés. %d fichiers n'ont pas pu être transférés."
 
-#: ../src/interface/resources/xrc/settings.xrc:214
+#: ../src/interface/resources/xrc/settings.xrc:158
 msgid "Allow &fall back to other transfer mode on failure"
 msgstr "Autoriser un retour sur un autre mode de trans&fert en cas d'échec"
 
@@ -1614,7 +1614,7 @@ msgid_plural "Alternative names:"
 msgstr[0] "Nom alternatif :"
 msgstr[1] "Noms alternatifs :"
 
-#: ../src/interface/resources/xrc/settings.xrc:661
+#: ../src/interface/resources/xrc/settings.xrc:605
 msgid ""
 "Alternatively you can use the Pageant tool from PuTTY to manage your keys, "
 "FileZilla does recognize Pageant."
@@ -1622,7 +1622,7 @@ msgstr ""
 "Vous pouvez aussi utiliser l'outil Pageant de PuTTY pour gérer vos clés, "
 "FileZilla supporte cet outil."
 
-#: ../src/interface/resources/xrc/settings.xrc:666
+#: ../src/interface/resources/xrc/settings.xrc:610
 msgid ""
 "Alternatively you can use your system's SSH agent. To do so, make sure the "
 "SSH_AUTH_SOCK environment variable is set."
@@ -1730,8 +1730,8 @@ msgstr "Comme onglet dans le volet de la file d'attente"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1357
 #: ../src/interface/resources/xrc/dialogs.xrc:1380
-#: ../src/interface/resources/xrc/settings.xrc:1187
-#: ../src/interface/resources/xrc/settings.xrc:1208
+#: ../src/interface/resources/xrc/settings.xrc:1131
+#: ../src/interface/resources/xrc/settings.xrc:1152
 #: ../src/interface/settings/optionspage_interface.cpp:159
 msgid "Ask for action"
 msgstr "Demander l'action à effectuer"
@@ -1773,7 +1773,7 @@ msgstr "Attribut"
 msgid "Authentication failed."
 msgstr "Échec de l'authentification."
 
-#: ../src/interface/resources/xrc/settings.xrc:1287
+#: ../src/interface/resources/xrc/settings.xrc:1231
 msgid "Author:"
 msgstr "Auteur :"
 
@@ -1781,7 +1781,7 @@ msgstr "Auteur :"
 msgid "Auto"
 msgstr "Automatique"
 
-#: ../src/interface/resources/xrc/settings.xrc:1081
+#: ../src/interface/resources/xrc/settings.xrc:1025
 msgid "Automatic file type classification"
 msgstr "Classement automatique par type de fichier"
 
@@ -1857,7 +1857,7 @@ msgstr "Informations de compilation"
 msgid "Business category:"
 msgstr "Catégorie d'entreprise :"
 
-#: ../src/interface/resources/xrc/settings.xrc:285
+#: ../src/interface/resources/xrc/settings.xrc:229
 msgid ""
 "By default uses any available local port to establish transfers in active "
 "mode. If you want to limit FileZilla to use only a small range of ports, "
@@ -1886,7 +1886,7 @@ msgstr "C&opier l'(es) adresse(s) dans le presse-papier"
 msgid "C&opy URL(s) with password to clipboard"
 msgstr "C&opier l'(es) adresse(s) avec mot de passe dans le presse-papier"
 
-#: ../src/interface/resources/xrc/settings.xrc:1365
+#: ../src/interface/resources/xrc/settings.xrc:1309
 msgid "C&ustom"
 msgstr "P&ersonnaliser"
 
@@ -1894,7 +1894,7 @@ msgstr "P&ersonnaliser"
 msgid "C&ustom KMS ARN:"
 msgstr "&KMS ARN personnalisé :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1854
+#: ../src/interface/resources/xrc/settings.xrc:1798
 msgid "C&ustom filetype associations:"
 msgstr "Associations par t&ype de fichier personnalisées :"
 
@@ -1944,7 +1944,7 @@ msgstr "Impossible d'écrire les données dans un fichier : %s"
 #: ../src/interface/resources/xrc/dialogs.xrc:3551
 #: ../src/interface/resources/xrc/dialogs.xrc:3623
 #: ../src/interface/bookmarks_dialog.cpp:283
-#: ../src/interface/loginmanager.cpp:121 ../src/interface/loginmanager.cpp:260
+#: ../src/interface/loginmanager.cpp:123 ../src/interface/loginmanager.cpp:265
 #: ../src/interface/sitemanager_dialog.cpp:369
 msgid "Cancel"
 msgstr "Annuler"
@@ -2012,7 +2012,7 @@ msgstr "Impossible d'éditer le fichier, absence de connexion à un serveur."
 msgid "Cannot edit file, remote path unknown."
 msgstr "Impossible d'éditer le fichier, le chemin distant est inconnu."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:131
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:136
 msgid ""
 "Cannot establish FTP connection to an SFTP server. Please select proper "
 "protocol."
@@ -2067,19 +2067,19 @@ msgstr "Impossible d'afficher/éditer le fichier sélectionné"
 msgid "Case Insensitive"
 msgstr "Insensible à la casse"
 
-#: ../src/interface/resources/xrc/settings.xrc:1609
+#: ../src/interface/resources/xrc/settings.xrc:1553
 msgid "Case insensitive"
 msgstr "Insensible à la casse"
 
-#: ../src/interface/resources/xrc/settings.xrc:1608
+#: ../src/interface/resources/xrc/settings.xrc:1552
 msgid "Case insensitive (default)"
 msgstr "Insensible à la casse (par défaut)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1610
+#: ../src/interface/resources/xrc/settings.xrc:1554
 msgid "Case sensitive"
 msgstr "Sensible à la casse"
 
-#: ../src/interface/resources/xrc/settings.xrc:1611
+#: ../src/interface/resources/xrc/settings.xrc:1555
 msgid "Case sensitive (default)"
 msgstr "Sensible à la casse (par défaut)"
 
@@ -2100,7 +2100,7 @@ msgstr "Chaîne de certificats :"
 msgid "Certificate issuer"
 msgstr "Émetteur du certificat"
 
-#: ../src/interface/loginmanager.cpp:211
+#: ../src/interface/loginmanager.cpp:213
 msgid "Challenge:"
 msgstr "Demande d'accès :"
 
@@ -2113,7 +2113,7 @@ msgstr "Modification des attributs du fichier"
 msgid "Change the file permissions."
 msgstr "Modifier les droits d'accès au fichier."
 
-#: ../src/interface/resources/xrc/settings.xrc:2053
+#: ../src/interface/resources/xrc/settings.xrc:1997
 msgid "Changing logfile settings requires restart of FileZilla."
 msgstr ""
 "Toutes modifications des paramètres du fichier journal nécessitent un "
@@ -2131,7 +2131,7 @@ msgstr "Jeu de caractères"
 msgid "Check for &updates..."
 msgstr "Rechercher des mises à jo&ur..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1900
+#: ../src/interface/resources/xrc/settings.xrc:1844
 msgid "Check for FileZilla &updates automatically:"
 msgstr "Recherche automatique des mises à jour de FileZilla :"
 
@@ -2181,11 +2181,11 @@ msgstr "La somme de contrôle correspond à celle du fichier %s\n"
 msgid "Checksum mismatch on file %s\n"
 msgstr "La somme de contrôle ne correspond pas à celle du fichier %s\n"
 
-#: ../src/interface/sitemanager_site.cpp:1366
+#: ../src/interface/sitemanager_site.cpp:1365
 msgid "Choose a key file"
 msgstr "Sélectionnez le fichier de clé"
 
-#: ../src/interface/sitemanager_site.cpp:1357
+#: ../src/interface/sitemanager_site.cpp:1356
 msgid "Choose the default local directory"
 msgstr "Sélectionnez le dossier local par défaut"
 
@@ -2285,7 +2285,7 @@ msgstr "Propriétés des colonnes"
 msgid "Column setup"
 msgstr "Configuration des colonnes"
 
-#: ../src/interface/resources/xrc/settings.xrc:1798
+#: ../src/interface/resources/xrc/settings.xrc:1742
 msgid "Command and its arguments should be properly quoted."
 msgstr "La commande et ses arguments doivent être correctement saisis."
 
@@ -2330,7 +2330,7 @@ msgstr "Co&mparer l'horodatage"
 msgid "Compare file&size"
 msgstr "Comparer la taille de&s fichiers"
 
-#: ../src/interface/resources/xrc/settings.xrc:1642
+#: ../src/interface/resources/xrc/settings.xrc:1586
 msgid "Comparison &threshold (in minutes):"
 msgstr "Écar&t de comparaison (en minutes) :"
 
@@ -2358,7 +2358,7 @@ msgstr "Options de compilation :"
 msgid "Compressed"
 msgstr "Compressé"
 
-#: ../src/interface/resources/xrc/settings.xrc:814
+#: ../src/interface/resources/xrc/settings.xrc:758
 msgid "Concurrent transfers"
 msgstr "Transferts simultanés"
 
@@ -2442,7 +2442,7 @@ msgstr "Connexion à %s via %s Proxy"
 msgid "Connecting to %s..."
 msgstr "Connexion à %s..."
 
-#: ../src/interface/settings/settingsdialog.cpp:96
+#: ../src/interface/settings/settingsdialog.cpp:118
 msgid "Connection"
 msgstr "Connexion"
 
@@ -2477,13 +2477,13 @@ msgstr "Tentative de connexion expirée"
 msgid "Connection closed"
 msgstr "Connexion interrompue"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:66 ../src/engine/http/request.cpp:305
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:69 ../src/engine/http/request.cpp:305
 #: ../src/engine/http/request.cpp:318 ../src/engine/http/request.cpp:329
 #: ../src/engine/http/request.cpp:340
 msgid "Connection closed by server"
 msgstr "Connexion interrompue par le serveur"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:176
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:181
 #: ../src/engine/http/httpcontrolsocket.cpp:199
 msgid "Connection established, initializing TLS..."
 msgstr "Connexion établie, initialisation TLS..."
@@ -2496,7 +2496,7 @@ msgstr "Connexion établie, envoi d'une requête HTTP"
 msgid "Connection established, waiting for welcome message."
 msgstr "Connexion établie, attente du message d'accueil."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:197
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:202
 msgid "Connection established, waiting for welcome message..."
 msgstr "Connexion établie, attente du message d'accueil..."
 
@@ -2808,7 +2808,7 @@ msgstr "Impossible de lire depuis '%s'"
 msgid "Could not read from data socket."
 msgstr "Impossible de lire depuis le socket."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:55 ../src/engine/http/request.cpp:377
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:58 ../src/engine/http/request.cpp:377
 #, c-format
 msgid "Could not read from socket: %s"
 msgstr "Impossible de lire depuis le socket : %s"
@@ -2980,7 +2980,7 @@ msgstr "Créer un fichier vide"
 msgid "Creating directory"
 msgstr "Création d'un dossier"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:591
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:596
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:559
 #: ../src/engine/storj/storjcontrolsocket.cpp:105
 #, c-format
@@ -3034,8 +3034,8 @@ msgstr "Le type de transfert actuel est défini sur Binaire."
 msgid "Curve:"
 msgstr "Courbe :"
 
-#: ../src/interface/resources/xrc/settings.xrc:479
-#: ../src/interface/resources/xrc/settings.xrc:1414
+#: ../src/interface/resources/xrc/settings.xrc:423
+#: ../src/interface/resources/xrc/settings.xrc:1358
 msgid "Cus&tom"
 msgstr "Pers&onnaliser"
 
@@ -3064,7 +3064,7 @@ msgstr "Cyan"
 msgid "D&ata type"
 msgstr "Type de d&onnées"
 
-#: ../src/interface/resources/xrc/settings.xrc:1484
+#: ../src/interface/resources/xrc/settings.xrc:1428
 msgid "D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"
 msgstr ""
 "Préfix&es décimaux du Système International (SI) (ex. 1 Ko = 1000 octets)"
@@ -3092,7 +3092,7 @@ msgstr "Tout désact&iver"
 msgid "D&o not save passwords"
 msgstr "Ne pas sauvegarder les m&ots de passe"
 
-#: ../src/interface/resources/xrc/settings.xrc:1690
+#: ../src/interface/resources/xrc/settings.xrc:1634
 msgid "D&ouble-click action on directories:"
 msgstr "Action du d&ouble-clic sur les dossiers :"
 
@@ -3122,11 +3122,11 @@ msgstr "Fermeture prématurée du socket de données."
 msgid "Date"
 msgstr "Date"
 
-#: ../src/interface/resources/xrc/settings.xrc:1348
+#: ../src/interface/resources/xrc/settings.xrc:1292
 msgid "Date formatting"
 msgstr "Format des dates"
 
-#: ../src/interface/settings/settingsdialog.cpp:109
+#: ../src/interface/settings/settingsdialog.cpp:131
 msgid "Date/time format"
 msgstr "Format de Date et Heure"
 
@@ -3134,11 +3134,11 @@ msgstr "Format de Date et Heure"
 msgid "Date/time unknown"
 msgstr "Date et heure inconnues"
 
-#: ../src/interface/settings/settingsdialog.cpp:121
+#: ../src/interface/settings/settingsdialog.cpp:143
 msgid "Debug"
 msgstr "Débogage"
 
-#: ../src/interface/resources/xrc/settings.xrc:2074
+#: ../src/interface/resources/xrc/settings.xrc:2018
 msgid "Debugging settings"
 msgstr "Paramètres de débogage"
 
@@ -3160,7 +3160,7 @@ msgstr "Éditeur par défaut incorrectement saisi."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1329
 #: ../src/interface/resources/xrc/dialogs.xrc:1399
-#: ../src/interface/resources/xrc/settings.xrc:1227
+#: ../src/interface/resources/xrc/settings.xrc:1171
 msgid "Default file exists action"
 msgstr "Action par défaut sur les fichiers existants"
 
@@ -3184,12 +3184,12 @@ msgstr "Langue par défaut du système"
 msgid "Default transfer mode:"
 msgstr "Mode de transfert par défaut :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1051
+#: ../src/interface/resources/xrc/settings.xrc:995
 msgid "Default transfer type:"
 msgstr "Type de transfert par défaut :"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:233
-#: ../src/interface/resources/xrc/settings.xrc:381
+#: ../src/interface/resources/xrc/settings.xrc:325
 msgid "Default: http://ip.filezilla-project.org/ip.php"
 msgstr "Par défaut : http://ip.filezilla-project.org/ip.php"
 
@@ -3280,7 +3280,7 @@ msgstr "Dossier"
 msgid "Directory access permissions"
 msgstr "Droits d'accès au dossier"
 
-#: ../src/interface/resources/xrc/settings.xrc:1628
+#: ../src/interface/resources/xrc/settings.xrc:1572
 #: ../src/interface/filelistctrl.cpp:477 ../src/interface/Mainfrm.cpp:2359
 #: ../src/interface/Mainfrm.cpp:2379
 #: ../src/interface/sitemanager_dialog.cpp:303
@@ -3349,7 +3349,7 @@ msgstr "Déconnecter du serveur actuel"
 
 #: ../src/engine/ControlSocket.cpp:48 ../src/engine/ControlSocket.cpp:709
 #: ../src/engine/ControlSocket.cpp:808
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:57 ../src/engine/http/request.cpp:242
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:60 ../src/engine/http/request.cpp:242
 #: ../src/interface/queue.cpp:352
 msgid "Disconnected from server"
 msgstr "Déconnecté du serveur"
@@ -3372,7 +3372,7 @@ msgstr "Déconnecter du serveur actuellement visible"
 msgid "Display about dialog"
 msgstr "Affiche le dialogue À propos de FileZilla"
 
-#: ../src/interface/resources/xrc/settings.xrc:1763
+#: ../src/interface/resources/xrc/settings.xrc:1707
 msgid "Do &not use default editor"
 msgstr "&Ne pas utiliser l'éditeur par défaut"
 
@@ -3424,14 +3424,14 @@ msgstr "Documentation"
 msgid "Don't use external IP address on &local connections."
 msgstr "Ne pas utiliser l'adresse IP externe pour les connexions &locales."
 
-#: ../src/interface/resources/xrc/settings.xrc:1148
+#: ../src/interface/resources/xrc/settings.xrc:1092
 msgid "Dotfiles are filenames starting with a dot, e.g. .htaccess"
 msgstr ""
 "Les fichiers dont le nom commence par un point, sont, sous les systèmes de "
 "type Unix, des fichiers généralement cachés et/ou de configuration, ex. ."
 "htaccess"
 
-#: ../src/interface/resources/xrc/settings.xrc:1666
+#: ../src/interface/resources/xrc/settings.xrc:1610
 msgid "Double-click action"
 msgstr "Action du double-clic"
 
@@ -3440,7 +3440,7 @@ msgid "Download"
 msgstr "Télécharger"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:3323
-#: ../src/interface/resources/xrc/settings.xrc:906
+#: ../src/interface/resources/xrc/settings.xrc:850
 msgid "Download &limit:"
 msgstr "&Limite de téléchargement :"
 
@@ -3569,7 +3569,7 @@ msgstr "Échec de l'édition"
 msgid "Editing search results"
 msgstr "Édition des résultats de recherche"
 
-#: ../src/interface/resources/xrc/settings.xrc:1298
+#: ../src/interface/resources/xrc/settings.xrc:1242
 msgid "Email:"
 msgstr "Courriel :"
 
@@ -3609,7 +3609,7 @@ msgstr "La chaîne saisie entre guillemets est vide."
 msgid "En&able all"
 msgstr "Tout &activer"
 
-#: ../src/interface/resources/xrc/settings.xrc:987
+#: ../src/interface/resources/xrc/settings.xrc:931
 msgid "Enable invalid character &filtering"
 msgstr "Activer le filtrage des ca&ractères invalides"
 
@@ -3621,7 +3621,7 @@ msgstr "Chiffré"
 msgid "Encryption"
 msgstr "Chiffrement"
 
-#: ../src/interface/loginmanager.cpp:243
+#: ../src/interface/loginmanager.cpp:245
 #: ../src/interface/sitemanager_site.cpp:165
 msgid "Encryption &key:"
 msgstr "Clé de &chiffrement :"
@@ -3654,7 +3654,7 @@ msgstr "Saisir une commande"
 msgid "Enter custom command"
 msgstr "Saisie d'une commande personnalisée"
 
-#: ../src/interface/resources/xrc/settings.xrc:1699
+#: ../src/interface/resources/xrc/settings.xrc:1643
 msgid "Enter directory"
 msgstr "Développer le dossier"
 
@@ -3676,7 +3676,7 @@ msgstr "Saisie d'un nom pour le jeu de filtres"
 msgid "Enter new name for filterset"
 msgstr "Saisir un nouveau nom pour le jeu de filtres"
 
-#: ../src/interface/loginmanager.cpp:175
+#: ../src/interface/loginmanager.cpp:177
 msgid "Enter password"
 msgstr "Saisie de mot de passe"
 
@@ -3729,11 +3729,11 @@ msgstr ""
 "Saisissez le port d'écoute du serveur. Le port par défaut pour le FTP est le "
 "21 et le 22 pour le SFTP."
 
-#: ../src/interface/loginmanager.cpp:164
+#: ../src/interface/loginmanager.cpp:166
 msgid "Enter username"
 msgstr "Saisir un identifiant"
 
-#: ../src/interface/loginmanager.cpp:170
+#: ../src/interface/loginmanager.cpp:172
 msgid "Enter username and password"
 msgstr "Saisie d'un identifiant et mot de passe"
 
@@ -3799,11 +3799,11 @@ msgstr "Erreur lors de l'écriture du fichier xml"
 msgid "Error:"
 msgstr "Erreur :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1871
+#: ../src/interface/resources/xrc/settings.xrc:1815
 msgid "Example: png \"c:\\program files\\viewer\\viewer.exe\" -open"
 msgstr "Exemple : png \"c:\\program files\\viewer\\viewer.exe\" -open"
 
-#: ../src/interface/resources/xrc/settings.xrc:1521
+#: ../src/interface/resources/xrc/settings.xrc:1465
 msgid "Examples"
 msgstr "Exemples"
 
@@ -3841,7 +3841,7 @@ msgstr "Exportation des paramètres"
 msgid "F&ilter name:"
 msgstr "Nom du f&iltre :"
 
-#: ../src/interface/settings/settingsdialog.cpp:97
+#: ../src/interface/settings/settingsdialog.cpp:119
 msgid "FTP"
 msgstr "FTP"
 
@@ -3861,12 +3861,12 @@ msgstr "FTP - Protocole de Transfert de Fichiers non sécurisé"
 msgid "FTP Engine not initialized, can't connect"
 msgstr "Le moteur FTP n'est pas initialisé, impossible de se connecter"
 
-#: ../src/interface/resources/xrc/settings.xrc:233
+#: ../src/interface/resources/xrc/settings.xrc:177
 msgid "FTP Keep-alive"
 msgstr "Paramètres anti-déconnexion"
 
-#: ../src/interface/resources/xrc/settings.xrc:446
-#: ../src/interface/settings/settingsdialog.cpp:100
+#: ../src/interface/resources/xrc/settings.xrc:390
+#: ../src/interface/settings/settingsdialog.cpp:122
 msgid "FTP Proxy"
 msgstr "Proxy FTP"
 
@@ -3882,7 +3882,7 @@ msgstr ""
 "FTP utilise des connexions secondaires pour les transferts de données. Ces "
 "connexions supplémentaires peuvent être établies de deux manières."
 
-#: ../src/interface/settings/settingsdialog.cpp:104
+#: ../src/interface/settings/settingsdialog.cpp:126
 msgid "FTP: File Types"
 msgstr "FTP : Types de fichiers"
 
@@ -3908,7 +3908,7 @@ msgstr "Impossible de changer de dossier"
 msgid "Failed to change language"
 msgstr "Impossible de changer de langue"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:292
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:297
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Impossible de convertir en jeu de caractères 8 bits"
 
@@ -3929,7 +3929,7 @@ msgstr "Impossible de créer un socket d'écoute sur le port %d, abandon."
 msgid "Failed to create listening socket for active mode transfer"
 msgstr "Impossible de créer le socket d'écoute pour le mode de transfert actif"
 
-#: ../src/interface/loginmanager.cpp:143
+#: ../src/interface/loginmanager.cpp:145
 msgid "Failed to decrypt server password."
 msgstr "Impossible de décrypter le mot de passe du serveur."
 
@@ -3957,7 +3957,7 @@ msgstr ""
 msgid "Failed to initialize FTP engine"
 msgstr "Impossible d'initialiser le moteur FTP"
 
-#: ../src/interface/settings/settingsdialog.cpp:153
+#: ../src/interface/settings/settingsdialog.cpp:173
 msgid "Failed to load panels, invalid resource files?"
 msgstr ""
 "Impossible de charger l'interface, les fichiers de ressources sont-ils "
@@ -4000,7 +4000,7 @@ msgstr "Impossible de récupérer le contenu du dossier"
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "Impossible de récupérer l'adresse IP externe, abandon."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:662
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:667
 msgid "Failed to retrieve external IP address, using local address"
 msgstr ""
 "Impossible de récupérer l'adresse IP externe, utilisation de l'adresse locale"
@@ -4009,7 +4009,7 @@ msgstr ""
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "Impossible de récupérer l'adresse IP locale, abandon."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:680
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:685
 msgid "Failed to retrieve local IP address."
 msgstr "Impossible de récupérer l'adresse IP locale."
 
@@ -4105,7 +4105,7 @@ msgstr "Le descripteur de fichier n'est pas un socket"
 msgid "File does not contain any importable data."
 msgstr "Le fichier ne contient aucune donnée importable."
 
-#: ../src/interface/settings/settingsdialog.cpp:113
+#: ../src/interface/settings/settingsdialog.cpp:135
 msgid "File editing"
 msgstr "Édition des fichiers"
 
@@ -4113,7 +4113,7 @@ msgstr "Édition des fichiers"
 msgid "File exists"
 msgstr "Le fichier existe"
 
-#: ../src/interface/settings/settingsdialog.cpp:105
+#: ../src/interface/settings/settingsdialog.cpp:127
 msgid "File exists action"
 msgstr "Action lorsque le fichier existe"
 
@@ -4121,7 +4121,7 @@ msgstr "Action lorsque le fichier existe"
 msgid "File has changed"
 msgstr "Le fichier a été modifié"
 
-#: ../src/interface/settings/settingsdialog.cpp:111
+#: ../src/interface/settings/settingsdialog.cpp:133
 msgid "File lists"
 msgstr "Listes des fichiers"
 
@@ -4202,7 +4202,7 @@ msgid "FileZilla needs to be restarted for the language change to take effect."
 msgstr ""
 "FileZilla doit être redémarré pour que le changement de langue prenne effet."
 
-#: ../src/interface/resources/xrc/settings.xrc:1959
+#: ../src/interface/resources/xrc/settings.xrc:1903
 msgid "FileZilla updates"
 msgstr "Mises à jour de FileZilla"
 
@@ -4234,7 +4234,7 @@ msgid "Filename unchanged"
 msgstr "Nom de fichier inchangé"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1649
-#: ../src/interface/resources/xrc/settings.xrc:1991
+#: ../src/interface/resources/xrc/settings.xrc:1935
 msgid "Filename:"
 msgstr "Nom de fichier :"
 
@@ -4272,7 +4272,7 @@ msgstr "Fichiers introuvables"
 msgid "Filesize"
 msgstr "Taille de fichier"
 
-#: ../src/interface/settings/settingsdialog.cpp:110
+#: ../src/interface/settings/settingsdialog.cpp:132
 msgid "Filesize format"
 msgstr "Format de la taille des fichiers"
 
@@ -4281,8 +4281,8 @@ msgstr "Format de la taille des fichiers"
 msgid "Filetype"
 msgstr "Type de fichier"
 
-#: ../src/interface/resources/xrc/settings.xrc:1883
-#: ../src/interface/settings/settingsdialog.cpp:114
+#: ../src/interface/resources/xrc/settings.xrc:1827
+#: ../src/interface/settings/settingsdialog.cpp:136
 msgid "Filetype associations"
 msgstr "Associations par type de fichier"
 
@@ -4290,7 +4290,7 @@ msgstr "Associations par type de fichier"
 msgid "Filter applies to:"
 msgstr "Filtre appliqué aux :"
 
-#: ../src/interface/resources/xrc/settings.xrc:981
+#: ../src/interface/resources/xrc/settings.xrc:925
 msgid "Filter invalid characters in filenames"
 msgstr "Filtrage des caractères invalides des noms de fichiers"
 
@@ -4356,7 +4356,7 @@ msgstr "Empreintes :"
 msgid "Firewall and router configuration wizard"
 msgstr "Assistant de configuration du routeur et du pare-feu"
 
-#: ../src/interface/resources/xrc/settings.xrc:71
+#: ../src/interface/resources/xrc/settings.xrc:15
 msgid ""
 "For more detailed information about what these options do, please run the "
 "network configuration wizard."
@@ -4389,11 +4389,11 @@ msgstr "Forcer l'affic&hage des fichiers cachés"
 msgid "Force showing hidden files"
 msgstr "Forcer l'affichage des fichiers cachés"
 
-#: ../src/interface/resources/xrc/settings.xrc:494
+#: ../src/interface/resources/xrc/settings.xrc:438
 msgid "Format specifications:"
 msgstr "Spécifications du format :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1866
+#: ../src/interface/resources/xrc/settings.xrc:1810
 msgid "Format: Extension followed by properly quoted command and arguments."
 msgstr ""
 "Format : Extension suivie de la commande placée entre guillemets, elle-même "
@@ -4426,8 +4426,8 @@ msgstr "Échec général du serveur SOCKS"
 msgid "Generate..."
 msgstr "Générer..."
 
-#: ../src/interface/resources/xrc/settings.xrc:707
-#: ../src/interface/settings/settingsdialog.cpp:102
+#: ../src/interface/resources/xrc/settings.xrc:651
+#: ../src/interface/settings/settingsdialog.cpp:124
 msgid "Generic proxy"
 msgstr "Proxy générique"
 
@@ -4475,7 +4475,7 @@ msgstr "Hash :"
 msgid "Hidden"
 msgstr "Caché"
 
-#: ../src/interface/resources/xrc/settings.xrc:964
+#: ../src/interface/resources/xrc/settings.xrc:908
 #: ../src/interface/queue.cpp:997 ../src/interface/queue.cpp:1059
 msgid "High"
 msgstr "Haute"
@@ -4524,7 +4524,7 @@ msgstr "Hôte inaccessible"
 #: ../src/interface/resources/xrc/certificate.xrc:179
 #: ../src/interface/resources/xrc/dialogs.xrc:782
 #: ../src/interface/resources/xrc/dialogs.xrc:903
-#: ../src/interface/loginmanager.cpp:94 ../src/interface/loginmanager.cpp:197
+#: ../src/interface/loginmanager.cpp:94 ../src/interface/loginmanager.cpp:199
 #: ../src/interface/verifycertdialog.cpp:763
 msgid "Host:"
 msgstr "Hôte :"
@@ -4545,7 +4545,7 @@ msgstr ""
 "J'ai oublié mon mot de passe principal. Supprimez tous les mots de passe "
 "stockés avec cette clé."
 
-#: ../src/interface/resources/xrc/settings.xrc:1409
+#: ../src/interface/resources/xrc/settings.xrc:1353
 msgid "I&SO 8601 (example: 15:47)"
 msgstr "I&SO 8601 (exemple : 15:47)"
 
@@ -4563,7 +4563,7 @@ msgstr "Identification de l'&hôte :"
 msgid "Identity service path:"
 msgstr "Chemin du service d'identification :"
 
-#: ../src/interface/resources/xrc/settings.xrc:118
+#: ../src/interface/resources/xrc/settings.xrc:62
 msgid ""
 "If no data is sent or received during an operation for longer than the "
 "specified time, the connection will be closed and FileZilla will try to "
@@ -4572,7 +4572,7 @@ msgstr ""
 "Si aucune donnée n'est envoyée ou reçue durant ce laps de temps, la "
 "connexion sera interrompue et FileZilla essaiera de se reconnecter."
 
-#: ../src/interface/resources/xrc/settings.xrc:2123
+#: ../src/interface/resources/xrc/settings.xrc:2067
 msgid "If reporting bugs, please provide logs with \"Verbose\" logging level."
 msgstr ""
 "Si vous soumettez un rapport d'erreur, merci d'y joindre un journal "
@@ -4622,7 +4622,7 @@ msgstr ""
 "Si le problème persiste, c'est que votre routeur et/ou pare-feu interrompt "
 "la connexion."
 
-#: ../src/interface/resources/xrc/settings.xrc:2046
+#: ../src/interface/resources/xrc/settings.xrc:1990
 msgid ""
 "If the size of the logfile reaches the limit, it gets renamed by adding "
 "\".1\" to the end of the filename (possibly overwriting older logfiles) and "
@@ -4654,7 +4654,7 @@ msgstr ""
 "Si ce problème persiste, veuillez contacter le fabricant de votre routeur."
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1408
-#: ../src/interface/resources/xrc/settings.xrc:1240
+#: ../src/interface/resources/xrc/settings.xrc:1184
 msgid ""
 "If using 'overwrite if newer', your system time has to be synchronized with "
 "the server. If the time differs (e.g. different timezone), specify a time "
@@ -4665,7 +4665,7 @@ msgstr ""
 "(ex. fuseau horaire différent), spécifiez un décalage horaire dans le "
 "Gestionnaire de Sites."
 
-#: ../src/interface/resources/xrc/settings.xrc:1635
+#: ../src/interface/resources/xrc/settings.xrc:1579
 msgid ""
 "If using timestamp based comparison, consider two files equal if their "
 "timestamp difference does not exceed this threshold."
@@ -4674,7 +4674,7 @@ msgstr ""
 "fichiers seront identiques si la différence de l'horodatage ne dépasse pas "
 "le seuil ci-dessous."
 
-#: ../src/interface/resources/xrc/settings.xrc:1740
+#: ../src/interface/resources/xrc/settings.xrc:1684
 msgid "If you change the language, you need to restart FileZilla."
 msgstr "Si vous changez de langue, vous devez redémarrer FileZilla."
 
@@ -4698,7 +4698,7 @@ msgstr ""
 "Si vous continuez, votre mot de passe et vos fichiers seront envoyés en "
 "clair sur Internet."
 
-#: ../src/interface/resources/xrc/settings.xrc:1128
+#: ../src/interface/resources/xrc/settings.xrc:1072
 msgid ""
 "If you enter the wrong filetypes, those files may get corrupted when "
 "transferred."
@@ -4712,7 +4712,7 @@ msgstr ""
 "Si vous obtenez la moindre erreur, c'est que votre configuration est "
 "incorrecte."
 
-#: ../src/interface/resources/xrc/settings.xrc:219
+#: ../src/interface/resources/xrc/settings.xrc:163
 msgid ""
 "If you have problems to retrieve directory listings or to transfer files, "
 "try to change the default transfer mode."
@@ -4795,7 +4795,7 @@ msgstr ""
 "choisis par votre système."
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:168
-#: ../src/interface/resources/xrc/settings.xrc:337
+#: ../src/interface/resources/xrc/settings.xrc:281
 msgid ""
 "In order to use active mode, FileZilla needs to know your external IP "
 "address."
@@ -4847,7 +4847,7 @@ msgstr "Serveur non sécurisé, celui-ci ne supporte pas FTP sur TLS."
 msgid "Interactive"
 msgstr "Interactif"
 
-#: ../src/interface/settings/settingsdialog.cpp:106
+#: ../src/interface/settings/settingsdialog.cpp:128
 msgid "Interface"
 msgstr "Interface"
 
@@ -4922,8 +4922,8 @@ msgstr "Nom d'hôte invalide : %s"
 
 #: ../src/interface/asksavepassworddialog.cpp:41
 #: ../src/interface/asksavepassworddialog.cpp:46
-#: ../src/interface/loginmanager.cpp:138 ../src/interface/loginmanager.cpp:143
-#: ../src/interface/loginmanager.cpp:276 ../src/interface/loginmanager.cpp:380
+#: ../src/interface/loginmanager.cpp:140 ../src/interface/loginmanager.cpp:145
+#: ../src/interface/loginmanager.cpp:281 ../src/interface/loginmanager.cpp:385
 msgid "Invalid input"
 msgstr "Entrée invalide"
 
@@ -5011,7 +5011,7 @@ msgstr "Juridiction locale :"
 msgid "Jurisdiction state or province:"
 msgstr "Juridiction d'état ou de province :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1592
+#: ../src/interface/resources/xrc/settings.xrc:1536
 msgid "Keep directories on top"
 msgstr "Maintenir les dossiers en tête"
 
@@ -5047,8 +5047,8 @@ msgstr "Identificateur de clé :"
 msgid "L&owest"
 msgstr "La &plus basse"
 
-#: ../src/interface/resources/xrc/settings.xrc:1721
-#: ../src/interface/settings/settingsdialog.cpp:112
+#: ../src/interface/resources/xrc/settings.xrc:1665
+#: ../src/interface/settings/settingsdialog.cpp:134
 msgid "Language"
 msgstr "Langue"
 
@@ -5065,33 +5065,33 @@ msgstr "Dernière modification"
 msgid "Layout"
 msgstr "Agencement"
 
-#: ../src/interface/sitemanager_site.cpp:1201
+#: ../src/interface/sitemanager_site.cpp:1200
 msgid "Leave empty to keep existing data."
 msgstr "Laissez le champ vide pour conserver les données existantes."
 
 #. @translator: Keep this string as short as possible
 #: ../src/interface/settings/optionspage_passwords.cpp:44
-#: ../src/interface/sitemanager_site.cpp:1199
+#: ../src/interface/sitemanager_site.cpp:1198
 msgid "Leave empty to keep existing password."
 msgstr "Laissez le champ vide pour conserver le mot de passe existant."
 
-#: ../src/interface/resources/xrc/settings.xrc:844
+#: ../src/interface/resources/xrc/settings.xrc:788
 msgid "Limit for concurrent &downloads:"
 msgstr "Limite &des téléchargements simultanés :"
 
-#: ../src/interface/resources/xrc/settings.xrc:865
+#: ../src/interface/resources/xrc/settings.xrc:809
 msgid "Limit for concurrent &uploads:"
 msgstr "Limite des envois sim&ultanés :"
 
-#: ../src/interface/resources/xrc/settings.xrc:265
+#: ../src/interface/resources/xrc/settings.xrc:209
 msgid "Limit local ports"
 msgstr "Limites des ports locaux"
 
-#: ../src/interface/resources/xrc/settings.xrc:2015
+#: ../src/interface/resources/xrc/settings.xrc:1959
 msgid "Limit size of logfile"
 msgstr "Taille limite du fichier journal"
 
-#: ../src/interface/resources/xrc/settings.xrc:2023
+#: ../src/interface/resources/xrc/settings.xrc:1967
 msgid "Limit:"
 msgstr "Limite :"
 
@@ -5112,7 +5112,7 @@ msgstr "Socket d'écoute fermé"
 msgid "Listing:"
 msgstr "Contenu :"
 
-#: ../src/interface/resources/xrc/settings.xrc:295
+#: ../src/interface/resources/xrc/settings.xrc:239
 msgid "Lo&west available port:"
 msgstr "P&ort le plus bas disponible :"
 
@@ -5183,8 +5183,8 @@ msgstr "Fichier journal"
 msgid "Logged in"
 msgstr "Connecté"
 
-#: ../src/interface/resources/xrc/settings.xrc:1969
-#: ../src/interface/settings/settingsdialog.cpp:120
+#: ../src/interface/resources/xrc/settings.xrc:1913
+#: ../src/interface/settings/settingsdialog.cpp:142
 msgid "Logging"
 msgstr "Journalisation"
 
@@ -5318,7 +5318,7 @@ msgstr "Correspondances à aucune des conditions suivantes"
 msgid "Match not all of the following"
 msgstr "Correspondances à aucune de toutes les conditions suivantes"
 
-#: ../src/interface/resources/xrc/settings.xrc:823
+#: ../src/interface/resources/xrc/settings.xrc:767
 msgid "Maximum simultaneous &transfers:"
 msgstr "Nombre maximum de &transferts simultanés :"
 
@@ -5338,7 +5338,7 @@ msgstr "Emplacement du journal des événeme&nts :"
 msgid "Message too large"
 msgstr "Message trop volumineux"
 
-#: ../src/interface/resources/xrc/settings.xrc:2035
+#: ../src/interface/resources/xrc/settings.xrc:1979
 msgid "MiB"
 msgstr "Mio"
 
@@ -5391,12 +5391,12 @@ msgstr "Le nom existe déjà"
 msgid "Name of bookmark already exists."
 msgstr "Le nom du favori existe déjà."
 
-#: ../src/interface/loginmanager.cpp:90 ../src/interface/loginmanager.cpp:193
+#: ../src/interface/loginmanager.cpp:90 ../src/interface/loginmanager.cpp:195
 #: ../src/interface/verifycertdialog.cpp:654
 msgid "Name:"
 msgstr "Nom :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1612
+#: ../src/interface/resources/xrc/settings.xrc:1556
 msgid "Natural sort"
 msgstr "Tri naturel"
 
@@ -5432,7 +5432,7 @@ msgstr ""
 msgid "Network unreachable"
 msgstr "Réseau inaccessible"
 
-#: ../src/interface/resources/xrc/settings.xrc:1906
+#: ../src/interface/resources/xrc/settings.xrc:1850
 msgid "Never"
 msgstr "Jamais"
 
@@ -5521,7 +5521,7 @@ msgstr "Aucun dossier ajouté"
 msgid "No entries found matching '%s'."
 msgstr "Aucune entrée ne correspond à '%s'."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:635
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:640
 msgid "No external IP address set, trying default."
 msgstr ""
 "Aucune adresse IP externe spécifiée, utilisation des paramètres par défaut."
@@ -5574,12 +5574,12 @@ msgstr "Aucun site disponible"
 msgid "No supported SOCKS5 auth method"
 msgstr "Méthode d'authentification SOCKS5 non supportée"
 
-#: ../src/interface/loginmanager.cpp:276
+#: ../src/interface/loginmanager.cpp:281
 msgid "No username given."
 msgstr "Aucun identifiant spécifié."
 
-#: ../src/interface/resources/xrc/settings.xrc:1683
-#: ../src/interface/resources/xrc/settings.xrc:1702
+#: ../src/interface/resources/xrc/settings.xrc:1627
+#: ../src/interface/resources/xrc/settings.xrc:1646
 #: ../src/interface/sitemanager.cpp:20
 #: ../src/interface/verifycertdialog.cpp:402
 msgid "None"
@@ -5593,7 +5593,7 @@ msgstr "Pas encore sélectionné"
 msgid "Nonrecoverable failure in name resolution"
 msgstr "Échec non récupérable dans la résolution du nom"
 
-#: ../src/interface/resources/xrc/settings.xrc:963 ../src/engine/server.cpp:709
+#: ../src/interface/resources/xrc/settings.xrc:907 ../src/engine/server.cpp:709
 #: ../src/engine/server.cpp:736 ../src/interface/manual_transfer.cpp:148
 #: ../src/interface/manual_transfer.cpp:176
 #: ../src/interface/manual_transfer.cpp:535 ../src/interface/queue.cpp:995
@@ -5638,12 +5638,12 @@ msgstr ""
 msgid "Note: A lost key cannot be recovered."
 msgstr "Remarque : Une clé perdue ne peut pas être récupérée."
 
-#: ../src/interface/resources/xrc/settings.xrc:596
+#: ../src/interface/resources/xrc/settings.xrc:540
 msgid "Note: This only works with plain, unencrypted FTP connections."
 msgstr ""
 "Note : Ceci fonctionne uniquement avec les connexions FTP non chiffrées."
 
-#: ../src/interface/resources/xrc/settings.xrc:795
+#: ../src/interface/resources/xrc/settings.xrc:739
 msgid "Note: Using a generic proxy forces passive mode on FTP connections."
 msgstr ""
 "Note : L'utilisation d'un Proxy générique force les connexions FTP en mode "
@@ -5653,7 +5653,7 @@ msgstr ""
 msgid "Null character in line"
 msgstr "Caractère nul en ligne"
 
-#: ../src/interface/resources/xrc/settings.xrc:1496
+#: ../src/interface/resources/xrc/settings.xrc:1440
 msgid "Number of decimal places:"
 msgstr "Nombre de décimales :"
 
@@ -5691,8 +5691,8 @@ msgstr "O&uvrir"
 #: ../src/interface/resources/xrc/dialogs.xrc:3381
 #: ../src/interface/resources/xrc/dialogs.xrc:3483
 #: ../src/interface/resources/xrc/dialogs.xrc:3617
-#: ../src/interface/resources/xrc/settings.xrc:28
 #: ../src/interface/resources/xrc/storj.xrc:37
+#: ../src/interface/settings/settingsdialog.cpp:72
 #: ../src/interface/welcome_dialog.cpp:114
 msgid "OK"
 msgstr "OK"
@@ -5718,11 +5718,11 @@ msgstr ""
 msgid "Once"
 msgstr "Une seule fois"
 
-#: ../src/interface/resources/xrc/settings.xrc:1907
+#: ../src/interface/resources/xrc/settings.xrc:1851
 msgid "Once a day"
 msgstr "Une fois par jour"
 
-#: ../src/interface/resources/xrc/settings.xrc:1908
+#: ../src/interface/resources/xrc/settings.xrc:1852
 msgid "Once a week"
 msgstr "Une fois par semaine"
 
@@ -5821,7 +5821,7 @@ msgstr "Orange"
 msgid "Organization:"
 msgstr "Organisation :"
 
-#: ../src/interface/resources/xrc/settings.xrc:681
+#: ../src/interface/resources/xrc/settings.xrc:625
 msgid "Other SFTP options"
 msgstr "Autres options SFTP"
 
@@ -5837,7 +5837,7 @@ msgstr "Autre :"
 msgid "Out of memory"
 msgstr "Mémoire insuffisante"
 
-#: ../src/interface/resources/xrc/settings.xrc:64
+#: ../src/interface/resources/xrc/settings.xrc:8
 msgid "Overview"
 msgstr "Vue d'ensemble"
 
@@ -5847,22 +5847,22 @@ msgstr "Remplacer s&i la source est plus récente"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1358
 #: ../src/interface/resources/xrc/dialogs.xrc:1381
-#: ../src/interface/resources/xrc/settings.xrc:1188
-#: ../src/interface/resources/xrc/settings.xrc:1209
+#: ../src/interface/resources/xrc/settings.xrc:1132
+#: ../src/interface/resources/xrc/settings.xrc:1153
 msgid "Overwrite file"
 msgstr "Remplacer le fichier"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1360
 #: ../src/interface/resources/xrc/dialogs.xrc:1383
-#: ../src/interface/resources/xrc/settings.xrc:1190
-#: ../src/interface/resources/xrc/settings.xrc:1211
+#: ../src/interface/resources/xrc/settings.xrc:1134
+#: ../src/interface/resources/xrc/settings.xrc:1155
 msgid "Overwrite file if size differs"
 msgstr "Remplacer le fichier si la taille est différente"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1361
 #: ../src/interface/resources/xrc/dialogs.xrc:1384
-#: ../src/interface/resources/xrc/settings.xrc:1191
-#: ../src/interface/resources/xrc/settings.xrc:1212
+#: ../src/interface/resources/xrc/settings.xrc:1135
+#: ../src/interface/resources/xrc/settings.xrc:1156
 msgid "Overwrite file if size differs or source file is newer"
 msgstr ""
 "Remplacer le fichier si la taille est différente ou si la source est plus "
@@ -5870,8 +5870,8 @@ msgstr ""
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1359
 #: ../src/interface/resources/xrc/dialogs.xrc:1382
-#: ../src/interface/resources/xrc/settings.xrc:1189
-#: ../src/interface/resources/xrc/settings.xrc:1210
+#: ../src/interface/resources/xrc/settings.xrc:1133
+#: ../src/interface/resources/xrc/settings.xrc:1154
 msgid "Overwrite file if source file newer"
 msgstr "Remplacer le fichier si la source est plus récente"
 
@@ -5905,8 +5905,8 @@ msgstr ""
 "Empêche&r la mise en veille de l'ordinateur pendant les transferts et toutes "
 "autres opérations"
 
-#: ../src/interface/resources/xrc/settings.xrc:556
-#: ../src/interface/resources/xrc/settings.xrc:743
+#: ../src/interface/resources/xrc/settings.xrc:500
+#: ../src/interface/resources/xrc/settings.xrc:687
 msgid "P&roxy host:"
 msgstr "Hôte P&roxy :"
 
@@ -5914,7 +5914,7 @@ msgstr "Hôte P&roxy :"
 msgid "PORT command tainted by router or firewall."
 msgstr "La commande PORT a été corrompue par le routeur ou le pare-feu."
 
-#: ../src/interface/resources/xrc/settings.xrc:203
+#: ../src/interface/resources/xrc/settings.xrc:147
 msgid "Pa&ssive (recommended)"
 msgstr "Pa&ssif (recommandé)"
 
@@ -5938,8 +5938,8 @@ msgstr "&Mot de passe :"
 msgid "Passive (recommended)"
 msgstr "Passif (recommandé)"
 
-#: ../src/interface/resources/xrc/settings.xrc:410
-#: ../src/interface/settings/settingsdialog.cpp:99
+#: ../src/interface/resources/xrc/settings.xrc:354
+#: ../src/interface/settings/settingsdialog.cpp:121
 msgid "Passive mode"
 msgstr "Mode passif"
 
@@ -5958,7 +5958,7 @@ msgid "Password required"
 msgstr "Mot de passe requis"
 
 #: ../src/interface/settings/optionspage_passwords.cpp:170
-#: ../src/interface/settings/settingsdialog.cpp:107
+#: ../src/interface/settings/settingsdialog.cpp:129
 msgid "Passwords"
 msgstr "Mots de passe"
 
@@ -6123,7 +6123,7 @@ msgstr ""
 "Saisissez un nombre compris entre 1 et 10 pour le nombre de transferts "
 "simultanés."
 
-#: ../src/interface/loginmanager.cpp:176
+#: ../src/interface/loginmanager.cpp:178
 msgid "Please enter a password for this server:"
 msgstr "Saisissez un mot de passe pour ce serveur :"
 
@@ -6138,7 +6138,7 @@ msgstr ""
 msgid "Please enter a unique name for this filter set"
 msgstr "Saisissez un nom unique pour ce jeu de filtres"
 
-#: ../src/interface/loginmanager.cpp:165
+#: ../src/interface/loginmanager.cpp:167
 msgid "Please enter a username for this server:"
 msgstr "Saisissez un identifiant pour ce serveur :"
 
@@ -6190,7 +6190,7 @@ msgstr "Saisissez le nom du dossier qui doit être créé :"
 msgid "Please enter the name of the file which should be created:"
 msgstr "Saisissez le nom du fichier que vous souhaitez créer :"
 
-#: ../src/interface/loginmanager.cpp:171
+#: ../src/interface/loginmanager.cpp:173
 msgid "Please enter username and password for this server:"
 msgstr "Saisissez un identifiant et un mot de passe pour ce serveur :"
 
@@ -6279,7 +6279,7 @@ msgstr ""
 "FTPS and FTPES ne fonctionne uniquement que si la commande MFMT est "
 "supportée."
 
-#: ../src/interface/resources/xrc/settings.xrc:180
+#: ../src/interface/resources/xrc/settings.xrc:124
 msgid ""
 "Please note that some servers might ban you if you try to reconnect too "
 "often or in too short intervals."
@@ -6365,11 +6365,11 @@ msgstr "Port :"
 msgid "Postal code:"
 msgstr "Code postal :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1032
+#: ../src/interface/resources/xrc/settings.xrc:976
 msgid "Pre&allocate space before downloading"
 msgstr "Espace pré&alloué avant téléchargement"
 
-#: ../src/interface/resources/xrc/settings.xrc:1028
+#: ../src/interface/resources/xrc/settings.xrc:972
 msgid "Preallocation"
 msgstr "Préallocation"
 
@@ -6382,7 +6382,7 @@ msgstr "Sites prédéfinis"
 msgid "Preserving file timestamps"
 msgstr "Préserver l'horodatage des fichiers"
 
-#: ../src/interface/resources/xrc/settings.xrc:1329
+#: ../src/interface/resources/xrc/settings.xrc:1273
 msgid "Preview"
 msgstr "Aperçu"
 
@@ -6395,7 +6395,7 @@ msgid "Print version information to stdout and exit"
 msgstr ""
 "Imprimer les informations de version sur la sortie par défaut et quitter"
 
-#: ../src/interface/resources/xrc/settings.xrc:1591
+#: ../src/interface/resources/xrc/settings.xrc:1535
 msgid "Prioritize directories (default)"
 msgstr "Priorité aux dossiers (par défaut)"
 
@@ -6403,7 +6403,7 @@ msgstr "Priorité aux dossiers (par défaut)"
 msgid "Priority"
 msgstr "Priorité"
 
-#: ../src/interface/resources/xrc/settings.xrc:1947
+#: ../src/interface/resources/xrc/settings.xrc:1891
 msgid ""
 "Privacy policy: Only your version of FileZilla, your used operating system "
 "and your CPU architecture will be submitted to the server."
@@ -6412,7 +6412,7 @@ msgstr ""
 "système d'exploitation et de l'architecture de votre processeur seront "
 "soumises au serveur."
 
-#: ../src/interface/resources/xrc/settings.xrc:630
+#: ../src/interface/resources/xrc/settings.xrc:574
 msgid "Private &keys:"
 msgstr "&Clés privées :"
 
@@ -6428,8 +6428,8 @@ msgstr "Pro&jet :"
 msgid "Pro&tocol:"
 msgstr "Pro&tocole :"
 
-#: ../src/interface/resources/xrc/settings.xrc:579
-#: ../src/interface/resources/xrc/settings.xrc:776
+#: ../src/interface/resources/xrc/settings.xrc:523
+#: ../src/interface/resources/xrc/settings.xrc:720
 msgid "Pro&xy password:"
 msgstr "Mot de passe Pro&xy :"
 
@@ -6464,12 +6464,12 @@ msgstr "Protocole non supporté étant donné le type de socket"
 msgid "Protocol:"
 msgstr "Protocole :"
 
-#: ../src/interface/resources/xrc/settings.xrc:753
+#: ../src/interface/resources/xrc/settings.xrc:697
 msgid "Proxy &port:"
 msgstr "Port du &Proxy :"
 
-#: ../src/interface/resources/xrc/settings.xrc:569
-#: ../src/interface/resources/xrc/settings.xrc:766
+#: ../src/interface/resources/xrc/settings.xrc:513
+#: ../src/interface/resources/xrc/settings.xrc:710
 msgid "Proxy &user:"
 msgstr "&Identifiant Proxy :"
 
@@ -6517,7 +6517,7 @@ msgstr ""
 msgid "Proxy set but proxy host or port invalid"
 msgstr "Proxy spécifié mais le Proxy hôte ou le port sont invalides"
 
-#: ../src/interface/resources/xrc/settings.xrc:617
+#: ../src/interface/resources/xrc/settings.xrc:561
 msgid "Public Key Authentication"
 msgstr "Authentification par clé publique"
 
@@ -6685,6 +6685,10 @@ msgstr "Données reçues corrompues"
 msgid "Received invalid character in version information"
 msgstr "Réception de caractère non valide dans l'information de version"
 
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:106
+msgid "Received too long response line from server, closing connection."
+msgstr ""
+
 #: ../src/interface/updater.cpp:597
 msgid "Received version information is too large"
 msgstr "Réception de l'information de version trop grande"
@@ -6698,7 +6702,7 @@ msgstr ""
 "êtes connecté à un serveur.\n"
 "Si vous continuez, votre connexion sera interrompue."
 
-#: ../src/interface/resources/xrc/settings.xrc:185
+#: ../src/interface/resources/xrc/settings.xrc:129
 msgid "Reconnection settings"
 msgstr "Paramètres de reconnexion"
 
@@ -6816,8 +6820,8 @@ msgstr "Retirer la &sélection"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1363
 #: ../src/interface/resources/xrc/dialogs.xrc:1386
-#: ../src/interface/resources/xrc/settings.xrc:1193
-#: ../src/interface/resources/xrc/settings.xrc:1214
+#: ../src/interface/resources/xrc/settings.xrc:1137
+#: ../src/interface/resources/xrc/settings.xrc:1158
 #: ../src/interface/asyncrequestqueue.cpp:350
 msgid "Rename file"
 msgstr "Renommer le fichier"
@@ -6832,7 +6836,7 @@ msgstr "Renommer le dossier sélectionné"
 msgid "Rename selected files and directories"
 msgstr "Renommer les fichiers et dossiers sélectionnés"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:602
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:607
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:603
 #, c-format
 msgid "Renaming '%s' to '%s'"
@@ -6909,12 +6913,12 @@ msgstr "Résultats :"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1362
 #: ../src/interface/resources/xrc/dialogs.xrc:1385
-#: ../src/interface/resources/xrc/settings.xrc:1192
-#: ../src/interface/resources/xrc/settings.xrc:1213
+#: ../src/interface/resources/xrc/settings.xrc:1136
+#: ../src/interface/resources/xrc/settings.xrc:1157
 msgid "Resume file transfer"
 msgstr "Reprendre le transfert du fichier"
 
-#: ../src/interface/resources/xrc/settings.xrc:1253
+#: ../src/interface/resources/xrc/settings.xrc:1197
 msgid ""
 "Resuming ASCII files can cause problems if server uses a different line "
 "ending format than the client."
@@ -6922,20 +6926,20 @@ msgstr ""
 "La reprise du transfert des fichiers ASCII peut poser problème si le serveur "
 "utilise des fins de ligne dans un format différent de celui du client."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:322
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:327
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:455
 #: ../src/engine/storj/storjcontrolsocket.cpp:67
 #, c-format
 msgid "Retrieving directory listing of \"%s\"..."
 msgstr "Récupération du contenu du dossier \"%s\"..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:319
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:324
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:452
 #: ../src/engine/storj/storjcontrolsocket.cpp:64
 msgid "Retrieving directory listing..."
 msgstr "Récupération du contenu du dossier..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:650
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:655
 #: ../src/interface/netconfwizard.cpp:722
 #, c-format
 msgid "Retrieving external IP address from %s"
@@ -6969,7 +6973,7 @@ msgstr "Mise en veille de l'ordinate&ur dès que"
 msgid "S&ynchronized browsing"
 msgstr "Navigation s&ynchronisée"
 
-#: ../src/interface/settings/settingsdialog.cpp:101
+#: ../src/interface/settings/settingsdialog.cpp:123
 msgid "SFTP"
 msgstr "SFTP"
 
@@ -6977,7 +6981,7 @@ msgstr "SFTP"
 msgid "SFTP support"
 msgstr "Support SFTP"
 
-#: ../src/interface/resources/xrc/settings.xrc:730
+#: ../src/interface/resources/xrc/settings.xrc:674
 msgid "SOC&KS 4"
 msgstr "SOC&KS 4"
 
@@ -7022,7 +7026,7 @@ msgstr ""
 msgid "Saving of passwords has been disabled by you."
 msgstr "Vous avez désactivé la sauvegarde des mots de passe."
 
-#: ../src/interface/resources/xrc/settings.xrc:1309
+#: ../src/interface/resources/xrc/settings.xrc:1253
 msgid "Scale factor:"
 msgstr "Facteur d'échelle :"
 
@@ -7076,15 +7080,15 @@ msgstr "Voir aussi : https://wiki.filezilla-project.org/Network_Configuration"
 msgid "Sele&ct server"
 msgstr "Séle&ctionner le serveur"
 
-#: ../src/interface/resources/xrc/settings.xrc:13
+#: ../src/interface/settings/settingsdialog.cpp:66
 msgid "Select &page:"
 msgstr "Sélectionnez une &page :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1271
+#: ../src/interface/resources/xrc/settings.xrc:1215
 msgid "Select Theme"
 msgstr "Sélection du thème"
 
-#: ../src/interface/resources/xrc/settings.xrc:1168
+#: ../src/interface/resources/xrc/settings.xrc:1112
 msgid ""
 "Select default action to perform if target file of a transfer already exists."
 msgstr ""
@@ -7257,7 +7261,7 @@ msgstr ""
 msgid "Selected port usually in use by a different protocol."
 msgstr "Le port sélectionné est habituellement utilisé par un autre protocole."
 
-#: ../src/interface/resources/xrc/settings.xrc:241
+#: ../src/interface/resources/xrc/settings.xrc:185
 msgid "Send FTP &keep-alive commands"
 msgstr "Envoyer des &commandes FTP anti-déconnexion"
 
@@ -7266,7 +7270,7 @@ msgid "Send custom command to the server otherwise not available"
 msgstr ""
 "Envoi d'une commande personnalisée au serveur si celui-ci est indisponible"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:772
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:777
 msgid "Sending keep-alive command"
 msgstr "Envoi d'une commande anti-déconnexion"
 
@@ -7431,13 +7435,13 @@ msgstr "Détails de session"
 msgid "Set &Priority"
 msgstr "Définir la &priorité"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:609
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:614
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:597
 #, c-format
 msgid "Setting permissions of '%s' to '%s'"
 msgstr "Définition des permissions de '%s' à '%s'"
 
-#: ../src/interface/resources/xrc/settings.xrc:4
+#: ../src/interface/settings/settingsdialog.cpp:54
 msgid "Settings"
 msgstr "Paramètres de FileZilla"
 
@@ -7449,7 +7453,7 @@ msgstr "Dossier des paramètres :"
 msgid "Sh&ow notification bubble"
 msgstr "Afficher une bulle de n&otification"
 
-#: ../src/interface/resources/xrc/settings.xrc:2131
+#: ../src/interface/resources/xrc/settings.xrc:2075
 msgid "Show &raw directory listing"
 msgstr "Afficher le contenu b&rut du dossier"
 
@@ -7466,7 +7470,7 @@ msgstr "Afficher les arborescences des 2 côtés et continuer la comparaison ?"
 msgid "Show details"
 msgstr "Afficher les détails"
 
-#: ../src/interface/resources/xrc/settings.xrc:1446
+#: ../src/interface/resources/xrc/settings.xrc:1390
 msgid "Show details about custom date and time formats"
 msgstr ""
 "Afficher les détails à propos de la personnalisation du format de la date et "
@@ -7569,7 +7573,7 @@ msgstr ""
 msgid "Size"
 msgstr "Taille"
 
-#: ../src/interface/resources/xrc/settings.xrc:1460
+#: ../src/interface/resources/xrc/settings.xrc:1404
 msgid "Size formatting"
 msgstr "Format des tailles"
 
@@ -7579,8 +7583,8 @@ msgstr "Taille inconnue"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1364
 #: ../src/interface/resources/xrc/dialogs.xrc:1387
-#: ../src/interface/resources/xrc/settings.xrc:1194
-#: ../src/interface/resources/xrc/settings.xrc:1215
+#: ../src/interface/resources/xrc/settings.xrc:1138
+#: ../src/interface/resources/xrc/settings.xrc:1159
 msgid "Skip file"
 msgstr "Ignorer le fichier"
 
@@ -7628,7 +7632,7 @@ msgstr ""
 "envoyés."
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:147
-#: ../src/interface/resources/xrc/settings.xrc:416
+#: ../src/interface/resources/xrc/settings.xrc:360
 msgid ""
 "Some misconfigured remote servers which are behind a router, may reply with "
 "their local IP address."
@@ -7636,7 +7640,7 @@ msgstr ""
 "Certains serveurs distants mal configurés, se trouvant derrière un routeur, "
 "peuvent répondre avec leurs adresses IP locales."
 
-#: ../src/interface/resources/xrc/settings.xrc:1593
+#: ../src/interface/resources/xrc/settings.xrc:1537
 msgid "Sort directories inline"
 msgstr "Trier les dossiers en ligne"
 
@@ -7645,11 +7649,11 @@ msgid "Sort order cannot be changed if comparing directories."
 msgstr ""
 "L'ordre de tri ne peut pas être modifié pendant la comparaison des dossiers."
 
-#: ../src/interface/resources/xrc/settings.xrc:1577
+#: ../src/interface/resources/xrc/settings.xrc:1521
 msgid "Sorting"
 msgstr "Tri"
 
-#: ../src/interface/resources/xrc/settings.xrc:1584
+#: ../src/interface/resources/xrc/settings.xrc:1528
 msgid "Sorting &mode:"
 msgstr "&Méthode de tri :"
 
@@ -7677,7 +7681,7 @@ msgstr "Fichier source :"
 msgid "Speed Limits"
 msgstr "Limitation des taux de transfert"
 
-#: ../src/interface/resources/xrc/settings.xrc:893
+#: ../src/interface/resources/xrc/settings.xrc:837
 msgid "Speed limits"
 msgstr "Limitation des taux de transfert"
 
@@ -7691,15 +7695,15 @@ msgid "Speed limits are enabled, click to change."
 msgstr ""
 "La limitation des taux de transfert est activée, cliquez pour modifier."
 
-#: ../src/interface/resources/xrc/settings.xrc:1925
+#: ../src/interface/resources/xrc/settings.xrc:1869
 msgid "Stable and beta versions"
 msgstr "Versions stables et bêtas"
 
-#: ../src/interface/resources/xrc/settings.xrc:1924
+#: ../src/interface/resources/xrc/settings.xrc:1868
 msgid "Stable versions only"
 msgstr "Versions stables uniquement"
 
-#: ../src/interface/resources/xrc/settings.xrc:1926
+#: ../src/interface/resources/xrc/settings.xrc:1870
 msgid "Stable, beta and nightly versions"
 msgstr "Versions stables, bêtas et journalières (nightly builds)"
 
@@ -7849,11 +7853,11 @@ msgstr "Barre d'&outils"
 msgid "TLS connection established, sending HTTP request"
 msgstr "Connexion TLS établie, envoi d'une requête HTTP"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:188
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:193
 msgid "TLS connection established, waiting for welcome message..."
 msgstr "Connexion TLS établie, attente du message d'accueil..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:192
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:197
 msgid "TLS connection established."
 msgstr "Connexion TLS établie."
 
@@ -8117,7 +8121,7 @@ msgstr "La clé de chiffrement générée est :"
 msgid "The global bookmarks could not be saved."
 msgstr "Les favoris globaux ne peuvent pas être sauvegardés."
 
-#: ../src/interface/resources/xrc/settings.xrc:2118
+#: ../src/interface/resources/xrc/settings.xrc:2062
 msgid ""
 "The higher the debug level, the more information will be displayed in the "
 "message log. Displaying debug information has a negative impact on "
@@ -8171,7 +8175,7 @@ msgstr "La nouvelle version n'a pas pu être téléchargée, réessayer plus tar
 #: ../src/interface/resources/xrc/update.xrc:66
 msgid "The new version has been saved in your Downloads directory."
 msgstr ""
-"La nouvelle version a été enregistré dans votre dossier de téléchargement."
+"La nouvelle version a été enregistrée dans votre dossier de téléchargement."
 
 #: ../src/interface/QueueView.cpp:1580
 msgid "The queue will not be saved."
@@ -8312,7 +8316,7 @@ msgstr "Le test a échoué. Souhaitez-vous vraiment sauvegarder les paramètres 
 msgid "The valid backup file %s could not be restored"
 msgstr "Le fichier de sauvegarde valide %s ne peut pas être restauré"
 
-#: ../src/interface/settings/settingsdialog.cpp:108
+#: ../src/interface/settings/settingsdialog.cpp:130
 msgid "Themes"
 msgstr "Thèmes"
 
@@ -8364,15 +8368,15 @@ msgstr ""
 msgid "Time"
 msgstr "Temps"
 
-#: ../src/interface/resources/xrc/settings.xrc:1397
+#: ../src/interface/resources/xrc/settings.xrc:1341
 msgid "Time formatting"
 msgstr "Format des heures"
 
-#: ../src/interface/resources/xrc/settings.xrc:97
+#: ../src/interface/resources/xrc/settings.xrc:41
 msgid "Time&out in seconds:"
 msgstr "Délai d'attente en sec&ondes :"
 
-#: ../src/interface/resources/xrc/settings.xrc:126
+#: ../src/interface/resources/xrc/settings.xrc:70
 #: ../src/interface/queue.cpp:350
 msgid "Timeout"
 msgstr "Délai d'attente"
@@ -8397,7 +8401,7 @@ msgstr ""
 "Pour ce faire, les arborescences doivent être toutes deux visibles ou "
 "masquées."
 
-#: ../src/interface/resources/xrc/settings.xrc:624
+#: ../src/interface/resources/xrc/settings.xrc:568
 msgid ""
 "To support public key authentication, FileZilla needs to know the private "
 "keys to use."
@@ -8465,8 +8469,8 @@ msgstr "Trop de redirections"
 msgid "Trace:"
 msgstr "Suivi :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1680
-#: ../src/interface/resources/xrc/settings.xrc:1700
+#: ../src/interface/resources/xrc/settings.xrc:1624
+#: ../src/interface/resources/xrc/settings.xrc:1644
 msgid "Transfer"
 msgstr "Transférer"
 
@@ -8478,7 +8482,7 @@ msgstr "Direction &du transfert"
 msgid "Transfer &type"
 msgstr "Type de &transfert"
 
-#: ../src/interface/resources/xrc/settings.xrc:197
+#: ../src/interface/resources/xrc/settings.xrc:141
 msgid "Transfer Mode"
 msgstr "Mode de transfert"
 
@@ -8503,7 +8507,7 @@ msgstr "Les données transferrées ont été corrompues."
 msgid "Transferring"
 msgstr "Transfert en cours"
 
-#: ../src/interface/settings/settingsdialog.cpp:103
+#: ../src/interface/settings/settingsdialog.cpp:125
 msgid "Transfers"
 msgstr "Transferts"
 
@@ -8511,11 +8515,11 @@ msgstr "Transferts"
 msgid "Transfers finished"
 msgstr "Transferts réussis"
 
-#: ../src/interface/resources/xrc/settings.xrc:1136
+#: ../src/interface/resources/xrc/settings.xrc:1080
 msgid "Treat files &without extension as ASCII file"
 msgstr "Traiter les fichiers sans &extension comme des fichiers ASCII"
 
-#: ../src/interface/resources/xrc/settings.xrc:1088
+#: ../src/interface/resources/xrc/settings.xrc:1032
 msgid "Treat the &following filetypes as ASCII files:"
 msgstr "Traiter les types de &fichiers suivants comme des fichiers ASCII :"
 
@@ -8549,11 +8553,11 @@ msgstr "Essayer à nouveau"
 msgid "Type"
 msgstr "Type"
 
-#: ../src/interface/resources/xrc/settings.xrc:454
+#: ../src/interface/resources/xrc/settings.xrc:398
 msgid "Type of FTP Proxy:"
 msgstr "Type de Proxy FTP :"
 
-#: ../src/interface/resources/xrc/settings.xrc:715
+#: ../src/interface/resources/xrc/settings.xrc:659
 msgid "Type of generic proxy:"
 msgstr "Type de Proxy générique :"
 
@@ -8562,19 +8566,19 @@ msgid "U&pload"
 msgstr "E&nvoyer"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:3340
-#: ../src/interface/resources/xrc/settings.xrc:931
+#: ../src/interface/resources/xrc/settings.xrc:875
 msgid "U&pload limit:"
 msgstr "Limite de l'&envoi :"
 
-#: ../src/interface/resources/xrc/settings.xrc:1810
+#: ../src/interface/resources/xrc/settings.xrc:1754
 msgid "U&se filetype associations if available"
 msgstr "Utili&ser l'association par type de fichier si elle est disponible"
 
-#: ../src/interface/resources/xrc/settings.xrc:1403
+#: ../src/interface/resources/xrc/settings.xrc:1347
 msgid "U&se system defaults for current language"
 msgstr "Utili&ser la langue du système par défaut"
 
-#: ../src/interface/resources/xrc/settings.xrc:464
+#: ../src/interface/resources/xrc/settings.xrc:408
 msgid "USER@&HOST"
 msgstr "UTILISATEUR@&HÔTE"
 
@@ -8673,7 +8677,7 @@ msgid "Up&load and unedit"
 msgstr "Envoyer et terminer &l'édition"
 
 #: ../src/interface/settings/optionspage_updatecheck.cpp:45
-#: ../src/interface/settings/settingsdialog.cpp:117
+#: ../src/interface/settings/settingsdialog.cpp:139
 msgid "Updates"
 msgstr "Mises à jour"
 
@@ -8732,7 +8736,7 @@ msgstr "Envoi et fin de l'édition"
 msgid "Use &custom charset"
 msgstr "Utiliser un jeu de &caractères personnalisé"
 
-#: ../src/interface/resources/xrc/settings.xrc:1774
+#: ../src/interface/resources/xrc/settings.xrc:1718
 msgid "Use &custom editor:"
 msgstr "Utiliser l'éditeur pers&onnalisé :"
 
@@ -8766,7 +8770,7 @@ msgstr "Utiliser le serveur auquel vous êtes actuellement connecté"
 msgid "Use server from site manager"
 msgstr "Utiliser le serveur défini dans le Gestionnaire de Sites"
 
-#: ../src/interface/resources/xrc/settings.xrc:1354
+#: ../src/interface/resources/xrc/settings.xrc:1298
 msgid "Use system &defaults for current language"
 msgstr "Utiliser la langue du système par &défaut"
 
@@ -8783,7 +8787,7 @@ msgid "Use the server's external IP address instead"
 msgstr "Utiliser à la place l'adresse IP externe des serveurs"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:207
-#: ../src/interface/resources/xrc/settings.xrc:359
+#: ../src/interface/resources/xrc/settings.xrc:303
 msgid ""
 "Use this if you're behind a router and have a static external IP address."
 msgstr ""
@@ -8801,7 +8805,7 @@ msgstr ""
 "du mode actif. Seule la version de FileZilla utilisée sera transmise au "
 "serveur."
 
-#: ../src/interface/loginmanager.cpp:97 ../src/interface/loginmanager.cpp:201
+#: ../src/interface/loginmanager.cpp:97 ../src/interface/loginmanager.cpp:203
 msgid "User:"
 msgstr "Identifiant :"
 
@@ -8848,7 +8852,7 @@ msgstr "Valable jusqu'à :"
 msgid "Verbose log messages from wxWidgets"
 msgstr "Détailler les historiques d'événements depuis wxWidgets"
 
-#: ../src/interface/resources/xrc/settings.xrc:965
+#: ../src/interface/resources/xrc/settings.xrc:909
 msgid "Very high"
 msgstr "Très haute"
 
@@ -8858,7 +8862,7 @@ msgstr ""
 "L'option d'affichage des fichiers cachés est activée, mais n'est pas "
 "supportée par le serveur"
 
-#: ../src/interface/resources/xrc/settings.xrc:1682
+#: ../src/interface/resources/xrc/settings.xrc:1626
 msgid "View/Edit"
 msgstr "Afficher / Éditer"
 
@@ -8958,7 +8962,7 @@ msgstr ""
 "reconnecter sans avoir à les resaisir la prochaine fois que vous "
 "réutiliserez FileZilla."
 
-#: ../src/interface/resources/xrc/settings.xrc:992
+#: ../src/interface/resources/xrc/settings.xrc:936
 msgid ""
 "When enabled, characters that are not supported by the local operating "
 "system in filenames are replaced if downloading such a file."
@@ -8993,7 +8997,7 @@ msgstr "Adresse IP externe incorrecte"
 msgid "Wrong line endings"
 msgstr "Fins de ligne incorrectes"
 
-#: ../src/interface/loginmanager.cpp:380
+#: ../src/interface/loginmanager.cpp:385
 msgid ""
 "Wrong master password entered, it cannot be used to decrypt the stored "
 "passwords."
@@ -9001,7 +9005,7 @@ msgstr ""
 "Saisie du mot de passe principal incorrecte, il ne peut pas être utilisé "
 "pour décrypter les mots de passe stockés."
 
-#: ../src/interface/loginmanager.cpp:138
+#: ../src/interface/loginmanager.cpp:140
 msgid "Wrong master password entered, it cannot be used to decrypt this item."
 msgstr ""
 "Saisie du mot de passe principal incorrecte, il ne peut pas être utilisé "
@@ -9345,7 +9349,7 @@ msgstr "lecture par le groupe"
 msgid "group writeable"
 msgstr "écriture par le groupe"
 
-#: ../src/interface/resources/xrc/settings.xrc:1448
+#: ../src/interface/resources/xrc/settings.xrc:1392
 msgid "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 msgstr "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 
