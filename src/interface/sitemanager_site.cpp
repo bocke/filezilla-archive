@@ -489,7 +489,7 @@ ServerProtocol CSiteManagerSite::GetProtocol() const
 	auto const group = findGroup(protocol);
 	if (group.first != protocolGroups().cend()) {
 		int encSel = xrc_call(*this, "ID_ENCRYPTION", &wxChoice::GetSelection);
-		if (encSel < 0 && encSel >= static_cast<int>(group.first->protocols.size())) {
+		if (encSel < 0 || encSel >= static_cast<int>(group.first->protocols.size())) {
 			encSel = 0;
 		}
 		protocol = group.first->protocols[encSel].first;
@@ -699,7 +699,7 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	transferModeLabel->Show(hasTransferMode);
 	transferModeLabel->GetContainingSizer()->CalcMin();
 	transferModeLabel->GetContainingSizer()->Layout();
-	
+
 	if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::Charset)) {
 		if (FindPage(m_pCharsetPage) == wxNOT_FOUND) {
 			AddPage(m_pCharsetPage, m_charsetPageText);
@@ -1078,7 +1078,6 @@ void CSiteManagerSite::UpdateExtraParameters(CServer & server)
 		}
 		else if (xrc_call(*this, "ID_S3_AES256", &wxRadioButton::GetValue)) {
 			server.SetExtraParameter("ssealgorithm", L"AES256");
-			
 		}
 		else if (xrc_call(*this, "ID_S3_AWSKMS", &wxRadioButton::GetValue)) {
 			server.SetExtraParameter("ssealgorithm", L"aws:kms");
