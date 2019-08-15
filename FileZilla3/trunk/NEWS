@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.44.2 (2019-08-15)
+
+- MSW: Fixed a crash if using predefined sites through fzdefaults.xml
+- Fixes to protocol selection glitches in the Site Manager
+- Increase maximum length of response lines when using FTP
+
 3.44.1 (2019-08-09)
 
 - Fixed a regression introduced in 3.44.0-rc1 breaking support for insecure servers
