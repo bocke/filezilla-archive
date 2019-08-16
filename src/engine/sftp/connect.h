@@ -15,7 +15,7 @@ class CSftpConnectOpData final : public COpData, public CSftpOpData
 {
 public:
 	CSftpConnectOpData(CSftpControlSocket & controlSocket, Credentials const& credentials)
-		: COpData(Command::connect, L"CSftpDeleteOpData")
+		: COpData(Command::connect, L"CSftpConnectOpData")
 		, CSftpOpData(controlSocket)
 		, credentials_(credentials)
 		, keyfile_(keyfiles_.cend())
