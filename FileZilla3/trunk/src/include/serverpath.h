@@ -4,12 +4,12 @@
 #include <libfilezilla/optional.hpp>
 #include <libfilezilla/shared.hpp>
 
-#include <deque>
+#include <vector>
 
 class CServerPathData final
 {
 public:
-	std::deque<std::wstring> m_segments;
+	std::vector<std::wstring> m_segments;
 	fz::sparse_optional<std::wstring> m_prefix;
 
 	bool operator==(const CServerPathData& cmp) const;
@@ -80,7 +80,7 @@ private:
 
 	ServerType m_type;
 
-	typedef std::deque<std::wstring> tSegmentList;
+	typedef std::vector<std::wstring> tSegmentList;
 	typedef tSegmentList::iterator tSegmentIter;
 	typedef tSegmentList::const_iterator tConstSegmentIter;
 
