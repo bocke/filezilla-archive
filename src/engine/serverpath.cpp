@@ -479,8 +479,8 @@ bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase) const
 		return false;
 	}
 
-	tConstSegmentIter iter1 = m_data->m_segments.begin();
-	tConstSegmentIter iter2 = path.m_data->m_segments.begin();
+	auto iter1 = m_data->m_segments.cbegin();
+	auto iter2 = path.m_data->m_segments.cbegin();
 	while (iter1 != m_data->m_segments.end()) {
 		if (iter2 == path.m_data->m_segments.end()) {
 			return true;
@@ -946,8 +946,8 @@ int CServerPath::CmpNoCase(const CServerPath &op) const
 		return -1;
 	}
 
-	tConstSegmentIter iter = m_data->m_segments.begin();
-	tConstSegmentIter iter2 = op.m_data->m_segments.begin();
+	auto iter = m_data->m_segments.cbegin();
+	auto iter2 = op.m_data->m_segments.cbegin();
 	while (iter != m_data->m_segments.end()) {
 		int res = fz::stricmp(*(iter++), *(iter2++));
 		if (res) {
@@ -1008,8 +1008,8 @@ CServerPath CServerPath::GetCommonParent(const CServerPath& path) const
 
 	CServerPathData& parentData = parent.m_data.get();
 
-	tConstSegmentIter last = m_data->m_segments.end();
-	tConstSegmentIter last2 = path.m_data->m_segments.end();
+	auto last = m_data->m_segments.cend();
+	auto last2 = path.m_data->m_segments.cend();
 	if (traits[m_type].prefixmode == 1) {
 		if (!m_data->m_prefix) {
 			--last;
@@ -1023,8 +1023,8 @@ CServerPath CServerPath::GetCommonParent(const CServerPath& path) const
 		parentData.m_prefix = m_data->m_prefix;
 	}
 
-	tConstSegmentIter iter = m_data->m_segments.begin();
-	tConstSegmentIter iter2 = path.m_data->m_segments.begin();
+	auto iter = m_data->m_segments.cbegin();
+	auto iter2 = path.m_data->m_segments.cbegin();
 	while (iter != last && iter2 != last2) {
 		if (*iter != *iter2) {
 			if (!traits[m_type].has_root && parentData.m_segments.empty()) {
@@ -1119,8 +1119,9 @@ bool CServerPath::Segmentize(std::wstring const& str, tSegmentList& segments)
 		}
 	}
 
-	if (append)
+	if (append) {
 		return false;
+	}
 
 	return true;
 }

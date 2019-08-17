@@ -6,6 +6,8 @@
 
 #include <libfilezilla/uri.hpp>
 
+#include <deque>
+
 // See below for actual commands and their parameters
 
 // Command IDs
