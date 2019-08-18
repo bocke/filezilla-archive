@@ -704,7 +704,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 		++iter;
 		inserted = true;
 	}
-	for (auto it = toDelete.rend(); it != toDelete.rbegin(); ++it) {
+	for (auto it = toDelete.rbegin(); it != toDelete.rend(); ++it) {
 		Delete(*it);
 	}
 
