@@ -112,6 +112,12 @@ public:
 	CServer() = default;
 	CServer(ServerProtocol protocol, ServerType type, std::wstring const& host, unsigned int);
 
+	CServer(CServer const&) = default;
+	CServer& operator=(CServer const&) = default;
+
+	CServer(CServer &&) noexcept = default;
+	CServer& operator=(CServer &&) noexcept = default;
+
 	void clear();
 
 	void SetType(ServerType type);
@@ -131,7 +137,6 @@ public:
 
 	void SetUser(std::wstring const& user);
 
-	CServer& operator=(const CServer &op);
 	bool operator==(const CServer &op) const;
 	bool operator<(const CServer &op) const;
 	bool operator!=(const CServer &op) const;

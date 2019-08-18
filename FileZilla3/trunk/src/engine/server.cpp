@@ -101,26 +101,6 @@ std::wstring CServer::GetUser() const
 	return m_user;
 }
 
-CServer& CServer::operator=(const CServer &op)
-{
-	m_protocol = op.m_protocol;
-	m_type = op.m_type;
-	m_host = op.m_host;
-	m_port = op.m_port;
-	m_user = op.m_user;
-	m_timezoneOffset = op.m_timezoneOffset;
-	m_pasvMode = op.m_pasvMode;
-	m_maximumMultipleConnections = op.m_maximumMultipleConnections;
-	m_encodingType = op.m_encodingType;
-	m_customEncoding = op.m_customEncoding;
-	m_postLoginCommands = op.m_postLoginCommands;
-	m_bypassProxy = op.m_bypassProxy;
-	m_name = op.m_name;
-	extraParameters_ = op.extraParameters_;
-
-	return *this;
-}
-
 bool CServer::operator==(const CServer &op) const
 {
 	if (m_protocol != op.m_protocol) {
@@ -268,7 +248,7 @@ CServer::CServer(ServerProtocol protocol, ServerType type, std::wstring const& h
 		m_port = port;
 	}
 	else {
-		port = GetDefaultPort(protocol);
+		m_port = GetDefaultPort(protocol);
 	}
 }
 
