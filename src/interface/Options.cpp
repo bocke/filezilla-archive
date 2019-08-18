@@ -831,7 +831,9 @@ void COptions::SaveIfNeeded()
 	}
 
 	m_save_timer.Stop();
-	Save();
+	if (save) {
+		Save();
+	}
 }
 
 namespace {
