@@ -245,8 +245,8 @@ void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 		return;
 	}
 
-	if (event.AltDown() && !event.ControlDown()) // Alt but not AltGr
-	{
+	if (event.AltDown() && !event.ControlDown()) {
+		// Alt but not AltGr
 		event.Skip();
 		return;
 	}
@@ -283,10 +283,8 @@ void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 		key = 0;
 		break;
 	}
-	if (key)
-	{
-		if (event.GetModifiers())
-		{
+	if (key) {
+		if (event.GetModifiers()) {
 			// Numpad keys can not have modifiers
 			event.Skip();
 		}

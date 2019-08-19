@@ -32,6 +32,20 @@ wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 {
 	Create(parent, id, pos, size, style);
 	SetBackgroundStyle(wxBG_STYLE_SYSTEM);
+
+#ifdef __WXMSW__
+	Bind(wxEVT_CHAR, [this](wxKeyEvent& evt) {
+		auto key = evt.GetUnicodeKey();
+		if (key && key > 32) {
+			inPrefixSearch_ = true;
+		}
+		evt.Skip();
+	});
+	Bind(wxEVT_KEY_UP, [this](wxKeyEvent& evt) {
+		inPrefixSearch_ = false;
+		evt.Skip();
+	});
+#endif
 }
 
 wxTreeItemId wxTreeCtrlEx::GetSelection() const
