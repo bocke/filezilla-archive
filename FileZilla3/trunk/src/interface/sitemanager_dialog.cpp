@@ -1142,11 +1142,21 @@ void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 	UpdateItem();
 }
 
-void CSiteManagerDialog::OnSelChanged(wxTreeEvent&)
+void CSiteManagerDialog::OnSelChanged(wxTreeEvent& evt)
 {
 	if (m_is_deleting) {
 		return;
 	}
+
+#ifdef __WXMSW__
+	if (tree_->InPrefixSearch()) {
+		m_is_deleting = true;
+		tree_->SafeSelectItem(evt.GetItem());
+		m_is_deleting = false;
+	}
+#else
+	(void)evt;
+#endif
 
 	SetCtrlState();
 }
