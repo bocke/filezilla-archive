@@ -40,15 +40,11 @@ public:
 	wxTreeItemId GetNextItemSimple(wxTreeItemId const& item, bool includeCollapsed = false) const;
 	wxTreeItemId GetPrevItemSimple(wxTreeItemId const& item) const;
 
-#ifdef __WXMSW__
 	bool InPrefixSearch() const { return inPrefixSearch_; }
-#endif
 
 protected:
 
-#ifdef __WXMSW__
 	bool inPrefixSearch_{};
-#endif
 
 	int m_setSelection{};
 
