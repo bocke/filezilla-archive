@@ -4,6 +4,7 @@
 #include "dialogex.h"
 #include "filezillaapp.h"
 #include "Options.h"
+#include "textctrlex.h"
 #include "xrc_helper.h"
 
 #include <algorithm>
@@ -105,7 +106,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 
 	inner->Add(new wxStaticText(&pwdDlg, -1, _("Master &Password:")), lay.valign);
 
-	auto* password = new wxTextCtrl(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	auto* password = new wxTextCtrlEx(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
 	password->SetMinSize(wxSize(150, -1));
 	password->SetFocus();
 	inner->Add(password, lay.valign);
@@ -211,7 +212,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 #endif
 		main->AddSpacer(0);
 		main->Add(new wxStaticText(&pwdDlg, -1, _("Challenge:")));
-		auto* challengeText = new wxTextCtrl(&pwdDlg, -1, displayChallenge, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+		auto* challengeText = new wxTextCtrlEx(&pwdDlg, -1, displayChallenge, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
 		challengeText->SetMinSize(wxSize(lay.dlgUnits(160), lay.dlgUnits(50)));
 		challengeText->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 		main->Add(challengeText, lay.grow);
@@ -225,7 +226,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 	wxTextCtrl* newUser{};
 	if (site.server.GetUser().empty()) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("&User:")), lay.valign);
-		newUser = new wxTextCtrl(&pwdDlg, -1, wxString());
+		newUser = new wxTextCtrlEx(&pwdDlg, -1, wxString());
 		newUser->SetMinSize(wxSize(150, -1));
 		newUser->SetFocus();
 		inner->Add(newUser, lay.valign);
@@ -234,7 +235,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 	wxTextCtrl* password{};
 	if (!site.server.GetUser().empty() || site.credentials.logonType_ != LogonType::interactive) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("&Password:")), lay.valign);
-		password = new wxTextCtrl(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+		password = new wxTextCtrlEx(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
 		password->SetMinSize(wxSize(150, -1));
 		if (!newUser) {
 			password->SetFocus();
@@ -243,7 +244,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 
 		if (site.server.GetProtocol() == STORJ) {
 			inner->Add(new wxStaticText(&pwdDlg, -1, _("Encryption &key:")), lay.valign);
-			auto * key = new wxTextCtrl(&pwdDlg, XRCID("ID_ENCRYPTIONKEY"));
+			auto * key = new wxTextCtrlEx(&pwdDlg, XRCID("ID_ENCRYPTIONKEY"));
 			key->SetMinSize(wxSize(150, -1));
 			inner->Add(key, lay.valign);
 		}
