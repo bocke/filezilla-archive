@@ -446,10 +446,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	}
 #endif
 
-	wxAcceleratorEntry accel(0, WXK_F3, XRCID("ID_SEARCH"));
-	wxAcceleratorTable accelTable(1, &accel);
-	SetAcceleratorTable(accelTable);
-
+	acceleratorTable_.emplace_back(0, WXK_F3, XRCID("ID_SEARCH"));
 
 	m_connected_sites = connected_sites;
 	MarkConnectedSites();

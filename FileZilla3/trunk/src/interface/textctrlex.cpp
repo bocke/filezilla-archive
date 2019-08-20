@@ -4,6 +4,11 @@
 
 #ifdef __WXMAC__
 
+wxTextCtrlEx::wxTextCtrlEx(wxWindow* parent, int id, wxString const& value, wxPoint const& pos, wxSize const& size, long style)
+	: wxTextCtrl(parent, id, value, pos, size, style)
+{
+}
+
 static wxTextAttr DoGetDefaultStyle(wxTextCtrl* ctrl)
 {
 	wxTextAttr style;
