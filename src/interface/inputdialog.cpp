@@ -1,5 +1,6 @@
 #include <filezilla.h>
 #include "inputdialog.h"
+#include "textctrlex.h"
 
 BEGIN_EVENT_TABLE(CInputDialog, wxDialogEx)
 EVT_TEXT(XRCID("ID_STRING"), CInputDialog::OnValueChanged)
@@ -18,7 +19,7 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 
 	main->Add(new wxStaticText(this, -1, text));
 
-	m_pTextCtrl = new wxTextCtrl(this, XRCID("ID_STRING"), wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
+	m_pTextCtrl = new wxTextCtrlEx(this, XRCID("ID_STRING"), wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
 	main->Add(m_pTextCtrl, lay.grow);
 	if (max_len != -1) {
 		m_pTextCtrl->SetMaxLength(max_len);

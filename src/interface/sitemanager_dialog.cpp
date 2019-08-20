@@ -11,6 +11,7 @@
 #include "Options.h"
 #include "sitemanager_site.h"
 #include "themeprovider.h"
+#include "textctrlex.h"
 #include "treectrlex.h"
 #include "window_state_manager.h"
 #include "wrapengine.h"
@@ -293,11 +294,11 @@ wxPanel * CreateBookmarkPanel(wxWindow* parent, DialogLayout const& lay)
 	auto row = lay.createFlex(0, 1);
 	main->Add(row, lay.grow);
 	row->AddGrowableCol(0);
-	row->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_LOCALDIR")), lay.valigng);
+	row->Add(new wxTextCtrlEx(panel, XRCID("ID_BOOKMARK_LOCALDIR")), lay.valigng);
 	row->Add(new wxButton(panel, XRCID("ID_BOOKMARK_BROWSE"), _("&Browse...")), lay.valign);
 	main->AddSpacer(0);
 	main->Add(new wxStaticText(panel, -1, _("&Remote directory:")));
-	main->Add(new wxTextCtrl(panel, XRCID("ID_BOOKMARK_REMOTEDIR")), lay.grow);
+	main->Add(new wxTextCtrlEx(panel, XRCID("ID_BOOKMARK_REMOTEDIR")), lay.grow);
 	main->AddSpacer(0);
 	main->Add(new wxCheckBox(panel, XRCID("ID_BOOKMARK_SYNC"), _("Use &synchronized browsing")));
 	main->Add(new wxCheckBox(panel, XRCID("ID_BOOKMARK_COMPARISON"), _("Directory comparison")));

@@ -22,17 +22,6 @@ static int const selectAllId = wxNewId();
 
 extern wxTextEntry* GetSpecialTextEntry(wxWindow*, wxChar);
 
-bool wxDialogEx::Create(wxWindow * parent, int id, wxString const& title, wxPoint const& pos, wxSize const& size, long style)
-{
-	bool ret = wxDialog::Create(parent, id, title, pos, size, style);
-#ifdef __WXMAC__
-	if (ret) {
-		FixPasswordPaste(acceleratorTable_);
-	}
-#endif
-	return ret;
-}
-
 bool wxDialogEx::ProcessEvent(wxEvent& event)
 {
 	if (event.GetEventType() != wxEVT_MENU) {
@@ -53,6 +42,17 @@ bool wxDialogEx::ProcessEvent(wxEvent& event)
 	}
 }
 #endif
+
+bool wxDialogEx::Create(wxWindow* parent, int id, wxString const& title, wxPoint const& pos, wxSize const& size, long style)
+{
+	bool ret = wxDialog::Create(parent, id, title, pos, size, style);
+#ifdef __WXMAC__
+	if (ret) {
+		FixPasswordPaste(acceleratorTable_);
+	}
+#endif
+	return ret;
+}
 
 void wxDialogEx::OnChar(wxKeyEvent& event)
 {
