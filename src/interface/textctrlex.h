@@ -8,6 +8,9 @@
 class wxTextCtrlEx : public wxTextCtrl
 {
 public:
+	wxTextCtrlEx() = default;
+	wxTextCtrlEx(wxWindow* parent, int id, wxString const& value = wxString(), wxPoint const& pos = wxDefaultPosition, wxSize const& size = wxDefaultSize, long style = 0);
+
 	virtual void Paste();
 };
 

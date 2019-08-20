@@ -11,6 +11,7 @@
 #if ENABLE_STORJ
 #include "storj_key_interface.h"
 #endif
+#include "textctrlex.h"
 #include "xrc_helper.h"
 
 #include <s3sse.h>
@@ -113,9 +114,9 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		auto * row = lay.createFlex(0, 1);
 		row->AddGrowableCol(0);
 		lay.gbAdd(bag, row, lay.valigng);
-		row->Add(new wxTextCtrl(generalPage, XRCID("ID_HOST")), lay.valigng);
+		row->Add(new wxTextCtrlEx(generalPage, XRCID("ID_HOST")), lay.valigng);
 		row->Add(new wxStaticText(generalPage, -1, _("&Port:")), lay.valign);
-		auto* port = new wxTextCtrl(generalPage, XRCID("ID_PORT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(27), -1));
+		auto* port = new wxTextCtrlEx(generalPage, XRCID("ID_PORT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(27), -1));
 		port->SetMaxLength(5);
 		row->Add(port, lay.valign);
 
@@ -129,7 +130,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_HOST_DESC"), L""), lay.valign)->Show(false);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_HOST")), lay.valigng)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_EXTRA_HOST")), lay.valigng)->Show(false);
 
 		lay.gbAddRow(bag, new wxStaticLine(generalPage), lay.grow);
 
@@ -139,26 +140,26 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_USER_DESC"), _("&User:")), lay.valign);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_USER")), lay.valigng);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_USER")), lay.valigng);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_USER_DESC"), L""), lay.valign)->Show(false);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_USER")), lay.valigng)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_EXTRA_USER")), lay.valigng)->Show(false);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_PASS_DESC"), _("Pass&word:")), lay.valign);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_PASS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_PASS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_ACCOUNT_DESC"), _("&Account:")), lay.valign);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_ACCOUNT")), lay.valigng);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_ACCOUNT")), lay.valigng);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_KEYFILE_DESC"), _("&Key file:")), lay.valign)->Show(false);
 		row = lay.createFlex(0, 1);
 		row->AddGrowableCol(0);
 		lay.gbAdd(bag, row, lay.valigng);
-		row->Add(new wxTextCtrl(generalPage, XRCID("ID_KEYFILE")), lay.valigng)->Show(false);
+		row->Add(new wxTextCtrlEx(generalPage, XRCID("ID_KEYFILE")), lay.valigng)->Show(false);
 		row->Add(new wxButton(generalPage, XRCID("ID_KEYFILE_BROWSE"), _("Browse...")), lay.valign)->Show(false);
 
 		lay.gbNewRow(bag);
@@ -166,16 +167,16 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		row = lay.createFlex(0, 1);
 		row->AddGrowableCol(0);
 		lay.gbAdd(bag, row, lay.valigng);
-		row->Add(new wxTextCtrl(generalPage, XRCID("ID_ENCRYPTIONKEY")), lay.valigng)->Show(false);
+		row->Add(new wxTextCtrlEx(generalPage, XRCID("ID_ENCRYPTIONKEY")), lay.valigng)->Show(false);
 		row->Add(new wxButton(generalPage, XRCID("ID_ENCRYPTIONKEY_GENERATE"), _("Generate...")), lay.valign)->Show(false);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_CREDENTIALS_DESC"), L""), lay.valign)->Show(false);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_CREDENTIALS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_EXTRA_CREDENTIALS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng)->Show(false);
 
 		lay.gbNewRow(bag);
 		lay.gbAdd(bag, new wxStaticText(generalPage, XRCID("ID_EXTRA_EXTRA_DESC"), L""), lay.valign)->Show(false);
-		lay.gbAdd(bag, new wxTextCtrl(generalPage, XRCID("ID_EXTRA_EXTRA")), lay.valigng)->Show(false);
+		lay.gbAdd(bag, new wxTextCtrlEx(generalPage, XRCID("ID_EXTRA_EXTRA")), lay.valigng)->Show(false);
 
 		main->Add(new wxStaticLine(generalPage), lay.grow);
 
@@ -185,7 +186,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		row->Add(new wxChoice(generalPage, XRCID("ID_COLOR")), lay.valign);
 
 		main->Add(new wxStaticText(generalPage, -1, _("Co&mments:")));
-		main->Add(new wxTextCtrl(generalPage, XRCID("ID_COMMENTS"), L"", wxDefaultPosition, wxSize(-1, lay.dlgUnits(43)), wxTE_MULTILINE), 1, wxGROW);
+		main->Add(new wxTextCtrlEx(generalPage, XRCID("ID_COMMENTS"), L"", wxDefaultPosition, wxSize(-1, lay.dlgUnits(43)), wxTE_MULTILINE), 1, wxGROW);
 		main->AddGrowableRow(main->GetEffectiveRowsCount() - 1);
 	}
 
@@ -210,11 +211,11 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		row = lay.createFlex(0, 1);
 		main->Add(row, lay.grow);
 		row->AddGrowableCol(0);
-		row->Add(new wxTextCtrl(advancedPage, XRCID("ID_LOCALDIR")), lay.valigng);
+		row->Add(new wxTextCtrlEx(advancedPage, XRCID("ID_LOCALDIR")), lay.valigng);
 		row->Add(new wxButton(advancedPage, XRCID("ID_BROWSE"), _("&Browse...")), lay.valign);
 		main->AddSpacer(0);
 		main->Add(new wxStaticText(advancedPage, -1, _("Default r&emote directory:")));
-		main->Add(new wxTextCtrl(advancedPage, XRCID("ID_REMOTEDIR")), lay.grow);
+		main->Add(new wxTextCtrlEx(advancedPage, XRCID("ID_REMOTEDIR")), lay.grow);
 		main->AddSpacer(0);
 		main->Add(new wxCheckBox(advancedPage, XRCID("ID_SYNC"), _("&Use synchronized browsing")));
 		main->Add(new wxCheckBox(advancedPage, XRCID("ID_COMPARISON"), _("Directory comparison")));
@@ -268,7 +269,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		main->Add(new wxRadioButton(m_pCharsetPage, XRCID("ID_CHARSET_CUSTOM"), _("Use &custom charset")));
 		auto * row = lay.createFlex(0, 1);
 		row->Add(new wxStaticText(m_pCharsetPage, -1, _("&Encoding:")), lay.valign);
-		row->Add(new wxTextCtrl(m_pCharsetPage, XRCID("ID_ENCODING")), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 18);
+		row->Add(new wxTextCtrlEx(m_pCharsetPage, XRCID("ID_ENCODING")), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 18);
 		main->Add(row);
 		main->AddSpacer(lay.dlgUnits(6));
 		main->Add(new wxStaticText(m_pCharsetPage, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
@@ -296,14 +297,14 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		choice->Append(_("Custom KMS ARN"));
 		row->Add(choice, lay.valigng);
 		row->Add(new wxStaticText(m_pS3Page, -1, _("C&ustom KMS ARN:")), lay.valign);
-		row->Add(new wxTextCtrl(m_pS3Page, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
+		row->Add(new wxTextCtrlEx(m_pS3Page, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
 
 		main->Add(new wxRadioButton(m_pS3Page, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption")));
 		row = lay.createFlex(2);
 		row->AddGrowableCol(1);
 		main->Add(row, 0, wxLEFT | wxGROW, lay.dlgUnits(10));
 		row->Add(new wxStaticText(m_pS3Page, -1, _("Cus&tomer Key:")), lay.valign);
-		row->Add(new wxTextCtrl(m_pS3Page, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
+		row->Add(new wxTextCtrlEx(m_pS3Page, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
 	}
 
 	extraParameters_[ParameterSection::host].emplace_back(XRCCTRL(*this, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_HOST", wxTextCtrl));
@@ -610,7 +611,7 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 			}
 		}
 		auto label = new wxStaticText(rows.back().first->GetParent(), wxID_ANY, L"");
-		auto text = new wxTextCtrl(rows.back().first->GetParent(), wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
+		auto text = new wxTextCtrlEx(rows.back().first->GetParent(), wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
 		sizer->Add(label, wxGBPosition(pos.GetRow() + 1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
 		sizer->Add(text, wxGBPosition(pos.GetRow() + 1, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL|wxGROW);
 

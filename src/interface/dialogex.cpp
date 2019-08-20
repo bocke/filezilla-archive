@@ -22,9 +22,20 @@ static int const selectAllId = wxNewId();
 
 extern wxTextEntry* GetSpecialTextEntry(wxWindow*, wxChar);
 
+bool wxDialogEx::Create(wxWindow * parent, int id, wxString const& title, wxPoint const& pos, wxSize const& size, long style)
+{
+	bool ret = wxDialog::Create(parent, id, title, pos, size, style);
+#ifdef __WXMAC__
+	if (ret) {
+		FixPasswordPaste(acceleratorTable_);
+	}
+#endif
+	return ret;
+}
+
 bool wxDialogEx::ProcessEvent(wxEvent& event)
 {
-	if(event.GetEventType() != wxEVT_MENU) {
+	if (event.GetEventType() != wxEVT_MENU) {
 		return wxDialog::ProcessEvent(event);
 	}
 
@@ -63,12 +74,8 @@ bool wxDialogEx::Load(wxWindow* pParent, wxString const& name, std::wstring cons
 		return false;
 	}
 
-#ifdef __WXMAC__
-	wxAcceleratorEntry entries[2];
-	entries[0].Set(wxACCEL_CMD, 'V', pasteId);
-	entries[1].Set(wxACCEL_CMD, 'A', selectAllId);
-	wxAcceleratorTable accel(sizeof(entries) / sizeof(wxAcceleratorEntry), entries);
-	SetAcceleratorTable(accel);
+#ifdef __WCMAC__
+	FixPasswordPaste(acceleratorTable_);
 #endif
 
 	return true;
@@ -122,6 +129,13 @@ int wxDialogEx::ShowModal()
 #endif
 
 	++m_shown_dialogs;
+
+	if (acceleratorTable_.empty()) {
+		SetAcceleratorTable(wxNullAcceleratorTable);
+	}
+	else {
+		SetAcceleratorTable(wxAcceleratorTable(acceleratorTable_.size(), acceleratorTable_.data()));
+	}
 
 	int ret = wxDialog::ShowModal();
 
@@ -298,3 +312,12 @@ std::wstring LabelEscape(std::wstring const& label)
 {
 	return fz::replaced_substrings(label, L"&", L"&&");
 }
+
+#ifdef __WXMAC__
+void FixPasswordPaste(std::vector<wxAcceleratorEntry> & entries)
+{
+	entries.emplace_back(wxACCEL_CMD, 'V', pasteId);
+	entries.emplace_back(wxACCEL_CMD, 'A', selectAllId);
+}
+#endif
+
