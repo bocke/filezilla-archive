@@ -471,8 +471,9 @@ bool CFileZillaApp::LoadResourceFiles()
 		wxMessageBoxEx(msg, _("FileZilla Error"), wxOK | wxICON_ERROR);
 		return false;
 	}
-
-	m_resourceDir.AddSegment(_T("resources"));
+	else {
+		m_resourceDir.AddSegment(_T("resources"));
+	}
 
 	// Useful for XRC files with embedded image data.
 	wxFileSystem::AddHandler(new wxFileSystemBlobHandler);
