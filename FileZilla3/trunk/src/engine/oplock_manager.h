@@ -32,8 +32,8 @@ public:
 	OpLock(OpLock const&) = delete;
 	OpLock& operator=(OpLock const&) = delete;
 
-	OpLock(OpLock && op);
-	OpLock& operator=(OpLock && op);
+	OpLock(OpLock && op) noexcept;
+	OpLock& operator=(OpLock && op) noexcept;
 
 	explicit operator bool() const {
 		return mgr_ != nullptr;
