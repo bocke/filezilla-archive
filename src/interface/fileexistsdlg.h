@@ -18,8 +18,7 @@ public:
 	bool Always(bool &directionOnly, bool &queueOnly) const;
 
 protected:
-	/// Creates the controls and sizers
-	bool CreateControls();
+	bool SetupControls();
 
 	void DisplayFile(bool left, std::wstring const& name, int64_t size, fz::datetime const& time, wxString const& iconFile);
 

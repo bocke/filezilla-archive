@@ -8,6 +8,7 @@
 #include "xrc_helper.h"
 
 #include <wx/display.h>
+#include <wx/statbox.h>
 
 BEGIN_EVENT_TABLE(CFileExistsDlg, wxDialogEx)
 EVT_BUTTON(XRCID("wxID_OK"), CFileExistsDlg::OnOK)
@@ -27,7 +28,83 @@ bool CFileExistsDlg::Create(wxWindow* parent)
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
 	SetParent(parent);
-	if (!CreateControls()) {
+
+	if (!wxDialogEx::Create(parent, -1, _("Target file already exists"))) {
+		return false;
+	}
+
+	auto& lay = layout();
+	auto* main = lay.createMain(this, 1);
+
+	auto* inner = lay.createFlex(3);
+	main->Add(inner);
+
+	auto* left = lay.createFlex(1);
+	inner->Add(left);
+
+	left->Add(new wxStaticText(this, -1, _("The target file already exists.\nPlease choose an action.")));
+
+	left->AddSpacer(lay.dlgUnits(1));
+
+	left->Add(new wxStaticText(this, -1, _("Source file:")));
+	left->Add(new wxStaticText(this, XRCID("ID_FILE2_NAME"), wxString()));
+	auto* source = lay.createFlex(2);
+	left->Add(source);
+	source->Add(new wxStaticBitmap(this, XRCID("ID_FILE2_ICON"), wxBitmap()), lay.valign);
+	auto* sourceDetails = lay.createFlex(1);
+	source->Add(sourceDetails, lay.valign);
+	sourceDetails->Add(new wxStaticText(this, XRCID("ID_FILE2_SIZE"), wxString()));
+	sourceDetails->Add(new wxStaticText(this, XRCID("ID_FILE2_TIME"), wxString()));
+
+	left->AddSpacer(lay.dlgUnits(1));
+
+	left->Add(new wxStaticText(this, -1, _("Target file:")));
+	left->Add(new wxStaticText(this, XRCID("ID_FILE1_NAME"), wxString()));
+	auto* target = lay.createFlex(2);
+	left->Add(target);
+	target->Add(new wxStaticBitmap(this, XRCID("ID_FILE1_ICON"), wxBitmap()), lay.valign);
+	auto* targetDetails = lay.createFlex(1);
+	target->Add(targetDetails, lay.valign);
+	targetDetails->Add(new wxStaticText(this, XRCID("ID_FILE1_SIZE"), wxString()));
+	targetDetails->Add(new wxStaticText(this, XRCID("ID_FILE1_TIME"), wxString()));
+
+	inner->AddSpacer(lay.dlgUnits(10));
+
+	auto* right = lay.createFlex(1);
+	inner->Add(right);
+
+	auto [box, actions] = lay.createStatBox(right, _("Action:"), 1);
+
+	auto* first = new wxRadioButton(box, XRCID("ID_ACTION1"), _("&Overwrite"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	first->SetValue(true);
+	actions->Add(first);
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION2"), _("Overwrite &if source newer")));
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION7"), _("Overwrite if &different size")));
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION6"), _("Overwrite if different si&ze or source newer")));
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION3"), _("&Resume")));
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION4"), _("Re&name")));
+	actions->Add(new wxRadioButton(box, XRCID("ID_ACTION5"), _("&Skip")));
+
+
+	right->Add(new wxCheckBox(this, XRCID("ID_ALWAYS"), _("&Always use this action")));
+	right->Add(new wxCheckBox(this, XRCID("ID_QUEUEONLY"), _("Apply to &current queue only")), 0, wxLEFT, lay.dlgUnits(10));
+	right->Add(new wxCheckBox(this, XRCID("ID_UPDOWNONLY"), wxString()), 0, wxLEFT, lay.dlgUnits(10));
+
+	auto* buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
+
+
+
+
+	if (!SetupControls()) {
 		return false;
 	}
 	GetSizer()->Fit(this);
@@ -58,12 +135,8 @@ void CFileExistsDlg::DisplayFile(bool left, std::wstring const& name, int64_t si
 	LoadIcon(left ? XRCID("ID_FILE1_ICON") : XRCID("ID_FILE2_ICON"), iconFile);
 }
 
-bool CFileExistsDlg::CreateControls()
+bool CFileExistsDlg::SetupControls()
 {
-	if (!Load(GetParent(), _T("ID_FILEEXISTSDLG"))) {
-		return false;
-	}
-
 	std::wstring const& localFile = m_pNotification->localFile;
 	std::wstring remoteFile = m_pNotification->remotePath.FormatFilename(m_pNotification->remoteFile);
 
