@@ -22,6 +22,8 @@ public:
 	wxGridBagSizer* createGridBag(int cols, int rows = 0) const;
 	wxStdDialogButtonSizer* createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const;
 
+	std::tuple<wxStaticBox*, wxFlexGridSizer*> createStatBox(wxSizer* parent, wxString const& title, int cols, int rows = 0) const;
+
 	DialogLayout(wxTopLevelWindow * parent);
 
 	void gbNewRow(wxGridBagSizer * gb) const;

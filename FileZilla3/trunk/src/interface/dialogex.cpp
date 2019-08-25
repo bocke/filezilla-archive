@@ -308,6 +308,18 @@ wxSizerItem* DialogLayout::gbAdd(wxGridBagSizer* gb, wxSizer* sizer, wxSizerFlag
 	return item;
 }
 
+std::tuple<wxStaticBox*, wxFlexGridSizer*> DialogLayout::createStatBox(wxSizer* parent, wxString const& title, int cols, int rows) const
+{
+	auto* boxSizer = new wxStaticBoxSizer(wxHORIZONTAL, parent->GetContainingWindow(), title);
+	auto* box = boxSizer->GetStaticBox();
+	parent->Add(boxSizer, 1, wxGROW);
+
+	auto* flex = createFlex(cols, rows);
+	boxSizer->Add(flex, 1, wxALL|wxGROW, border);
+
+	return std::make_tuple(box, flex);
+}
+
 std::wstring LabelEscape(std::wstring const& label)
 {
 	return fz::replaced_substrings(label, L"&", L"&&");
@@ -320,4 +332,3 @@ void FixPasswordPaste(std::vector<wxAcceleratorEntry> & entries)
 	entries.emplace_back(wxACCEL_CMD, 'A', selectAllId);
 }
 #endif
-
