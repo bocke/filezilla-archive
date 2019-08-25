@@ -52,9 +52,9 @@ public:
 protected:
 	struct t_cap
 	{
-		capabilities cap;
+		capabilities cap{unknown};
 		std::wstring option;
-		int number;
+		int number{};
 	};
 	std::map<capabilityNames, t_cap> m_capabilityMap;
 };
