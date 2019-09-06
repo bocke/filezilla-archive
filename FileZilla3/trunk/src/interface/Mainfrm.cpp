@@ -1749,10 +1749,14 @@ void CMainFrame::OnFilter(wxCommandEvent& event)
 }
 
 #if FZ_MANUALUPDATECHECK
-void CMainFrame::OnCheckForUpdates(wxCommandEvent&)
+void CMainFrame::OnCheckForUpdates(wxCommandEvent& event)
 {
 	if (!m_pUpdater) {
 		return;
+	}
+
+	if (event.GetId() == XRCID("ID_CHECKFORUPDATES") || (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0)) {
+		m_pUpdater->RunIfNeeded();
 	}
 
 	update_dialog_timer_.Stop();
@@ -1782,14 +1786,11 @@ void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 		}
 		return;
 	}
-	else if (s != UpdaterState::newversion && s != UpdaterState::newversion_ready) {
+	else if (s != UpdaterState::newversion && s != UpdaterState::newversion_ready && s != UpdaterState::newversion_stale) {
 		return;
 	}
-	else if (v.version_.empty()) {
-		return;
-	}
-
-	wxString const name = wxString::Format(_("&Version %s"), v.version_);
+	
+	wxString const name = v.version_.empty() ? _("Unknown version") : wxString::Format(_("&Version %s"), v.version_);
 
 	wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId());
 	if (!pItem) {

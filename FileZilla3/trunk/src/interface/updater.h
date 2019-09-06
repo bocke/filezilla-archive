@@ -45,7 +45,8 @@ enum class UpdaterState
 	checking,
 	newversion, // There is a new version available, user needs to manually download
 	newversion_downloading, // There is a new version available, file is being downloaded
-	newversion_ready // There is a new version available, file has been downloaded
+	newversion_ready, // There is a new version available, file has been downloaded
+	newversion_stale // Very old version of FileZilla. Either update checking has been disabled or is otherwise not working.
 };
 
 class CUpdateHandler
@@ -78,8 +79,6 @@ public:
 
 	std::wstring GetLog() const { return log_; }
 
-	bool LongTimeSinceLastCheck() const;
-
 	static CUpdater* GetInstance();
 
 	bool UpdatableBuild() const;
@@ -89,6 +88,8 @@ public:
 	bool Busy() const;
 
 protected:
+	bool LongTimeSinceLastCheck() const;
+
 	int Download(std::wstring const& url, std::wstring const& local_file = std::wstring());
 	int Request(fz::uri const& uri);
 	int ContinueDownload();

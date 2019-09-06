@@ -75,6 +75,16 @@
             <border>10</border>
           </object>
           <object class="sizeritem">
+            <object class="wxStaticText" name="ID_OUTDATED">
+              <label>Unfortunately information about the new update could not be retrieved.</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="ID_DISABLED_CHECK">
+              <label>Either you or your system administrator has disabled checking for updates. Please re-enable checking for updates to obtain more information.</label>
+            </object>
+          </object>
+          <object class="sizeritem">
             <object class="wxStaticText" name="ID_DOWNLOAD_FAIL">
               <label>The new version could not be downloaded, please retry later.</label>
             </object>

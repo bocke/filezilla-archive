@@ -127,9 +127,18 @@ CUpdater* CUpdater::GetInstance()
 void CUpdater::AutoRunIfNeeded()
 {
 #if FZ_AUTOUPDATECHECK
-	if (state_ == UpdaterState::failed || state_ == UpdaterState::idle) {
-		if (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0 && LongTimeSinceLastCheck()) {
-			Run(false);
+	if (state_ == UpdaterState::failed || state_ == UpdaterState::idle || state_ == UpdaterState::newversion_stale) {
+		if (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0) {
+			if (LongTimeSinceLastCheck()) {
+				Run(false);
+			}
+		}
+		else {
+			auto const age = fz::datetime::now() - CBuildInfo::GetBuildDate();
+			if (age >= fz::duration::from_days(31*6)) {
+				version_information_ = version_information();
+				SetState(UpdaterState::newversion_stale);
+			}
 		}
 	}
 #endif
@@ -138,7 +147,7 @@ void CUpdater::AutoRunIfNeeded()
 void CUpdater::RunIfNeeded()
 {
 	build const b = AvailableBuild();
-	if (state_ == UpdaterState::idle || state_ == UpdaterState::failed ||
+	if (state_ == UpdaterState::idle || state_ == UpdaterState::failed || state_ == UpdaterState::newversion_stale ||
 		LongTimeSinceLastCheck() || (state_ == UpdaterState::newversion && !b.url_.empty()) ||
 		(state_ == UpdaterState::newversion_ready && !VerifyChecksum(DownloadedFile(), b.size_, b.hash_)))
 	{
@@ -253,7 +262,8 @@ fz::uri CUpdater::GetUrl()
 bool CUpdater::Run(bool manual)
 {
 	if (state_ != UpdaterState::idle && state_ != UpdaterState::failed &&
-		state_ != UpdaterState::newversion && state_ != UpdaterState::newversion_ready)
+		state_ != UpdaterState::newversion && state_ != UpdaterState::newversion_ready
+		&& state_ != UpdaterState::newversion_stale)
 	{
 		return false;
 	}
