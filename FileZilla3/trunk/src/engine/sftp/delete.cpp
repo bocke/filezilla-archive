@@ -1,7 +1,7 @@
 #include <filezilla.h>
 
 #include "delete.h"
-#include "directorycache.h"
+#include "../directorycache.h"
 
 int CSftpDeleteOpData::Send()
 {

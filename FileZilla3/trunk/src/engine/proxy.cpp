@@ -1,7 +1,7 @@
 #include <filezilla.h>
 #include "engineprivate.h"
 #include "proxy.h"
-#include "ControlSocket.h"
+#include "controlsocket.h"
 
 #include <libfilezilla/iputils.hpp>
 

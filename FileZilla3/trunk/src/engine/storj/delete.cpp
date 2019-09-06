@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "delete.h"
 
 enum DeleteStates
@@ -46,7 +46,7 @@ int CStorjDeleteOpData::Send()
 		return controlSocket_.SendCommand(L"rm " + bucket_ + L" " + id);
 	}
 
-	log(logmsg::debug_warning, L"Unknown opState in CStorjDeleteOpData::FileTransferSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjDeleteOpData::Send()");
 	return FZ_REPLY_INTERNALERROR;
 }
 

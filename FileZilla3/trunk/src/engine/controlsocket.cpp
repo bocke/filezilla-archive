@@ -1,8 +1,9 @@
 #include <filezilla.h>
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "directorycache.h"
 #include "engineprivate.h"
 #include "local_path.h"
+#include "lookup.h"
 #include "logging_private.h"
 #include "proxy.h"
 #include "servercapabilities.h"
@@ -635,7 +636,7 @@ void CControlSocket::InvalidateCurrentWorkingDir(const CServerPath& path)
 		return;
 	}
 
-	if (currentPath_ == path || path.IsParentOf(currentPath_, false)) {
+	if (path.IsParentOf(currentPath_, false, true)) {
 		if (!operations_.empty()) {
 			m_invalidateCurrentPath = true;
 		}
@@ -1155,4 +1156,54 @@ void CControlSocket::CallSetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 
 	SetAlive();
 	SetAsyncRequestReply(pNotification);
+}
+
+void CControlSocket::Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry)
+{
+	Push(std::make_unique<LookupOpData>(*this, path, file, entry));
+}
+
+int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::duration const& lastChunkDuration, int64_t minChunkSize, int64_t multiple, int64_t partCount, int64_t maxPartCount, int64_t maxChunkSize)
+{
+	if (remaining <= 0) {
+		return 0;
+	}
+
+	int64_t newChunkSize = minChunkSize;
+
+	if (lastChunkDuration && lastChunkSize) {
+		int64_t size = lastChunkSize * 30000 / lastChunkDuration.get_milliseconds();
+		if (size > newChunkSize) {
+			newChunkSize = size;
+		}
+	}
+
+	if (maxPartCount) {
+		if (newChunkSize * (maxPartCount - partCount) < remaining) {
+			if (maxPartCount - partCount <= 1) {
+				newChunkSize = remaining;
+			}
+			else {
+				newChunkSize = remaining / (maxPartCount - partCount - 1);
+			}
+		}
+	}
+
+	if (multiple) {
+		// Round up
+		int modulus = newChunkSize % multiple;
+		if (modulus) {
+			newChunkSize += multiple - modulus;
+		}
+	}
+
+	if (maxChunkSize && newChunkSize > maxChunkSize) {
+		newChunkSize = maxChunkSize;
+	}
+
+	if (newChunkSize > remaining) {
+		newChunkSize = remaining;
+	}
+
+	return newChunkSize;
 }

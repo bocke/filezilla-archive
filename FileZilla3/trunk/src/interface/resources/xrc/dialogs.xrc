@@ -3342,8 +3342,7 @@
             </object>
           </object>
           <object class="sizeritem">
-            <object class="wxListBox" name="ID_DIRS">
-            </object>
+            <object class="wxListBox" name="ID_DIRS" />
             <flag>wxGROW</flag>
             <minsize>-1,100d</minsize>
           </object>

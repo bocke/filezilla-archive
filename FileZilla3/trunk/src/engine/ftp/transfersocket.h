@@ -3,7 +3,7 @@
 
 #include "iothread.h"
 #include "backend.h"
-#include "ControlSocket.h"
+#include "controlsocket.h"
 
 class CFileZillaEnginePrivate;
 class CFtpControlSocket;

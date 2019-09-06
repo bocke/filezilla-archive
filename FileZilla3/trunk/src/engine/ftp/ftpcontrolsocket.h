@@ -2,7 +2,7 @@
 #define FILEZILLA_ENGINE_FTP_FTPCONTROLSOCKET_HEADER
 
 #include "logging_private.h"
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "externalipresolver.h"
 #include "rtt.h"
 

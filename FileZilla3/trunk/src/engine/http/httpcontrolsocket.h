@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_HTTP_HTTPCONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_HTTP_HTTPCONTROLSOCKET_HEADER
 
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "httpheaders.h"
 
 #include <libfilezilla/file.hpp>

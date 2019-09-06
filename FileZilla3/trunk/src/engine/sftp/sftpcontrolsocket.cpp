@@ -4,7 +4,7 @@
 #include "connect.h"
 #include "cwd.h"
 #include "delete.h"
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "directorylistingparser.h"
 #include "engineprivate.h"
 #include "event.h"

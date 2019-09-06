@@ -3,7 +3,7 @@
 #include "cwd.h"
 #include "chmod.h"
 #include "delete.h"
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "directorylistingparser.h"
 #include "engineprivate.h"
 #include "externalipresolver.h"

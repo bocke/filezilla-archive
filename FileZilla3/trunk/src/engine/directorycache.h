@@ -18,6 +18,52 @@ version.
 
 #include <set>
 
+enum class LookupFlags
+{
+	allow_outdated        = 0x01,
+	force_caseinsensitive = 0x02,
+};
+
+enum class LookupResults : unsigned
+{
+	found       = 0x01,
+	outdated    = 0x02,
+	direxists   = 0x04,
+	matchedcase = 0x08
+};
+
+inline bool operator&(LookupFlags lhs, LookupFlags rhs)
+{
+	return (static_cast<std::underlying_type_t<LookupFlags>>(lhs) & static_cast<std::underlying_type_t<LookupFlags>>(rhs)) != 0;
+}
+
+inline LookupFlags operator|(LookupFlags lhs, LookupFlags rhs)
+{
+	return static_cast<LookupFlags>(static_cast<std::underlying_type_t<LookupFlags>>(lhs) | static_cast<std::underlying_type_t<LookupFlags>>(rhs));
+}
+
+inline LookupFlags& operator|=(LookupFlags & lhs, LookupFlags rhs)
+{
+	lhs = lhs | rhs;
+	return lhs;
+}
+
+inline bool operator&(LookupResults lhs, LookupResults rhs)
+{
+	return (static_cast<std::underlying_type_t<LookupResults>>(lhs) & static_cast<std::underlying_type_t<LookupResults>>(rhs)) != 0;
+}
+
+inline LookupResults operator|(LookupResults lhs, LookupResults rhs)
+{
+	return static_cast<LookupResults>(static_cast<std::underlying_type_t<LookupResults>>(lhs) | static_cast<std::underlying_type_t<LookupResults>>(rhs));
+}
+
+inline LookupResults& operator|=(LookupResults & lhs, LookupResults rhs)
+{
+	lhs = lhs | rhs;
+	return lhs;
+}
+
 class CDirectoryCache final
 {
 public:
@@ -34,12 +80,14 @@ public:
 	CDirectoryCache(CDirectoryCache const&) = delete;
 	CDirectoryCache& operator=(CDirectoryCache const&) = delete;
 
+	std::tuple<LookupResults, CDirentry> LookupFile(CServer const& server, CServerPath const& path, std::wstring const& filename, LookupFlags flags);
+
 	void Store(CDirectoryListing const& listing, CServer const& server);
 	bool GetChangeTime(fz::monotonic_clock& time, CServer const& server, CServerPath const& path);
 	bool Lookup(CDirectoryListing &listing, CServer const&server, CServerPath const& path, bool allowUnsureEntries, bool& is_outdated);
 	bool DoesExist(CServer const& server, CServerPath const& path, int &hasUnsureEntries, bool &is_outdated);
 	bool LookupFile(CDirentry &entry, CServer const& server, CServerPath const& path, std::wstring const& filename, bool &dirDidExist, bool &matchedCase);
-	bool InvalidateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool *wasDir = nullptr);
+	bool InvalidateFile(CServer const& server, CServerPath const& path, std::wstring const& filename);
 	bool UpdateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool mayCreate, Filetype type = file, int64_t size = -1, std::wstring const& ownerGroup = std::wstring{});
 	bool RemoveFile(CServer const& server, CServerPath const& path, std::wstring const& filename);
 	void InvalidateServer(CServer const& server);

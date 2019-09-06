@@ -1,7 +1,7 @@
 #include <filezilla.h>
 
 #include "connect.h"
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "engineprivate.h"
 #include "filetransfer.h"
 #include "httpcontrolsocket.h"
@@ -38,6 +38,9 @@ int file_body::data_request(unsigned char* data, unsigned int & len)
 	assert(size_ >= written_);
 	assert(len > 0);
 	len = static_cast<unsigned int>(std::min(static_cast<uint64_t>(len), size_ - written_));
+	if (!len) {
+		return FZ_REPLY_CONTINUE;
+	}
 	auto bytes_read = file_.read(data, len);
 	if (bytes_read < 0) {
 		len = 0;

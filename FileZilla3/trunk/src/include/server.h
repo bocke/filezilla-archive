@@ -102,6 +102,15 @@ enum class ProtocolFeature
 	Security // Encryption, integrity protection and authentication
 };
 
+enum class CaseSensitivity
+{
+	unspecified,
+	yes,
+	no
+};
+
+CaseSensitivity GetCaseSensitivity(ServerProtocol protocol);
+
 class Credentials;
 class CServerPath;
 class CServer final
@@ -173,6 +182,8 @@ public:
 
 	bool HasFeature(ProtocolFeature const feature) const;
 	static bool ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature const feature);
+
+	CaseSensitivity GetCaseSensitivity() const;
 
 	// These commands will be executed after a successful login.
 	std::vector<std::wstring> const& GetPostLoginCommands() const { return m_postLoginCommands; }
