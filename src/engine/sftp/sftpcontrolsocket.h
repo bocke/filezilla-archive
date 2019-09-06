@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_SFTP_SFTPCONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_SFTP_SFTPCONTROLSOCKET_HEADER
 
-#include "ControlSocket.h"
+#include "controlsocket.h"
 
 #include "backend.h"
 

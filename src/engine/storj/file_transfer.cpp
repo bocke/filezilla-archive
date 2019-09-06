@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "file_transfer.h"
 
 #include <libfilezilla/local_filesys.hpp>
@@ -99,7 +99,7 @@ int CStorjFileTransferOpData::Send()
 		return FZ_REPLY_WOULDBLOCK;
 	}
 
-	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::FileTransferSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::Send()");
 	return FZ_REPLY_INTERNALERROR;
 }
 

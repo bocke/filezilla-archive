@@ -4,7 +4,7 @@
 #include "delete.h"
 #include "event.h"
 #include "input_thread.h"
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "directorylistingparser.h"
 #include "engineprivate.h"
 #include "file_transfer.h"

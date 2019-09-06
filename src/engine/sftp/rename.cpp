@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "pathcache.h"
 #include "rename.h"
 
@@ -21,8 +21,7 @@ int CSftpRenameOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case rename_rename:
 	{
-		bool wasDir = false;
-		engine_.GetDirectoryCache().InvalidateFile(currentServer_, command_.GetFromPath(), command_.GetFromFile(), &wasDir);
+		engine_.GetDirectoryCache().InvalidateFile(currentServer_, command_.GetFromPath(), command_.GetFromFile());
 		engine_.GetDirectoryCache().InvalidateFile(currentServer_, command_.GetToPath(), command_.GetToFile());
 
 		std::wstring fromQuoted = controlSocket_.QuoteFilename(command_.GetFromPath().FormatFilename(command_.GetFromFile(), !useAbsolute_));
@@ -31,15 +30,13 @@ int CSftpRenameOpData::Send()
 		engine_.GetPathCache().InvalidatePath(currentServer_, command_.GetFromPath(), command_.GetFromFile());
 		engine_.GetPathCache().InvalidatePath(currentServer_, command_.GetToPath(), command_.GetToFile());
 
-		if (wasDir) {
-			// Need to invalidate current working directories
-			CServerPath path = engine_.GetPathCache().Lookup(currentServer_, command_.GetFromPath(), command_.GetFromFile());
-			if (path.empty()) {
-				path = command_.GetFromPath();
-				path.AddSegment(command_.GetFromFile());
-			}
-			engine_.InvalidateCurrentWorkingDirs(path);
+		// Need to invalidate current working directories
+		CServerPath path = engine_.GetPathCache().Lookup(currentServer_, command_.GetFromPath(), command_.GetFromFile());
+		if (path.empty()) {
+			path = command_.GetFromPath();
+			path.AddSegment(command_.GetFromFile());
 		}
+		engine_.InvalidateCurrentWorkingDirs(path);
 
 		return controlSocket_.SendCommand(L"mv " + controlSocket_.WildcardEscape(fromQuoted) + L" " + toQuoted, L"mv " + fromQuoted + L" " + toQuoted);
 	}

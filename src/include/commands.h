@@ -28,7 +28,10 @@ enum class Command
 	httprequest, // Only used by HTTP protocol
 
 	// Only used internally
+	lookup,
 	cwd,
+	common_private1, // Internal commands common to multiple protocols
+	common_private2,
 	private1,
 	private2,
 	private3,
@@ -49,7 +52,7 @@ enum class Command
 #define FZ_REPLY_NOTCONNECTED	(0x0020 | FZ_REPLY_ERROR)
 #define FZ_REPLY_DISCONNECTED	(0x0040)
 #define FZ_REPLY_INTERNALERROR	(0x0080 | FZ_REPLY_ERROR) // If you get this reply, the error description will be
-														  // given by the last Debug_Warning log message. This
+														  // given by the last debug_warning log message. This
 														  // should not happen unless there is a bug in FileZilla 3.
 #define FZ_REPLY_BUSY			(0x0100 | FZ_REPLY_ERROR)
 #define FZ_REPLY_ALREADYCONNECTED	(0x0200 | FZ_REPLY_ERROR) // Will be returned by connect if already connected

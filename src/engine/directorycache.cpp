@@ -114,6 +114,52 @@ bool CDirectoryCache::DoesExist(CServer const& server, CServerPath const& path, 
 	return false;
 }
 
+std::tuple<LookupResults, CDirentry> CDirectoryCache::LookupFile(CServer const& server, CServerPath const& path, std::wstring const& filename, LookupFlags flags)
+{
+	LookupResults results{};
+	CDirentry entry;
+
+	fz::scoped_lock lock(mutex_);
+
+	tServerIter sit = GetServerEntry(server);
+	if (sit == m_serverList.end()) {
+		return {results, entry};
+	}
+
+	tCacheIter iter;
+	bool outdated{};
+	if (!Lookup(iter, sit, path, true, outdated)) {
+		return {results, entry};
+	}
+
+	if (outdated) {
+		results |= LookupResults::outdated;
+		if (!(flags & LookupFlags::allow_outdated)) {
+			return {results, entry};
+		}
+	}
+
+	results |= LookupResults::direxists;
+
+	CCacheEntry const& cacheEntry = *iter;
+	CDirectoryListing const& listing = cacheEntry.listing;
+
+	size_t i = listing.FindFile_CmpCase(filename);
+	if (i != std::string::npos) {
+		entry = listing[i];
+		results |= LookupResults::found | LookupResults::matchedcase;
+	}
+	else if (server.GetCaseSensitivity() != CaseSensitivity::yes || (flags & LookupFlags::force_caseinsensitive)) {
+		i = listing.FindFile_CmpNoCase(filename);
+		if (i != std::string::npos) {
+			entry = listing[i];
+			results |= LookupResults::found;
+		}
+	}
+
+	return {results, entry};
+}
+
 bool CDirectoryCache::LookupFile(CDirentry &entry, CServer const& server, CServerPath const& path, std::wstring const& filename, bool &dirDidExist, bool &matchedCase)
 {
 	fz::scoped_lock lock(mutex_);
@@ -151,7 +197,7 @@ bool CDirectoryCache::LookupFile(CDirentry &entry, CServer const& server, CServe
 	return false;
 }
 
-bool CDirectoryCache::InvalidateFile(CServer const& server, CServerPath const& path, std::wstring const& filename, bool *wasDir)
+bool CDirectoryCache::InvalidateFile(CServer const& server, CServerPath const& path, std::wstring const& filename)
 {
 	fz::scoped_lock lock(mutex_);
 
@@ -160,24 +206,56 @@ bool CDirectoryCache::InvalidateFile(CServer const& server, CServerPath const& p
 		return false;
 	}
 
+	bool const cmpCase = server.GetCaseSensitivity() == CaseSensitivity::yes;
+	bool dir{};
+
+	auto const now = fz::monotonic_clock::now();
 	for (tCacheIter iter = sit->cacheList.begin(); iter != sit->cacheList.end(); ++iter) {
 		auto & entry = const_cast<CCacheEntry&>(*iter);
-		if (path.CmpNoCase(entry.listing.path)) {
-			continue;
+
+		if (cmpCase) {
+			if (path != entry.listing.path) {
+				continue;
+			}
+		}
+		else {
+			if (path.CmpNoCase(entry.listing.path)) {
+				continue;
+			}
 		}
 
 		UpdateLru(sit, iter);
 
 		for (unsigned int i = 0; i < entry.listing.size(); i++) {
-			if (!fz::stricmp(filename, entry.listing[i].name)) {
-				if (wasDir) {
-					*wasDir = entry.listing[i].is_dir();
+			bool same;
+			if (cmpCase) {
+				same = filename == entry.listing[i].name;
+			}
+			else {
+				same = !fz::stricmp(filename, entry.listing[i].name);
+			}
+			if (same) {
+				if (entry.listing[i].is_dir()) {
+					dir = true;
 				}
 				entry.listing.get(i).flags |= CDirentry::flag_unsure;
 			}
 		}
 		entry.listing.m_flags |= CDirectoryListing::unsure_unknown;
-		entry.modificationTime = fz::monotonic_clock::now();
+		entry.modificationTime = now;
+	}
+
+	if (dir) {
+		CServerPath child = path;
+		if (child.ChangePath(filename)) {
+			for (tCacheIter iter = sit->cacheList.begin(); iter != sit->cacheList.end(); ++iter) {
+				auto & entry = const_cast<CCacheEntry&>(*iter);
+				if (path.IsParentOf(entry.listing.path, !cmpCase, true)) {
+					entry.listing.m_flags |= CDirectoryListing::unsure_unknown;
+					entry.modificationTime = now;
+				}
+			}
+		}
 	}
 
 	return true;

@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "filetransfer.h"
 
 #include <libfilezilla/local_filesys.hpp>

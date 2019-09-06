@@ -1809,7 +1809,7 @@ void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 
 void CMainFrame::TriggerUpdateDialog()
 {
-	if (m_bQuit) {
+	if (m_bQuit || !m_pUpdater) {
 		return;
 	}
 

@@ -595,7 +595,7 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		}
 		break;
 	case ProtocolFeature::RecursiveDelete:
-		if (protocol == GOOGLE_DRIVE || protocol == DROPBOX || protocol == ONEDRIVE) {
+		if (protocol == GOOGLE_DRIVE || protocol == DROPBOX || protocol == ONEDRIVE || protocol == B2) {
 			return true;
 		}
 		break;
@@ -912,4 +912,23 @@ bool CServer::SameContent(CServer const& other) const
 	auto r = std::tie(other.m_timezoneOffset, other.m_encodingType, other.m_customEncoding);
 
 	return l == r;
+}
+
+CaseSensitivity GetCaseSensitivity(ServerProtocol protocol)
+{
+	switch (protocol) {
+	case B2:
+	case GOOGLE_DRIVE:
+		return CaseSensitivity::yes;
+	case BOX:
+	case ONEDRIVE:
+		return CaseSensitivity::no;
+	default:
+		return CaseSensitivity::unspecified;
+	}
+}
+
+CaseSensitivity CServer::GetCaseSensitivity() const
+{
+	return ::GetCaseSensitivity(m_protocol);
 }

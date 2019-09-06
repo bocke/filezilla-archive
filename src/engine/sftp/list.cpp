@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "directorycache.h"
+#include "../directorycache.h"
 #include "list.h"
 
 enum listStates
@@ -59,7 +59,7 @@ int CSftpListOpData::Send()
 		return controlSocket_.SendCommand(L"ls");
 	}
 
-	log(logmsg::debug_warning, L"Unknown opState in CSftpControlSocket::ListSend()");
+	log(logmsg::debug_warning, L"Unknown opState in CSftpListOpData::Send()");
 	return FZ_REPLY_INTERNALERROR;
 }
 

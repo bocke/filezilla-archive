@@ -1,6 +1,6 @@
 #include <filezilla.h>
 
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "oplock_manager.h"
 
 #include <assert.h>

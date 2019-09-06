@@ -23,14 +23,14 @@ int CStorjConnectOpData::Send()
 			std::vector<fz::native_string> args;
 			if (!controlSocket_.process_->spawn(executable, args)) {
 				log(logmsg::debug_warning, L"Could not create process");
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;;
+				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 
 			controlSocket_.input_thread_ = std::make_unique<CStorjInputThread>(controlSocket_, *controlSocket_.process_);
 			if (!controlSocket_.input_thread_->spawn(engine_.GetThreadPool())) {
 				log(logmsg::debug_warning, L"Thread creation failed");
 				controlSocket_.input_thread_.reset();
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;;
+				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 		}
 		return FZ_REPLY_WOULDBLOCK;

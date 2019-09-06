@@ -1,5 +1,5 @@
 #include <filezilla.h>
-#include "ControlSocket.h"
+#include "controlsocket.h"
 #include "directorycache.h"
 #include "engineprivate.h"
 #include "ftp/ftpcontrolsocket.h"
@@ -353,10 +353,16 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 				if (command.GetSubDir().empty()) {
 					path = command.GetPath();
 				}
-				else if (server.GetProtocol() == STORJ) {
-                                        path = command.GetPath();
-                                        path.ChangePath(command.GetSubDir());
-                                }
+				else if (server.GetProtocol() == S3 || server.GetProtocol() == STORJ ||
+						server.GetProtocol() == WEBDAV || server.GetProtocol() == INSECURE_WEBDAV ||
+						server.GetProtocol() == AZURE_FILE || server.GetProtocol() == AZURE_BLOB ||
+						server.GetProtocol() == SWIFT || server.GetProtocol() == GOOGLE_CLOUD ||
+						server.GetProtocol() == GOOGLE_DRIVE || server.GetProtocol() == DROPBOX ||
+						server.GetProtocol() == ONEDRIVE || server.GetProtocol() == B2 ||
+						server.GetProtocol() == BOX) {
+					path = command.GetPath();
+					path.ChangePath(command.GetSubDir());
+				}
 			}
 			if (!path.empty()) {
 				CDirectoryListing *pListing = new CDirectoryListing;

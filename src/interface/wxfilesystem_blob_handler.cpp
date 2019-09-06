@@ -1,6 +1,8 @@
 #include <filezilla.h>
 #include "wxfilesystem_blob_handler.h"
 
+#include <libfilezilla/encode.hpp>
+
 #include <wx/mstream.h>
 
 bool wxFileSystemBlobHandler::CanOpen(wxString const& location)

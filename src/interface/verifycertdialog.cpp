@@ -723,6 +723,9 @@ void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecure
 	case INSECURE_FTP:
 		name = L"FTP";
 		break;
+	case INSECURE_WEBDAV:
+		name = L"WebDAV";
+		break;
 	default:
 		name = CServer::GetProtocolName(protocol);
 		break;

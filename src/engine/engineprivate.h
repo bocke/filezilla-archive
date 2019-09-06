@@ -92,6 +92,7 @@ public:
 	CPathCache& GetPathCache() { return path_cache_; }
 	fz::thread_pool& GetThreadPool() { return thread_pool_; }
 	CFileZillaEngineContext& GetContext() { return context_; }
+	CFileZillaEngine& GetParent() { return parent_; }
 
 	// If deleting or renaming a directory, it could be possible that another
 	// engine's CControlSocket instance still has that directory as

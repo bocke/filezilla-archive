@@ -1,7 +1,7 @@
 #include <filezilla.h>
 
 #include "chmod.h"
-#include "directorycache.h"
+#include "../directorycache.h"
 
 enum chmodStates
 {

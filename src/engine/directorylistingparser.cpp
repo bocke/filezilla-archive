@@ -1,6 +1,6 @@
 #include <filezilla.h>
 #include "directorylistingparser.h"
-#include "ControlSocket.h"
+#include "controlsocket.h"
 
 #include <libfilezilla/format.hpp>
 

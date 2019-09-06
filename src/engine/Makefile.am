@@ -8,7 +8,7 @@ libengine_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
 libengine_a_SOURCES = \
 		backend.cpp \
 		commands.cpp \
-		ControlSocket.cpp \
+		controlSocket.cpp \
 		directorycache.cpp \
 		directorylisting.cpp \
 		directorylistingparser.cpp \
@@ -37,6 +37,7 @@ libengine_a_SOURCES = \
 		iothread.cpp \
 		local_path.cpp \
 		logging.cpp \
+		lookup.cpp \
 		misc.cpp \
 		notification.cpp \
 		oplock_manager.cpp \
@@ -63,7 +64,7 @@ libengine_a_SOURCES = \
 		xmlutils.cpp
 
 noinst_HEADERS = backend.h \
-		ControlSocket.h \
+		controlSocket.h \
 		directorycache.h \
 		directorylistingparser.h \
 		engineprivate.h \
@@ -89,6 +90,7 @@ noinst_HEADERS = backend.h \
 		http/request.h \
 		iothread.h \
 		logging_private.h \
+		lookup.h \
 		oplock_manager.h \
 		pathcache.h \
 		proxy.h \

@@ -212,6 +212,11 @@ bool CFileZillaApp::OnInit()
 {
 	AddStartupProfileRecord("CFileZillaApp::OnInit()");
 
+	// Turn off idle events, we don't need them
+	wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
+
+	wxUpdateUIEvent::SetMode(wxUPDATE_UI_PROCESS_SPECIFIED);
+
 	fz::set_translators(translator, translator_pf);
 
 #ifdef __WXMSW__
@@ -289,21 +294,15 @@ USE AT OWN RISK"), _T("Important Information"));
 		return false;
 	}
 
+	themeProvider_ = std::make_unique<CThemeProvider>();
 	CheckExistsFzsftp();
 #if ENABLE_STORJ
 	CheckExistsFzstorj();
 #endif
 
-	// Turn off idle events, we don't need them
-	wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
-
-	wxUpdateUIEvent::SetMode(wxUPDATE_UI_PROCESS_SPECIFIED);
-
 #ifdef WITH_LIBDBUS
 	CSessionManager::Init();
 #endif
-
-	themeProvider_ = std::make_unique<CThemeProvider>();
 
 	// Load the text wrapping engine
 	m_pWrapEngine = std::make_unique<CWrapEngine>();
@@ -313,14 +312,14 @@ USE AT OWN RISK"), _T("Important Information"));
 #ifdef USE_MAC_SANDBOX
 	OSXSandboxUserdirs::Get().Load();
 
-    if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
+	if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
 		CWelcomeDialog welcome;
 		welcome.Run(nullptr, false);
 		welcome_skip = true;
 
-        OSXSandboxUserdirsDialog dlg;
-        dlg.Run(nullptr, true);
-	    if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
+		OSXSandboxUserdirsDialog dlg;
+		dlg.Run(nullptr, true);
+		if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
 			return false;
 		}
     }

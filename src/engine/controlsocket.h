@@ -73,6 +73,20 @@ public:
 	CServerPath& currentPath_;
 };
 
+class ResultOpData : public COpData
+{
+public:
+	explicit ResultOpData(int result)
+		: COpData(Command::none, L"ResultOpData")
+		, result_(result)
+	{}
+
+	virtual int Send() { return result_; }
+	virtual int ParseResponse() { return FZ_REPLY_INTERNALERROR; }
+
+	int const result_{};
+};
+
 class CNotSupportedOpData : public COpData
 {
 public:
@@ -231,7 +245,15 @@ public:
 	void log_raw(Args&& ... args) {
 		logger_.log_raw(std::forward<Args>(args)...);
 	}
+
+	fz::logger_interface& logger() const { return logger_; }
+
 protected:
+	virtual void Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry = nullptr);
+
+	friend class LookupOpData;
+	friend class CProtocolOpData<CControlSocket>;
+
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) = 0;
 	void SendDirectoryListingNotification(CServerPath const& path, bool failed);
 

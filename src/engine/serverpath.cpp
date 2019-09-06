@@ -442,7 +442,7 @@ ServerType CServerPath::GetType() const
 	return m_type;
 }
 
-bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase) const
+bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase, bool allowEqual) const
 {
 	if (empty() || path.empty()) {
 		return false;
@@ -481,8 +481,8 @@ bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase) const
 
 	auto iter1 = m_data->m_segments.cbegin();
 	auto iter2 = path.m_data->m_segments.cbegin();
-	while (iter1 != m_data->m_segments.end()) {
-		if (iter2 == path.m_data->m_segments.end()) {
+	while (iter1 != m_data->m_segments.cend()) {
+		if (iter2 == path.m_data->m_segments.cend()) {
 			return true;
 		}
 		if (cmpNoCase) {
@@ -498,12 +498,16 @@ bool CServerPath::IsSubdirOf(const CServerPath &path, bool cmpNoCase) const
 		++iter2;
 	}
 
+	if (allowEqual && iter2 == path.m_data->m_segments.cend()) {
+		return true;
+	}
+
 	return false;
 }
 
-bool CServerPath::IsParentOf(const CServerPath &path, bool cmpNoCase) const
+bool CServerPath::IsParentOf(const CServerPath &path, bool cmpNoCase, bool allowEqual) const
 {
-	return path.IsSubdirOf(*this, cmpNoCase);
+	return path.IsSubdirOf(*this, cmpNoCase, allowEqual);
 }
 
 bool CServerPath::ChangePath(std::wstring const& subdir)

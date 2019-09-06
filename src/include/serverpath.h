@@ -53,8 +53,8 @@ public:
 	bool SetType(ServerType type);
 	ServerType GetType() const;
 
-	bool IsSubdirOf(CServerPath const& path, bool cmpNoCase) const;
-	bool IsParentOf(CServerPath const& path, bool cmpNoCase) const;
+	bool IsSubdirOf(CServerPath const& path, bool cmpNoCase, bool allowEqual = false) const;
+	bool IsParentOf(CServerPath const& path, bool cmpNoCase, bool allowEqual = false) const;
 
 	bool operator==(CServerPath const& op) const;
 	bool operator!=(CServerPath const& op) const;
