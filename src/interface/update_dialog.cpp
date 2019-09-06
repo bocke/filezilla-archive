@@ -121,11 +121,9 @@ int CUpdateDialog::ShowModal()
 	xrc_call(*this, "ID_DETAILS_DL", &wxTextCtrl::Hide);
 
 	UpdaterState s = updater_.GetState();
-	UpdaterStateChanged( s, updater_.AvailableBuild() );
+	UpdaterStateChanged(s, updater_.AvailableBuild());
 
 	updater_.AddHandler(*this);
-
-	updater_.RunIfNeeded();
 
 	int ret = wxDialogEx::ShowModal();
 	updater_.RemoveHandler(*this);
@@ -248,23 +246,23 @@ void CUpdateDialog::LoadPanel(wxString const& name)
 }
 
 
-void CUpdateDialog::UpdaterStateChanged( UpdaterState s, build const& v )
+void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 {
 	timer_.Stop();
 	for (auto const& panel : panels_) {
 		panel->Hide();
 	}
-	if( s == UpdaterState::idle ) {
+	if (s == UpdaterState::idle) {
 		panels_[pagenames::latest]->Show();
 	}
-	else if( s == UpdaterState::failed ) {
+	else if (s == UpdaterState::failed) {
 		XRCCTRL(*this, "ID_DETAILS", wxTextCtrl)->ChangeValue(updater_.GetLog());
 		panels_[pagenames::failed]->Show();
 	}
-	else if( s == UpdaterState::checking ) {
+	else if (s == UpdaterState::checking) {
 		panels_[pagenames::checking]->Show();
 	}
-	else if( s == UpdaterState::newversion || s == UpdaterState::newversion_ready || s == UpdaterState::newversion_downloading ) {
+	else if (s == UpdaterState::newversion || s == UpdaterState::newversion_ready || s == UpdaterState::newversion_downloading || s == UpdaterState::newversion_stale) {
 		xrc_call(*this, "ID_VERSION", &wxStaticText::SetLabel, v.version_);
 
 		wxString news = updater_.GetChangelog();
@@ -292,8 +290,14 @@ void CUpdateDialog::UpdaterStateChanged( UpdaterState s, build const& v )
 		XRCCTRL(*this, "ID_DOWNLOADED", wxStaticText)->Show(ready);
 		XRCCTRL(*this, "ID_INSTALL", wxButton)->Show(ready);
 
-		bool manual = s == UpdaterState::newversion;
-		bool dlfail = s == UpdaterState::newversion && !v.url_.empty();
+		bool const outdated = s == UpdaterState::newversion_stale;
+		bool const manual = s == UpdaterState::newversion || outdated;
+		bool const dlfail = s == UpdaterState::newversion && !v.url_.empty();
+		bool const disabled = COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !COptions::Get()->GetOptionVal(OPTION_UPDATECHECK);
+
+		XRCCTRL(*this, "ID_OUTDATED", wxStaticText)->Show(outdated);
+		XRCCTRL(*this, "ID_DISABLED_CHECK", wxStaticText)->Show(outdated && disabled);
+		XRCCTRL(*this, "ID_DOWNLOAD_FAIL", wxStaticText)->Show(dlfail);
 		XRCCTRL(*this, "ID_DOWNLOAD_FAIL", wxStaticText)->Show(dlfail);
 		XRCCTRL(*this, "ID_DOWNLOAD_RETRY", wxHyperlinkCtrl)->Show(dlfail);
 		XRCCTRL(*this, "ID_SHOW_DETAILS_DL", wxHyperlinkCtrl)->Show(dlfail);
