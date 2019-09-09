@@ -131,7 +131,7 @@
   <ItemGroup>
     <ClCompile Include="backend.cpp" />
     <ClCompile Include="commands.cpp" />
-    <ClCompile Include="controlSocket.cpp" />
+    <ClCompile Include="controlsocket.cpp" />
     <ClCompile Include="directorycache.cpp" />
     <ClCompile Include="directorylisting.cpp" />
     <ClCompile Include="directorylistingparser.cpp" />
@@ -203,7 +203,7 @@
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="backend.h" />
     <ClInclude Include="..\include\commands.h" />
-    <ClInclude Include="controlSocket.h" />
+    <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
     <ClInclude Include="..\include\directorylisting.h" />
     <ClInclude Include="directorylistingparser.h" />
