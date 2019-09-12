@@ -6,8 +6,6 @@
 
 #include <libfilezilla/uri.hpp>
 
-#include <deque>
-
 // See below for actual commands and their parameters
 
 // Command IDs
@@ -63,6 +61,7 @@ enum class Command
 #define FZ_REPLY_LINKNOTDIR		(0x4000 | FZ_REPLY_ERROR)
 
 #define FZ_REPLY_CONTINUE 0x8000 // Used internally
+#define FZ_REPLY_ERROR_NOTFOUND (0x10000 | FZ_REPLY_ERROR) // Used internally
 
 // --------------- //
 // Actual commands //
@@ -227,16 +226,16 @@ protected:
 class CDeleteCommand final : public CCommandHelper<CDeleteCommand, Command::del>
 {
 public:
-	CDeleteCommand(CServerPath const& path, std::deque<std::wstring> && files);
+	CDeleteCommand(CServerPath const& path, std::vector<std::wstring> && files);
 
 	CServerPath GetPath() const { return m_path; }
-	const std::deque<std::wstring>& GetFiles() const { return m_files; }
-	std::deque<std::wstring>&& ExtractFiles() { return std::move(m_files); }
+	const std::vector<std::wstring>& GetFiles() const { return files_; }
+	std::vector<std::wstring>&& ExtractFiles() { return std::move(files_); }
 
 	bool valid() const { return !GetPath().empty() && !GetFiles().empty(); }
 protected:
 	CServerPath const m_path;
-	std::deque<std::wstring> m_files;
+	std::vector<std::wstring> files_;
 };
 
 class CRemoveDirCommand final : public CCommandHelper<CRemoveDirCommand, Command::removedir>

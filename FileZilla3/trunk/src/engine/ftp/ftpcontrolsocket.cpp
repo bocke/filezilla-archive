@@ -565,7 +565,7 @@ void CFtpControlSocket::RawCommand(std::wstring const& command)
 	Push(std::make_unique<CFtpRawCommandOpData>(*this, command));
 }
 
-void CFtpControlSocket::Delete(CServerPath const& path, std::deque<std::wstring>&& files)
+void CFtpControlSocket::Delete(CServerPath const& path, std::vector<std::wstring>&& files)
 {
 	auto pData = std::make_unique<CFtpDeleteOpData>(*this);
 	pData->path_ = path;

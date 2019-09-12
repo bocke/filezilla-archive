@@ -569,7 +569,7 @@ std::wstring CSftpControlSocket::QuoteFilename(std::wstring const& filename)
 	return L"\"" + fz::replaced_substrings(filename, L"\"", L"\"\"") + L"\"";
 }
 
-void CSftpControlSocket::Delete(const CServerPath& path, std::deque<std::wstring>&& files)
+void CSftpControlSocket::Delete(const CServerPath& path, std::vector<std::wstring>&& files)
 {
 	// CFileZillaEnginePrivate should have checked this already
 	assert(!files.empty());

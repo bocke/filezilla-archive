@@ -253,7 +253,7 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 	// Is operation restricted to a single child?
 	bool const restrict = static_cast<bool>(dir.restrict);
 
-	std::deque<std::wstring> filesToDelete;
+	std::vector<std::wstring> filesToDelete;
 
 	std::wstring const remotePath = pDirectoryListing->path.GetPath();
 
@@ -465,7 +465,7 @@ void CRemoteRecursiveOperation::LinkIsNotDir()
 
 	if (m_operationMode == recursive_delete) {
 		if (!dir.subdir.empty()) {
-			std::deque<std::wstring> files;
+			std::vector<std::wstring> files;
 			files.push_back(dir.subdir);
 			m_state.m_pCommandQueue->ProcessCommand(new CDeleteCommand(dir.parent, std::move(files)), CCommandQueue::recursiveOperation);
 		}

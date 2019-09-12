@@ -58,7 +58,7 @@ int CStorjFileTransferOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_waitfileexists:
 		if (!download_ && !fileId_.empty()) {
-			controlSocket_.Delete(remotePath_, std::deque<std::wstring>{remoteFile_});
+			controlSocket_.Delete(remotePath_, std::vector<std::wstring>{remoteFile_});
 			opState = filetransfer_delete;
 		}
 		else {

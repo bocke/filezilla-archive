@@ -82,6 +82,8 @@ public:
 
 	std::tuple<LookupResults, CDirentry> LookupFile(CServer const& server, CServerPath const& path, std::wstring const& filename, LookupFlags flags);
 
+	std::vector<std::tuple<LookupResults, CDirentry>> LookupFiles(CServer const& server, CServerPath const& path, std::vector<std::wstring> const& filenames, LookupFlags flags);
+
 	void Store(CDirectoryListing const& listing, CServer const& server);
 	bool GetChangeTime(fz::monotonic_clock& time, CServer const& server, CServerPath const& path);
 	bool Lookup(CDirectoryListing &listing, CServer const&server, CServerPath const& path, bool allowUnsureEntries, bool& is_outdated);

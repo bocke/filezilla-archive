@@ -25,7 +25,7 @@ public:
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
 		std::wstring const& remoteFile, bool download,
 		CFileTransferCommand::t_transferSettings const& transferSettings) override;
-	virtual void Delete(CServerPath const& path, std::deque<std::wstring>&& files) override;
+	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files) override;
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring()) override;
 	virtual void Mkdir(CServerPath const& path) override;
 	virtual void Rename(CRenameCommand const& command) override;

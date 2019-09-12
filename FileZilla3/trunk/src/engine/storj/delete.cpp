@@ -29,11 +29,11 @@ int CStorjDeleteOpData::Send()
 			return deleteFailed_ ? FZ_REPLY_ERROR : FZ_REPLY_OK;
 		}
 
-		std::wstring const& file = files_.front();
-		std::wstring const& id = fileIds_.front();
+		std::wstring const& file = files_.back();
+		std::wstring const& id = fileIds_.back();
 		if (id.empty()) {
-			files_.pop_front();
-			fileIds_.pop_front();
+			files_.pop_back();
+			fileIds_.pop_back();
 			return FZ_REPLY_CONTINUE;
 		}
 
@@ -56,7 +56,7 @@ int CStorjDeleteOpData::ParseResponse()
 		deleteFailed_ = true;
 	}
 	else {
-		std::wstring const& file = files_.front();
+		std::wstring const& file = files_.back();
 
 		engine_.GetDirectoryCache().RemoveFile(currentServer_, path_, file);
 
@@ -71,8 +71,8 @@ int CStorjDeleteOpData::ParseResponse()
 		}
 	}
 
-	files_.pop_front();
-	fileIds_.pop_front();
+	files_.pop_back();
+	fileIds_.pop_back();
 
 	if (!files_.empty()) {
 		return FZ_REPLY_CONTINUE;

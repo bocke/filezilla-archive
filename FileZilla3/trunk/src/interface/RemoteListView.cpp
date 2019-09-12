@@ -1513,7 +1513,8 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 
 	CFilterManager filter;
 	if (CServer::ProtocolHasFeature(m_state.GetSite().server.GetProtocol(), ProtocolFeature::RecursiveDelete) && !filter.HasActiveRemoteFilters()) {
-		std::deque<std::wstring> filesToDelete;
+		std::vector<std::wstring> filesToDelete;
+		filesToDelete.reserve(count_files);
 
 		for (item = -1; ;) {
 			item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -1551,7 +1552,8 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 		CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
 		wxASSERT(pRecursiveOperation);
 
-		std::deque<std::wstring> filesToDelete;
+		std::vector<std::wstring> filesToDelete;
+		filesToDelete.reserve(count_files);
 
 		recursion_root root(m_pDirectoryListing->path, false);
 		for (item = -1; ;) {

@@ -79,7 +79,7 @@ void CStorjControlSocket::FileTransfer(std::wstring const& localFile, CServerPat
 }
 
 
-void CStorjControlSocket::Delete(CServerPath const& path, std::deque<std::wstring>&& files)
+void CStorjControlSocket::Delete(CServerPath const& path, std::vector<std::wstring>&& files)
 {
 	// CFileZillaEnginePrivate should have checked this already
 	assert(!files.empty());
@@ -94,7 +94,7 @@ void CStorjControlSocket::Resolve(CServerPath const& path, std::wstring const& f
 	Push(std::make_unique<CStorjResolveOpData>(*this, path, file, bucket, fileId, ignore_missing_file));
 }
 
-void CStorjControlSocket::Resolve(CServerPath const& path, std::deque<std::wstring> const& files, std::wstring & bucket, std::deque<std::wstring> & fileIds)
+void CStorjControlSocket::Resolve(CServerPath const& path, std::vector<std::wstring> const& files, std::wstring & bucket, std::vector<std::wstring> & fileIds)
 {
 	Push(std::make_unique<CStorjResolveManyOpData>(*this, path, files, bucket, fileIds));
 }
