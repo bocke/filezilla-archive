@@ -11,6 +11,7 @@
 #include "option_change_event_handler.h"
 
 #include <atomic>
+#include <deque>
 
 class CControlSocket;
 class CLogging;

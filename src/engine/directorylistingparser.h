@@ -32,6 +32,7 @@
  * get concatenated to be parsed again (and discarded if not recognized).
  */
 
+#include <deque>
 #include <vector>
 
 class CLine;

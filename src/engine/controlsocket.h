@@ -192,7 +192,7 @@ public:
 							 std::wstring const& remoteFile, bool download,
 							 CFileTransferCommand::t_transferSettings const& transferSettings) = 0;
 	virtual void RawCommand(std::wstring const& command = std::wstring());
-	virtual void Delete(CServerPath const& path, std::deque<std::wstring>&& files);
+	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files);
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring());
 	virtual void Mkdir(CServerPath const& path);
 	virtual void Rename(CRenameCommand const& command);
@@ -250,8 +250,10 @@ public:
 
 protected:
 	virtual void Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry = nullptr);
+	virtual void Lookup(CServerPath const& path, std::vector<std::wstring> const& files);
 
 	friend class LookupOpData;
+	friend class LookupManyOpData;
 	friend class CProtocolOpData<CControlSocket>;
 
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) = 0;

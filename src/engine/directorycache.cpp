@@ -160,6 +160,60 @@ std::tuple<LookupResults, CDirentry> CDirectoryCache::LookupFile(CServer const& 
 	return {results, entry};
 }
 
+std::vector<std::tuple<LookupResults, CDirentry>> CDirectoryCache::LookupFiles(CServer const& server, CServerPath const& path, std::vector<std::wstring> const& filenames, LookupFlags flags)
+{
+	std::vector<std::tuple<LookupResults, CDirentry>> ret;
+
+	fz::scoped_lock lock(mutex_);
+
+	tServerIter sit = GetServerEntry(server);
+	if (sit == m_serverList.end()) {
+		return ret;
+	}
+
+	tCacheIter iter;
+	bool outdated{};
+	if (!Lookup(iter, sit, path, true, outdated)) {
+		return ret;
+	}
+
+	LookupResults results{};
+	if (outdated) {
+		results |= LookupResults::outdated;
+		if (!(flags & LookupFlags::allow_outdated)) {
+			ret.insert(ret.begin(), filenames.size(), {results, CDirentry()});
+			return ret;
+		}
+	}
+
+	results |= LookupResults::direxists;
+
+	CCacheEntry const& cacheEntry = *iter;
+	CDirectoryListing const& listing = cacheEntry.listing;
+
+	ret.reserve(filenames.size());
+
+	for (auto const& filename : filenames) {
+		CDirentry entry;
+		LookupResults fileresults = results;
+		size_t i = listing.FindFile_CmpCase(filename);
+		if (i != std::string::npos) {
+			entry = listing[i];
+			fileresults |= LookupResults::found | LookupResults::matchedcase;
+		}
+		else if (server.GetCaseSensitivity() != CaseSensitivity::yes || (flags & LookupFlags::force_caseinsensitive)) {
+			i = listing.FindFile_CmpNoCase(filename);
+			if (i != std::string::npos) {
+				entry = listing[i];
+				fileresults |= LookupResults::found;
+			}
+		}
+		ret.emplace_back(fileresults, entry);
+	}
+
+	return ret;
+}
+
 bool CDirectoryCache::LookupFile(CDirentry &entry, CServer const& server, CServerPath const& path, std::wstring const& filename, bool &dirDidExist, bool &matchedCase)
 {
 	fz::scoped_lock lock(mutex_);

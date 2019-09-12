@@ -139,7 +139,8 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		int ret;
 		if (nErrorCode == FZ_REPLY_OK ||
 			nErrorCode == FZ_REPLY_ERROR ||
-			nErrorCode == FZ_REPLY_CRITICALERROR)
+			nErrorCode == FZ_REPLY_CRITICALERROR ||
+			nErrorCode == FZ_REPLY_ERROR_NOTFOUND)
 		{
 			ret = ParseSubcommandResult(nErrorCode, *oldOperation);
 		}
@@ -1098,7 +1099,7 @@ void CControlSocket::RawCommand(std::wstring const&)
 	Push(std::make_unique<CNotSupportedOpData>());
 }
 
-void CControlSocket::Delete(CServerPath const&, std::deque<std::wstring>&&)
+void CControlSocket::Delete(CServerPath const&, std::vector<std::wstring>&&)
 {
 	Push(std::make_unique<CNotSupportedOpData>());
 }
@@ -1161,6 +1162,11 @@ void CControlSocket::CallSetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 void CControlSocket::Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry)
 {
 	Push(std::make_unique<LookupOpData>(*this, path, file, entry));
+}
+
+void CControlSocket::Lookup(CServerPath const& path, std::vector<std::wstring> const& files)
+{
+	Push(std::make_unique<LookupManyOpData>(*this, path, files));
 }
 
 int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::duration const& lastChunkDuration, int64_t minChunkSize, int64_t multiple, int64_t partCount, int64_t maxPartCount, int64_t maxChunkSize)
