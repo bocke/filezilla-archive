@@ -23,7 +23,6 @@ public:
 protected:
 	virtual void UpdaterStateChanged( UpdaterState s, build const& v );
 
-	void LoadPanel(wxString const& name);
 	void Wrap();
 
 	void InitFooter();
