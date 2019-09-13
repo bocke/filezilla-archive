@@ -76,7 +76,8 @@ int CUpdateDialog::ShowModal()
 	main->AddGrowableCol(0);
 	main->AddGrowableRow(0);
 
-	main->Add(new wxPanel(this, XRCID("ID_CONTENT")), 1, wxGROW);
+	content_ = new wxPanel(this);
+	main->Add(content_, 1, wxGROW);
 	main->Add(new wxStaticLine(this), lay.grow);
 
 	auto buttons = new wxBoxSizer(wxHORIZONTAL);
@@ -93,7 +94,45 @@ int CUpdateDialog::ShowModal()
 	InitXrc(L"update.xrc");
 	LoadPanel(_T("ID_CHECKING_PANEL"));
 	LoadPanel(_T("ID_FAILURE_PANEL"));
-	LoadPanel(_T("ID_NEWVERSION_PANEL"));
+
+	{
+		auto p = new wxPanel(content_, XRCID("ID_NEWVERSION_PANEL"));
+		panels_.push_back(p);
+
+		auto s = lay.createMain(p, 1);
+		s->AddGrowableRow(4);
+		s->AddGrowableCol(0);
+		s->Add(new wxStaticText(p, -1, _("A new version of FileZilla is available:")));
+		s->Add(new wxStaticText(p, XRCID("ID_VERSION"), L"1.2.3.4"));
+		s->AddSpacer(0);
+		s->Add(new wxStaticText(p, XRCID("ID_NEWS_LABEL"), _("What's new:")));
+		s->Add(new wxTextCtrl(p, XRCID("ID_NEWS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_AUTO_SCROLL | wxTE_MULTILINE | wxTE_READONLY), 1, wxGROW)->SetMinSize(600, 150);
+
+		auto dl = lay.createFlex(0, 1);
+		s->Add(dl, lay.halign);
+		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_LABEL"), _("Downloading update...")), lay.valign);
+		dl->Add(new wxAnimationCtrl(p, XRCID("ID_WAIT_DOWNLOAD")), lay.valign);
+		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_PROGRESS"), L"12% downloaded"), lay.valign);
+
+		s->Add(new wxStaticText(p, XRCID("ID_DOWNLOADED"), _("The new version has been saved in your Downloads directory.")));
+		auto install = new wxButton(p, XRCID("ID_INSTALL"), _("&Install new version"));
+		install->SetDefault();
+		s->Add(install, lay.halign);
+		s->Add(new wxStaticText(p, XRCID("ID_OUTDATED"), _("Unfortunately information about the new update could not be retrieved.")));
+		s->Add(new wxStaticText(p, XRCID("ID_DISABLED_CHECK"), _("Either you or your system administrator has disabled checking for updates. Please re-enable checking for updates to obtain more information.")));
+		s->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_FAIL"), _("The new version could not be downloaded, please retry later.")));
+
+		s->Add(new wxTextCtrl(p, XRCID("ID_DETAILS_DL"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_AUTO_SCROLL | wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 0));
+		auto retry = lay.createFlex(0, 1);
+		s->Add(retry);
+		retry->Add(new wxHyperlinkCtrl(p, XRCID("ID_DOWNLOAD_RETRY"), _("Try again"), wxString()), lay.valign);
+		retry->Add(new wxHyperlinkCtrl(p, XRCID("ID_SHOW_DETAILS_DL"), _("Show details"), wxString()), lay.valign);
+
+		s->Add(new wxStaticText(p, XRCID("ID_NEWVERSION_WEBSITE_TEXT_DLFAIL"), _("Alternatively, you can also download the latest version from the FileZilla website:")));
+		s->Add(new wxStaticText(p, XRCID("ID_NEWVERSION_WEBSITE_TEXT"), _("You can download the latest version from the FileZilla website:")));
+		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_NEWVERSION_WEBSITE_LINK"), L"https://filezilla-project.org/", L"https://filezilla-project.org/"));
+	}
+
 	LoadPanel(_T("ID_LATEST_PANEL"));
 	if (panels_.size() != 4) {
 		return wxID_CANCEL;
@@ -182,14 +221,13 @@ void CUpdateDialog::InitFooter()
 
 void CUpdateDialog::Wrap()
 {
-	wxPanel* parentPanel = XRCCTRL(*this, "ID_CONTENT", wxPanel);
-	if (!parentPanel) {
+	if (!content_) {
 		return;
 	}
 
 	wxSize canvas;
-	canvas.x = GetSize().x - parentPanel->GetSize().x;
-	canvas.y = GetSize().y - parentPanel->GetSize().y;
+	canvas.x = GetSize().x - content_->GetSize().x;
+	canvas.y = GetSize().y - content_->GetSize().y;
 
 	// Wrap pages nicely
 	std::vector<wxWindow*> pages;
@@ -201,20 +239,24 @@ void CUpdateDialog::Wrap()
 	// Keep track of maximum page size
 	wxSize size = GetSizer()->GetMinSize();
 	for (auto const& panel : panels_) {
-		size.IncTo(panel->GetSizer()->GetMinSize());
+		if (panel->GetSizer()) {
+			size.IncTo(panel->GetSizer()->GetMinSize());
+		}
 	}
 
 	wxSize panelSize = size;
 #ifdef __WXGTK__
 	panelSize.x += 1;
 #endif
-	parentPanel->SetInitialSize(panelSize);
+	content_->SetInitialSize(panelSize);
 
 	// Adjust pages sizes according to maximum size
 	for (auto const& panel : panels_) {
-		panel->GetSizer()->SetMinSize(size);
-		panel->GetSizer()->Fit(panel);
-		panel->GetSizer()->SetSizeHints(panel);
+		if (panel->GetSizer()) {
+			panel->GetSizer()->SetMinSize(size);
+			panel->GetSizer()->Fit(panel);
+			panel->GetSizer()->SetSizeHints(panel);
+		}
 		if (GetLayoutDirection() == wxLayout_RightToLeft) {
 			panel->Move(wxPoint(0, 0));
 		}
@@ -237,7 +279,7 @@ void CUpdateDialog::Wrap()
 void CUpdateDialog::LoadPanel(wxString const& name)
 {
 	wxPanel* p = new wxPanel();
-	if (!wxXmlResource::Get()->LoadPanel(p, XRCCTRL(*this, "ID_CONTENT", wxPanel), name)) {
+	if (!wxXmlResource::Get()->LoadPanel(p, content_, name)) {
 		delete p;
 		return;
 	}
@@ -256,7 +298,7 @@ void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 		panels_[pagenames::latest]->Show();
 	}
 	else if (s == UpdaterState::failed) {
-		XRCCTRL(*this, "ID_DETAILS", wxTextCtrl)->ChangeValue(updater_.GetLog());
+		xrc_call(*this, "ID_DETAILS", &wxTextCtrl::ChangeValue, updater_.GetLog());
 		panels_[pagenames::failed]->Show();
 	}
 	else if (s == UpdaterState::checking) {

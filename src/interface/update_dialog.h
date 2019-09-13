@@ -30,9 +30,10 @@ protected:
 
 	void UpdateProgress();
 
-	wxWindow* parent_;
+	wxWindow* parent_{};
 	CUpdater& updater_;
 
+	wxPanel* content_{};
 	std::vector<wxPanel*> panels_;
 
 	wxTimer timer_;
