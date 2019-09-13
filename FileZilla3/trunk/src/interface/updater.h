@@ -22,7 +22,7 @@ struct build
 struct version_information
 {
 	bool empty() const {
-		return available_.version_.empty();
+		return available_.version_.empty() && !eol_;
 	}
 
 	void update_available();
@@ -36,6 +36,8 @@ struct version_information
 	std::wstring changelog_;
 
 	std::wstring resources_;
+
+	bool eol_{};
 };
 
 enum class UpdaterState
@@ -46,7 +48,8 @@ enum class UpdaterState
 	newversion, // There is a new version available, user needs to manually download
 	newversion_downloading, // There is a new version available, file is being downloaded
 	newversion_ready, // There is a new version available, file has been downloaded
-	newversion_stale // Very old version of FileZilla. Either update checking has been disabled or is otherwise not working.
+	newversion_stale, // Very old version of FileZilla. Either update checking has been disabled or is otherwise not working.
+	eol // Too old of an operating system
 };
 
 class CUpdateHandler
