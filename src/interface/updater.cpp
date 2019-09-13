@@ -148,6 +148,7 @@ void CUpdater::RunIfNeeded()
 {
 	build const b = AvailableBuild();
 	if (state_ == UpdaterState::idle || state_ == UpdaterState::failed || state_ == UpdaterState::newversion_stale ||
+		state_ == UpdaterState::eol ||
 		LongTimeSinceLastCheck() || (state_ == UpdaterState::newversion && !b.url_.empty()) ||
 		(state_ == UpdaterState::newversion_ready && !VerifyChecksum(DownloadedFile(), b.size_, b.hash_)))
 	{
@@ -263,7 +264,7 @@ bool CUpdater::Run(bool manual)
 {
 	if (state_ != UpdaterState::idle && state_ != UpdaterState::failed &&
 		state_ != UpdaterState::newversion && state_ != UpdaterState::newversion_ready
-		&& state_ != UpdaterState::newversion_stale)
+		&& state_ != UpdaterState::newversion_stale && state_ != UpdaterState::eol)
 	{
 		return false;
 	}
@@ -451,7 +452,10 @@ UpdaterState CUpdater::ProcessFinishedData(bool can_download)
 
 	ParseData();
 
-	if (version_information_.available_.version_.empty()) {
+	if (version_information_.eol_) {
+		s = UpdaterState::eol;
+	}
+	else if (version_information_.available_.version_.empty()) {
 		s = UpdaterState::idle;
 	}
 	else if (!version_information_.available_.url_.empty()) {
@@ -676,7 +680,36 @@ void CUpdater::ParseData()
 			}
 			continue;
 		}
+		else if (type == L"eol") {
+#if defined(__WXMSW__) || defined(__WXMAC__)
+			std::string host = fz::to_utf8(CBuildInfo::GetHostname());
+			if (host.empty()) {
+				host = "unknown";
+			}
+			fz::to_utf8(CBuildInfo::GetVersion());
 
+			std::string data = host + '|' + fz::to_utf8(CBuildInfo::GetVersion()) + '|' + fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
+
+			bool valid_signature{};
+			for (size_t i = 1; i < tokens.size(); ++i) {
+				auto const& token = tokens[i];
+				if (token.substr(0, 4) == "sig:") {
+					auto const& sig = token.substr(4);
+					auto raw_sig = fz::base64_decode(fz::to_utf8(sig));
+
+					if (!raw_sig.empty()) {
+						auto const pub = fz::public_verification_key::from_base64("xrjuitldZT7pvIhK9q1GVNfptrepB/ctt5aK1QO5RaI");
+						valid_signature = fz::verify(data, raw_sig, pub);
+					}
+				}
+			}
+			if (!valid_signature) {
+				log_ += fz::sprintf(L"Ignoring eol statement not matching our version and platform.\n");
+				continue;
+			}
+			version_information_.eol_ = true;
+#endif
+		}
 
 		std::wstring const& versionOrDate = tokens[1];
 
@@ -745,7 +778,7 @@ void CUpdater::ParseData()
 
 			bool valid_signature{};
 			for (size_t i = 6; i < tokens.size(); ++i) {
-				auto const& token = tokens[6];
+				auto const& token = tokens[i];
 				if (token.substr(0, 4) == "sig:") {
 					auto const& sig = token.substr(4);
 					auto raw_sig = fz::base64_decode(fz::to_utf8(sig));
