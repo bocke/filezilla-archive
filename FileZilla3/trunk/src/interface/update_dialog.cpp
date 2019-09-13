@@ -91,9 +91,53 @@ int CUpdateDialog::ShowModal()
 	buttons->Add(new wxButton(this, XRCID("ID_DEBUGLOG"), L"show log"))->Show(debug);
 	buttons->Add(new wxButton(this, wxID_CANCEL, _("&Close")));
 
-	InitXrc(L"update.xrc");
-	LoadPanel(_T("ID_CHECKING_PANEL"));
-	LoadPanel(_T("ID_FAILURE_PANEL"));
+	wxAnimation throbber = CThemeProvider::Get()->CreateAnimation(_T("ART_THROBBER"), wxSize(16, 16));
+
+	{
+		auto p = new wxPanel(content_, XRCID("ID_CHECKING_PANEL"));
+		panels_.push_back(p);
+
+		auto s = lay.createMain(p, 1);
+
+		s->AddGrowableCol(0);
+		s->AddGrowableRow(0);
+		s->AddGrowableRow(2);
+
+		s->AddStretchSpacer();
+
+		auto row = lay.createFlex(0, 1);
+		s->Add(row, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
+		
+		row->Add(new wxStaticText(p, -1, _("Checking for updates...")), lay.valign);
+
+		auto anim = new wxAnimationCtrl(p, -1, throbber);
+		anim->SetMinSize(throbber.GetSize());
+		anim->Play();
+		row->Add(anim, lay.valign);
+
+		s->AddStretchSpacer();
+	}
+
+	{
+		auto p = new wxPanel(content_, XRCID("ID_FAILURE_PANEL"));
+		panels_.push_back(p);
+
+		auto s = lay.createMain(p, 1);
+		s->AddGrowableCol(0);
+		s->AddGrowableRow(2);
+		
+		s->Add(new wxStaticText(p, -1, _("Information about the latest version of FileZilla could not be retrieved. Please try again later.")));
+		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_RETRY"), _("Try again"), wxString()));
+
+		s->Add(new wxTextCtrl(p, XRCID("ID_DETAILS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_AUTO_SCROLL | wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 200));
+		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_SHOW_DETAILS"), _("Show details"), wxString()), lay.valign);
+
+		s->AddSpacer(lay.dlgUnits(5));
+
+		s->Add(new wxStaticText(p, XRCID("ID_WEBSITE_TEXT"), _("You can download the latest version from the FileZilla website:")));
+		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_WEBSITE_LINK"), L"https://filezilla-project.org/", L"https://filezilla-project.org/"));
+
+	}
 
 	{
 		auto p = new wxPanel(content_, XRCID("ID_NEWVERSION_PANEL"));
@@ -111,7 +155,12 @@ int CUpdateDialog::ShowModal()
 		auto dl = lay.createFlex(0, 1);
 		s->Add(dl, lay.halign);
 		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_LABEL"), _("Downloading update...")), lay.valign);
-		dl->Add(new wxAnimationCtrl(p, XRCID("ID_WAIT_DOWNLOAD")), lay.valign);
+
+		auto anim = new wxAnimationCtrl(p, XRCID("ID_WAIT_DOWNLOAD"), throbber);
+		anim->SetMinSize(throbber.GetSize());
+		anim->Play();
+		dl->Add(anim, lay.valign);
+
 		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_PROGRESS"), L"12% downloaded"), lay.valign);
 
 		s->Add(new wxStaticText(p, XRCID("ID_DOWNLOADED"), _("The new version has been saved in your Downloads directory.")));
@@ -133,23 +182,19 @@ int CUpdateDialog::ShowModal()
 		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_NEWVERSION_WEBSITE_LINK"), L"https://filezilla-project.org/", L"https://filezilla-project.org/"));
 	}
 
-	LoadPanel(_T("ID_LATEST_PANEL"));
-	if (panels_.size() != 4) {
-		return wxID_CANCEL;
-	}
+	{
+		auto p = new wxPanel(content_, XRCID("ID_LATEST_PANEL"));
+		panels_.push_back(p);
 
-	wxAnimation a = CThemeProvider::Get()->CreateAnimation(_T("ART_THROBBER"), wxSize(16,16));
-	auto ctrl = XRCCTRL(*this, "ID_WAIT_CHECK", wxAnimationCtrl);
-	if (ctrl) {
-		ctrl->SetMinSize(a.GetSize());
-		ctrl->SetAnimation(a);
-		ctrl->Play();
-	}
-	ctrl = XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl);
-	if (ctrl) {
-		ctrl->SetMinSize(a.GetSize());
-		ctrl->SetAnimation(a);
-		ctrl->Play();
+		auto s = lay.createMain(p, 1);
+
+		s->AddGrowableCol(0);
+		s->AddGrowableRow(0);
+		s->AddGrowableRow(2);
+
+		s->AddStretchSpacer();
+		s->Add(new wxStaticText(p, -1, _("You are using the latest version of FileZilla."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL), lay.grow);
+		s->AddStretchSpacer();
 	}
 
 	InitFooter();
@@ -275,18 +320,6 @@ void CUpdateDialog::Wrap()
 	}
 	panels_[0]->Show();
 }
-
-void CUpdateDialog::LoadPanel(wxString const& name)
-{
-	wxPanel* p = new wxPanel();
-	if (!wxXmlResource::Get()->LoadPanel(p, content_, name)) {
-		delete p;
-		return;
-	}
-
-	panels_.push_back(p);
-}
-
 
 void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 {
