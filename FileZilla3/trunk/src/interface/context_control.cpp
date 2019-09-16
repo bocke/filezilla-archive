@@ -71,7 +71,7 @@ bool CContextControl::CreateTab()
 	return CreateTab(localPath, site, remotePath);
 }
 
-bool  CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath)
+bool CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, CServerPath const& remotePath)
 {
 	wxGetApp().AddStartupProfileRecord("CContextControl::CreateTab");
 
@@ -110,14 +110,15 @@ bool  CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, 
 		}
 		if (!pState) {
 			pState = CContextManager::Get()->CreateState(m_mainFrame);
-			if (!pState->CreateEngine()) {
-				wxMessageBoxEx(_("Failed to initialize FTP engine"));
+			if (!pState) {
+				return false;
 			}
 		}
-
+	
 		pState->SetLastSite(site, remotePath);
 
 		CreateContextControls(*pState);
+
 
 		pState->GetLocalRecursiveOperation()->SetQueue(m_mainFrame.GetQueue());
 		pState->GetRemoteRecursiveOperation()->SetQueue(m_mainFrame.GetQueue());

@@ -52,6 +52,11 @@ CState* CContextManager::CreateState(CMainFrame &mainFrame)
 
 	NotifyHandlers(pState, STATECHANGE_NEWCONTEXT, _T(""), 0);
 
+	if (!pState->CreateEngine()) {
+		DestroyState(pState);
+		return nullptr;
+	}
+
 	return pState;
 }
 
