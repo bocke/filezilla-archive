@@ -150,7 +150,7 @@ int CUpdateDialog::ShowModal()
 		s->Add(new wxStaticText(p, XRCID("ID_VERSION"), L"1.2.3.4"));
 		s->AddSpacer(0);
 		s->Add(new wxStaticText(p, XRCID("ID_NEWS_LABEL"), _("What's new:")));
-		s->Add(new wxTextCtrl(p, XRCID("ID_NEWS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY), 1, wxGROW)->SetMinSize(600, 150);
+		s->Add(new wxTextCtrl(p, XRCID("ID_NEWS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY), 1, wxGROW)->SetMinSize(400, 150);
 
 		auto dl = lay.createFlex(0, 1);
 		s->Add(dl, lay.halign);
