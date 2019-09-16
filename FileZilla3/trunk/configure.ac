@@ -149,7 +149,7 @@ if test "$buildmain" = "yes"; then
 
   # Find libfilezilla
   # -----------------
-  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.18.1],, [
+  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.18.2],, [
 	AC_MSG_ERROR([libfilezilla not found: $LIBFILEZILLA_PKG_ERRORS. You can download it from https://lib.filezilla-project.org/])
   ])
   AC_SUBST(LIBFILEZILLA_CFLAGS)
