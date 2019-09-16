@@ -3,12 +3,20 @@ This file only lists a short summary of the changes between FileZilla versions. 
 Legend:
   ! Security related bugfix or otherwise critical bugfix
   + New feature or important bugfix
-  - Bugfixes
+  - Bugfixes and other changes
 
   Platform prefixes:
     MSW: Microsoft Windows
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
+
+3.45.0-rc1 (2019-09-16)
+
++ If checking for updates cannot be performed for a prolonged time, users are warned about using an outdated version
+- Performance improvements if expanding or refreshing a directory with thousands of direct subdirectories in the directory trees
+- Fixed prefix search in Site Manager
+- macOS: Fix password pasting using Cmd+V
+- Minor performance improvements deleting many thousands of files
 
 3.44.2 (2019-08-15)
 
