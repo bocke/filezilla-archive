@@ -51,9 +51,7 @@ struct t_Option
 #define DEFAULT_FILENAME_SORT   _T("1")
 #endif
 
-// In C++14 we should be able to use this instead:
-//   static_assert(OPTIONS_NUM <= changed_options_t().size());
-static_assert(static_cast<int>(OPTIONS_NUM) <= static_cast<int>(changed_options_size), "OPTIONS_NUM too big for changed_options_t");
+static_assert(OPTIONS_NUM <= changed_options_t().size());
 
 static const t_Option options[OPTIONS_NUM] =
 {

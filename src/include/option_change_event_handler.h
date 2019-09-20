@@ -6,11 +6,7 @@
 
 class COptions;
 
-enum {
-	changed_options_size = 64*3
-};
-
-typedef std::bitset<changed_options_size> changed_options_t;
+typedef std::bitset<64*3> changed_options_t;
 
 class COptionChangeEventHandler
 {
