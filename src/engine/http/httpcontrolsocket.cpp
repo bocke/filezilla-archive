@@ -18,7 +18,7 @@
 
 int simple_body::data_request(unsigned char* data, unsigned int & len)
 {
-	len = std::min(static_cast<size_t>(len), body_.size() - written_);
+	len = static_cast<unsigned int>(std::min(static_cast<size_t>(len), body_.size() - written_));
 	memcpy(data, body_.c_str() + written_, len);
 	written_ += len;
 	return FZ_REPLY_CONTINUE;
