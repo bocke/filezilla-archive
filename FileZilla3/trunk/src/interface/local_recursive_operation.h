@@ -57,7 +57,7 @@ public:
 	void AddRecursionRoot(local_recursion_root && root);
 	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate = true);
 
-	virtual void StopRecursiveOperation();
+	virtual void StopRecursiveOperation() override;
 
 protected:
 	bool DoStartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate);
