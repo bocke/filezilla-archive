@@ -505,7 +505,8 @@ void CState::SetSite(Site const& site, CServerPath const& path)
 {
 	if (m_site) {
 		if (site == m_site) {
-			// Nothing changes
+			// Nothing changes, other than possibly credentials
+			m_site = site;
 			return;
 		}
 
