@@ -271,5 +271,12 @@ bool COptionsPageThemes::OnDisplayedFirstTime()
 
 	pTheme->GetContainingSizer()->Layout();
 
+#ifdef __WXMAC__
+	if (!failure) {
+		CallAfter([this]{
+			xrc_call(*this, "ID_PREVIEW", &CIconPreview::Refresh, true, nullptr);
+		});
+	}
+#endif
 	return !failure;
 }
