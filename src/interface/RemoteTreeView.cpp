@@ -596,8 +596,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 		}
 	}
 
-	auto const& sortFunc = CFileListCtrlSortBase::GetCmpFunction(m_nameSortMode);
-	std::sort(dirs.begin(), dirs.end(), [&](auto const& lhs, auto const& rhs) { return sortFunc(lhs, rhs) < 0; });
+	std::sort(dirs.begin(), dirs.end(), [&](auto const& lhs, auto const& rhs) { return sortFunction_(lhs, rhs) < 0; });
 
 	std::vector<wxTreeItemId> toDelete;
 
@@ -610,7 +609,8 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 
 	auto iter = dirs.begin();
 	while (child && iter != dirs.end()) {
-		int cmp = sortFunc(GetItemText(child).ToStdWstring(), *iter);
+		wxString const& childName = GetItemText(child);
+		int cmp = sortFunction_(std::wstring_view(childName.data(), childName.size()), *iter);
 
 		if (!cmp) {
 			CServerPath childPath = listing.path;
@@ -1410,8 +1410,9 @@ void CRemoteTreeView::ApplyFilters(bool resort)
 	wxTreeItemIdValue cookie;
 	for (wxTreeItemId child = GetFirstChild(root, cookie); child; child = GetNextSibling(child)) {
 		CServerPath path = GetPathFromItem(child);
-		if (path.empty())
+		if (path.empty()) {
 			continue;
+		}
 
 		_parents dir;
 		dir.item = child;
@@ -1508,19 +1509,22 @@ void CRemoteTreeView::OnMenuGeturl(wxCommandEvent& event)
 
 void CRemoteTreeView::UpdateSortMode()
 {
+	CFileListCtrlSortBase::NameSortMode sortMode;
 	switch (COptions::Get()->GetOptionVal(OPTION_FILELIST_NAMESORT))
 	{
 	case 0:
 	default:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
+		sortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
 		break;
 	case 1:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_casesensitive;
+		sortMode = CFileListCtrlSortBase::namesort_casesensitive;
 		break;
 	case 2:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_natural;
+		sortMode = CFileListCtrlSortBase::namesort_natural;
 		break;
 	}
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(sortMode);
+	Resort();
 }
 
 void CRemoteTreeView::OnOptionsChanged(changed_options_t const& options)

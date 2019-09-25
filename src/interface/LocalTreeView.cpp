@@ -401,12 +401,11 @@ wxTreeItemId CLocalTreeView::GetNearestParent(wxString& localDir)
 	return root;
 }
 
-wxTreeItemId CLocalTreeView::GetSubdir(wxTreeItemId parent, const wxString& subDir)
+wxTreeItemId CLocalTreeView::GetSubdir(wxTreeItemId parent, wxString const& subDir)
 {
 	wxTreeItemIdValue value;
 	wxTreeItemId child = GetFirstChild(parent, value);
-	while (child)
-	{
+	while (child) {
 #ifdef __WXMSW__
 		if (!GetItemText(child).CmpNoCase(subDir))
 #else
@@ -695,19 +694,21 @@ std::wstring CLocalTreeView::GetDirFromItem(wxTreeItemId item)
 
 void CLocalTreeView::UpdateSortMode()
 {
+	CFileListCtrlSortBase::NameSortMode sortMode;
 	switch (COptions::Get()->GetOptionVal(OPTION_FILELIST_NAMESORT))
 	{
 	case 0:
 	default:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
+		sortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
 		break;
 	case 1:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_casesensitive;
+		sortMode = CFileListCtrlSortBase::namesort_casesensitive;
 		break;
 	case 2:
-		m_nameSortMode = CFileListCtrlSortBase::namesort_natural;
+		sortMode = CFileListCtrlSortBase::namesort_natural;
 		break;
 	}
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(sortMode);
 }
 
 namespace {
@@ -727,6 +728,9 @@ void CLocalTreeView::RefreshListing()
 	std::list<t_dir> dirsToCheck;
 
 #ifdef __WXMSW__
+	if (!m_drives) {
+		return;
+	}
 	int prevErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
 
 	wxTreeItemIdValue tmp;
@@ -748,6 +752,9 @@ void CLocalTreeView::RefreshListing()
 	t_dir root_dir;
 	root_dir.dir = separator;
 	root_dir.item = GetRootItem();
+	if (!root_dir.item) {
+		return;
+	}
 	dirsToCheck.push_back(root_dir);
 #endif
 
@@ -794,8 +801,7 @@ void CLocalTreeView::RefreshListing()
 
 			dirs.emplace_back(std::move(wfile));
 		}
-		auto const& sortFunc = CFileListCtrlSortBase::GetCmpFunction(m_nameSortMode);
-		std::sort(dirs.begin(), dirs.end(), [&](auto const& lhs, auto const& rhs) { return sortFunc(lhs, rhs) < 0; });
+		std::sort(dirs.begin(), dirs.end(), [&](auto const& lhs, auto const& rhs) { return sortFunction_(lhs, rhs) < 0; });
 
 		// Step 3: Merge list of subdirectories with subtree.
 		std::vector<wxTreeItemId> toDelete;
@@ -811,11 +817,8 @@ void CLocalTreeView::RefreshListing()
 		while (child || iter != dirs.end()) {
 			int cmp;
 			if (child && iter != dirs.end()) {
-#ifdef __WXMSW__
-				cmp = GetItemText(child).CmpNoCase(*iter);
-#else
-				cmp = GetItemText(child).Cmp(*iter);
-#endif
+				wxString const& childName = GetItemText(child);
+				cmp = sortFunction_(std::wstring_view(childName.data(), childName.size()), *iter);
 			}
 			else if (child) {
 				cmp = 1;
