@@ -7,29 +7,29 @@ EVT_CHAR(wxTreeCtrlEx::OnChar)
 END_EVENT_TABLE()
 #endif
 
+// Needed for OnCompareItems to work on Windows. Bad library design, why not use normal RTTI?
+IMPLEMENT_CLASS(wxTreeCtrlEx, wxNavigationEnabled<wxTreeCtrl>)
+
 wxTreeCtrlEx::wxTreeCtrlEx()
-	: m_nameSortMode(
-#ifdef __WXMSW__
-		CFileListCtrlSortBase::namesort_caseinsensitive
-#else
-		CFileListCtrlSortBase::namesort_casesensitive
-#endif
-	)
 {
+#ifdef __WXMSW__
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_caseinsensitive);
+#else
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_casesensitive);
+#endif
 }
 
 wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 			   const wxPoint& pos /*=wxDefaultPosition*/,
 			   const wxSize& size /*=wxDefaultSize*/,
 			   long style /*=wxTR_HAS_BUTTONS|wxTR_LINES_AT_ROOT*/)
-	: m_nameSortMode(
-#ifdef __WXMSW__
-		CFileListCtrlSortBase::namesort_caseinsensitive
-#else
-		CFileListCtrlSortBase::namesort_casesensitive
-#endif
-	)
 {
+#ifdef __WXMSW__
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_caseinsensitive);
+#else
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_casesensitive);
+#endif
+
 	Create(parent, id, pos, size, style);
 	SetBackgroundStyle(wxBG_STYLE_SYSTEM);
 
@@ -223,17 +223,26 @@ int wxTreeCtrlEx::OnCompareItems(wxTreeItemId const& item1, wxTreeItemId const& 
 {
 	wxString const& label1 = GetItemText(item1);
 	wxString const& label2 = GetItemText(item2);
+	auto const label1v = std::wstring_view(label1.data(), label1.size());
+	auto const label2v = std::wstring_view(label2.data(), label2.size());
 
-	switch (m_nameSortMode)
-	{
-	case CFileListCtrlSortBase::namesort_casesensitive:
-		return CFileListCtrlSortBase::CmpCase(label1, label2);
+	return sortFunction_(label1v, label2v);
+}
 
-	default:
-	case CFileListCtrlSortBase::namesort_caseinsensitive:
-		return CFileListCtrlSortBase::CmpNoCase(label1, label2);
-
-	case CFileListCtrlSortBase::namesort_natural:
-		return CFileListCtrlSortBase::CmpNatural(label1, label2);
+void wxTreeCtrlEx::Resort()
+{
+	std::vector<wxTreeItemId> work;
+	if (!GetRootItem()) {
+		return;
+	}
+	work.emplace_back(GetRootItem());
+	while (!work.empty()) {
+		wxTreeItemId item = work.back();
+		work.pop_back();
+		SortChildren(item);
+		wxTreeItemIdValue cookie;
+		for (wxTreeItemId child = GetFirstChild(item, cookie); child; child = GetNextSibling(child)) {
+			work.push_back(child);
+		}
 	}
 }

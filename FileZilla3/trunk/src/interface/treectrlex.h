@@ -6,6 +6,7 @@
 
 class wxTreeCtrlEx : public wxNavigationEnabled<wxTreeCtrl>
 {
+	DECLARE_CLASS(wxTreeCtrlEx); // Needed for OnCompareItems to work on Windows. Bad library design, why not use normal RTTI?
 public:
 	typedef wxTreeItemId Item;
 
@@ -42,6 +43,7 @@ public:
 
 	bool InPrefixSearch() const { return inPrefixSearch_; }
 
+	void Resort();
 protected:
 
 	bool inPrefixSearch_{};
@@ -53,9 +55,10 @@ protected:
 	void OnChar(wxKeyEvent& event);
 #endif
 
-	virtual int OnCompareItems(wxTreeItemId const& item1, wxTreeItemId const& item2);
+	virtual int OnCompareItems(wxTreeItemId const& item1, wxTreeItemId const& item2) override;
 
-	CFileListCtrlSortBase::NameSortMode m_nameSortMode;
+	typedef int (*CompareFunction)(std::wstring_view const&, std::wstring_view const&);
+	CompareFunction sortFunction_{};
 };
 
 #endif

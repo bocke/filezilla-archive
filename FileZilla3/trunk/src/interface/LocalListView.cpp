@@ -311,7 +311,6 @@ CLocalListView::~CLocalListView()
 
 bool CLocalListView::DisplayDir(CLocalPath const& dirname)
 {
-
 	CancelLabelEdit();
 
 	std::wstring focused;
