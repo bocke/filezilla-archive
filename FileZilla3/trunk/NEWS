@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.45.1 (2019-09-25)
+
+- Fixed sorting issues in the directory trees
+
 3.45.0 (2019-09-23)
 
 - Updated translations
