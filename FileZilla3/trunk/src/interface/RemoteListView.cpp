@@ -390,7 +390,7 @@ CRemoteListView::CRemoteListView(CView* pParent, CState& state, CQueueView* pQue
 
 	m_pInfoText = new CInfoText(this);
 
-	m_pDirectoryListing = 0;
+	m_pDirectoryListing = nullptr;
 
 	const unsigned long widths[6] = { 80, 75, 80, 100, 80, 80 };
 
@@ -409,7 +409,7 @@ CRemoteListView::CRemoteListView(CView* pParent, CState& state, CQueueView* pQue
 
 	InitSort(OPTION_REMOTEFILELIST_SORTORDER);
 
-	SetDirectoryListing(0);
+	SetDirectoryListing(nullptr);
 
 	SetDropTarget(new CRemoteListViewDropTarget(this));
 

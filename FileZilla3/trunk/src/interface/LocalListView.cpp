@@ -385,6 +385,10 @@ regular_dir:
 
 		if (!local_filesys.begin_find_files(fz::to_native(m_dir.GetPath()), false)) {
 			SetItemCount(1);
+			if (m_pFilelistStatusBar) {
+				m_pFilelistStatusBar->SetDirectoryContents(0, 0, 0, 0, 0);
+			}
+
 			return false;
 		}
 
@@ -408,23 +412,23 @@ regular_dir:
 			m_fileData.push_back(data);
 			if (!filter.FilenameFiltered(data.name, m_dir.GetPath(), data.dir, data.size, true, data.attributes, data.time)) {
 				if (data.dir) {
-					totalDirCount++;
+					++totalDirCount;
 				}
 				else {
 					if (data.size != -1) {
 						totalSize += data.size;
 					}
 					else {
-						unknown_sizes++;
+						++unknown_sizes;
 					}
-					totalFileCount++;
+					++totalFileCount;
 				}
 				m_indexMapping.push_back(num);
 			}
 			else {
-				hidden++;
+				++hidden;
 			}
-			num++;
+			++num;
 		}
 
 		if (m_pFilelistStatusBar) {
