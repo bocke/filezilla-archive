@@ -90,7 +90,7 @@ protected:
 	// Cache icon for directories, no need to calculate it multiple times
 	int m_dirIcon;
 
-	CInfoText* m_pInfoText;
+	CInfoText* m_pInfoText{};
 	void RepositionInfoText();
 	void SetInfoText();
 
