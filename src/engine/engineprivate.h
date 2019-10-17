@@ -15,7 +15,6 @@
 
 class CControlSocket;
 class CLogging;
-class CRateLimiter;
 class OpLockManager;
 
 enum EngineNotificationType
@@ -88,7 +87,7 @@ public:
 	std::unique_ptr<CNotification> GetNextNotification();
 
 	COptionsBase& GetOptions() { return m_options; }
-	CRateLimiter& GetRateLimiter() { return m_rateLimiter; }
+	fz::rate_limiter& GetRateLimiter() { return rate_limiter_; }
 	CDirectoryCache& GetDirectoryCache() { return directory_cache_; }
 	CPathCache& GetPathCache() { return path_cache_; }
 	fz::thread_pool& GetThreadPool() { return thread_pool_; }
@@ -202,7 +201,7 @@ protected:
 	int m_retryCount{};
 	fz::timer_id m_retryTimer{};
 
-	CRateLimiter& m_rateLimiter;
+	fz::rate_limiter& rate_limiter_;
 	CDirectoryCache& directory_cache_;
 	CPathCache& path_cache_;
 

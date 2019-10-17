@@ -310,7 +310,10 @@ protected:
 };
 
 class CProxySocket;
-class CRatelimitLayer;
+
+namespace fz {
+class rate_limited_layer;
+}
 
 class CRealControlSocket : public CControlSocket
 {
@@ -341,7 +344,7 @@ protected:
 	}
 
 	std::unique_ptr<fz::socket> socket_;
-	std::unique_ptr<CRatelimitLayer> ratelimit_layer_;
+	std::unique_ptr<fz::rate_limited_layer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
 	fz::socket_layer* active_layer_{};
 

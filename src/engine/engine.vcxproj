@@ -129,7 +129,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="backend.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="controlsocket.cpp" />
     <ClCompile Include="directorycache.cpp" />
@@ -171,7 +170,6 @@
     <ClCompile Include="proxy.cpp">
       <PrecompiledHeader />
     </ClCompile>
-    <ClCompile Include="ratelimiter.cpp" />
     <ClCompile Include="rtt.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="servercapabilities.cpp" />
@@ -201,7 +199,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\engine_context.h" />
-    <ClInclude Include="backend.h" />
     <ClInclude Include="..\include\commands.h" />
     <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
@@ -244,7 +241,6 @@
     <ClInclude Include="oplock_manager.h" />
     <ClInclude Include="pathcache.h" />
     <ClInclude Include="proxy.h" />
-    <ClInclude Include="ratelimiter.h" />
     <ClInclude Include="..\include\Server.h" />
     <ClInclude Include="rtt.h" />
     <ClInclude Include="servercapabilities.h" />

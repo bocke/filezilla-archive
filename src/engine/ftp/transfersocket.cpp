@@ -8,7 +8,8 @@
 #include "servercapabilities.h"
 #include "transfersocket.h"
 
-#include "libfilezilla/tls_layer.hpp"
+#include <libfilezilla/rate_limited_layer.hpp>
+#include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/util.hpp>
 
 CTransferSocket::CTransferSocket(CFileZillaEnginePrivate & engine, CFtpControlSocket & controlSocket, TransferMode transferMode)
@@ -471,7 +472,7 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 
 bool CTransferSocket::InitLayers(bool active)
 {
-	ratelimit_layer_ = std::make_unique<CRatelimitLayer>(nullptr, *socket_, engine_.GetRateLimiter());
+	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(nullptr, *socket_, &engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	if (controlSocket_.proxy_layer_ && !active) {

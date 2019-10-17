@@ -3,7 +3,7 @@
 
 #include "controlsocket.h"
 
-#include "backend.h"
+#include <libfilezilla/rate_limiter.hpp>
 
 namespace fz {
 class process;
@@ -13,7 +13,7 @@ class CSftpInputThread;
 struct sftp_message;
 struct sftp_list_message;
 
-class CSftpControlSocket final : public CControlSocket, public CRateLimiterObject
+class CSftpControlSocket final : public CControlSocket, public fz::bucket
 {
 public:
 	CSftpControlSocket(CFileZillaEnginePrivate & engine);
@@ -49,8 +49,8 @@ protected:
 	int AddToStream(std::wstring const& cmd);
 	int AddToStream(std::string const& cmd);
 
-	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
-	void OnQuotaRequest(CRateLimiter::rate_direction direction);
+	virtual void wakeup(fz::direction::type const d) override;
+	void OnQuotaRequest(fz::direction::type const d);
 
 	// see src/putty/wildcard.c
 	std::wstring WildcardEscape(std::wstring const& file);

@@ -6,7 +6,6 @@
 #include "http/httpcontrolsocket.h"
 #include "logging_private.h"
 #include "pathcache.h"
-#include "ratelimiter.h"
 #include "sftp/sftpcontrolsocket.h"
 #if ENABLE_STORJ
 #include "storj/storjcontrolsocket.h"
@@ -40,7 +39,7 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 	, notification_handler_(notificationHandler)
 	, m_engine_id(get_next_engine_id())
 	, m_options(context.GetOptions())
-	, m_rateLimiter(context.GetRateLimiter())
+	, rate_limiter_(context.GetRateLimiter())
 	, directory_cache_(context.GetDirectoryCache())
 	, path_cache_(context.GetPathCache())
 	, parent_(parent)

@@ -12,6 +12,7 @@
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/iputils.hpp>
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/rate_limited_layer.hpp>
 
 #include <string.h>
 
@@ -847,7 +848,7 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 	ResetSocket();
 	socket_ = std::make_unique<fz::socket>(engine_.GetThreadPool(), nullptr);
-	ratelimit_layer_ = std::make_unique<CRatelimitLayer>(this, *socket_, engine_.GetRateLimiter());
+	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(this, *socket_, &engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	const int proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
