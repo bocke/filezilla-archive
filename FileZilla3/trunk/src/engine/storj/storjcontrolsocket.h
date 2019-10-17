@@ -3,8 +3,6 @@
 
 #include "controlsocket.h"
 
-#include "backend.h"
-
 namespace fz {
 class process;
 }
@@ -16,7 +14,7 @@ auto const resolve = Command::private1;
 class CStorjInputThread;
 
 struct storj_message;
-class CStorjControlSocket final : public CControlSocket, public CRateLimiterObject
+class CStorjControlSocket final : public CControlSocket
 {
 public:
 	CStorjControlSocket(CFileZillaEnginePrivate & engine);
@@ -53,9 +51,6 @@ protected:
 
 	int SendCommand(std::wstring const& cmd, std::wstring const& show = std::wstring());
 	int AddToStream(std::wstring const& cmd);
-
-	virtual void OnRateAvailable(CRateLimiter::rate_direction direction) override;
-	void OnQuotaRequest(CRateLimiter::rate_direction direction);
 
 	std::unique_ptr<fz::process> process_;
 	std::unique_ptr<CStorjInputThread> input_thread_;
