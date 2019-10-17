@@ -2,7 +2,6 @@
 #define FILEZILLA_ENGINE_FTP_TRANSFERSOCKET_HEADER
 
 #include "iothread.h"
-#include "backend.h"
 #include "controlsocket.h"
 
 class CFileZillaEnginePrivate;
@@ -89,7 +88,7 @@ protected:
 	void TriggerPostponedEvents();
 
 	std::unique_ptr<fz::socket> socket_;
-	std::unique_ptr<CRatelimitLayer> ratelimit_layer_;
+	std::unique_ptr<fz::rate_limited_layer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
 	std::unique_ptr<fz::tls_layer> tls_layer_;
 

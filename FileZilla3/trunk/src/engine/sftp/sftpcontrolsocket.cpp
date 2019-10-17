@@ -26,6 +26,9 @@
 #include <algorithm>
 #include <cwchar>
 
+struct SftpRateAvailableEventType;
+typedef fz::simple_event<SftpRateAvailableEventType, fz::direction::type> SftpRateAvailableEvent;
+
 CSftpControlSocket::CSftpControlSocket(CFileZillaEnginePrivate & engine)
 	: CControlSocket(engine)
 {
@@ -34,6 +37,7 @@ CSftpControlSocket::CSftpControlSocket(CFileZillaEnginePrivate & engine)
 
 CSftpControlSocket::~CSftpControlSocket()
 {
+	remove_bucket();
 	remove_handler();
 	DoClose();
 }
@@ -77,7 +81,7 @@ void CSftpControlSocket::Connect(CServer const& server, Credentials const& crede
 
 	process_ = std::make_unique<fz::process>();
 
-	engine_.GetRateLimiter().AddObject(this);
+	engine_.GetRateLimiter().add(this);
 	Push(std::move(pData));
 }
 
@@ -232,10 +236,10 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		m_requestInstruction = message.text[0];
 		break;
 	case sftpEvent::UsedQuotaRecv:
-		OnQuotaRequest(CRateLimiter::inbound);
+		OnQuotaRequest(fz::direction::inbound);
 		break;
 	case sftpEvent::UsedQuotaSend:
-		OnQuotaRequest(CRateLimiter::outbound);
+		OnQuotaRequest(fz::direction::outbound);
 		break;
 	case sftpEvent::KexAlgorithm:
 		m_sftpEncryptionDetails.kexAlgorithm = message.text[0];
@@ -516,7 +520,7 @@ void CSftpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath
 
 int CSftpControlSocket::DoClose(int nErrorCode)
 {
-	engine_.GetRateLimiter().RemoveObject(this);
+//	engine_.GetRateLimiter().RemoveObject(this); //XXX
 
 	if (process_) {
 		process_->kill();
@@ -629,15 +633,22 @@ std::wstring CSftpControlSocket::WildcardEscape(std::wstring const& file)
 	return ret;
 }
 
-void CSftpControlSocket::OnRateAvailable(CRateLimiter::rate_direction direction)
+void CSftpControlSocket::wakeup(fz::direction::type const d)
 {
-	OnQuotaRequest(direction);
+	send_event<SftpRateAvailableEvent>(d);
 }
 
-void CSftpControlSocket::OnQuotaRequest(CRateLimiter::rate_direction direction)
+void CSftpControlSocket::OnQuotaRequest(fz::direction::type const d)
 {
-	int64_t bytes = GetAvailableBytes(direction);
-	if (bytes > 0) {
+	if (!process_) {
+		return;
+	}
+
+	size_t bytes = available(d);
+	if (bytes == fz::rate::unlimited) {
+		AddToStream(fz::sprintf("-%d-\n", d));
+	}
+	else if (bytes > 0) {
 		int b;
 		if (bytes > std::numeric_limits<int>::max()) {
 			b = std::numeric_limits<int>::max();
@@ -645,23 +656,18 @@ void CSftpControlSocket::OnQuotaRequest(CRateLimiter::rate_direction direction)
 		else {
 			b = static_cast<int>(bytes);
 		}
-		AddToStream(fz::sprintf("-%d%d,%d\n", direction, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(direction))));
-		UpdateUsage(direction, b);
-	}
-	else if (bytes == 0) {
-		Wait(direction);
-	}
-	else if (bytes < 0) {
-		AddToStream(fz::sprintf("-%d-\n", direction));
+		AddToStream(fz::sprintf("-%d%d,%d\n", d, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(d))));
+		consume(d, static_cast<size_t>(bytes));
 	}
 }
 
 void CSftpControlSocket::operator()(fz::event_base const& ev)
 {
-	if (fz::dispatch<CSftpEvent, CSftpListEvent, CTerminateEvent>(ev, this,
+	if (fz::dispatch<CSftpEvent, CSftpListEvent, CTerminateEvent, SftpRateAvailableEvent>(ev, this,
 		&CSftpControlSocket::OnSftpEvent,
 		&CSftpControlSocket::OnSftpListEvent,
-		&CSftpControlSocket::OnTerminate)) {
+		&CSftpControlSocket::OnTerminate,
+		&CSftpControlSocket::OnQuotaRequest)) {
 		return;
 	}
 

@@ -6,7 +6,6 @@ libengine_a_CPPFLAGS = -I$(srcdir)/../include
 libengine_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
 
 libengine_a_SOURCES = \
-		backend.cpp \
 		commands.cpp \
 		controlsocket.cpp \
 		directorycache.cpp \
@@ -44,7 +43,6 @@ libengine_a_SOURCES = \
 		option_change_event_handler.cpp \
 		pathcache.cpp \
 		proxy.cpp \
-		ratelimiter.cpp \
 		rtt.cpp \
 		server.cpp \
 		servercapabilities.cpp \
@@ -63,7 +61,7 @@ libengine_a_SOURCES = \
 		sizeformatting_base.cpp \
 		xmlutils.cpp
 
-noinst_HEADERS = backend.h \
+noinst_HEADERS = \
 		controlsocket.h \
 		directorycache.h \
 		directorylistingparser.h \
@@ -94,7 +92,6 @@ noinst_HEADERS = backend.h \
 		oplock_manager.h \
 		pathcache.h \
 		proxy.h \
-		ratelimiter.h \
 		rtt.h \
 		servercapabilities.h \
 		sftp/chmod.h \
