@@ -520,7 +520,7 @@ void CSftpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath
 
 int CSftpControlSocket::DoClose(int nErrorCode)
 {
-//	engine_.GetRateLimiter().RemoveObject(this); //XXX
+	RemoveBucket();
 
 	if (process_) {
 		process_->kill();
