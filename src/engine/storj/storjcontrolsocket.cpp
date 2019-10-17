@@ -46,7 +46,6 @@ void CStorjControlSocket::Connect(CServer const &server, Credentials const& cred
 
 	process_ = std::make_unique<fz::process>();
 
-	engine_.GetRateLimiter().AddObject(this);
 	Push(std::make_unique<CStorjConnectOpData>(*this, credentials));
 }
 
@@ -174,12 +173,6 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 				ResetOperation(res);
 			}
 		}
-		break;
-	case storjEvent::UsedQuotaRecv:
-		OnQuotaRequest(CRateLimiter::inbound);
-		break;
-	case storjEvent::UsedQuotaSend:
-		OnQuotaRequest(CRateLimiter::outbound);
 		break;
 	case storjEvent::Transfer:
 		{
@@ -342,8 +335,6 @@ int CStorjControlSocket::ResetOperation(int nErrorCode)
 
 int CStorjControlSocket::DoClose(int nErrorCode)
 {
-	engine_.GetRateLimiter().RemoveObject(this);
-
 	if (process_) {
 		process_->kill();
 	}
@@ -372,33 +363,6 @@ void CStorjControlSocket::Cancel()
 	if (GetCurrentCommandId() != Command::none) {
 		DoClose(FZ_REPLY_CANCELED);
 	}
-}
-
-void CStorjControlSocket::OnRateAvailable(CRateLimiter::rate_direction direction)
-{
-	//OnQuotaRequest(direction);
-}
-
-void CStorjControlSocket::OnQuotaRequest(CRateLimiter::rate_direction direction)
-{
-	/*int64_t bytes = GetAvailableBytes(direction);
-	if (bytes > 0) {
-		int b;
-		if (bytes > INT_MAX) {
-			b = INT_MAX;
-		}
-		else {
-			b = bytes;
-		}
-		AddToStream(fz::sprintf(L"-%d%d,%d\n", direction, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(direction))));
-		UpdateUsage(direction, b);
-	}
-	else if (bytes == 0) {
-		Wait(direction);
-	}
-	else if (bytes < 0) {
-		AddToStream(fz::sprintf(L"-%d-\n", direction));
-	}*/
 }
 
 void CStorjControlSocket::operator()(fz::event_base const& ev)
