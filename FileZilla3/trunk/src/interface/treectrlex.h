@@ -6,7 +6,7 @@
 
 class wxTreeCtrlEx : public wxNavigationEnabled<wxTreeCtrl>
 {
-	DECLARE_CLASS(wxTreeCtrlEx); // Needed for OnCompareItems to work on Windows. Bad library design, why not use normal RTTI?
+	wxDECLARE_CLASS(wxTreeCtrlEx); // Needed for OnCompareItems to work on Windows. Bad library design, why not use normal RTTI?
 public:
 	typedef wxTreeItemId Item;
 
@@ -51,7 +51,7 @@ protected:
 	int m_setSelection{};
 
 #ifdef __WXMAC__
-	DECLARE_EVENT_TABLE()
+	wxDECLARE_EVENT_TABLE();
 	void OnChar(wxKeyEvent& event);
 #endif
 
