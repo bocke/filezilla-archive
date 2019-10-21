@@ -1883,7 +1883,7 @@ void CSiteManagerDialog::RememberLastSelected()
 	COptions::Get()->SetOption(OPTION_SITEMANAGER_LASTSELECTED, path);
 }
 
-void CSiteManagerDialog::OnContextMenu(wxTreeEvent& event)
+void CSiteManagerDialog::OnContextMenu(wxTreeEvent&)
 {
 	if (!Verify()) {
 		return;
