@@ -248,7 +248,7 @@ EVT_MENU(XRCID("ID_OPEN"), CLocalTreeView::OnMenuOpen)
 END_EVENT_TABLE()
 
 CLocalTreeView::CLocalTreeView(wxWindow* parent, wxWindowID id, CState& state, CQueueView *pQueueView)
-	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxTR_LINES_AT_ROOT | wxTR_HAS_BUTTONS | wxNO_BORDER),
+	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER),
 	CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x),
 	CStateEventHandler(state),
 	m_pQueueView(pQueueView)

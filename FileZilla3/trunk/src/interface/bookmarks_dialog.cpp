@@ -261,7 +261,7 @@ int CBookmarksDialog::Run()
 
 	left->Add(new wxStaticText(this, wxID_ANY, _("Bookmark:")));
 
-	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT);
+	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_HIDE_ROOT);
 	tree_->SetFocus();
 	tree_->SetMinSize(wxSize(-1, 250));
 	left->Add(tree_, lay.grow)->SetProportion(1);

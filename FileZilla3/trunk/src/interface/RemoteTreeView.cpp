@@ -243,7 +243,7 @@ EVT_MENU(XRCID("ID_GETURL"), CRemoteTreeView::OnMenuGeturl)
 END_EVENT_TABLE()
 
 CRemoteTreeView::CRemoteTreeView(wxWindow* parent, wxWindowID id, CState& state, CQueueView* pQueue)
-	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxTR_LINES_AT_ROOT | wxTR_HAS_BUTTONS | wxNO_BORDER | wxTR_HIDE_ROOT),
+	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER | wxTR_HIDE_ROOT),
 	CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x),
 	CStateEventHandler(state)
 {
