@@ -854,7 +854,7 @@ void CEditHandler::OnTimerEvent(wxTimerEvent&)
 	}
 #endif
 
-	CheckForModifications();
+	CheckForModifications(true);
 }
 
 void CEditHandler::SetTimerState()
