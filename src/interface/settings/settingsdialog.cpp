@@ -65,7 +65,7 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 
 	left->Add(new wxStaticText(this, -1, _("Select &page:")));
 
-	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT | wxTR_HIDE_ROOT);
+	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTR_HIDE_ROOT);
 	tree_->SetFocus();
 	left->Add(tree_, 1, wxGROW);
 

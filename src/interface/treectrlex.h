@@ -4,6 +4,12 @@
 #include <wx/dnd.h>
 #include "filelistctrl.h"
 
+#ifndef __WXMAC__
+	#define DEFAULT_TREE_STYLE wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT
+#else
+	#define DEFAULT_TREE_STYLE wxTR_HAS_BUTTONS | wxTR_NO_LINES
+#endif
+
 class wxTreeCtrlEx : public wxNavigationEnabled<wxTreeCtrl>
 {
 	wxDECLARE_CLASS(wxTreeCtrlEx); // Needed for OnCompareItems to work on Windows. Bad library design, why not use normal RTTI?
@@ -14,7 +20,7 @@ public:
 	wxTreeCtrlEx(wxWindow *parent, wxWindowID id = wxID_ANY,
 			   const wxPoint& pos = wxDefaultPosition,
 			   const wxSize& size = wxDefaultSize,
-			   long style = wxTR_HAS_BUTTONS | wxTR_LINES_AT_ROOT);
+			   long style = DEFAULT_TREE_STYLE);
 	void SafeSelectItem(wxTreeItemId const& item, bool clearSelection = true);
 
 	// Small wrappers to make wxTreeCtrl(Ex) API more similar to wxListCtrl(ex).

@@ -341,7 +341,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 
 	left->Add(new wxStaticText(this, wxID_ANY, _("&Select entry:")));
 
-	tree_ = new wxTreeCtrlEx(this, XRCID("ID_SITETREE"), wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_HAS_BUTTONS | wxTR_MULTIPLE | wxTR_LINES_AT_ROOT);
+	tree_ = new wxTreeCtrlEx(this, XRCID("ID_SITETREE"), wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxBORDER_SUNKEN | wxTR_EDIT_LABELS | wxTR_MULTIPLE);
 	tree_->SetFocus();
 	left->Add(tree_, lay.grow)->SetProportion(1);
 
