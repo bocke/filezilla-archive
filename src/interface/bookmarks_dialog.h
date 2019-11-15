@@ -9,7 +9,7 @@ class CNewBookmarkDialog final : public wxDialogEx
 public:
 	CNewBookmarkDialog(wxWindow* parent, std::wstring& site_path, Site const* site);
 
-	int Run(const wxString &local_path, const CServerPath &remote_path);
+	int Run(wxString const& local_path, CServerPath const& remote_path);
 
 protected:
 	wxWindow* m_parent;

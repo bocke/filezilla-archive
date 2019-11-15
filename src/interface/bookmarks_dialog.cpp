@@ -36,7 +36,7 @@ CNewBookmarkDialog::CNewBookmarkDialog(wxWindow* parent, std::wstring& site_path
 {
 }
 
-int CNewBookmarkDialog::Run(const wxString &local_path, const CServerPath &remote_path)
+int CNewBookmarkDialog::Run(wxString const& local_path, CServerPath const& remote_path)
 {
 	if (!Load(m_parent, _T("ID_NEWBOOKMARK"))) {
 		return wxID_CANCEL;
@@ -70,7 +70,7 @@ void CNewBookmarkDialog::OnOK(wxCommandEvent&)
 	CServerPath remote_path;
 	if (!remote_path_raw.empty()) {
 		if (!global && site_) {
-			remote_path.SetType(site_->server.GetType());
+			remote_path.SetType(site_->GetOriginalServer().GetType());
 		}
 		if (!remote_path.SetPath(remote_path_raw.ToStdWstring())) {
 			wxMessageBoxEx(_("Could not parse remote path."), _("New bookmark"), wxICON_EXCLAMATION);
@@ -474,14 +474,14 @@ bool CBookmarksDialog::Verify()
 	if (!remotePathRaw.empty()) {
 		CServerPath remotePath;
 		if (site) {
-			remotePath.SetType(site->server.GetType());
+			remotePath.SetType(site->GetOriginalServer().GetType());
 		}
 		if (!remotePath.SetPath(remotePathRaw.ToStdWstring())) {
 			xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::SetFocus);
 			if (site) {
 				wxString msg;
-				if (site->server.GetType() != DEFAULT) {
-					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(site->server.GetType()));
+				if (site->GetOriginalServer().GetType() != DEFAULT) {
+					msg = wxString::Format(_("Remote path cannot be parsed. Make sure it is a valid absolute path and is supported by the current site's servertype (%s)."), CServer::GetNameFromServerType(site->GetOriginalServer().GetType()));
 				}
 				else {
 					msg = _("Remote path cannot be parsed. Make sure it is a valid absolute path.");
@@ -535,7 +535,7 @@ void CBookmarksDialog::UpdateBookmark()
 	wxString const remotePathRaw = xrc_call(*this, "ID_BOOKMARK_REMOTEDIR", &wxTextCtrl::GetValue);
 	if (!remotePathRaw.empty()) {
 		if (site) {
-			data->m_remote_dir.SetType(site->server.GetType());
+			data->m_remote_dir.SetType(site->GetOriginalServer().GetType());
 		}
 		data->m_remote_dir.SetPath(remotePathRaw.ToStdWstring());
 	}

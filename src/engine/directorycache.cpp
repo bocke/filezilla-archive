@@ -589,6 +589,40 @@ void CDirectoryCache::Rename(CServer const& server, CServerPath const& pathFrom,
 	InvalidateServer(server);
 }
 
+void CDirectoryCache::UpdateOwnerGroup(CServer const& server, CServerPath const& path, std::wstring const& filename, std::wstring& ownerGroup)
+{
+	fz::scoped_lock lock(mutex_);
+
+	tServerIter sit = GetServerEntry(server);
+	if (sit == m_serverList.end()) {
+		return;
+	}
+
+	tCacheIter iter;
+	bool is_outdated = false;
+	bool found = Lookup(iter, sit, path, true, is_outdated);
+	if (found) {
+		auto & listing = const_cast<CDirectoryListing&>(iter->listing);
+		size_t i;
+		for (i = 0; i < listing.size(); ++i) {
+			if (listing[i].name == filename) {
+				break;
+			}
+		}
+		if (i != listing.size()) {
+			if (!listing[i].is_dir()) {
+				listing.get(i).ownerGroup.get() = ownerGroup;
+				listing.ClearFindMap();
+			}
+			return;
+		}
+	}
+
+	// We know nothing, be on the safe side and invalidate everything.
+	InvalidateServer(server);
+}
+
+
 CDirectoryCache::tServerIter CDirectoryCache::CreateServerEntry(CServer const& server)
 {
 	for (tServerIter iter = m_serverList.begin(); iter != m_serverList.end(); ++iter) {

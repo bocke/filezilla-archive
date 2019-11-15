@@ -104,7 +104,7 @@ std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
 	if (!::GetServer(element, *data)) {
 		return nullptr;
 	}
-	if (data->server.GetName().empty()) {
+	if (data->GetName().empty()) {
 		return nullptr;
 	}
 
@@ -182,12 +182,12 @@ public:
 
 	virtual bool AddSite(std::unique_ptr<Site> data)
 	{
-		std::wstring newName(data->server.GetName());
+		std::wstring newName(data->GetName());
 		int i = GetInsertIndex(m_pMenu, newName);
 		newName = LabelEscape(newName);
 		wxMenuItem* pItem = m_pMenu->Insert(i, wxID_ANY, newName);
 
-		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->server.GetName()));
+		data->SetSitePath(path + _T("/") + CSiteManager::EscapeSegment(data->GetName()));
 
 		(*m_idMap)[pItem->GetId()] = std::move(data);
 
@@ -564,7 +564,7 @@ std::wstring CSiteManager::AddServer(Site site)
 		name = _("New site").ToStdWstring() + fz::sprintf(L" %d", ++i);
 	}
 
-	site.server.SetName(name);
+	site.SetName(name);
 
 	auto xServer = element.append_child("Server");
 	SetServer(xServer, site);
@@ -615,7 +615,7 @@ pugi::xml_node CSiteManager::GetElementByPath(pugi::xml_node node, std::vector<s
 	return node;
 }
 
-bool CSiteManager::AddBookmark(std::wstring sitePath, const wxString& name, const wxString &local_dir, const CServerPath &remote_dir, bool sync, bool comparison)
+bool CSiteManager::AddBookmark(std::wstring sitePath, wxString const& name, wxString const& local_dir, CServerPath const& remote_dir, bool sync, bool comparison)
 {
 	if (local_dir.empty() && remote_dir.empty()) {
 		return false;
@@ -968,13 +968,13 @@ bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exis
 		}
 			
 		// Find free name
-		auto const name = site->server.GetName();
+		auto const name = site->GetName();
 		std::wstring newName = name;
 		int i = 2;
 		while (GetChildWithName(existingSites, newName)) {
 			newName = fz::sprintf(L"%s %d", name.substr(0, 240), i++);
 		}
-		site->server.SetName(newName);
+		site->SetName(newName);
 
 		site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), false);
 		site->credentials.Protect();

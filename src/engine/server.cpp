@@ -268,7 +268,7 @@ void CServer::SetProtocol(ServerProtocol serverProtocol)
 	m_protocol = serverProtocol;
 
 	// Clear out parameters not supported by the current protocol
-	std::map<std::string, std::wstring> oldParams;
+	std::map<std::string, std::wstring, std::less<>> oldParams;
 	std::swap(extraParameters_, oldParams);
 	for (auto const& param : oldParams) {
 		SetExtraParameter(param.first, param.second);
@@ -644,7 +644,7 @@ void CServer::ClearExtraParameters()
 	extraParameters_.clear();
 }
 
-std::wstring CServer::GetExtraParameter(std::string const& name) const
+std::wstring CServer::GetExtraParameter(std::string_view const& name) const
 {
 	auto it = extraParameters_.find(name);
 	if (it != extraParameters_.cend()) {
@@ -653,15 +653,23 @@ std::wstring CServer::GetExtraParameter(std::string const& name) const
 	return std::wstring();
 }
 
-std::map<std::string, std::wstring> const& CServer::GetExtraParameters() const
+std::map<std::string, std::wstring, std::less<>> const& CServer::GetExtraParameters() const
 {
 	return extraParameters_;
 }
 
-void CServer::SetExtraParameter(std::string const& name, std::wstring const& value)
+bool CServer::HasExtraParameter(std::string_view const& name) const
 {
+	return extraParameters_.find(name) != extraParameters_.cend();
+}
+
+void CServer::SetExtraParameter(std::string_view const& name, std::wstring const& value)
+{
+	auto it = extraParameters_.find(name);
 	if (value.empty()) {
-		extraParameters_.erase(name);
+		if (it != extraParameters_.cend()) {
+			extraParameters_.erase(it);
+		}
 	}
 	else {
 		bool found = false;
@@ -674,14 +682,22 @@ void CServer::SetExtraParameter(std::string const& name, std::wstring const& val
 		}
 
 		if (found) {
-			extraParameters_[name] = value;
+			if (it == extraParameters_.cend()) {
+				extraParameters_.emplace(name, value);
+			}
+			else {
+				it->second = value;
+			}
 		}
 	}
 }
 
-void CServer::ClearExtraParameter(const std::string &name)
+void CServer::ClearExtraParameter(std::string_view const& name)
 {
-	extraParameters_.erase(name);
+	auto it = extraParameters_.find(name);
+	if (it != extraParameters_.cend()) {
+		extraParameters_.erase(it);
+	}
 }
 
 LogonType GetLogonTypeFromName(std::wstring const& name)
@@ -749,7 +765,7 @@ void Credentials::ClearExtraParameters()
 	extraParameters_.clear();
 }
 
-std::wstring Credentials::GetExtraParameter(std::string const& name) const
+std::wstring Credentials::GetExtraParameter(std::string_view const& name) const
 {
 	auto it = extraParameters_.find(name);
 	if (it != extraParameters_.cend()) {
@@ -758,24 +774,42 @@ std::wstring Credentials::GetExtraParameter(std::string const& name) const
 	return std::wstring();
 }
 
-std::map<std::string, std::wstring> const& Credentials::GetExtraParameters() const
+std::map<std::string, std::wstring, std::less<>> const& Credentials::GetExtraParameters() const
 {
 	return extraParameters_;
 }
 
-void Credentials::SetExtraParameter(ServerProtocol protocol, std::string const& name, std::wstring const& value)
+bool Credentials::HasExtraParameter(std::string_view const& name) const
 {
-	bool found = false;
-	auto const& traits = ExtraServerParameterTraits(protocol);
-	for (auto const& trait : traits) {
-		if (trait.section_ != ParameterSection::credentials && name == trait.name_) {
-			found = true;
-			break;
+	return extraParameters_.find(name) != extraParameters_.cend();
+}
+
+void Credentials::SetExtraParameter(ServerProtocol protocol, std::string_view const& name, std::wstring const& value)
+{
+	auto it = extraParameters_.find(name);
+	if (value.empty()) {
+		if (it != extraParameters_.cend()) {
+			extraParameters_.erase(it);
 		}
 	}
+	else {
+		bool found = false;
+		auto const& traits = ExtraServerParameterTraits(protocol);
+		for (auto const& trait : traits) {
+			if (trait.section_ != ParameterSection::credentials && name == trait.name_) {
+				found = true;
+				break;
+			}
+		}
 
-	if (found) {
-		extraParameters_[name] = value;
+		if (found) {
+			if (it == extraParameters_.cend()) {
+				extraParameters_.emplace(name, value);
+			}
+			else {
+				it->second = value;
+			}
+		}
 	}
 }
 
@@ -823,7 +857,8 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		{
 			static std::vector<ParameterTraits> ret = []() {
 				std::vector<ParameterTraits> ret;
-				ret.emplace_back(ParameterTraits{"email", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
+				ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;
@@ -849,6 +884,46 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 			}();
 			return ret;
 		}
+	case GOOGLE_DRIVE:
+	{
+		static std::vector<ParameterTraits> ret = []() {
+			std::vector<ParameterTraits> ret;
+			ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
+			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			return ret;
+		}();
+		return ret;
+	}
+	case DROPBOX:
+	{
+		static std::vector<ParameterTraits> ret = []() {
+			std::vector<ParameterTraits> ret;
+			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			return ret;
+		}();
+		return ret;
+	}
+	case ONEDRIVE:
+	{
+		static std::vector<ParameterTraits> ret = []() {
+			std::vector<ParameterTraits> ret;
+			ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
+			ret.emplace_back(ParameterTraits{"nowebview", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			return ret;
+		}();
+		return ret;
+	}
+	case BOX:
+	{
+		static std::vector<ParameterTraits> ret = []() {
+			std::vector<ParameterTraits> ret;
+			ret.emplace_back(ParameterTraits{"nowebview", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			return ret;
+		}();
+		return ret;
+	}
 	default:
 		break;
 	}
@@ -888,7 +963,7 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 
 bool ProtocolHasUser(ServerProtocol protocol)
 {
-	return protocol != DROPBOX && protocol != ONEDRIVE && protocol != BOX;
+	return protocol != DROPBOX && protocol != ONEDRIVE && protocol != BOX && protocol != GOOGLE_DRIVE;
 }
 
 bool CServer::SameResource(CServer const& other) const

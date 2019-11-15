@@ -191,11 +191,6 @@ public:
 
 	void SetBypassProxy(bool val);
 
-	// Abstract server name.
-	// Not compared in ==, < and related operators
-	void SetName(std::wstring const& name) { m_name = name; }
-	std::wstring GetName() const { return m_name; }
-
 	static std::wstring GetNameFromServerType(ServerType type);
 	static ServerType GetServerTypeFromName(std::wstring const& name);
 
@@ -203,10 +198,11 @@ public:
 	explicit operator bool() const { return !empty(); }
 
 	void ClearExtraParameters();
-	std::wstring GetExtraParameter(std::string const& name) const;
-	std::map<std::string, std::wstring> const& GetExtraParameters() const;
-	void SetExtraParameter(std::string const& name, std::wstring const& value);
-	void ClearExtraParameter(std::string const& name);
+	std::wstring GetExtraParameter(std::string_view const& name) const;
+	std::map<std::string, std::wstring, std::less<>> const& GetExtraParameters() const;
+	bool HasExtraParameter(std::string_view const& name) const;
+	void SetExtraParameter(std::string_view const& name, std::wstring const& value);
+	void ClearExtraParameter(std::string_view const& name);
 
 protected:
 	ServerProtocol m_protocol{UNKNOWN};
@@ -219,12 +215,11 @@ protected:
 	int m_maximumMultipleConnections{};
 	CharsetEncoding m_encodingType{ENCODING_AUTO};
 	std::wstring m_customEncoding;
-	std::wstring m_name;
 
 	std::vector<std::wstring> m_postLoginCommands;
 	bool m_bypassProxy{};
 
-	std::map<std::string, std::wstring> extraParameters_;
+	std::map<std::string, std::wstring, std::less<>> extraParameters_;
 };
 
 
@@ -299,13 +294,14 @@ public:
 	std::wstring keyFile_;
 
 	void ClearExtraParameters();
-	std::wstring GetExtraParameter(std::string const& name) const;
-	std::map<std::string, std::wstring> const& GetExtraParameters() const;
-	void SetExtraParameter(ServerProtocol protocol, std::string const& name, std::wstring const& value);
+	std::wstring GetExtraParameter(std::string_view const& name) const;
+	std::map<std::string, std::wstring, std::less<>> const& GetExtraParameters() const;
+	bool HasExtraParameter(std::string_view const& name) const;
+	void SetExtraParameter(ServerProtocol protocol, std::string_view const& name, std::wstring const& value);
 
 protected:
 	std::wstring password_;
-	std::map<std::string, std::wstring> extraParameters_;
+	std::map<std::string, std::wstring, std::less<>> extraParameters_;
 };
 
 struct ServerHandleData {

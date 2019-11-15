@@ -629,7 +629,7 @@ public:
 			data->credentials.encrypted_ = fz::public_key();
 		}
 
-		std::wstring const name = data->server.GetName();
+		std::wstring const name = data->GetName();
 
 		CSiteManagerItemData* pData = new CSiteManagerItemData(std::move(data));
 		wxTreeItemId newItem = m_tree_->AppendItem(m_item, name, 2, 2, pData);
@@ -868,10 +868,8 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 		CSiteManager::Save(node, *data->m_site);
 
 		if (data->connected_item != -1) {
-			if ((*m_connected_sites)[data->connected_item].site.server == data->m_site->server) {
-				(*m_connected_sites)[data->connected_item].new_path = GetSitePath(child);
-				(*m_connected_sites)[data->connected_item].site = *data->m_site;
-			}
+			(*m_connected_sites)[data->connected_item].site = *data->m_site;
+			(*m_connected_sites)[data->connected_item].site.SetSitePath(GetSitePath(child));
 		}
 	}
 
@@ -1228,7 +1226,7 @@ void CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
 {
 	m_pNotebook_Site->UpdateSite(site);
 
-	site.server.SetName(name.ToStdWstring());
+	site.SetName(name.ToStdWstring());
 }
 
 bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
@@ -1842,6 +1840,10 @@ void CSiteManagerDialog::AddNewSite(wxTreeItemId parent, Site const& site, bool 
 	CSiteManagerItemData* pData = new CSiteManagerItemData;
 	pData->m_site = std::make_unique<Site>();
 	*pData->m_site = site;
+
+	// Erase updated server info
+	pData->m_site->server = site.GetOriginalServer();
+	pData->m_site->originalServer.reset();
 	if (connected) {
 		pData->connected_item = 0;
 	}

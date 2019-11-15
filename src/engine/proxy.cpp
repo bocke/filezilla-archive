@@ -36,6 +36,7 @@ CProxySocket::CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface 
 CProxySocket::~CProxySocket()
 {
 	remove_handler();
+	next_layer_.set_event_handler(nullptr);
 }
 
 std::wstring CProxySocket::Name(ProxyType t)

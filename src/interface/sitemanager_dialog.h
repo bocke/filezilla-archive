@@ -21,7 +21,6 @@ public:
 	{
 		Site site;
 		std::wstring old_path;
-		std::wstring new_path;
 	};
 
 	/// Constructors

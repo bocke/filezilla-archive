@@ -791,6 +791,7 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 		else {
 			reason = ResetReason::reset;
 		}
+		SetActive(false);
 		ResetEngine(*pEngineData, reason);
 		return;
 	}
