@@ -91,7 +91,6 @@ protected:
 	int m_dirIcon;
 
 	CInfoText* m_pInfoText{};
-	void RepositionInfoText();
 	void SetInfoText();
 
 	virtual bool OnBeginRename(const wxListEvent& event);

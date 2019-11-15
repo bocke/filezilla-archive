@@ -54,6 +54,7 @@ filezilla_SOURCES = aboutdialog.cpp \
 		fzputtygen_interface.cpp \
 		graphics.cpp \
 		import.cpp \
+		infotext.cpp \
 		inputdialog.cpp \
 		ipcmutex.cpp \
 		led.cpp \
@@ -177,6 +178,7 @@ noinst_HEADERS = aboutdialog.h \
 		 fzputtygen_interface.h \
 		 graphics.h \
 		 import.h \
+		 infotext.h \
 		 inputdialog.h \
 		 ipcmutex.h \
 		 led.h \
