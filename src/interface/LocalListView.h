@@ -4,6 +4,7 @@
 #include "filelistctrl.h"
 #include "state.h"
 
+class CInfoText;
 class CQueueView;
 class CLocalListViewDropTarget;
 #ifdef __WXMSW__
@@ -94,6 +95,9 @@ protected:
 
 	CView *m_parentView{};
 
+	CInfoText* m_pInfoText{};
+	void SetInfoText(wxString const& text);
+
 	// Event handlers
 	DECLARE_EVENT_TABLE()
 	void OnItemActivated(wxListEvent& event);
@@ -104,6 +108,7 @@ protected:
 	void OnMenuDelete(wxCommandEvent& event);
 	void OnMenuRename(wxCommandEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
+	void OnSize(wxSizeEvent& event);
 	void OnBeginDrag(wxListEvent& event);
 	void OnMenuOpen(wxCommandEvent& event);
 	void OnMenuEdit(wxCommandEvent& event);

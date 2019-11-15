@@ -8,6 +8,7 @@
 #include "filezillaapp.h"
 #include "filter.h"
 #include "file_utils.h"
+#include "infotext.h"
 #include "inputdialog.h"
 #include <algorithm>
 #include "dndobjects.h"
@@ -256,6 +257,7 @@ BEGIN_EVENT_TABLE(CLocalListView, CFileListCtrl<CLocalFileData>)
 	EVT_MENU(XRCID("ID_DELETE"), CLocalListView::OnMenuDelete)
 	EVT_MENU(XRCID("ID_RENAME"), CLocalListView::OnMenuRename)
 	EVT_KEY_DOWN(CLocalListView::OnKeyDown)
+	EVT_SIZE(CLocalListView::OnSize)
 	EVT_LIST_BEGIN_DRAG(wxID_ANY, CLocalListView::OnBeginDrag)
 	EVT_MENU(XRCID("ID_OPEN"), CLocalListView::OnMenuOpen)
 	EVT_MENU(XRCID("ID_EDIT"), CLocalListView::OnMenuEdit)
@@ -297,6 +299,8 @@ CLocalListView::CLocalListView(CView* pParent, CState& state, CQueueView *pQueue
 	EnablePrefixSearch(true);
 
 	m_windowTinter = std::make_unique<CWindowTinter>(*GetMainWindow());
+
+	m_pInfoText = new CInfoText(*this);
 }
 
 CLocalListView::~CLocalListView()
@@ -384,6 +388,9 @@ regular_dir:
 		fz::local_filesys local_filesys;
 
 		if (!local_filesys.begin_find_files(fz::to_native(m_dir.GetPath()), false)) {
+
+			SetInfoText(_("Could not list directory contents"));
+
 			SetItemCount(1);
 			if (m_pFilelistStatusBar) {
 				m_pFilelistStatusBar->SetDirectoryContents(0, 0, 0, 0, 0);
@@ -391,6 +398,8 @@ regular_dir:
 
 			return false;
 		}
+
+		SetInfoText(wxString());
 
 		int64_t totalSize{};
 		int unknown_sizes = 0;
@@ -626,6 +635,7 @@ void CLocalListView::OnMenuEnter(wxCommandEvent &)
 #ifdef __WXMSW__
 void CLocalListView::DisplayDrives()
 {
+	SetInfoText(wxString());
 	int count = m_fileData.size();
 
 	std::vector<std::wstring> drives = CVolumeDescriptionEnumeratorThread::GetDrives();
@@ -661,6 +671,8 @@ void CLocalListView::DisplayDrives()
 
 void CLocalListView::DisplayShares(wxString computer)
 {
+	SetInfoText(wxString());
+
 	// Cast through a union to avoid warning about breaking strict aliasing rule
 	union
 	{
@@ -1365,6 +1377,14 @@ void CLocalListView::ReselectItems(const std::vector<std::wstring>& selectedName
 	}
 }
 
+void CLocalListView::OnSize(wxSizeEvent& event)
+{
+	event.Skip();
+	if (m_pInfoText) {
+		m_pInfoText->Reposition();
+	}
+}
+
 void CLocalListView::OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void*)
 {
 	if (notification == STATECHANGE_LOCAL_DIR) {
@@ -1374,11 +1394,32 @@ void CLocalListView::OnStateChange(t_statechange_notifications notification, std
 		ApplyCurrentFilter();
 	}
 	else if (notification == STATECHANGE_SERVER) {
-		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+		if (m_windowTinter) {
+			m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+		}
+		if (m_pInfoText) {
+			m_pInfoText->SetBackgroundTint(m_state.GetSite().m_colour);
+		}
 	}
 	else {
 		wxASSERT(notification == STATECHANGE_LOCAL_REFRESH_FILE);
 		RefreshFile(data);
+	}
+}
+
+void CLocalListView::SetInfoText(wxString const& text)
+{
+	if (!m_pInfoText) {
+		return;
+	}
+
+	if (IsComparing() || text.empty()) {
+		m_pInfoText->Hide();
+	}
+	else {
+		m_pInfoText->SetText(text);
+		m_pInfoText->Reposition();
+		m_pInfoText->Show();
 	}
 }
 
@@ -1686,6 +1727,8 @@ bool CLocalListView::get_next_file(std::wstring & name, bool& dir, int64_t& size
 
 void CLocalListView::FinishComparison()
 {
+	SetInfoText(wxString());
+
 	SetItemCount(m_indexMapping.size());
 
 	ComparisonRestoreSelections();
