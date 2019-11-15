@@ -620,8 +620,8 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	};
 
 	auto SetLabel = [](wxStaticText & label, ServerProtocol const, std::string const& name) {
-		if (name == "email") {
-			label.SetLabel(_("E-&mail account:"));
+		if (name == "login_hint") {
+			label.SetLabel(_("Login (optional):"));
 		}
 		else if (name == "identpath") {
 			// @translator: Keep short

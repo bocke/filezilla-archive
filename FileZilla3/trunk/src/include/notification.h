@@ -46,7 +46,8 @@ enum NotificationId
 	nId_active,				// sent if data gets either received or sent
 	nId_data,				// for memory downloads, indicates that new data is available.
 	nId_sftp_encryption,	// information about key exchange, encryption algorithms and so on for SFTP
-	nId_local_dir_created	// local directory has been created
+	nId_local_dir_created,	// local directory has been created
+	nId_serverchange		// With some protocols, actual server identity isn't known until after logon
 };
 
 // Async request IDs
@@ -370,6 +371,18 @@ public:
 
 	CServer const server_;
 	bool allow_{};
+};
+
+class ServerChangeNotification final : public CNotificationHelper<nId_serverchange>
+{
+public:
+	ServerChangeNotification() = default;
+
+	explicit ServerChangeNotification(CServer const& server)
+	    : newServer_(server)
+	{}
+
+	CServer newServer_;
 };
 
 #endif

@@ -86,7 +86,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 	auto* inner = lay.createFlex(2);
 	main->Add(inner);
 	
-	std::wstring const& name = site.server.GetName();
+	std::wstring const& name = site.GetName();
 	if (!name.empty()) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("Name:")));
 		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));
@@ -191,7 +191,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 	auto* inner = lay.createFlex(2);
 	main->Add(inner);
 
-	std::wstring const& name = site.server.GetName();
+	std::wstring const& name = site.GetName();
 	if (!name.empty()) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("Name:")));
 		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));

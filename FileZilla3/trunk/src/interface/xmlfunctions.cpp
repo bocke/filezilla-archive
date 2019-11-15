@@ -329,7 +329,10 @@ bool GetServer(pugi::xml_node node, Site & site)
 	site.SetLogonType(static_cast<LogonType>(logonType));
 	
 	if (site.credentials.logonType_ != LogonType::anonymous) {
-		std::wstring user = GetTextElement(node, "User");
+		std::wstring user;
+		if (ProtocolHasUser(site.server.GetProtocol())) {
+			user = GetTextElement(node, "User");
+		}
 		if (user.empty() && site.credentials.logonType_ != LogonType::interactive && site.credentials.logonType_ != LogonType::ask) {
 			return false;
 		}
@@ -431,10 +434,10 @@ bool GetServer(pugi::xml_node node, Site & site)
 	}
 
 	site.server.SetBypassProxy(GetTextElementInt(node, "BypassProxy", false) == 1);
-	site.server.SetName(GetTextElement_Trimmed(node, "Name").substr(0, 255));
+	site.SetName(GetTextElement_Trimmed(node, "Name"));
 
-	if (site.server.GetName().empty()) {
-		site.server.SetName(GetTextElement_Trimmed(node).substr(0, 255));
+	if (site.GetName().empty()) {
+		site.SetName(GetTextElement_Trimmed(node));
 	}
 
 	for (auto parameter = node.child("Parameter"); parameter; parameter = parameter.next_sibling("Parameter")) {
@@ -535,7 +538,7 @@ void SetServer(pugi::xml_node node, Site const& site)
 	}
 
 	AddTextElementUtf8(node, "BypassProxy", site.server.GetBypassProxy() ? "1" : "0");
-	std::wstring const& name = site.server.GetName();
+	std::wstring const& name = site.GetName();
 	if (!name.empty()) {
 		AddTextElement(node, "Name", name);
 	}

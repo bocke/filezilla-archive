@@ -1337,14 +1337,14 @@ void CState::UpdateSite(std::wstring const& oldPath, Site const& newSite)
 
 	bool changed = false;
 	if (m_site && m_site != newSite) {
-		if (m_site.SitePath() == oldPath && m_site.server == newSite.server) {
+		if (m_site.SitePath() == oldPath && m_site.GetOriginalServer().SameResource(newSite.GetOriginalServer())) {
 			// Update handles
 			m_site.Update(newSite);
 			changed = true;
 		}
 	}
 	if (m_last_site && m_last_site != newSite) {
-		if (m_last_site.SitePath() == oldPath && m_last_site.server == newSite.server) {
+		if (m_last_site.SitePath() == oldPath && m_last_site.GetOriginalServer().SameResource(newSite.GetOriginalServer())) {
 			m_last_site.Update(newSite);
 			if (!m_site) {
 				// Active site has precedence over historic data
@@ -1364,12 +1364,10 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 	if (m_site) {
 		for (auto const& active_site : active_sites) {
 			if (active_site.old_path == m_site.SitePath()) {
-				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
-
-				if (active_site.old_path == m_site.SitePath() && newSite && m_site.SameResource(*newSite)) {
-					if (m_site != *newSite) {
+				if (active_site.old_path == m_site.SitePath() && active_site.site && m_site.GetOriginalServer().SameResource(active_site.site.GetOriginalServer())) {
+					if (m_site != active_site.site) {
 						changed = true;
-						m_site.Update(*newSite);
+						m_site.Update(active_site.site);
 					}
 				}
 				else {
@@ -1384,11 +1382,10 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 	else if (m_last_site) {
 		for (auto const& active_site : active_sites) {
 			if (active_site.old_path == m_last_site.SitePath()) {
-				std::unique_ptr<Site> newSite = CSiteManager::GetSiteByPath(active_site.new_path, false).first;
-				if (active_site.old_path == m_last_site.SitePath() && newSite && m_last_site.SameResource(*newSite)) {
-					if (m_last_site != *newSite) {
+				if (active_site.old_path == m_last_site.SitePath() && active_site.site && m_last_site.GetOriginalServer().SameResource(active_site.site.GetOriginalServer())) {
+					if (m_last_site != active_site.site) {
 						changed = true;
-						m_last_site.Update(*newSite);
+						m_last_site.Update(active_site.site);
 					}
 				}
 				else {
@@ -1409,7 +1406,7 @@ void CState::UpdateKnownSites(std::vector<CSiteManagerDialog::_connected_site> c
 void CState::UpdateTitle()
 {
 	if (m_site) {
-		std::wstring const& name = m_site.server.GetName();
+		std::wstring const& name = m_site.GetName();
 		m_title.clear();
 		if (!name.empty()) {
 			m_title = name + _T(" - ");
@@ -1418,5 +1415,15 @@ void CState::UpdateTitle()
 	}
 	else {
 		m_title = _("Not connected");
+	}
+}
+
+void CState::ChangeServer(CServer const& newServer)
+{
+	if (m_site) {
+		if (!m_site.originalServer) {
+			m_site.originalServer = m_site.server;
+		}
+		m_site.server = newServer;
 	}
 }

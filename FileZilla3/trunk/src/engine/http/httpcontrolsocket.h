@@ -71,7 +71,7 @@ public:
 
 	std::function<void(int64_t)> progress_callback_;
 
-private:
+protected:
 	fz::file & file_;
 	uint64_t start_{};
 	uint64_t written_{};

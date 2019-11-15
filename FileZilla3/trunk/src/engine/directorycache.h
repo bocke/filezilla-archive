@@ -95,6 +95,7 @@ public:
 	void InvalidateServer(CServer const& server);
 	void RemoveDir(CServer const& server, CServerPath const& path, std::wstring const& filename, CServerPath const& target);
 	void Rename(CServer const& server, CServerPath const& pathFrom, std::wstring const& fileFrom, CServerPath const& pathTo, std::wstring const& fileTo);
+	void UpdateOwnerGroup(CServer const& server, CServerPath const& path, std::wstring const& filename, std::wstring& ownerGroup);
 
 	void SetTtl(fz::duration const& ttl);
 

@@ -841,7 +841,6 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		dlg.Run(this, pState);
 	}
 	else if (event.GetId() == XRCID("ID_BOOKMARK_ADD") || event.GetId() == XRCID("ID_BOOKMARK_MANAGE")) {
-		CServer server;
 		CState* pState = CContextManager::Get()->GetCurrentContext();
 		if (!pState) {
 			return;
@@ -1035,6 +1034,12 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 			if (pState) {
 				auto const& localDirCreatedNotification = static_cast<CLocalDirCreatedNotification const&>(*pNotification.get());
 				pState->LocalDirCreated(localDirCreatedNotification.dir);
+			}
+			break;
+		case nId_serverchange:
+			if (pState) {
+				auto const& notification = static_cast<ServerChangeNotification const&>(*pNotification.get());
+				pState->ChangeServer(notification.newServer_);
 			}
 			break;
 		default:
