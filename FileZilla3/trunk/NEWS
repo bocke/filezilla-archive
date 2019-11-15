@@ -10,6 +10,14 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.46.0-rc1 (2019-11-15)
+
++ Show an error message in the local directory listing if the user lacks permission to show the directory
+- Local filelist status bar is now reset if accessing a local directory fails
+- macOS: Work around an a bug in macOS 10.15 (Catalina) where closing a dialog shown from a timer can result in temporary freezes
+- Refactored speed-limiting code
+- Building and running FileZilla now depends on libfilezilla >= 0.19.1 (https://lib.filezilla-project.org/)
+
 3.45.1 (2019-09-25)
 
 - Fixed sorting issues in the directory trees
