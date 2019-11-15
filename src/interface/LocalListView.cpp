@@ -387,9 +387,15 @@ regular_dir:
 		CStateFilterManager const& filter = m_state.GetStateFilterManager();
 		fz::local_filesys local_filesys;
 
-		if (!local_filesys.begin_find_files(fz::to_native(m_dir.GetPath()), false)) {
-
-			SetInfoText(_("Could not list directory contents"));
+		auto result = local_filesys.begin_find_files(fz::to_native(m_dir.GetPath()), false);
+		if (!result) {
+			
+			if (result.error_ == fz::result::noperm) {
+				SetInfoText(_("You do not have permission to list this directory"));
+			}
+			else {
+				SetInfoText(_("Could not list directory contents"));
+			}
 
 			SetItemCount(1);
 			if (m_pFilelistStatusBar) {
