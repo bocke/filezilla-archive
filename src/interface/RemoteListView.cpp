@@ -392,7 +392,7 @@ CRemoteListView::CRemoteListView(CView* pParent, CState& state, CQueueView* pQue
 
 	m_pDirectoryListing = nullptr;
 
-	const unsigned long widths[6] = { 80, 75, 80, 100, 80, 80 };
+	const unsigned long widths[6] = { 150, 75, 80, 100, 80, 85 };
 
 	AddColumn(_("Filename"), wxLIST_FORMAT_LEFT, widths[0], true);
 	AddColumn(_("Filesize"), wxLIST_FORMAT_RIGHT, widths[1]);

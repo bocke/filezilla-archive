@@ -307,7 +307,7 @@ CMainFrame::CMainFrame()
 	initial_size.y = wxMin(950, screen_size.GetHeight() - 50);
 
 	Create(NULL, -1, _T("FileZilla"), wxDefaultPosition, initial_size);
-	SetSizeHints(350, 300);
+	SetSizeHints(700, 500);
 
 #ifdef __WXMSW__
 	// In order for the --close commandline argument to work,
