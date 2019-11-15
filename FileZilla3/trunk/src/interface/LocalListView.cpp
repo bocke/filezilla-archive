@@ -278,7 +278,7 @@ CLocalListView::CLocalListView(CView* pParent, CState& state, CQueueView *pQueue
 	m_state.RegisterHandler(this, STATECHANGE_LOCAL_REFRESH_FILE);
 	m_state.RegisterHandler(this, STATECHANGE_SERVER);
 
-	const unsigned long widths[4] = { 120, 80, 100, 120 };
+	const unsigned long widths[4] = { 170, 80, 120, 120 };
 
 	AddColumn(_("Filename"), wxLIST_FORMAT_LEFT, widths[0], true);
 	AddColumn(_("Filesize"), wxLIST_FORMAT_RIGHT, widths[1]);
