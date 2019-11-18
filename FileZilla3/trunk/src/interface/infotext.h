@@ -8,8 +8,8 @@ class CInfoText final : public wxWindow
 {
 public:
 	CInfoText(wxListCtrlEx& parent)
-		: m_tinter(*this)
-		, parent_(parent)
+		: parent_(parent)
+		, m_tinter(*this)
 	{
 		Hide();
 		Create(&parent, wxID_ANY, wxPoint(0, 60), wxDefaultSize);
@@ -51,7 +51,7 @@ protected:
 	wxString m_text;
 
 	void OnPaint(wxPaintEvent&);
-	
+
 	wxSize m_textSize;
 
 	CWindowTinter m_tinter;
