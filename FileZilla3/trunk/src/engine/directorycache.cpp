@@ -662,6 +662,8 @@ void CDirectoryCache::UpdateLru(tServerIter const& sit, tCacheIter const& cit)
 
 void CDirectoryCache::Prune()
 {
+	fz::scoped_lock lock(mutex_);
+
 	while ((m_leastRecentlyUsedList.size() > 50000) ||
 		(m_totalFileCount > 1000000 && m_leastRecentlyUsedList.size() > 1000) ||
 		(m_totalFileCount > 5000000 && m_leastRecentlyUsedList.size() > 100))
@@ -683,6 +685,8 @@ void CDirectoryCache::Prune()
 
 void CDirectoryCache::SetTtl(fz::duration const& ttl)
 {
+	fz::scoped_lock lock(mutex_);
+
 	if (ttl < fz::duration::from_seconds(30)) {
 		ttl_ = fz::duration::from_seconds(30);
 	}
