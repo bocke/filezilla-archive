@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_SERVERPATH_HEADER
 #define FILEZILLA_ENGINE_SERVERPATH_HEADER
 
+#include "server.h"
+
 #include <libfilezilla/optional.hpp>
 #include <libfilezilla/shared.hpp>
 

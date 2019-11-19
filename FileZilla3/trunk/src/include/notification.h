@@ -19,8 +19,11 @@
 // requests have to be answered. Once processed, call
 // CFileZillaEngine::SetAsyncRequestReply to continue the current operation.
 
+#include "commands.h"
 #include "local_path.h"
 #include "server.h"
+
+#include <logging.h>
 
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_info.hpp>
