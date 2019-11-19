@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_DIRECTORYLISTING_HEADER
 #define FILEZILLA_ENGINE_DIRECTORYLISTING_HEADER
 
+#include "serverpath.h"
+
 #include <libfilezilla/optional.hpp>
 #include <libfilezilla/shared.hpp>
 #include <libfilezilla/time.hpp>

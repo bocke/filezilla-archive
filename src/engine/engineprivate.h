@@ -11,6 +11,7 @@
 #include "option_change_event_handler.h"
 
 #include <atomic>
+#include <list>
 #include <deque>
 
 class CControlSocket;

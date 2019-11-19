@@ -14,8 +14,11 @@ but for some operations the engine/interface prefers to retrieve a clean
 version.
 */
 
+#include <directorylisting.h>
+
 #include <libfilezilla/mutex.hpp>
 
+#include <list>
 #include <set>
 
 enum class LookupFlags

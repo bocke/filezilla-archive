@@ -6,6 +6,8 @@
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>
 
+#include <directorylisting.h>
+
 #include "oplock_manager.h"
 #include "server.h"
 #include "serverpath.h"

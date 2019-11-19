@@ -3,6 +3,7 @@
 
 #include "serverpath.h"
 
+#include <libfilezilla/event.hpp>
 #include <libfilezilla/mutex.hpp>
 
 #include <memory>
