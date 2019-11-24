@@ -2559,6 +2559,9 @@ void CQueueView::OnTimer(wxTimerEvent& event)
 void CQueueView::DeleteEngines()
 {
 	for (auto & engineData : m_engineData) {
+		if (m_pAsyncRequestQueue) {
+			m_pAsyncRequestQueue->ClearPending(engineData->pEngine);
+		}
 		delete engineData;
 	}
 	m_engineData.clear();
@@ -2568,38 +2571,48 @@ void CQueueView::OnSetPriority(wxCommandEvent& event)
 {
 #ifndef __WXMSW__
 	// GetNextItem is O(n) if nothing is selected, GetSelectedItemCount() is O(1)
-	if (!GetSelectedItemCount())
+	if (!GetSelectedItemCount()) {
 		return;
+	}
 #endif
 
 	QueuePriority priority;
 
 	const int id = event.GetId();
-	if (id == XRCID("ID_PRIORITY_LOWEST"))
+	if (id == XRCID("ID_PRIORITY_LOWEST")) {
 		priority = QueuePriority::lowest;
-	else if (id == XRCID("ID_PRIORITY_LOW"))
+	}
+	else if (id == XRCID("ID_PRIORITY_LOW")) {
 		priority = QueuePriority::low;
-	else if (id == XRCID("ID_PRIORITY_HIGH"))
+	}
+	else if (id == XRCID("ID_PRIORITY_HIGH")) {
 		priority = QueuePriority::high;
-	else if (id == XRCID("ID_PRIORITY_HIGHEST"))
+	}
+	else if (id == XRCID("ID_PRIORITY_HIGHEST")) {
 		priority = QueuePriority::highest;
-	else
+	}
+	else {
 		priority = QueuePriority::normal;
+	}
 
 
 	CQueueItem* pSkip = 0;
 	long item = -1;
 	while (-1 != (item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED))) {
 		CQueueItem* pItem = GetQueueItem(item);
-		if (!pItem)
+		if (!pItem) {
 			continue;
+		}
 
-		if (pItem->GetType() == QueueItemType::Server)
+		if (pItem->GetType() == QueueItemType::Server) {
 			pSkip = pItem;
-		else if (pItem->GetTopLevelItem() == pSkip)
+		}
+		else if (pItem->GetTopLevelItem() == pSkip) {
 			continue;
-		else
+		}
+		else {
 			pSkip = 0;
+		}
 
 		pItem->SetPriority(priority);
 	}

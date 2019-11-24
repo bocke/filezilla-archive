@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_INTERFACE_ASYNCREQUESTQUEUE_HEADER
 #define FILEZILLA_INTERFACE_ASYNCREQUESTQUEUE_HEADER
 
+#include "context_control.h"
+
 #include <wx/timer.h>
 
 #include <memory>
@@ -10,7 +12,7 @@ class CMainFrame;
 class CQueueView;
 class CVerifyCertDialog;
 
-class CAsyncRequestQueue final : public wxEvtHandler
+class CAsyncRequestQueue final : public wxEvtHandler, protected CGlobalStateEventHandler
 {
 public:
 	CAsyncRequestQueue(CMainFrame *pMainFrame);
@@ -25,6 +27,7 @@ public:
 	void TriggerProcessing();
 
 protected:
+	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*) override;
 
 	// Returns false if main window doesn't have focus or is minimized.
 	// Request attention if needed
