@@ -25,11 +25,13 @@ CAsyncRequestQueue::CAsyncRequestQueue(CMainFrame *pMainFrame)
 	, certStore_(std::make_unique<CertStore>())
 	, verifyCertDlg_(std::make_unique<CVerifyCertDialog>(*certStore_))
 {
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOVECONTEXT, false);
 	m_timer.SetOwner(this);
 }
 
 CAsyncRequestQueue::~CAsyncRequestQueue()
 {
+	CContextManager::Get()->UnregisterHandler(this, STATECHANGE_REMOVECONTEXT);
 }
 
 bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_ptr<CAsyncRequestNotification> & pNotification)
@@ -400,6 +402,10 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 
 void CAsyncRequestQueue::ClearPending(CFileZillaEngine const* const pEngine)
 {
+	if (!pEngine) {
+		return;
+	}
+
 	for (auto iter = m_requestList.begin(); iter != m_requestList.end();) {
 		if (iter->pEngine == pEngine) {
 			if (m_inside_request && iter == m_requestList.begin()) {
@@ -509,4 +515,11 @@ bool CAsyncRequestQueue::SendReply(t_queueEntry& entry)
 	}
 
 	return entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
+}
+
+void CAsyncRequestQueue::OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*)
+{
+	if (pState) {
+		ClearPending(pState->m_pEngine);
+	}
 }
