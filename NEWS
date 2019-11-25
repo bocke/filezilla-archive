@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.46.0 (2019-11-25)
+
+- Fixed a rare crash if closing FileZilla the very same moment a connection or transfer requests user attention
+
 3.46.0-rc1 (2019-11-15)
 
 + Show an error message in the local directory listing if the user lacks permission to show the directory
