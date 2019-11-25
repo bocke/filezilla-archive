@@ -517,7 +517,7 @@ bool CAsyncRequestQueue::SendReply(t_queueEntry& entry)
 	return entry.pEngine->SetAsyncRequestReply(std::move(entry.pNotification));
 }
 
-void CAsyncRequestQueue::OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const&, const void*)
+void CAsyncRequestQueue::OnStateChange(CState* pState, t_statechange_notifications, std::wstring const&, const void*)
 {
 	if (pState) {
 		ClearPending(pState->m_pEngine);
