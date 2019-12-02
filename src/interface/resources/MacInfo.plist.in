@@ -46,5 +46,15 @@
 	<string>public.app-category.utilities</string>
 	<key>NSRequiresAquaSystemAppearance</key>
 	<string>YES</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>Listing available files and folders on local network volumes, allowing you to select these items for uploading to remote server and to download files from remote servers into these folders.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Listing available files and folders, allowing you to select these items for uploading to remote server and to download files from remote servers onto your Desktop.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Listing available files and folders, allowing you to select these items for uploading to remote server and to download files from remote servers into your Documents folder.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Listing available files and folders, allowing you to select these items for uploading to remote server and to download files from remote servers into your Downloads folder.</string>
+	<key>NSRemovableVolumsUsageDescription</key>
+	<string>Listing available files and folders, allowing you to select these items for uploading to remote server and to download files from remote servers to your removable volumes.</string>
 </dict>
 </plist>
