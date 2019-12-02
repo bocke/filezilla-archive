@@ -105,6 +105,7 @@ void CFtpControlSocket::OnReceive()
 		if (receiveBuffer_.size() == max) {
 			log(fz::logmsg::error, _("Received too long response line from server, closing connection."));
 			DoClose();
+			return;
 		}
 	}
 }
