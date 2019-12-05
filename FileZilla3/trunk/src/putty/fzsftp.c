@@ -38,14 +38,18 @@ static int ReadQuotas(int i)
 	char buffer[21];
 
 	r = ReadFile(hin, buffer, 20, &read, 0);
-	if (!r || read == 0)
-	    fatalbox("ReadFile failed in ReadQuotas");
+	if (!r || read == 0) {
+		fzprintf(sftpError, "ReadFile failed in ReadQuotas");
+		cleanup_exit(1);
+	}
 	buffer[read] = 0;
 
 	if (buffer[0] != '-')
 	{
-	    if (input_pushback != 0)
-		fatalbox("input_pushback not null!");
+		if (input_pushback != 0) {
+			fzprintf(sftpError, "input_pushback not null!");
+			cleanup_exit(1);
+		}
 	    else {
 		int pos = strcspn(buffer, "\n") + 1;
 		input_pushback = snewn(pos + 1, char);
@@ -132,8 +136,10 @@ int ProcessQuotaCmd(const char* line)
 	direction = 0;
     else if (line[1] == '1')
 	direction = 1;
-    else
-	fatalbox("Invalid data received in ReadQuotas: Unknown direction");
+	else {
+		fzprintf(sftpError, "Invalid data received in ReadQuotas: Unknown direction");
+		cleanup_exit(1);
+	}
 
     if (line[2] == '-') {
 	bytesAvailable[direction] = -1;
@@ -145,8 +151,10 @@ int ProcessQuotaCmd(const char* line)
     for (pos = 2;; ++pos) {
 	if (line[pos] == ',')
 	    break;
-	if (line[pos] < '0' || line[pos] > '9')
-	    fatalbox("Invalid data received in ReadQuotas: Bytecount not a number");
+	if (line[pos] < '0' || line[pos] > '9') {
+		fzprintf(sftpError, "Invalid data received in ReadQuotas: Bytecount not a number");
+		cleanup_exit(1);
+	}
 
 	number *= 10;
 	number += line[pos] - '0';
@@ -157,8 +165,10 @@ int ProcessQuotaCmd(const char* line)
     for (;; ++pos) {
 	if (line[pos] == 0 || line[pos] == '\r' || line[pos] == '\n')
 	    break;
-	if (line[pos] < '0' || line[pos] > '9')
-	    fatalbox("Invalid data received in ReadQuotas: Limit not a number");
+	if (line[pos] < '0' || line[pos] > '9') {
+		fzprintf(sftpError, "Invalid data received in ReadQuotas: Limit not a number");
+		cleanup_exit(1);
+	}
 
 	limit[direction] *= 10;
 	limit[direction] += line[pos] - '0';

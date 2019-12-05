@@ -23,7 +23,7 @@ int CSftpDeleteOpData::Send()
 
 	engine_.GetDirectoryCache().InvalidateFile(currentServer_, path_, file);
 
-	return controlSocket_.SendCommand(L"rm " + controlSocket_.WildcardEscape(controlSocket_.QuoteFilename(filename)), L"rm " + controlSocket_.QuoteFilename(filename));
+	return controlSocket_.SendCommand(L"rm " + controlSocket_.QuoteFilename(filename));
 }
 
 int CSftpDeleteOpData::ParseResponse()

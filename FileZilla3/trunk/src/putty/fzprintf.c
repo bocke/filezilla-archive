@@ -1,8 +1,13 @@
 #include "putty.h"
 #include "misc.h"
 
+bool pending_reply = false;
+
 int fznotify(sftpEventTypes type)
 {
+	if (type == sftpDone || type == sftpReply) {
+		pending_reply = false;
+	}
     fprintf(stdout, "%c", (int)type + '0');
     fflush(stdout);
     return 0;
@@ -10,7 +15,11 @@ int fznotify(sftpEventTypes type)
 
 int fzprintf(sftpEventTypes type, const char* fmt, ...)
 {
-    va_list ap;
+	if (type == sftpDone || type == sftpReply) {
+		pending_reply = false;
+	}
+	
+	va_list ap;
     char* str, *p, *s;
     va_start(ap, fmt);
     str = dupvprintf(fmt, ap);
@@ -57,6 +66,10 @@ int fzprintf(sftpEventTypes type, const char* fmt, ...)
 
 int fzprintf_raw_untrusted(sftpEventTypes type, const char* fmt, ...)
 {
+	if (type == sftpDone || type == sftpReply) {
+		pending_reply = false;
+	}
+
     va_list ap;
     char* str, *p, *s;
     va_start(ap, fmt);
@@ -95,6 +108,10 @@ int fzprintf_raw_untrusted(sftpEventTypes type, const char* fmt, ...)
 
 int fzprintf_raw(sftpEventTypes type, const char* fmt, ...)
 {
+	if (type == sftpDone || type == sftpReply) {
+		pending_reply = false;
+	}
+
     va_list ap;
     char* str ;
     va_start(ap, fmt);
@@ -113,6 +130,10 @@ int fzprintf_raw(sftpEventTypes type, const char* fmt, ...)
 
 int fznotify1(sftpEventTypes type, int data)
 {
+	if (type == sftpDone || type == sftpReply) {
+		pending_reply = false;
+	}
+
     fprintf(stdout, "%c%d\n", (int)type + '0', data);
     fflush(stdout);
     return 0;

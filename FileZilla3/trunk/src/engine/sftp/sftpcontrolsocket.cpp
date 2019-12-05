@@ -608,31 +608,6 @@ void CSftpControlSocket::Rename(CRenameCommand const& command)
 	Push(std::make_unique<CSftpRenameOpData>(*this, command));
 }
 
-std::wstring CSftpControlSocket::WildcardEscape(std::wstring const& file)
-{
-	std::wstring ret;
-	// see src/putty/wildcard.c
-
-	ret.reserve(file.size());
-	for (size_t i = 0; i < file.size(); ++i) {
-		auto const& c = file[i];
-		switch (c)
-		{
-		case '[':
-		case ']':
-		case '*':
-		case '?':
-		case '\\':
-			ret.push_back('\\');
-			break;
-		default:
-			break;
-		}
-		ret.push_back(c);
-	}
-	return ret;
-}
-
 void CSftpControlSocket::wakeup(fz::direction::type const d)
 {
 	send_event<SftpRateAvailableEvent>(d);
