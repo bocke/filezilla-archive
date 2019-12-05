@@ -38,7 +38,7 @@ int CSftpRenameOpData::Send()
 		}
 		engine_.InvalidateCurrentWorkingDirs(path);
 
-		return controlSocket_.SendCommand(L"mv " + controlSocket_.WildcardEscape(fromQuoted) + L" " + toQuoted, L"mv " + fromQuoted + L" " + toQuoted);
+		return controlSocket_.SendCommand(L"mv " + fromQuoted + L" " + toQuoted);
 	}
 	default:
 		log(logmsg::debug_warning, L"unknown op state: %d", opState);

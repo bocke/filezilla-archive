@@ -16,7 +16,6 @@ libfzputtycommon_a_SOURCES = \
 			sshaes.c \
 			sshbcrypt.c \
 			sshblowf.c \
-			sshbn.c \
 			sshdes.c \
 			sshdss.c \
 			sshecc.c \
@@ -50,7 +49,7 @@ fzsftp_SOURCES = \
 		sshdss.c \
 		x11fwd.c \
 		wildcard.c pinger.c ssharcf.c \
-		sftp.c int64.c logging.c \
+		sftp.c logging.c \
 		psftp.c cmdline.c \
 		timing.c \
 		version.c \
@@ -63,12 +62,11 @@ fzputtygen_SOURCES = cmdgen.c \
 
 noinst_HEADERS = fzprintf.h \
 		 fzsftp.h \
-		 int64.h misc.h network.h \
+		 misc.h network.h \
 		 pageant.h \
 		 proxy.h psftp.h putty.h \
 		 puttymem.h puttyps.h sftp.h ssh.h \
 		 sshblowf.h \
-		 sshbn.h \
 		 storage.h \
 		 tree234.h
 

@@ -52,9 +52,6 @@ protected:
 	virtual void wakeup(fz::direction::type const d) override;
 	void OnQuotaRequest(fz::direction::type const d);
 
-	// see src/putty/wildcard.c
-	std::wstring WildcardEscape(std::wstring const& file);
-
 	std::unique_ptr<fz::process> process_;
 	std::unique_ptr<CSftpInputThread> input_thread_;
 
