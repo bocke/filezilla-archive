@@ -23,8 +23,7 @@ typedef struct Loaded_keyfile_list Loaded_keyfile_list;
 struct Loaded_keyfile_list
 {
     struct ssh2_userkey *ssh2key;
-    void* publickey_blob;
-    int publickey_bloblen;
+    strbuf* publickey_blob;
     Filename* file;
     char* publickey_comment;
     char* publickey_algorithm;
@@ -75,7 +74,7 @@ struct ssh2_userauth_state {
     uint32_t num_prompts;
     //fz const char *username;
     char *locally_allocated_username;
-	char *username;
+    char *username;
     char *password;
     bool got_username;
     strbuf *publickey_blob;
@@ -104,177 +103,174 @@ struct ssh2_userauth_state {
 
     PacketProtocolLayer ppl;
 
-	Conf* conf;
+    Conf* conf;
 };
 
 
 static Loaded_keyfile_list* new_loaded_keyfile(char* file)
 {
-	Loaded_keyfile_list* item = snew(Loaded_keyfile_list);
-	item->file = filename_from_str(file);
-	item->next = 0;
-	item->ssh2key = NULL;
-	item->publickey_blob = NULL;
-	item->publickey_bloblen = 0;
-	item->publickey_comment = NULL;
-	item->publickey_algorithm = NULL;
+    Loaded_keyfile_list* item = snew(Loaded_keyfile_list);
+    item->file = filename_from_str(file);
+    item->next = 0;
+    item->ssh2key = NULL;
+    item->publickey_blob = NULL;
+    item->publickey_comment = NULL;
+    item->publickey_algorithm = NULL;
 
-	return item;
+    return item;
 }
 
 static void free_loaded_keyfile(Loaded_keyfile_list* item)
 {
-	sfree(item->publickey_blob);
+    strbuf_free(item->publickey_blob);
 
-	if (item->ssh2key) {
-		ssh_key_free(item->ssh2key->key);
-		sfree(item->ssh2key->comment);
-		sfree(item->ssh2key);
-	}
-	filename_free(item->file);
-	sfree(item->publickey_comment);
-	sfree(item->publickey_algorithm);
+    if (item->ssh2key) {
+        ssh_key_free(item->ssh2key->key);
+        sfree(item->ssh2key->comment);
+        sfree(item->ssh2key);
+    }
+    filename_free(item->file);
+    sfree(item->publickey_comment);
+    sfree(item->publickey_algorithm);
 
-	sfree(item);
+    sfree(item);
 }
 
 /* Purge duplicate keys from loaded_keyfile_list */
 static void remove_duplicate_keys(PacketProtocolLayer* ppl, Loaded_keyfile_list** list, unsigned char* blob, size_t bloblen)
 {
-	Loaded_keyfile_list* cur, * prev = NULL;
-	if (!list)
-		return;
+    Loaded_keyfile_list* cur, * prev = NULL;
+    if (!list)
+        return;
 
-	cur = *list;
-	while (cur) {
-		if (bloblen == cur->publickey_bloblen && !memcmp(blob, cur->publickey_blob, bloblen)) {
-			Loaded_keyfile_list* next;
-			ppl_logevent("Key matched loaded keyfile, remove duplicate");
-			next = cur->next;
-			if (!prev)
-				*list = next;
-			else
-				prev->next = next;
-			free_loaded_keyfile(cur);
-			break;
-		}
-		else {
-			prev = cur;
-			cur = cur->next;
-		}
-	}
+    cur = *list;
+    while (cur) {
+        if (bloblen == cur->publickey_blob->len && !memcmp(blob, cur->publickey_blob->u, bloblen)) {
+            Loaded_keyfile_list* next;
+            ppl_logevent("Key matched loaded keyfile, remove duplicate");
+            next = cur->next;
+            if (!prev)
+                *list = next;
+            else
+                prev->next = next;
+            free_loaded_keyfile(cur);
+            break;
+        }
+        else {
+            prev = cur;
+            cur = cur->next;
+        }
+    }
 }
 
 static Loaded_keyfile_list* load_keyfiles(PacketProtocolLayer* ppl, struct ssh2_userauth_state* s)
 {
-	Loaded_keyfile_list* loaded_list = NULL;
-	int num_loaded = 0;
-	int num_tried = 0;
-	int type;
+    Loaded_keyfile_list* loaded_list = NULL;
+    int num_loaded = 0;
+    int num_tried = 0;
+    int type;
 
-	char* val, * file;
-	for (val = conf_get_str_strs(s->conf, CONF_fz_keyfiles, NULL, &file);
-		val != NULL;
-		val = conf_get_str_strs(s->conf, CONF_fz_keyfiles, file, &file))
-	{
-		const char* error = NULL;
-		++num_tried;
+    char* val, * file;
+    for (val = conf_get_str_strs(s->conf, CONF_fz_keyfiles, NULL, &file);
+        val != NULL;
+        val = conf_get_str_strs(s->conf, CONF_fz_keyfiles, file, &file))
+    {
+        const char* error = NULL;
+        ++num_tried;
 
-		Loaded_keyfile_list* loaded = new_loaded_keyfile(file);
+        Loaded_keyfile_list* loaded = new_loaded_keyfile(file);
 
-		type = key_type(loaded->file);
+        type = key_type(loaded->file);
 
-		if (type == SSH_KEYTYPE_SSH2) {
-			loaded->publickey_blob =
-				ssh2_userkey_loadpub(loaded->file,
-					&loaded->publickey_algorithm,
-					&loaded->publickey_bloblen,
-					&loaded->publickey_comment, &error);
-			if (!loaded->publickey_blob) {
-				if (!error) {
-					error = "unknown";
-				}
-				ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
-				free_loaded_keyfile(loaded);
-				continue;
-			}
+        if (type == SSH_KEYTYPE_SSH2) {
+            loaded->publickey_blob = strbuf_new();
+            if (!ssh2_userkey_loadpub(loaded->file,
+                &loaded->publickey_algorithm,
+                BinarySink_UPCAST(loaded->publickey_blob),
+                &loaded->publickey_comment, &error))
+            {
+                if (!error) {
+                    error = "unknown";
+                }
+                ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
+                free_loaded_keyfile(loaded);
+                continue;
+            }
 
-			loaded->ssh2key = ssh2_load_userkey(loaded->file, 0, &error);
-			if (loaded->ssh2key == SSH2_WRONG_PASSPHRASE) {
-				loaded->ssh2key = NULL;
-				ppl_logevent("Private key in '%s' is encrypted, defer loading until use.", filename_to_str(loaded->file));
-			}
-			else if (!loaded->ssh2key) {
-				if (!error) {
-					error = "unknown";
-				}
-				ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
-				free_loaded_keyfile(loaded);
-				continue;
-			}
-		}
-		else if (type == SSH_KEYTYPE_OPENSSH_PEM || type == SSH_KEYTYPE_OPENSSH_NEW || type == SSH_KEYTYPE_SSHCOM) {
-			loaded->ssh2key = import_ssh2(loaded->file, type, "", &error);
-			if (loaded->ssh2key == SSH2_WRONG_PASSPHRASE) {
-				loaded->ssh2key = NULL;
-				ppl_logevent("Failed to load private key '%s': Key is encrypted and not in PuTTY format.", filename_to_str(loaded->file));
-				free_loaded_keyfile(loaded);
-				continue;
-			}
-			else if (!loaded->ssh2key) {
-				if (!error) {
-					error = "unknown";
-				}
-				ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
-				free_loaded_keyfile(loaded);
-				continue;
-			}
-			else {
-				strbuf* blob = strbuf_new();
-				ssh_key_public_blob(loaded->ssh2key->key, BinarySink_UPCAST(blob));
-				loaded->publickey_bloblen = blob->len;
-				loaded->publickey_blob = strbuf_to_str(blob);
+            loaded->ssh2key = ssh2_load_userkey(loaded->file, 0, &error);
+            if (loaded->ssh2key == SSH2_WRONG_PASSPHRASE) {
+                loaded->ssh2key = NULL;
+                ppl_logevent("Private key in '%s' is encrypted, defer loading until use.", filename_to_str(loaded->file));
+            }
+            else if (!loaded->ssh2key) {
+                if (!error) {
+                    error = "unknown";
+                }
+                ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
+                free_loaded_keyfile(loaded);
+                continue;
+            }
+        }
+        else if (type == SSH_KEYTYPE_OPENSSH_PEM || type == SSH_KEYTYPE_OPENSSH_NEW || type == SSH_KEYTYPE_SSHCOM) {
+            loaded->ssh2key = import_ssh2(loaded->file, type, "", &error);
+            if (loaded->ssh2key == SSH2_WRONG_PASSPHRASE) {
+                loaded->ssh2key = NULL;
+                ppl_logevent("Failed to load private key '%s': Key is encrypted and not in PuTTY format.", filename_to_str(loaded->file));
+                free_loaded_keyfile(loaded);
+                continue;
+            }
+            else if (!loaded->ssh2key) {
+                if (!error) {
+                    error = "unknown";
+                }
+                ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
+                free_loaded_keyfile(loaded);
+                continue;
+            }
+            else {
+                loaded->publickey_blob = strbuf_new();
+                ssh_key_public_blob(loaded->ssh2key->key, BinarySink_UPCAST(loaded->publickey_blob));
 
-				if (!loaded->publickey_blob || !loaded->publickey_bloblen) {
-					ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
-					free_loaded_keyfile(loaded);
-					continue;
-				}
+                if (!loaded->publickey_blob->len) {
+                    ppl_logevent("Failed to load private key '%s': %s", filename_to_str(loaded->file), error);
+                    free_loaded_keyfile(loaded);
+                    continue;
+                }
 
-				loaded->publickey_comment = dupstr(loaded->ssh2key->comment);
-				loaded->publickey_algorithm = dupstr(ssh_key_ssh_id(loaded->ssh2key->key));
-			}
-		}
-		else {
-			free_loaded_keyfile(loaded);
-			continue;
-		}
+                loaded->publickey_comment = dupstr(loaded->ssh2key->comment);
+                loaded->publickey_algorithm = dupstr(ssh_key_ssh_id(loaded->ssh2key->key));
+            }
+        }
+        else {
+            free_loaded_keyfile(loaded);
+            continue;
+        }
 
-		loaded->next = loaded_list;
-		loaded_list = loaded;
+        loaded->next = loaded_list;
+        loaded_list = loaded;
 
-		num_loaded++;
-	}
+        num_loaded++;
+    }
 
-	if (num_tried) {
-		if (num_loaded == 1)
-			ppl_logevent("Successfully loaded %d key pair from file", num_loaded);
-		else
-			ppl_logevent("Successfully loaded %d key pairs from file", num_loaded);
-	}
+    if (num_tried) {
+        if (num_loaded == 1)
+            ppl_logevent("Successfully loaded %d key pair from file", num_loaded);
+        else
+            ppl_logevent("Successfully loaded %d key pairs from file", num_loaded);
+    }
 
-	return loaded_list;
+    return loaded_list;
 }
 
 static void free_loaded_keyfiles(Loaded_keyfile_list* list)
 {
-	while (list) {
-		Loaded_keyfile_list* next = list->next;
+    while (list) {
+        Loaded_keyfile_list* next = list->next;
 
-		free_loaded_keyfile(list);
+        free_loaded_keyfile(list);
 
-		list = next;
-	}
+        list = next;
+    }
 }
 
 static void ssh2_userauth_free(PacketProtocolLayer *);
@@ -318,7 +314,7 @@ PacketProtocolLayer *ssh2_userauth_new(
     const char *default_username, bool change_username,
     bool try_ki_auth, bool try_gssapi_auth, bool try_gssapi_kex_auth,
     bool gssapi_fwd, struct ssh_connection_shared_gss_state *shgss,
-	Conf* conf)
+    Conf* conf)
 {
     struct ssh2_userauth_state *s = snew(struct ssh2_userauth_state);
     memset(s, 0, sizeof(*s));
@@ -341,7 +337,7 @@ PacketProtocolLayer *ssh2_userauth_new(
     bufchain_init(&s->banner);
     bufchain_sink_init(&s->banner_bs, &s->banner);
 
-	s->conf = conf_copy(conf);
+    s->conf = conf_copy(conf);
 
     return &s->ppl;
 }
@@ -383,7 +379,7 @@ static void ssh2_userauth_free(PacketProtocolLayer *ppl)
     if (s->ki_scc)
         stripctrl_free(s->ki_scc);
 
-	conf_free(s->conf);
+    conf_free(s->conf);
 
     sfree(s);
 }

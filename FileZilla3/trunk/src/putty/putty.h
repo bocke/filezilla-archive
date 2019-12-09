@@ -1582,8 +1582,8 @@ const struct BackendVtable *backend_vt_from_proto(int proto);
 char *get_remote_username(Conf *conf); /* dynamically allocated */
 char *save_settings(const char *section, Conf *conf);
 void save_open_settings(settings_w *sesskey, Conf *conf);
-bool load_settings(const char *section, Conf *conf, bool load_proxy_settings);
-void load_open_settings(settings_r *sesskey, Conf *conf);
+bool load_settings(const char *section, Conf *conf);
+void load_open_settings(settings_r *sesskey, Conf *conf, bool load_proxy_settings);
 void get_sesslist(struct sesslist *, bool allocate);
 bool do_defaults(const char *, Conf *);
 void registry_cleanup(void);
