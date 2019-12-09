@@ -2,7 +2,7 @@
 #define PUTTY_UNIX_H
 
 #ifdef HAVE_CONFIG_H
-# include "uxconfig.h" /* Space to hide it from mkfiles.pl */
+#include "config.h"
 #endif
 
 #include <stdio.h>                     /* for FILENAME_MAX */

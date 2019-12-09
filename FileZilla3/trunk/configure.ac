@@ -763,8 +763,6 @@ src/interface/resources/opencrystal/Makefile
 src/interface/resources/sun/Makefile
 src/interface/resources/tango/Makefile
 src/putty/Makefile
-src/putty/unix/Makefile
-src/putty/windows/Makefile
 src/storj/Makefile
 tests/Makefile
 src/interface/resources/version.rc
