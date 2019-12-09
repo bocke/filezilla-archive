@@ -4,7 +4,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "uxconfig.h" /* leading space prevents mkfiles.pl trying to follow */
+#include "config.h"
 #endif
 
 #ifdef HAVE_SO_PEERCRED

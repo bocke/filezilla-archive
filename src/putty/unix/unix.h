@@ -31,17 +31,17 @@
 #define JUST_USE_GTK_CLIPBOARD_UTF8 /* low-level gdk_selection_* fails */
 
 #define BUILDINFO_PLATFORM_GTK "OS X (GTK)"
-#define BUILDINFO_GTK
+//#define BUILDINFO_GTK
 
 #elif defined NOT_X_WINDOWS
 
 #define BUILDINFO_PLATFORM_GTK "Unix (pure GTK)"
-#define BUILDINFO_GTK
+//#define BUILDINFO_GTK
 
 #else
 
 #define BUILDINFO_PLATFORM_GTK "Unix (GTK + X11)"
-#define BUILDINFO_GTK
+//#define BUILDINFO_GTK
 
 #endif
 

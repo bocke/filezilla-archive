@@ -68,16 +68,17 @@ static int ReadQuotas(int i)
     {
 	int error = 0;
 	line = read_input_line(1, &error);
-	if (line == NULL || error)
-	{
-	    fatalbox("read_input_line failed in ReadQuotas");
-	    break;
+	if (line == NULL || error) {
+            fzprintf(sftpError, "read_input_line failed in ReadQuotas");
+            cleanup_exit(1);
 	}
 
 	if (line[0] != '-')
 	{
-	    if (input_pushback != 0)
-		fatalbox("input_pushback not null!");
+	    if (input_pushback != 0) {
+                fzprintf(sftpError, "input_pushback not null!");
+                cleanup_exit(1);
+            }
 	    else
 		input_pushback = strndup(line, strcspn(line, "\n") + 1);
 	}
