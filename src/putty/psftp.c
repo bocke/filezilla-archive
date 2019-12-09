@@ -282,7 +282,7 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
     struct fxp_xfer *xfer;
     uint64_t offset;
     WFile *file;
-    int ret, shown_err = FALSE;
+    int ret, shown_err = false;
     struct fxp_attrs attrs;
     _fztimer timer;
     int winterval;
@@ -357,7 +357,7 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
         if (retd <= 0) {
             if (!shown_err) {
                 fzprintf(sftpError, "error while reading: %s", fxp_error());
-                shown_err = TRUE;
+                shown_err = true;
             }
             if (retd == INT_MIN)        /* pktin not even freed */
                 sfree(pktin);
@@ -373,7 +373,7 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
                 if (wlen <= 0) {
                     if (!shown_err) {
                         fzprintf(sftpError, "error while writing local file");
-                        shown_err = TRUE;
+                        shown_err = true;
                     }
                     ret = 0;
                     xfer_set_error(xfer);
@@ -1082,7 +1082,7 @@ int sftp_cmd_mv(struct sftp_command *cmd)
     }
 
     /*FZ: Force dest_is_dir to FALSE. See #11047 */
-    ctx->dest_is_dir = FALSE;
+    ctx->dest_is_dir = false;
 
     ret = sftp_action_mv(ctx, cmd->words[1]);
     sfree(ctx->dstfname);

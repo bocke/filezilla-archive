@@ -116,12 +116,12 @@ fzsftp_SOURCES += \
 else
 fzsftp_SOURCES += \
 		time.c \
-		unix\uxsftp.c \
-		unix\uxnoise.c \
-		unix\uxagentc.c \
-		unix\uxsel.c \
-		unix\uxnet.c \
-		unix\uxpeer.c
+		unix/uxsftp.c \
+		unix/uxnoise.c \
+		unix/uxagentc.c \
+		unix/uxsel.c \
+		unix/uxnet.c \
+		unix/uxpeer.c
 endif
 
 fzputtygen_SOURCES = cmdgen.c \
