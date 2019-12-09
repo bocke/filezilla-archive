@@ -4,7 +4,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "uxconfig.h" /* leading space prevents mkfiles.pl trying to follow */
 #endif
 
 #ifdef HAVE_SO_PEERCRED
@@ -16,7 +16,7 @@
 
 #include "putty.h"
 
-int so_peercred(int fd, int *pid, int *uid, int *gid)
+bool so_peercred(int fd, int *pid, int *uid, int *gid)
 {
 #ifdef HAVE_SO_PEERCRED
     struct ucred cr;
@@ -25,8 +25,8 @@ int so_peercred(int fd, int *pid, int *uid, int *gid)
         *pid = cr.pid;
         *uid = cr.uid;
         *gid = cr.gid;
-        return TRUE;
+        return true;
     }
 #endif
-    return FALSE;
+    return false;
 }
