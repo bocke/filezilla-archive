@@ -130,6 +130,7 @@ fzputtygen_SOURCES = cmdgen.c \
 
 
 noinst_HEADERS = \
+		charset.h \
 		fzprintf.h \
 		fzsftp.h \
 		marshal.h \
