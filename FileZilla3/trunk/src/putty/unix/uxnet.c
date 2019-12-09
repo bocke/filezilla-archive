@@ -1788,5 +1788,5 @@ Socket *new_unix_listener(SockAddr *listenaddr, Plug *plug)
 int recv_peek(Socket *sock, char* buf, int len)
 {
     NetSocket *s = container_of(sock, NetSocket, sock);
-    return p_recv(s->s, buf, len, MSG_PEEK);
+    return recv(s->s, buf, len, MSG_PEEK);
 }

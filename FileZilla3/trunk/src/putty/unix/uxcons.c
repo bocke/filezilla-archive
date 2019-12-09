@@ -211,23 +211,8 @@ int console_verify_ssh_host_key(
     if (ret == 0)                      /* success - key matched OK */
         return 1;
 
-    premsg(&cf);
-    if (ret == 2) {                    /* key was different */
-        if (console_batch_mode) {
-            fprintf(stderr, wrongmsg_batch, keytype, fingerprint);
-            return 0;
-        }
-        fprintf(stderr, wrongmsg, keytype, fingerprint);
-        fflush(stderr);
-    }
-    if (ret == 1) {                    /* key was absent */
-        if (console_batch_mode) {
-            fprintf(stderr, absentmsg_batch, keytype, fingerprint);
-            return 0;
-        }
-        fprintf(stderr, absentmsg, keytype, fingerprint);
-        fflush(stderr);
-    }
+//FZ premsg(&cf);
+    fzprintf_raw((ret == 1) ? sftpAskHostkey : sftpAskHostkeyChanged, "%s\n%d\n", host, port);
 
     {
         struct termios oldmode, newmode;

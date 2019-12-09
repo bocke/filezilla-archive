@@ -43,10 +43,11 @@ libfzputtycommon_a_SOURCES += \
 			windows/winnojmp.c \
 			windows/winstore.c
 else
-libfzputtycommon_a_SOURCES +=
+libfzputtycommon_a_SOURCES += \
 			unix/uxcons.c \
 			unix/uxmisc.c \
 			unix/uxnoise.c \
+			unix/uxpoll.c \
 			unix/uxstore.c
 endif
 
@@ -130,29 +131,43 @@ fzputtygen_SOURCES = cmdgen.c \
 
 
 noinst_HEADERS = \
-		charset.h \
-		fzprintf.h \
-		fzsftp.h \
-		marshal.h \
-		misc.h \
-		mpint.h \
-		network.h \
-		pageant.h \
-		proxy.h \
-		psftp.h \
-		putty.h \
-		puttymem.h \
-		puttyps.h \
-		sftp.h \
-		ssh.h \
-		sshblowf.h \
-		storage.h \
-		tree234.h \
-		unix/unix.h \
-		windows/wincapi.h \
-		windows/winsecur.h \
-		windows/winstuff.h \
-		windows/rcstuff.h
+	charset.h \
+	defs.h \
+	ecc.h \
+	fzprintf.h \
+	fzsftp.h \
+	marshal.h \
+	misc.h \
+	mpint.h \
+	mpint_i.h \
+	network.h \
+	pageant.h \
+	proxy.h \
+	psftp.h \
+	putty.h \
+	puttymem.h \
+	puttyps.h \
+	sftp.h /
+	ssh2connection.h \
+	ssh2transport.h \
+	sshblowf.h \
+	sshbpp.h \
+	sshchan.h \
+	sshcr.h \
+	sshgssc.h \
+	ssh.h \
+	sshppl.h \
+	sshserver.h \
+	sshsignals.h \
+	sshttymodes.h \
+	storage.h \
+	terminal.h \
+	tree234.h
+	unix/unix.h \
+	windows/wincapi.h \
+	windows/winsecur.h \
+	windows/winstuff.h \
+	windows/rcstuff.h
 
 dist_noinst_DATA = \
 	windows/psftp.rc \
