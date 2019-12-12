@@ -1252,7 +1252,7 @@ void base64_encode(FILE *fp, const unsigned char *data, int datalen, int cpl)
     fputc('\n', fp);
 }
 
-void base64_encode_buf(const unsigned char *data, int datalen, unsigned char *out)
+void base64_encode_buf(const unsigned char *data, int datalen, char *out)
 {
     int n;
 
