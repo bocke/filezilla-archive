@@ -449,11 +449,11 @@ static void console_close(FILE *outfp, int infd)
         fclose(outfp);             /* will automatically close infd too */
 }
 
-static void console_write(FILE *outfp, ptrlen data)
+/*static void console_write(FILE *outfp, ptrlen data)
 {
     fwrite(data.ptr, 1, data.len, outfp);
     fflush(outfp);
-}
+}*/
 
 int console_get_userpass_input(prompts_t *p)
 {
