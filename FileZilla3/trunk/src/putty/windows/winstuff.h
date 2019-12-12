@@ -5,6 +5,31 @@
 #ifndef PUTTY_WINSTUFF_H
 #define PUTTY_WINSTUFF_H
 
+#ifndef _WINDOWS
+#define _WINDOWS
+#endif
+
+#ifndef _WIN32_IE
+  #define _WIN32_IE 0x0900
+#elif _WIN32_IE < 0x0900
+  #undef _WIN32_IE
+  #define _WIN32_IE 0x0900
+#endif
+
+#ifndef WINVER
+  #define WINVER 0x0601
+#elif WINVER < 0x0601
+  #undef WINVER
+  #define WINVER 0x0601
+#endif
+
+#ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0601
+#elif _WIN32_WINNT < 0x0601
+  #undef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0601
+#endif
+
 #ifndef AUTO_WINSOCK
 #include <winsock2.h>
 #endif
