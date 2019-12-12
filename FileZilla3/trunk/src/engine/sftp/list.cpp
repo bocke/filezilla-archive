@@ -120,6 +120,12 @@ int CSftpListOpData::ParseEntry(std::wstring && entry, uint64_t mtime, std::wstr
 		return FZ_REPLY_INTERNALERROR;
 	}
 
+	if (entry.size() > 65536 || name.size() > 65536) {
+		log(fz::logmsg::error, _("Received too long response line from server, closing connection."));
+		return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+	}
+
+
 	if (!listing_parser_) {
 		controlSocket_.log_raw(logmsg::listing, entry);
 		log(logmsg::debug_warning, L"listing_parser_ is null");

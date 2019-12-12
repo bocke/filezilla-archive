@@ -264,7 +264,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		break;
 	case sftpEvent::Hostkey:
 		{
-			auto tokens = fz::strtok(message.text[0], ' ');
+			auto tokens = fz::strtok_view(message.text[0], ' ');
 			if (!tokens.empty()) {
 				m_sftpEncryptionDetails.hostKeyFingerprintSHA256 = tokens.back();
 				tokens.pop_back();
@@ -482,12 +482,20 @@ void CSftpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& 
 void CSftpControlSocket::ProcessReply(int result, std::wstring const& reply)
 {
 	result_ = result;
-	response_ = reply;
+	response_.clear();
 
 	if (operations_.empty()) {
 		log(logmsg::debug_info, L"Skipping reply without active operation.");
 		return;
 	}
+
+	if (reply.size() > 65536) {
+		log(fz::logmsg::error, _("Received too long response line, closing connection."));
+		DoClose(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
+		return;
+	}
+
+	response_ = reply;
 
 	auto & data = *operations_.back();
 	log(logmsg::debug_verbose, L"%s::ParseResponse() in state %d", data.name_, data.opState);
