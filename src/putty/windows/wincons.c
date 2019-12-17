@@ -346,7 +346,6 @@ static void console_logging_error(LogPolicy *lp, const char *string)
     /* Ordinary Event Log entries are displayed in the same way as
      * logging errors, but only in verbose mode */
     fzprintf(sftpError, "%s", string);
-    fflush(stderr);
 }
 
 static void console_eventlog(LogPolicy *lp, const char *string)
@@ -354,7 +353,7 @@ static void console_eventlog(LogPolicy *lp, const char *string)
     /* Ordinary Event Log entries are displayed in the same way as
      * logging errors, but only in verbose mode */
     if (flags & FLAG_VERBOSE)
-        console_logging_error(lp, string);
+        fzprintf(sftpVerbose, "%s", string);
 }
 
 StripCtrlChars *console_stripctrl_new(
