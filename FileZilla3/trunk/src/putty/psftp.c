@@ -328,9 +328,9 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
 
             return 0;
         }
-            
+
         offset = get_file_posn(file);
-        fzprintf(sftpInfo, "reget: restarting at file position %s"PRIu64, offset);
+        fzprintf(sftpInfo, "reget: restarting at file position %"PRIu64, offset);
     } else {
         offset = 0;
     }
@@ -466,7 +466,7 @@ int sftp_put_file(char *fname, char *outfname, int restart)
             goto cleanup;
         }
         offset = attrs.size;
-        fzprintf(sftpInfo, "reput: restarting at file position %s"PRIu64, offset);
+        fzprintf(sftpInfo, "reput: restarting at file position %"PRIu64, offset);
         if (seek_file((WFile *)file, offset, FROM_START) != 0)
             seek_file((WFile *)file, 0, FROM_END);    /* *shrug* */
     } else {
@@ -781,7 +781,7 @@ int sftp_cmd_cd(struct sftp_command *cmd)
     sfree(pwd);
     pwd = dir;
     fzprintf(sftpReply, "New directory is: \"%s\"", pwd);
-    
+
     return 1;
 }
 
@@ -1376,7 +1376,7 @@ static int sftp_cmd_mtime(struct sftp_command *cmd)
     
     sfree(cname);
 
-    fzprintf(sftpReply, "%s"PRIu64, mtime);
+    fzprintf(sftpReply, "%"PRIu64, mtime);
     return 1;
 }
 

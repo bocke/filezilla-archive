@@ -306,6 +306,8 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
                              void (*callback)(void *ctx, int result),
                              void *ctx)
 {
+    return 0;
+/*FZ
     static const char msgtemplate[] =
         "The session log file \"%.*s\" already exists.\n"
         "You can overwrite it with a new session log,\n"
@@ -320,9 +322,9 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
         "Logging will not be enabled.\n";
 
     char line[32];
-//FZ struct termios cf;
+    struct termios cf;
 
-//FZ premsg(&cf);
+    premsg(&cf);
     if (console_batch_mode) {
         fprintf(stderr, msgtemplate_batch, FILENAME_MAX, filename->path);
         fflush(stderr);
@@ -339,17 +341,18 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
         tcsetattr(0, TCSANOW, &newmode);
         line[0] = '\0';
         if (block_and_read(0, line, sizeof(line) - 1) <= 0)
-            /* handled below */;
+            /* handled below *//*;
         tcsetattr(0, TCSANOW, &oldmode);
     }
 
-//FZ postmsg(&cf);
+    postmsg(&cf);
     if (line[0] == 'y' || line[0] == 'Y')
         return 2;
     else if (line[0] == 'n' || line[0] == 'N')
         return 1;
     else
         return 0;
+*/
 }
 
 bool console_antispoof_prompt = true;

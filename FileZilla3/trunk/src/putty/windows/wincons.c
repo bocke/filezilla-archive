@@ -256,6 +256,8 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
                              void (*callback)(void *ctx, int result),
                              void *ctx)
 {
+    return 0;
+    /* FZ
     HANDLE hin;
     DWORD savemode, i;
 
@@ -295,6 +297,7 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
         return 1;
     else
         return 0;
+*/
 }
 
 /*
