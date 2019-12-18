@@ -122,7 +122,12 @@ static Loaded_keyfile_list* new_loaded_keyfile(char* file)
 
 static void free_loaded_keyfile(Loaded_keyfile_list* item)
 {
-    strbuf_free(item->publickey_blob);
+    if (!item) {
+        return;
+    }
+    if (item->publickey_blob) {
+        strbuf_free(item->publickey_blob);
+    }
 
     if (item->ssh2key) {
         ssh_key_free(item->ssh2key->key);
@@ -1176,14 +1181,14 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                     sfree(key->comment);
                     sfree(key);
                 }
-#if 0
+
             } else if (s->can_pubkey && s->loaded_keyfile_list) {
 
                 Loaded_keyfile_list *next_keyfile;
-                struct ssh2_userkey *key;   /* not live over crReturn */
+                ssh2_userkey *key;   /* not live over crReturn */
                 char *passphrase;
 
-                ssh->pkt_actx = SSH2_PKTCTX_PUBLICKEY;
+                s->ppl.bpp->pls->actx = SSH2_PKTCTX_PUBLICKEY;
 
                 /*
                  * Try the public key supplied in the configuration.
@@ -1191,75 +1196,79 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                  * First, offer the public blob to see if the server is
                  * willing to accept it.
                  */
-                s->pktout = ssh2_pkt_init(SSH2_MSG_USERAUTH_REQUEST);
-                ssh2_pkt_addstring(s->pktout, ssh->username);
-                ssh2_pkt_addstring(s->pktout, "ssh-connection");
-                                                /* service requested */
-                ssh2_pkt_addstring(s->pktout, "publickey");        /* method */
-                ssh2_pkt_addbool(s->pktout, FALSE);
+                s->pktout = ssh_bpp_new_pktout(s->ppl.bpp, SSH2_MSG_USERAUTH_REQUEST);
+                put_stringz(s->pktout, s->username);
+                put_stringz(s->pktout, s->successor_layer->vt->name);
+                put_stringz(s->pktout, "publickey");    /* method */
+                put_bool(s->pktout, false);
                                                 /* no signature included */
-                ssh2_pkt_addstring(s->pktout, s->loaded_keyfile_list->publickey_algorithm);
-                ssh2_pkt_addstring_start(s->pktout);
-                ssh2_pkt_addstring_data(s->pktout,
-                                        (char *)s->loaded_keyfile_list->publickey_blob,
-                                        s->loaded_keyfile_list->publickey_bloblen);
-                ssh2_pkt_send(ssh, s->pktout);
-                logeventf(ssh, "Offered public key from \"%s\"", filename_to_str(s->loaded_keyfile_list->file));
+                put_stringz(s->pktout, s->loaded_keyfile_list->publickey_algorithm);
+                put_string(s->pktout, s->loaded_keyfile_list->publickey_blob->s,
+                           s->loaded_keyfile_list->publickey_blob->len);
+                pq_push(s->ppl.out_pq, s->pktout);
+                ppl_logevent("Offered public key from \"%s\"", filename_to_str(s->loaded_keyfile_list->file));
 
-                crWaitUntilV(pktin);
+                crMaybeWaitUntilV((pktin = ssh2_userauth_pop(s)) != NULL);
                 if (pktin->type != SSH2_MSG_USERAUTH_PK_OK) {
                     /* Key refused. Give up. */
                     next_keyfile = s->loaded_keyfile_list->next;
                     free_loaded_keyfile(s->loaded_keyfile_list);
                     s->loaded_keyfile_list = next_keyfile;
-                    s->gotit = TRUE; /* reconsider message next loop */
+                    pq_push_front(s->ppl.in_pq, pktin);
                     s->type = AUTH_TYPE_PUBLICKEY_OFFER_LOUD;
                     continue; /* process this new message */
                 }
-                logevent("Offer of public key accepted, trying to authenticate using it.");
+                ppl_logevent("Offer of public key accepted, trying to authenticate using it.");
 
                 /*
                  * Actually attempt a serious authentication using
                  * the key.
                  */
-                /*if (flags & FLAG_VERBOSE) {
-                    c_write_str(ssh, "Authenticating with public key \"");
-                    c_write_str(ssh, s->publickey_comment);
-                    c_write_str(ssh, "\"\r\n");
-                }*/
-                
-                key = s->loaded_keyfile_list->ssh2key;
+                /*if (flags & FLAG_VERBOSE)
+                    ppl_printf("Authenticating with public key \"%s\"\r\n",
+                               s->publickey_comment);
+                */
 
+                key = s->loaded_keyfile_list->ssh2key;
                 while (!key) {
                     const char *error;  /* not live over crReturn */
                     if (!key) {
                         /*
                          * Get a passphrase from the user.
                          */
-                        int ret; /* need not be kept over crReturn */
-                        s->cur_prompt = new_prompts(ssh->frontend);
-                        s->cur_prompt->to_server = FALSE;
+                        s->cur_prompt = new_prompts();
+                        s->cur_prompt->to_server = false;
+                        s->cur_prompt->from_server = false;
                         s->cur_prompt->name = dupstr("SSH key passphrase");
                         add_prompt(s->cur_prompt,
-                                   dupprintf("Passphrase for key \"%.100s\" in key file \"%s\"",
+                                   dupprintf("Passphrase for key \"%s\" in key file \"%s\"",
                                              s->loaded_keyfile_list->publickey_comment, filename_to_str(s->loaded_keyfile_list->file)),
-                                   FALSE);
-                        ret = get_userpass_input(s->cur_prompt, NULL, 0);
-                        while (ret < 0) {
-                            ssh->send_ok = 1;
-                            crWaitUntilV(!pktin);
-                            ret = get_userpass_input(s->cur_prompt,
-                                                     in, inlen);
-                            ssh->send_ok = 0;
+                                   false);
+                        s->userpass_ret = seat_get_userpass_input(
+                            s->ppl.seat, s->cur_prompt, NULL);
+                        while (1) {
+                           while (s->userpass_ret < 0 &&
+                                   bufchain_size(s->ppl.user_input) > 0)
+                                s->userpass_ret = seat_get_userpass_input(
+                                    s->ppl.seat, s->cur_prompt,
+                                    s->ppl.user_input);
+
+                            if (s->userpass_ret >= 0)
+                                break;
+
+                            s->want_user_input = true;
+                            crReturnV;
+                            s->want_user_input = false;
                         }
-                        if (!ret) {
+                        if (!s->userpass_ret) {
                             /* Failed to get a passphrase. Terminate. */
                             free_prompts(s->cur_prompt);
-                            ssh_disconnect(ssh, NULL,
-                                           "Unable to authenticate",
-                                           SSH2_DISCONNECT_AUTH_CANCELLED_BY_USER,
-                                           TRUE);
-                            crStopV;
+                            ssh_bpp_queue_disconnect(
+                                s->ppl.bpp, "Unable to authenticate",
+                                SSH2_DISCONNECT_AUTH_CANCELLED_BY_USER);
+                            ssh_user_close(s->ppl.ssh, "User aborted at "
+                                           "passphrase prompt");
+                            return;
                         }
                         passphrase =
                             dupstr(s->cur_prompt->prompts[0]->result);
@@ -1280,41 +1289,49 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                     if (key == SSH2_WRONG_PASSPHRASE || key == NULL) {
                         if (passphrase &&
                             (key == SSH2_WRONG_PASSPHRASE)) {
-                            c_write_str(ssh, "Wrong passphrase\r\n");
+                            ppl_printf("Wrong passphrase\r\n");
                             key = NULL;
                             /* and loop again */
                         } else {
-                            c_write_str(ssh, "Unable to load private key (");
-                            c_write_str(ssh, error);
-                            c_write_str(ssh, ")\r\n");
+                            ppl_printf("Unable to load private key (%s)\r\n", error);
                             key = NULL;
+                            break; /* try something else */
+                        }
+                    } else {
+                        /* FIXME: if we ever support variable signature
+                         * flags, this is somewhere they'll need to be
+                         * put */
+                        char *invalid = ssh_key_invalid(key->key, 0);
+                        if (invalid) {
+                            ppl_printf("Cannot use this private key (%s)\r\n",
+                                       invalid);
+                            ssh_key_free(key->key);
+                            sfree(key->comment);
+                            sfree(key);
+                            sfree(invalid);
+                            key = NULL;
+                            s->suppress_wait_for_response_packet = true;
                             break; /* try something else */
                         }
                     }
                 }
 
                 if (key) {
-                    unsigned char *sigblob, *sigdata;
-                    int sigblob_len, sigdata_len;
-                    int p;
+                    strbuf *sigdata, *sigblob;
 
                     /*
                      * We have loaded the private key and the server
                      * has announced that it's willing to accept it.
                      * Hallelujah. Generate a signature and send it.
                      */
-                    s->pktout = ssh2_pkt_init(SSH2_MSG_USERAUTH_REQUEST);
-                    ssh2_pkt_addstring(s->pktout, ssh->username);
-                    ssh2_pkt_addstring(s->pktout, "ssh-connection");
-                                                    /* service requested */
-                    ssh2_pkt_addstring(s->pktout, "publickey");
-                                                    /* method */
-                    ssh2_pkt_addbool(s->pktout, TRUE);
-                                                    /* signature follows */
-                    ssh2_pkt_addstring(s->pktout, key->alg->name);
-                    ssh2_pkt_addstring_start(s->pktout);
-                    ssh2_pkt_addstring_data(s->pktout, (char *)s->loaded_keyfile_list->publickey_blob,
-                                            s->loaded_keyfile_list->publickey_bloblen);
+                    s->pktout = ssh_bpp_new_pktout(
+                        s->ppl.bpp, SSH2_MSG_USERAUTH_REQUEST);
+                    put_stringz(s->pktout, s->username);
+                    put_stringz(s->pktout, s->successor_layer->vt->name);
+                    put_stringz(s->pktout, "publickey"); /* method */
+                    put_bool(s->pktout, true); /* signature follows */
+                    put_stringz(s->pktout, ssh_key_ssh_id(key->key));
+                    put_string(s->pktout, s->loaded_keyfile_list->publickey_blob->s, s->loaded_keyfile_list->publickey_blob->len);
 
                     /*
                      * The data to be signed is:
@@ -1324,38 +1341,27 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                      * followed by everything so far placed in the
                      * outgoing packet.
                      */
-                    sigdata_len = s->pktout->length - 5 + 4 +
-                        ssh->v2_session_id_len;
-                    if (ssh->remote_bugs & BUG_SSH2_PK_SESSIONID)
-                        sigdata_len -= 4;
-                    sigdata = snewn(sigdata_len, unsigned char);
-                    p = 0;
-                    if (!(ssh->remote_bugs & BUG_SSH2_PK_SESSIONID)) {
-                        PUT_32BIT(sigdata+p, ssh->v2_session_id_len);
-                        p += 4;
-                    }
-                    memcpy(sigdata+p, ssh->v2_session_id,
-                           ssh->v2_session_id_len);
-                    p += ssh->v2_session_id_len;
-                    memcpy(sigdata+p, s->pktout->data + 5,
-                           s->pktout->length - 5);
-                    p += s->pktout->length - 5;
-                    assert(p == sigdata_len);
-                    sigblob = key->alg->sign(key->data, (char *)sigdata,
-                                             sigdata_len, &sigblob_len);
-                    ssh2_add_sigblob(ssh, s->pktout, s->loaded_keyfile_list->publickey_blob, s->loaded_keyfile_list->publickey_bloblen,
-                                     sigblob, sigblob_len);
-                    sfree(sigblob);
-                    sfree(sigdata);
+                    sigdata = strbuf_new();
+                    ssh2_userauth_add_session_id(s, sigdata);
+                    put_data(sigdata, s->pktout->data + 5,
+                             s->pktout->length - 5);
+                    sigblob = strbuf_new();
+                    ssh_key_sign(key->key, ptrlen_from_strbuf(sigdata), 0,
+                                 BinarySink_UPCAST(sigblob));
+                    strbuf_free(sigdata);
+                    ssh2_userauth_add_sigblob(
+                        s, s->pktout, ptrlen_from_strbuf(s->loaded_keyfile_list->publickey_blob),
+                        ptrlen_from_strbuf(sigblob));
+                    strbuf_free(sigblob);
 
-                    ssh2_pkt_send(ssh, s->pktout);
+                    pq_push(s->ppl.out_pq, s->pktout);
+                    ppl_logevent("Sent public key signature");
                     s->type = AUTH_TYPE_PUBLICKEY;
                     s->loaded_keyfile_list->ssh2key = key;
                 }
                 next_keyfile = s->loaded_keyfile_list->next;
                 free_loaded_keyfile(s->loaded_keyfile_list);
                 s->loaded_keyfile_list = next_keyfile;
-#endif
 #ifndef NO_GSSAPI
             } else if (s->can_gssapi && !s->tried_gssapi) {
 
