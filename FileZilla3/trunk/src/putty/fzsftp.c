@@ -254,10 +254,10 @@ void fz_timer_init(_fztimer *timer)
 
 #ifndef _WINDOWS
 // 1/10th of a second in microseconds
-const static int notificationDelay = 1000000 / 10;
+static int const notificationDelay = 1000000 / 10;
 #else
 // 1/10th of a second in 100 nanoseconds
-const static unsigned int notificationDelay = 10000000 / 10;
+static unsigned int const notificationDelay = 10000000 / 10;
 #endif
 
 
