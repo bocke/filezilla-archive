@@ -404,7 +404,7 @@ int console_get_userpass_input(prompts_t *p)
     /*
      * And if we have anything to print, we need standard output.
      */
-    if ((p->name_reqd && p->name) || p->instruction || p->n_prompts) {
+    if (p->name || p->instruction || p->n_prompts) {
         hout = GetStdHandle(STD_OUTPUT_HANDLE);
         if (hout == INVALID_HANDLE_VALUE) {
             fzprintf(sftpError, "Cannot get standard output handle");
@@ -415,8 +415,8 @@ int console_get_userpass_input(prompts_t *p)
     /*
      * Preamble.
      */
-    /* We only print the `name' caption if we have to... */
-    if (p->name_reqd && p->name) {
+    /* We always print the `name' caption... */
+    if (p->name) {
         fzprintf_raw_untrusted(sftpRequestPreamble, "%s", p->name);
     }
     else {
