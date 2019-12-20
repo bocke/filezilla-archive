@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.46.2 (2019-12-20)
+
+- SFTP: Fixed a regression connecting using a password-protected keyfile
+
 3.46.1 (2019-12-20)
 
 - Fixed a crash if an FTP server sends too long response lines
