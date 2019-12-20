@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Filezilla italian translation v. 17.11.2019\n"
+"Project-Id-Version: Filezilla italian translation v. 19.12.2019\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-11-24 14:57+0100\n"
-"PO-Revision-Date: 2019-11-17 23:19+0100\n"
+"POT-Creation-Date: 2019-12-20 13:17+0100\n"
+"PO-Revision-Date: 2019-12-19 13:58+0100\n"
 "Last-Translator: bovirus <bovirus@gmail.com>\n"
 "Language-Team: bovirus - Andrea Sanavia - Vincenzo Reale - Riccardo Vianello "
 "<bovirus@gmail.com>\n"
@@ -2001,7 +2001,7 @@ msgstr "Impossibile modificare il file, non connesso a nessun server."
 msgid "Cannot edit file, remote path unknown."
 msgstr "Impossibile modificare il file, percorso remoto sconosciuto."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:136
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:137
 msgid ""
 "Cannot establish FTP connection to an SFTP server. Please select proper "
 "protocol."
@@ -2469,7 +2469,7 @@ msgstr "Connessione chiusa"
 msgid "Connection closed by server"
 msgstr "Connessione chiusa dal server"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:181
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:182
 #: ../src/engine/http/httpcontrolsocket.cpp:202
 msgid "Connection established, initializing TLS..."
 msgstr "Connessione stabilita, inizializzazione TLS in corso..."
@@ -2482,7 +2482,7 @@ msgstr "Connessione stabilita, invio richiesta HTTP"
 msgid "Connection established, waiting for welcome message."
 msgstr "Connessione stabilita. In attesa del messaggio di benvenuto."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:202
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:203
 msgid "Connection established, waiting for welcome message..."
 msgstr "Connessione stabilita, in attesa del messaggio di benvenuto..."
 
@@ -2968,8 +2968,8 @@ msgstr "Crea un file vuoto"
 msgid "Creating directory"
 msgstr "Creazione della cartella in corso"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:596
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:563
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:597
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:571
 #: ../src/engine/storj/storjcontrolsocket.cpp:104
 #, c-format
 msgid "Creating directory '%s'..."
@@ -3893,7 +3893,7 @@ msgstr "Non è stato possibile cambiare la cartella"
 msgid "Failed to change language"
 msgstr "Errore durante il cambio di lingua"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:297
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:298
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Impossibile convertire il comando nel set caratteri 8bit"
 
@@ -3981,7 +3981,7 @@ msgstr "Non è stato possibile leggere il contenuto della cartella"
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "Impossibile ottenere l'indirizzo IP esterno. Annullamento."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:667
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:668
 msgid "Failed to retrieve external IP address, using local address"
 msgstr "Impossibile ottenere l'indirizzo IP esterno. Uso indirizzo locale"
 
@@ -3989,7 +3989,7 @@ msgstr "Impossibile ottenere l'indirizzo IP esterno. Uso indirizzo locale"
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "Impossibile ottenere l'indirizzo IP locale. Annulllamento."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:685
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:686
 msgid "Failed to retrieve local IP address."
 msgstr "Impossibile ottenere l'indirizzo IP locale."
 
@@ -5489,7 +5489,7 @@ msgstr "Nessuna cartella aggiunta"
 msgid "No entries found matching '%s'."
 msgstr "Nessun elemento corrispondente '%s'."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:640
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:641
 msgid "No external IP address set, trying default."
 msgstr "Nessun IP esterno impostato, sarà provato quello predefinito."
 
@@ -6622,11 +6622,15 @@ msgstr "Ricevuti dati corrotti"
 msgid "Received invalid character in version information"
 msgstr "Ricevuti caratteri non validi nell'informazione versione"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:106
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:106 ../src/engine/sftp/list.cpp:124
 msgid "Received too long response line from server, closing connection."
 msgstr ""
 "Ricevuta linea di risposta troppo lunga dal server.\n"
 "Chiusura connessione."
+
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:493
+msgid "Received too long response line, closing connection."
+msgstr "Ricevuta linea di risposta troppo lunga. Chiusura connessione."
 
 #: ../src/interface/updater.cpp:611
 msgid "Received version information is too large"
@@ -6775,8 +6779,8 @@ msgstr "Rinomina le cartelle selezionate"
 msgid "Rename selected files and directories"
 msgstr "Rinomina i file e cartelle selezionate"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:607
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:607
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:608
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:615
 #, c-format
 msgid "Renaming '%s' to '%s'"
 msgstr "Rinomina da '%s' a '%s'"
@@ -6865,20 +6869,20 @@ msgstr ""
 "Riprendere il trasferimento di un file ASCII può causare problemi se il "
 "server utilizza un formato di terminazione di riga diverso dal client."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:327
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:328
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:459
 #: ../src/engine/storj/storjcontrolsocket.cpp:66
 #, c-format
 msgid "Retrieving directory listing of \"%s\"..."
 msgstr "Recupero elenco cartella di \"%s\"..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:324
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:325
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:456
 #: ../src/engine/storj/storjcontrolsocket.cpp:63
 msgid "Retrieving directory listing..."
 msgstr "Lettura elenco cartelle..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:655
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:656
 #: ../src/interface/netconfwizard.cpp:708
 #, c-format
 msgid "Retrieving external IP address from %s"
@@ -7206,7 +7210,7 @@ msgstr "Invia coman&di FTP per mantenere attiva la connessione"
 msgid "Send custom command to the server otherwise not available"
 msgstr "Invia al server un comando personalizzato altrimenti non disponibile"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:777
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:778
 msgid "Sending keep-alive command"
 msgstr "Invia comando per mantenere connessione attiva"
 
@@ -7363,8 +7367,8 @@ msgstr "Dettagli sessione"
 msgid "Set &Priority"
 msgstr "Imposta &priorità"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:614
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:601
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:615
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:609
 #, c-format
 msgid "Setting permissions of '%s' to '%s'"
 msgstr "Impostazione permessi di '%s' a '%s'"
@@ -7777,11 +7781,11 @@ msgstr "&Barra strumenti"
 msgid "TLS connection established, sending HTTP request"
 msgstr "Connessione TSL stabilita. Invio richiesta HTTP"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:193
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:194
 msgid "TLS connection established, waiting for welcome message..."
 msgstr "Connessione TLS stabilita. In attesa del messaggio di benvenuto..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:197
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:198
 msgid "TLS connection established."
 msgstr "Connessione TLS stabilita."
 

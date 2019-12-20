@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2019-11-24 14:57+0100\n"
-"PO-Revision-Date: 2019-08-05 11:51+0300\n"
+"POT-Creation-Date: 2019-12-20 13:17+0100\n"
+"PO-Revision-Date: 2019-11-25 14:04+0200\n"
 "Last-Translator: Igor Chomko <igor.chomko@gmail.com>\n"
 "Language-Team: Igor Chomko <igorchomko@gmail.com>\n"
 "Language: uk_UA\n"
@@ -2005,7 +2005,7 @@ msgstr "Редагування файлу неможливе; нема підк�
 msgid "Cannot edit file, remote path unknown."
 msgstr "Неможливо редагувати файл, невідомий віддалений шлях."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:136
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:137
 msgid ""
 "Cannot establish FTP connection to an SFTP server. Please select proper "
 "protocol."
@@ -2473,7 +2473,7 @@ msgstr "З'єднання завершено"
 msgid "Connection closed by server"
 msgstr "З'єднання завершено сервером"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:181
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:182
 #: ../src/engine/http/httpcontrolsocket.cpp:202
 msgid "Connection established, initializing TLS..."
 msgstr "З'єднання встановлено, ініціюється TLS..."
@@ -2486,7 +2486,7 @@ msgstr "З'єднання встановлено, надсилається за�
 msgid "Connection established, waiting for welcome message."
 msgstr "З'єднання встановлено, очікуємо на запрошення."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:202
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:203
 msgid "Connection established, waiting for welcome message..."
 msgstr "З'єднання встановлено, очікуємо на вітальне повідомлення..."
 
@@ -2699,7 +2699,7 @@ msgstr "Неможливо отримати тимчасовий каталог 
 
 #: ../src/interface/LocalListView.cpp:397
 msgid "Could not list directory contents"
-msgstr ""
+msgstr "Не вдалося перелічити вміст каталогу"
 
 #: ../src/interface/sitemanager.cpp:923
 #, c-format
@@ -2966,8 +2966,8 @@ msgstr "Створити порожній файл"
 msgid "Creating directory"
 msgstr "Створення каталогу"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:596
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:563
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:597
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:571
 #: ../src/engine/storj/storjcontrolsocket.cpp:104
 #, c-format
 msgid "Creating directory '%s'..."
@@ -3551,6 +3551,9 @@ msgid ""
 "Either you or your system administrator has disabled checking for updates. "
 "Please re-enable checking for updates to obtain more information."
 msgstr ""
+"Ви або системний адміністратор вимкнули перевірку наявності оновлень. Щоб "
+"отримати додаткову інформацію, ввімкніть функцію перевірки наявності "
+"оновлень ще раз."
 
 #: ../src/interface/resources/xrc/settings.xrc:1242
 msgid "Email:"
@@ -3890,7 +3893,7 @@ msgstr "Помилка зміни каталогу"
 msgid "Failed to change language"
 msgstr "Помилка зміни мови"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:297
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:298
 msgid "Failed to convert command to 8 bit charset"
 msgstr "Помилка конвертації команди у 8-бітний набір символів"
 
@@ -3976,7 +3979,7 @@ msgstr "Помилка видобутку списку каталогу"
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "Невдале отримання зовнішньої ІР адреси, аварійне завершення."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:667
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:668
 msgid "Failed to retrieve external IP address, using local address"
 msgstr "Невдале отримання зовнішньої ІР адреси, використовуючи локальну адресу"
 
@@ -3984,7 +3987,7 @@ msgstr "Невдале отримання зовнішньої ІР адреси
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "Невдале отримання локальної ІР адреси, аварійне завершення."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:685
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:686
 msgid "Failed to retrieve local IP address."
 msgstr "Невдале отримання локальної ІР адреси."
 
@@ -5146,7 +5149,7 @@ msgstr "Вхід"
 
 #: ../src/interface/sitemanager_site.cpp:624
 msgid "Login (optional):"
-msgstr ""
+msgstr "Логін (необов'язково):"
 
 #: ../src/engine/ftp/logon.cpp:316
 msgid ""
@@ -5349,7 +5352,7 @@ msgstr "Ім'я закладки вже існує."
 #: ../src/engine/server.cpp:860 ../src/engine/server.cpp:891
 #: ../src/engine/server.cpp:910
 msgid "Name or email address"
-msgstr ""
+msgstr "Ім'я або адреса електронної пошти"
 
 #: ../src/interface/loginmanager.cpp:91 ../src/interface/loginmanager.cpp:196
 #: ../src/interface/verifycertdialog.cpp:654
@@ -5479,7 +5482,7 @@ msgstr "Відсутній каталог"
 msgid "No entries found matching '%s'."
 msgstr "Відсутні записи, що співпадають з '%s'."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:640
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:641
 msgid "No external IP address set, trying default."
 msgstr ""
 "Не встановлено зовнішньої IP адреси, робиться спроба за типовою адресою."
@@ -6615,8 +6618,13 @@ msgstr "Отримані дані заблоковано"
 msgid "Received invalid character in version information"
 msgstr "Отримано неприпустимий символ в інформації версії"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:106
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:106 ../src/engine/sftp/list.cpp:124
 msgid "Received too long response line from server, closing connection."
+msgstr ""
+"Отримано занадто довгий рядок відповіді від сервера, закриття підключення."
+
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:493
+msgid "Received too long response line, closing connection."
 msgstr ""
 
 #: ../src/interface/updater.cpp:611
@@ -6765,8 +6773,8 @@ msgstr "Перейменувати обраний каталог"
 msgid "Rename selected files and directories"
 msgstr "Перейменувати обрані файли і каталоги"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:607
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:607
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:608
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:615
 #, c-format
 msgid "Renaming '%s' to '%s'"
 msgstr "Перейменування '%s' в '%s'"
@@ -6854,20 +6862,20 @@ msgstr ""
 "Поновлення файлів ASCII може створити проблеми, якщо сервер використовує "
 "інший формат завершення лінійки, ніж клієнт."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:327
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:328
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:459
 #: ../src/engine/storj/storjcontrolsocket.cpp:66
 #, c-format
 msgid "Retrieving directory listing of \"%s\"..."
 msgstr "Видобування списку каталогів з \"%s\"..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:324
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:325
 #: ../src/engine/sftp/sftpcontrolsocket.cpp:456
 #: ../src/engine/storj/storjcontrolsocket.cpp:63
 msgid "Retrieving directory listing..."
 msgstr "Видобування списку каталогів..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:655
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:656
 #: ../src/interface/netconfwizard.cpp:708
 #, c-format
 msgid "Retrieving external IP address from %s"
@@ -7201,7 +7209,7 @@ msgstr ""
 msgid "Send custom command to the server otherwise not available"
 msgstr "Надіслати настроювану команду на сервер"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:777
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:778
 msgid "Sending keep-alive command"
 msgstr "Надсилання команди keep-alive"
 
@@ -7355,8 +7363,8 @@ msgstr "Подробиці з'єднання"
 msgid "Set &Priority"
 msgstr "Встановити &пріоритет"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:614
-#: ../src/engine/sftp/sftpcontrolsocket.cpp:601
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:615
+#: ../src/engine/sftp/sftpcontrolsocket.cpp:609
 #, c-format
 msgid "Setting permissions of '%s' to '%s'"
 msgstr "Встановлення дозволів '%s' для '%s'"
@@ -7763,11 +7771,11 @@ msgstr "П&анель інструментів"
 msgid "TLS connection established, sending HTTP request"
 msgstr "З'єднання TLS встановлено, надсилається запит HTTP"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:193
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:194
 msgid "TLS connection established, waiting for welcome message..."
 msgstr "З'єднання встановлено, очікуємо на вітальне повідомлення..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:197
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:198
 msgid "TLS connection established."
 msgstr "З'єднання TLS встановлено."
 
@@ -8485,7 +8493,7 @@ msgstr "Неініціалізоаний код помилки %d"
 
 #: ../src/interface/update_dialog.cpp:170
 msgid "Unfortunately information about the new update could not be retrieved."
-msgstr ""
+msgstr "На жаль, інформацію про нове оновлення не вдалося отримати."
 
 #: ../src/interface/verifycertdialog.cpp:644
 msgid "Unit:"
@@ -8550,7 +8558,7 @@ msgstr "Невідоме кодування передачі"
 
 #: ../src/interface/Mainfrm.cpp:1798
 msgid "Unknown version"
-msgstr ""
+msgstr "Невідома версія"
 
 #: ../src/interface/netconfwizard.cpp:609
 #: ../src/interface/netconfwizard.cpp:619
@@ -8977,7 +8985,7 @@ msgstr ""
 
 #: ../src/interface/LocalListView.cpp:394
 msgid "You do not have permission to list this directory"
-msgstr ""
+msgstr "Ви не маєте дозволу на список цього каталогу"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:2925
 msgid "You have selected at least one symbolic link."
