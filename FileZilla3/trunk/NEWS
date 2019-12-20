@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.46.1 (2019-12-20)
+
+- Fixed a crash if an FTP server sends too long response lines
+- Building and running FileZilla now depends on libfilezilla >= 0.19.3 (https://lib.filezilla-project.org/), this fixes a few issues with the new speed limiting code
+- SFTP components have been updated and are now based on PuTTY 0.73
+
 3.46.0 (2019-11-25)
 
 - Fixed a rare crash if closing FileZilla the very same moment a connection or transfer requests user attention
