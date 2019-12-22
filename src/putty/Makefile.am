@@ -147,7 +147,7 @@ noinst_HEADERS = \
 	putty.h \
 	puttymem.h \
 	puttyps.h \
-	sftp.h /
+	sftp.h \
 	ssh2connection.h \
 	ssh2transport.h \
 	sshblowf.h \
@@ -162,7 +162,7 @@ noinst_HEADERS = \
 	sshttymodes.h \
 	storage.h \
 	terminal.h \
-	tree234.h
+	tree234.h \
 	unix/unix.h \
 	windows/wincapi.h \
 	windows/winsecur.h \
