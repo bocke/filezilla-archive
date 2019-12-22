@@ -536,7 +536,9 @@ char *do_select(SOCKET skt, bool startup)
         if (startup) {
             events = (FD_CONNECT | FD_READ | FD_WRITE |
                       FD_OOB | FD_CLOSE | FD_ACCEPT);
-            netevent = CreateEvent(NULL, false, false, NULL);
+            if (netevent == INVALID_HANDLE_VALUE) {
+                netevent = CreateEvent(NULL, false, false, NULL);
+            }
         } else {
             events = 0;
         }
