@@ -61,7 +61,7 @@ static const SeatVtable psftp_seat_vt = {
     console_verify_ssh_host_key,
     console_confirm_weak_crypto_primitive,
     console_confirm_weak_cached_hostkey,
-	nullseat_is_always_utf8,
+    nullseat_is_always_utf8,
     nullseat_echoedit_update,
     nullseat_get_x_display,
     nullseat_get_windowid,
@@ -382,8 +382,8 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
                 wpos += wlen;
             }
             if (wpos < len) {               /* we had an error */
-				ret = 0;
-				xfer_set_error(xfer);
+                ret = 0;
+                xfer_set_error(xfer);
             }
             winterval += wpos;
             sfree(vbuf);
@@ -408,8 +408,8 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
 }
 
 int pending_receive() {
-	// TODO
-	return 0;
+    // TODO
+    return 0;
 }
 
 int sftp_put_file(char *fname, char *outfname, int restart)
@@ -527,7 +527,7 @@ int sftp_put_file(char *fname, char *outfname, int restart)
 
     close_rfile(file);
 
-	return err ? 0 : 1;
+    return err ? 0 : 1;
 }
 
 /* ----------------------------------------------------------------------
@@ -754,13 +754,14 @@ int sftp_cmd_cd(struct sftp_command *cmd)
         return 0;
     }
 
-    if (cmd->nwords < 2)
-        dir = dupstr(homedir);
-    else
-        dir = canonify(cmd->words[1], false);
+    if (cmd->nwords != 2) {
+        fzprintf(sftpError, "Wrong number of arguments");
+        return 0;
+    }
 
+    dir = canonify(cmd->words[1], false);
     if (!dir) {
-        fzprintf(sftpError, "%s: canonify: %s", dir, fxp_error());
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
         return 0;
     }
 
@@ -823,8 +824,8 @@ int sftp_general_get(struct sftp_command *cmd, int restart)
     }
 
     ret = 1;
-	origfname = cmd->words[1];
-	outfname = cmd->words[2];
+    origfname = cmd->words[1];
+    outfname = cmd->words[2];
 
     fname = canonify(origfname, 0);
     if (!fname) {
@@ -868,8 +869,8 @@ int sftp_general_put(struct sftp_command *cmd, int restart)
         fzprintf(sftpError, "%s: expects source and target filenames", cmd->words[0]);
         return 0;
     }
-	fname = cmd->words[1];
-	origoutfname = cmd->words[2];
+    fname = cmd->words[1];
+    origoutfname = cmd->words[2];
 
     ret = 1;
 
@@ -938,7 +939,7 @@ int sftp_cmd_mkdir(struct sftp_command *cmd)
     return ret;
 }
 
-static int sftp_action_rmdir(void *vctx, char *dir)
+static int sftp_action_rmdir(char *dir)
 {
     struct sftp_packet *pktin;
     struct sftp_request *req;
@@ -970,10 +971,18 @@ int sftp_cmd_rmdir(struct sftp_command *cmd)
         return 0;
     }
 
-	return sftp_action_rmdir(NULL, cmd->words[1]);
+    char * cname = canonify(cmd->words[1], NULL);
+    if (!cname) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
+        return 0;
+    }
+
+    int ret = sftp_action_rmdir(cname);
+    sfree(cname);
+    return ret;
 }
 
-static int sftp_action_rm(void *vctx, char *fname)
+static int sftp_action_rm(char *fname)
 {
     struct sftp_packet *pktin;
     struct sftp_request *req;
@@ -1005,64 +1014,44 @@ int sftp_cmd_rm(struct sftp_command *cmd)
         return 0;
     }
 
-    return sftp_action_rm(NULL, cmd->words[1]);
+    char * cname = canonify(cmd->words[1], NULL);
+    if (!cname) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
+        return 0;
+    }
+
+    int ret = sftp_action_rm(cname);
+    sfree(cname);
+    return ret;
 }
 
-struct sftp_context_mv {
-    char *dstfname;
-    bool dest_is_dir;
-};
-
-static int sftp_action_mv(void *vctx, char *srcfname)
+static int sftp_action_mv(char* source, char* target)
 {
-    struct sftp_context_mv *ctx = (struct sftp_context_mv *)vctx;
     struct sftp_packet *pktin;
     struct sftp_request *req;
     const char *error;
-    char *finalfname, *newcanon = NULL;
     int ret, result;
 
-    if (ctx->dest_is_dir) {
-        char *p;
-        char *newname;
-
-        p = srcfname + strlen(srcfname);
-        while (p > srcfname && p[-1] != '/') p--;
-        newname = dupcat(ctx->dstfname, "/", p);
-        newcanon = canonify(newname, 0);
-        if (!newcanon) {
-            fzprintf(sftpError, "%s: canonify: %s", newname, fxp_error());
-            sfree(newname);
-            return 0;
-        }
-        sfree(newname);
-
-        finalfname = newcanon;
-    } else {
-        finalfname = ctx->dstfname;
-    }
-
-    req = fxp_rename_send(srcfname, finalfname);
+    req = fxp_rename_send(source, target);
     pktin = sftp_wait_for_reply(req);
     result = fxp_rename_recv(pktin, req);
 
     error = result ? NULL : fxp_error();
 
     if (error) {
-        fzprintf(sftpError, "mv %s %s: %s", srcfname, finalfname, error);
+        fzprintf(sftpError, "mv %s %s: %s", source, target, error);
         ret = 0;
     } else {
-        fzprintf(sftpStatus, "%s -> %s", srcfname, finalfname);
+        fzprintf(sftpStatus, "%s -> %s", source, target);
         ret = 1;
     }
 
-    sfree(newcanon);
     return ret;
 }
 
 int sftp_cmd_mv(struct sftp_command *cmd)
 {
-    struct sftp_context_mv actx, *ctx = &actx;
+    char *source, *target;
     int ret;
 
     if (!backend) {
@@ -1075,17 +1064,23 @@ int sftp_cmd_mv(struct sftp_command *cmd)
         return 0;
     }
 
-    ctx->dstfname = canonify(cmd->words[cmd->nwords-1], 0);
-    if (!ctx->dstfname) {
-        fzprintf(sftpError, "%s: canonify: %s", ctx->dstfname, fxp_error());
+    source = canonify(cmd->words[1], 0);
+    if (!source) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
         return 0;
     }
 
-    /*FZ: Force dest_is_dir to FALSE. See #11047 */
-    ctx->dest_is_dir = false;
+    target = canonify(cmd->words[2], 0);
+    if (!target) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
+        sfree(source);
+        return 0;
+    }
 
-    ret = sftp_action_mv(ctx, cmd->words[1]);
-    sfree(ctx->dstfname);
+    ret = sftp_action_mv(source, target);
+
+    sfree(source);
+    sfree(target);
 
     return ret;
 }
@@ -1256,7 +1251,16 @@ int sftp_cmd_chmod(struct sftp_command *cmd)
         }
     }
 
-    return sftp_action_chmod(ctx, cmd->words[2]);
+
+    char * cname = canonify(cmd->words[2], NULL);
+    if (!cname) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
+        return 0;
+    }
+
+    int ret = sftp_action_chmod(ctx, cname);
+    sfree(cname);
+    return 0;
 }
 
 static int sftp_cmd_chmtime(struct sftp_command *cmd)
@@ -1274,53 +1278,64 @@ static int sftp_cmd_chmtime(struct sftp_command *cmd)
         return 0;
     }
 
+    char *cname = canonify(cmd->words[2], 0);
+    if (!cname) {
+        fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
+        return 0;
+    }
+
     // Make sure mtime is valid
     p = cmd->words[1];
     while (*p) {
         char c = *p++;
         if (c < '0' || c > '9') {
             fzprintf(sftpError, "chmtime: not a valid time");
+            sfree(cname);
             return 0;
         }
-		mtime *= 10;
-		mtime += c - '0';
+        mtime *= 10;
+        mtime += c - '0';
     }
 
-	struct fxp_attrs attrs = {0};
-	struct sftp_packet* pktin;
-	struct sftp_request* req;
+    struct fxp_attrs attrs = {0};
+    struct sftp_packet* pktin;
+    struct sftp_request* req;
 
-	attrs.flags = SSH_FILEXFER_ATTR_ACMODTIME;
+    attrs.flags = SSH_FILEXFER_ATTR_ACMODTIME;
 
-	char* fname = cmd->words[2];
-	req = fxp_stat_send(fname);
-	pktin = sftp_wait_for_reply(req);
-	int result = fxp_stat_recv(pktin, req, &attrs);
+    req = fxp_stat_send(cname);
+    pktin = sftp_wait_for_reply(req);
+    int result = fxp_stat_recv(pktin, req, &attrs);
 
-	if (!result || !(attrs.flags & SSH_FILEXFER_ATTR_ACMODTIME)) {
-		fzprintf(sftpError, "get attrs for %s: %s", fname,
-			result ? "times not provided" : fxp_error());
-		return 0;
-	}
+    if (!result || !(attrs.flags & SSH_FILEXFER_ATTR_ACMODTIME)) {
+        fzprintf(sftpError, "get attrs for %s: %s", cname,
+             result ? "times not provided" : fxp_error());
+        sfree(cname);
+        return 0;
+    }
 
-	attrs.flags = SSH_FILEXFER_ATTR_ACMODTIME;
+    attrs.flags = SSH_FILEXFER_ATTR_ACMODTIME;
 
-	if (attrs.mtime == mtime) {
-		fzprintf(sftpVerbose, "Keeping existing mtime");
-		return 1;
-	}
-	attrs.mtime = mtime;
+    if (attrs.mtime == mtime) {
+        fzprintf(sftpVerbose, "Keeping existing mtime");
+        sfree(cname);
+        return 1;
+    }
+    attrs.mtime = mtime;
 
-	req = fxp_setstat_send(fname, attrs);
-	pktin = sftp_wait_for_reply(req);
-	result = fxp_setstat_recv(pktin, req);
+    req = fxp_setstat_send(cname, attrs);
+    pktin = sftp_wait_for_reply(req);
+    result = fxp_setstat_recv(pktin, req);
 
-	if (!result) {
-		fzprintf(sftpError, "set attrs for %s: %s", fname, fxp_error());
-		return 0;
-	}
+    if (!result) {
+        fzprintf(sftpError, "set attrs for %s: %s", cname, fxp_error());
+        sfree(cname);
+        return 0;
+    }
 
-	return 1;
+    sfree(cname);
+
+    return 1;
 }
 
 static int sftp_cmd_mtime(struct sftp_command *cmd)
@@ -1331,7 +1346,7 @@ static int sftp_cmd_mtime(struct sftp_command *cmd)
     struct fxp_attrs attrs = {0};
     struct sftp_packet *pktin;
     struct sftp_request *req;
-    
+
     if (!backend) {
         not_connected();
         return 0;
@@ -1373,7 +1388,7 @@ static int sftp_cmd_mtime(struct sftp_command *cmd)
         sfree(cname);
         return 0;
     }
-    
+
     sfree(cname);
 
     fzprintf(sftpReply, "%"PRIu64, mtime);
@@ -1691,7 +1706,7 @@ int do_sftp()
         cmd = sftp_getcmd();
         if (!cmd)
             break;
-		pending_reply = true;
+        pending_reply = true;
         ret = cmd->obey(cmd);
         if (cmd->words) {
             int i;
@@ -1700,9 +1715,9 @@ int do_sftp()
             sfree(cmd->words);
         }
         sfree(cmd);
-		if (pending_reply) {
-			fznotify1(sftpDone, ret);
-		}
+        if (pending_reply) {
+            fznotify1(sftpDone, ret);
+        }
         if (ret < 0)
             break;
     }
@@ -2136,7 +2151,7 @@ int psftp_main(int argc, char *argv[])
     do_defaults(NULL, conf);
     loaded_session = false;
 
-	conf_set_bool(conf, CONF_change_username, false);
+    conf_set_bool(conf, CONF_change_username, false);
 
     // FZ: Set proxy to none
     conf_set_int(conf, CONF_proxy_type, PROXY_NONE);
