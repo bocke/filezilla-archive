@@ -120,7 +120,7 @@ struct sftp_packet *sftp_wait_for_reply(struct sftp_request *req)
  * links as FXP_REALPATH would resolve the link if called with the
  * full path.
  */
-char *canonify(const char *name, int parent_only)
+char *canonify(const char *name, bool parent_only)
 {
     char *fullname, *canonname;
     struct sftp_packet *pktin;
@@ -826,7 +826,7 @@ int sftp_general_get(struct sftp_command *cmd, int restart)
     origfname = cmd->words[1];
     outfname = cmd->words[2];
 
-    fname = canonify(origfname, 0);
+    fname = canonify(origfname, false);
     if (!fname) {
         fzprintf(sftpError, "%s: canonify: %s", origfname, fxp_error());
         return 0;
@@ -873,7 +873,7 @@ int sftp_general_put(struct sftp_command *cmd, int restart)
 
     ret = 1;
 
-    outfname = canonify(origoutfname, 0);
+    outfname = canonify(origoutfname, false);
     if (!outfname) {
         fzprintf(sftpError, "%s: canonify: %s", origoutfname, fxp_error());
         return 0;
@@ -970,7 +970,7 @@ int sftp_cmd_rmdir(struct sftp_command *cmd)
         return 0;
     }
 
-    char * cname = canonify(cmd->words[1], NULL);
+    char * cname = canonify(cmd->words[1], false);
     if (!cname) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
         return 0;
@@ -1013,7 +1013,7 @@ int sftp_cmd_rm(struct sftp_command *cmd)
         return 0;
     }
 
-    char * cname = canonify(cmd->words[1], NULL);
+    char * cname = canonify(cmd->words[1], true);
     if (!cname) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
         return 0;
@@ -1063,13 +1063,13 @@ int sftp_cmd_mv(struct sftp_command *cmd)
         return 0;
     }
 
-    source = canonify(cmd->words[1], 0);
+    source = canonify(cmd->words[1], true);
     if (!source) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[1], fxp_error());
         return 0;
     }
 
-    target = canonify(cmd->words[2], 0);
+    target = canonify(cmd->words[2], true);
     if (!target) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
         sfree(source);
@@ -1251,7 +1251,7 @@ int sftp_cmd_chmod(struct sftp_command *cmd)
     }
 
 
-    char * cname = canonify(cmd->words[2], NULL);
+    char * cname = canonify(cmd->words[2], false);
     if (!cname) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
         return 0;
@@ -1277,7 +1277,7 @@ static int sftp_cmd_chmtime(struct sftp_command *cmd)
         return 0;
     }
 
-    char *cname = canonify(cmd->words[2], 0);
+    char *cname = canonify(cmd->words[2], false);
     if (!cname) {
         fzprintf(sftpError, "%s: canonify: %s", cmd->words[2], fxp_error());
         return 0;
@@ -1358,7 +1358,7 @@ static int sftp_cmd_mtime(struct sftp_command *cmd)
 
     filename = cmd->words[1];
 
-    cname = canonify(filename, 0);
+    cname = canonify(filename, false);
     if (!cname) {
         fzprintf(sftpError, "%s: canonify: %s", filename, fxp_error());
         return 0;
