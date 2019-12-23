@@ -408,8 +408,7 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
 }
 
 int pending_receive() {
-    // TODO
-    return 0;
+    return ssh_pending_receive(backend);
 }
 
 int sftp_put_file(char *fname, char *outfname, int restart)
