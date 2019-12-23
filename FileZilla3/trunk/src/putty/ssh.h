@@ -1568,3 +1568,5 @@ bool ssh_transient_hostkey_cache_verify(
 bool ssh_transient_hostkey_cache_has(
     ssh_transient_hostkey_cache *thc, const ssh_keyalg *alg);
 bool ssh_transient_hostkey_cache_non_empty(ssh_transient_hostkey_cache *thc);
+
+size_t ssh_pending_receive(Backend *be);

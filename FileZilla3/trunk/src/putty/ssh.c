@@ -1199,3 +1199,15 @@ const struct BackendVtable ssh_backend = {
     PROT_SSH,
     22
 };
+
+size_t ssh_pending_receive(Backend *be)
+{
+    Ssh *ssh = container_of(be, Ssh, backend);
+    if (!ssh || !ssh->s) {
+        return 0;
+    }
+
+    char tmp[64];
+    int r = recv_peek(ssh->s, tmp, 64);
+    return r > 0 ? r : 0;
+}
