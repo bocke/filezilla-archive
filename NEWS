@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.46.3 (2019-12-23)
+
+- SFTP: Fixed handle leak on Windows
+- SFTP: Remote paths were not fully resolved on all operations
+
 3.46.2 (2019-12-20)
 
 - SFTP: Fixed a regression connecting using a password-protected keyfile
