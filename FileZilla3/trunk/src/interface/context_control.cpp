@@ -735,3 +735,38 @@ void CContextControl::RestoreTabs()
 
 	SelectTab(selected);
 }
+
+namespace {
+bool SwitchFocus(wxWindow *focus, wxWindow *first, wxWindow *second)
+{
+	if (focus == first) {
+		if (second && second->IsShownOnScreen() && second->IsEnabled()) {
+			second->SetFocus();
+		}
+		return true;
+	}
+	return false;
+}
+}
+
+void CContextControl::_context_controls::SwitchFocusedSide()
+{
+	std::array<std::pair<wxWindow*, wxWindow*>, 3> ctrls =
+	{{
+		{pLocalListView, pRemoteListView},
+		{pLocalTreeView, pRemoteTreeView},
+		{pLocalViewHeader, pRemoteViewHeader}
+	}};
+	auto *focus = wxWindow::FindFocus();
+	while (focus) {
+		for (auto & p : ctrls) {
+			if (SwitchFocus(focus, p.first, p.second)) {
+					return;
+			}
+			if (SwitchFocus(focus, p.second, p.first)) {
+					return;
+			}
+		}
+		focus = focus->GetParent();
+	}
+}

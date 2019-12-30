@@ -2144,7 +2144,14 @@ void CMainFrame::OnNavigationKeyEvent(wxNavigationKeyEvent& event)
 
 void CMainFrame::OnChar(wxKeyEvent& event)
 {
-	if (event.GetKeyCode() != WXK_F6) {
+	if (event.GetKeyCode() == WXK_F7) {
+		auto * controls = m_pContextControl->GetCurrentControls();
+		if (controls) {
+			controls->SwitchFocusedSide();
+		}
+		return;
+	}
+	else if (event.GetKeyCode() != WXK_F6) {
 		event.Skip();
 		return;
 	}
