@@ -27,6 +27,8 @@
 
 #include <wx/wupdlock.h>
 
+#include <array>
+
 DECLARE_EVENT_TYPE(fzEVT_TAB_CLOSING_DEFERRED, -1)
 DEFINE_EVENT_TYPE(fzEVT_TAB_CLOSING_DEFERRED)
 
