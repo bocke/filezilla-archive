@@ -8,14 +8,13 @@
 #include <memory>
 
 class CertStore;
-class CMainFrame;
 class CQueueView;
 class CVerifyCertDialog;
 
 class CAsyncRequestQueue final : public wxEvtHandler, protected CGlobalStateEventHandler
 {
 public:
-	CAsyncRequestQueue(CMainFrame *pMainFrame);
+	CAsyncRequestQueue(wxTopLevelWindow * parent);
 	~CAsyncRequestQueue();
 
 	bool AddRequest(CFileZillaEngine *pEngine, std::unique_ptr<CAsyncRequestNotification> && pNotification);
@@ -33,10 +32,9 @@ protected:
 	// Request attention if needed
 	bool CheckWindowState();
 
-	CMainFrame *m_pMainFrame{};
+	wxTopLevelWindow *parent_{};
 	CQueueView *m_pQueueView{};
 	std::unique_ptr<CertStore> certStore_;
-	std::unique_ptr<CVerifyCertDialog> verifyCertDlg_;
 
 	bool ProcessNextRequest();
 	bool ProcessDefaults(CFileZillaEngine *pEngine, std::unique_ptr<CAsyncRequestNotification> & pNotification);
@@ -49,7 +47,7 @@ protected:
 		{
 		}
 
-		CFileZillaEngine *pEngine;
+		CFileZillaEngine *pEngine{};
 		std::unique_ptr<CAsyncRequestNotification> pNotification;
 	};
 	std::list<t_queueEntry> m_requestList;

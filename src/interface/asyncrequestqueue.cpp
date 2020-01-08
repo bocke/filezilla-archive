@@ -20,10 +20,9 @@ EVT_COMMAND(wxID_ANY, fzEVT_PROCESSASYNCREQUESTQUEUE, CAsyncRequestQueue::OnProc
 EVT_TIMER(wxID_ANY, CAsyncRequestQueue::OnTimer)
 END_EVENT_TABLE()
 
-CAsyncRequestQueue::CAsyncRequestQueue(CMainFrame *pMainFrame)
-	: m_pMainFrame(pMainFrame)
+CAsyncRequestQueue::CAsyncRequestQueue(wxTopLevelWindow *parent)
+	: parent_(parent)
 	, certStore_(std::make_unique<CertStore>())
-	, verifyCertDlg_(std::make_unique<CVerifyCertDialog>(*certStore_))
 {
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOVECONTEXT, false);
 	m_timer.SetOwner(this);
@@ -201,7 +200,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			notification.m_alwaysTrust = false;
 		}
 		else {
-			CVerifyHostkeyDialog::ShowVerificationDialog(m_pMainFrame, notification);
+			CVerifyHostkeyDialog::ShowVerificationDialog(parent_, notification);
 		}
 
 		SendReply(entry);
@@ -211,8 +210,10 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			return false;
 		}
 
-		auto & notification = static_cast<CCertificateNotification&>(*entry.pNotification.get());
-		verifyCertDlg_->ShowVerificationDialog(notification);
+		if (certStore_) {
+			auto & notification = static_cast<CCertificateNotification&>(*entry.pNotification.get());
+			CVerifyCertDialog::ShowVerificationDialog(*certStore_, notification);
+		}
 
 		SendReply(entry);
 	}
@@ -223,7 +224,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		auto & notification = static_cast<CInsecureConnectionNotification&>(*entry.pNotification.get());
 
-		ConfirmInsecureConection(m_pMainFrame, *certStore_.get(), notification);
+		ConfirmInsecureConection(parent_, *certStore_.get(), notification);
 
 		SendReply(entry);
 	}
@@ -261,7 +262,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 		}
 
 		CFileExistsDlg dlg(&notification);
-		dlg.Create(m_pMainFrame);
+		dlg.Create(parent_);
 		int res = dlg.ShowModal();
 
 		if (res == wxID_OK) {
@@ -349,7 +350,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 				msg.Printf(_("The file %s already exists.\nPlease enter a new name:"), fullName);
 				defaultName = notification.remoteFile;
 			}
-			wxTextEntryDialog dlg(m_pMainFrame, msg, _("Rename file"), defaultName);
+			wxTextEntryDialog dlg(parent_, msg, _("Rename file"), defaultName);
 
 			// Repeat until user cancels or enters a new name
 			for (;;) {
@@ -359,7 +360,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 						continue; // Disallow empty names
 					}
 					if (dlg.GetValue() == defaultName) {
-						wxMessageDialog dlg2(m_pMainFrame, _("You did not enter a new name for the file. Overwrite the file instead?"), _("Filename unchanged"),
+						wxMessageDialog dlg2(parent_, _("You did not enter a new name for the file. Overwrite the file instead?"), _("Filename unchanged"),
 							wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION | wxCANCEL);
 						int res2 = dlg2.ShowModal();
 
@@ -476,27 +477,27 @@ void CAsyncRequestQueue::TriggerProcessing()
 bool CAsyncRequestQueue::CheckWindowState()
 {
 	m_timer.Stop();
-	if (!wxDialogEx::CanShowPopupDialog()) {
+	if (!wxDialogEx::CanShowPopupDialog(parent_)) {
 		m_timer.Start(100, true);
 		return false;
 	}
 
 #ifndef __WXMAC__
-	if (m_pMainFrame->IsIconized()) {
+	if (parent_->IsIconized()) {
 #ifndef __WXGTK__
-		m_pMainFrame->Show();
-		m_pMainFrame->Iconize(true);
-		m_pMainFrame->RequestUserAttention();
+		parent_->Show();
+		parent_->Iconize(true);
+		parent_->RequestUserAttention();
 #endif
 		return false;
 	}
 
-	wxWindow* pFocus = m_pMainFrame->FindFocus();
-	while (pFocus && pFocus != m_pMainFrame) {
+	wxWindow* pFocus = parent_->FindFocus();
+	while (pFocus && pFocus != parent_) {
 		pFocus = pFocus->GetParent();
 	}
 	if (!pFocus) {
-		m_pMainFrame->RequestUserAttention();
+		parent_->RequestUserAttention();
 	}
 #endif
 
