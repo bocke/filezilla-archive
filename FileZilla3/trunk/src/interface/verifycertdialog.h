@@ -44,12 +44,14 @@ private:
 class CVerifyCertDialog final : protected wxDialogEx
 {
 public:
-	static void ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification, bool displayOnly = false);
+	static void ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification);
+
+	static void DisplayCertificate(CCertificateNotification const& notification);
 
 private:
-	void ShowVerificationDialog(CCertificateNotification& notification, bool displayOnly);
+	bool CreateVerificationDialog(CCertificateNotification const& notification, bool displayOnly);
 
-	CVerifyCertDialog(CertStore & certStore);
+	CVerifyCertDialog() = default;
 
 	bool DisplayAlgorithm(int controlId, std::string const& name, bool insecure);
 
@@ -65,7 +67,8 @@ private:
 
 	void OnCertificateChoice(wxCommandEvent& event);
 
-	CertStore & certStore_;
+	bool warning_{};
+	bool sanTrustAllowed_{};
 };
 
 void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecureConnectionNotification & notification);
