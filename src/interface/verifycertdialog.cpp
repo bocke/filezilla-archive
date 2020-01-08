@@ -352,14 +352,6 @@ void CertStore::SetTrusted(fz::tls_session_info const& info, bool permanent, boo
 }
 
 
-
-
-CVerifyCertDialog::CVerifyCertDialog(CertStore & certStore)
-	: certStore_(certStore)
-{
-}
-
-
 bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 {
 	bool warning = false;
@@ -464,20 +456,43 @@ bool CVerifyCertDialog::DisplayAlgorithm(int controlId, std::string const& name,
 	return insecure;
 }
 
-void CVerifyCertDialog::ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification, bool displayOnly)
+void CVerifyCertDialog::ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification)
 {
-	CVerifyCertDialog dlg(certStore);
+	CVerifyCertDialog dlg;
+	if (!dlg.CreateVerificationDialog(notification, false)) {
+		return;
+	}
 
-	dlg.ShowVerificationDialog(notification, displayOnly);
+	int res = dlg.ShowModal();
+	if (res == wxID_OK) {
+		notification.trusted_ = true;
+
+		if (!notification.info_.get_algorithm_warnings()) {
+			bool trustSANs = dlg.sanTrustAllowed_ && xrc_call(dlg, "ID_TRUST_SANS", &wxCheckBox::GetValue);
+			bool permanent = !dlg.warning_ && xrc_call(dlg, "ID_ALWAYS", &wxCheckBox::GetValue);
+			certStore.SetTrusted(notification.info_, permanent, trustSANs);
+		}
+	}
+	else {
+		notification.trusted_ = false;
+	}
 }
 
-void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notification, bool displayOnly)
+void CVerifyCertDialog::DisplayCertificate(CCertificateNotification const& notification)
 {
-	fz::tls_session_info& info = notification.info_;
+	CVerifyCertDialog dlg;
+	if (dlg.CreateVerificationDialog(notification, true)) {
+		dlg.ShowModal();
+	}
+}
+
+bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const& notification, bool displayOnly)
+{
+	fz::tls_session_info const& info = notification.info_;
 
 	if (!Load(0, L"ID_VERIFYCERT", L"certificate.xrc")) {
 		wxBell();
-		return;
+		return false;
 	}
 
 	if (displayOnly) {
@@ -536,7 +551,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	}
 	GetSizer()->SetMinSize(minSize);
 
-	bool warning = DisplayCert(m_certificates[0]);
+	warning_ = DisplayCert(m_certificates[0]);
 
 	DisplayAlgorithm(XRCID("ID_PROTOCOL"), info.get_protocol(), (info.get_algorithm_warnings() & fz::tls_session_info::tlsver) != 0);
 	DisplayAlgorithm(XRCID("ID_KEYEXCHANGE"), info.get_key_exchange(), (info.get_algorithm_warnings() & fz::tls_session_info::kex) != 0);
@@ -544,19 +559,19 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	DisplayAlgorithm(XRCID("ID_MAC"), info.get_session_mac(), (info.get_algorithm_warnings() & fz::tls_session_info::mac) != 0);
 
 	if (info.get_algorithm_warnings() != 0) {
-		warning = true;
+		warning_ = true;
 	}
 
-	if (warning) {
+	if (warning_) {
 		XRCCTRL(*this, "ID_IMAGE", wxStaticBitmap)->SetBitmap(wxArtProvider::GetBitmap(wxART_WARNING));
 		XRCCTRL(*this, "ID_ALWAYS", wxCheckBox)->Enable(false);
 	}
 
 	bool const dnsname = fz::get_address_type(info.get_host()) == fz::address_type::unknown;
-	bool const sanTrustAllowed = !warning && dnsname && !info.mismatched_hostname();
-	XRCCTRL(*this, "ID_TRUST_SANS", wxCheckBox)->Enable(sanTrustAllowed);
+	sanTrustAllowed_ = !warning_ && dnsname && !info.mismatched_hostname();
+	XRCCTRL(*this, "ID_TRUST_SANS", wxCheckBox)->Enable(sanTrustAllowed_);
 
-	if (sanTrustAllowed && info.system_trust()) {
+	if (sanTrustAllowed_ && info.system_trust()) {
 		xrc_call(*this, "ID_ALWAYS", &wxCheckBox::SetValue, true);
 		xrc_call(*this, "ID_TRUST_SANS", &wxCheckBox::SetValue, true);
 	}
@@ -564,22 +579,7 @@ void CVerifyCertDialog::ShowVerificationDialog(CCertificateNotification& notific
 	GetSizer()->Fit(this);
 	GetSizer()->SetSizeHints(this);
 
-	int res = ShowModal();
-
-	if (!displayOnly) {
-		if (res == wxID_OK) {
-			notification.trusted_ = true;
-
-			if (!info.get_algorithm_warnings()) {
-				bool trustSANs = sanTrustAllowed && xrc_call(*this, "ID_TRUST_SANS", &wxCheckBox::GetValue);
-				bool permanent = !warning && xrc_call(*this, "ID_ALWAYS", &wxCheckBox::GetValue);
-				certStore_.SetTrusted(info, permanent, trustSANs);
-			}
-		}
-		else {
-			notification.trusted_ = false;
-		}
-	}
+	return true;
 }
 
 namespace {
