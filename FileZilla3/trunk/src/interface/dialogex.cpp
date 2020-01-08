@@ -14,7 +14,7 @@ BEGIN_EVENT_TABLE(wxDialogEx, wxDialog)
 EVT_CHAR_HOOK(wxDialogEx::OnChar)
 END_EVENT_TABLE()
 
-int wxDialogEx::m_shown_dialogs = 0;
+std::vector<wxDialogEx*> wxDialogEx::shown_dialogs_;
 
 #ifdef __WXMAC__
 static int const pasteId = wxNewId();
@@ -128,7 +128,7 @@ int wxDialogEx::ShowModal()
 	::ReleaseCapture();
 #endif
 
-	++m_shown_dialogs;
+	shown_dialogs_.push_back(this);
 
 	if (acceleratorTable_.empty()) {
 		SetAcceleratorTable(wxNullAcceleratorTable);
@@ -139,7 +139,7 @@ int wxDialogEx::ShowModal()
 
 	int ret = wxDialog::ShowModal();
 
-	--m_shown_dialogs;
+	shown_dialogs_.pop_back();
 
 	return ret;
 }
@@ -154,10 +154,15 @@ bool wxDialogEx::ReplaceControl(wxWindow* old, wxWindow* wnd)
 	return true;
 }
 
-bool wxDialogEx::CanShowPopupDialog()
+bool wxDialogEx::CanShowPopupDialog(wxTopLevelWindow * parent)
 {
-	if (m_shown_dialogs != 0 || IsShowingMessageBox()) {
-		// There already is a dialog or message box showing
+	if (IsShowingMessageBox()) {
+		// There already a message box showing
+		return false;
+	}
+
+	if (!shown_dialogs_.empty() && shown_dialogs_.back() != parent) {
+		// There is an open dialog which isn't the expected parent
 		return false;
 	}
 

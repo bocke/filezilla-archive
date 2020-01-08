@@ -516,8 +516,7 @@ void CStatusBar::OnHandleLeftClick(wxWindow* pWnd)
 		CSftpEncryptionNotification *pSftpEncryptionNotification = 0;
 		if (pState->GetSecurityInfo(pCertificateNotification)) {
 			CertStore certStore;
-			CVerifyCertDialog dlg(certStore);
-			dlg.ShowVerificationDialog(*pCertificateNotification, true);
+			CVerifyCertDialog::ShowVerificationDialog(certStore, *pCertificateNotification, true);
 		}
 		else if (pState->GetSecurityInfo(pSftpEncryptionNotification)) {
 			CSftpEncryptioInfoDialog dlg;

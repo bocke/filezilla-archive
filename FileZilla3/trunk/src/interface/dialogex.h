@@ -50,7 +50,7 @@ public:
 
 	bool ReplaceControl(wxWindow* old, wxWindow* wnd);
 
-	static bool CanShowPopupDialog();
+	static bool CanShowPopupDialog(wxTopLevelWindow * parent = 0);
 
 	DialogLayout const& layout();
 
@@ -65,7 +65,7 @@ protected:
 	virtual bool ProcessEvent(wxEvent& event);
 #endif
 
-	static int m_shown_dialogs;
+	static std::vector<wxDialogEx*> shown_dialogs_;
 
 	std::unique_ptr<DialogLayout> layout_;
 
