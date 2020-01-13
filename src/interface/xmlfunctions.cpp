@@ -344,7 +344,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 				std::wstring encoding = GetTextAttribute(passElement, "encoding");
 
 				if (encoding == _T("base64")) {
-					std::string decoded = fz::base64_decode(passElement.child_value());
+					std::string decoded = fz::base64_decode_s(passElement.child_value());
 					pass = fz::to_wstring_from_utf8(decoded);
 				}
 				else if (encoding == _T("crypt")) {

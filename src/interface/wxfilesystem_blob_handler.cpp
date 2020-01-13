@@ -46,11 +46,11 @@ wxFSFile* wxFileSystemBlobHandler::OpenFile(wxFileSystem&, const wxString& locat
 	}
 	else if (pos == 6) {
 		// base64
-		std::string data = fz::base64_decode(fz::to_utf8(location.Mid(pos + 1)));
+		auto const data = fz::base64_decode(fz::to_utf8(location.Mid(pos + 1)));
 		if (!data.empty()) {
 			buf = static_cast<unsigned char*>(malloc(data.size()));
 			if (buf) {
-				memcpy(buf, data.c_str(), data.size());
+				memcpy(buf, data.data(), data.size());
 				buf_len = data.size();
 			}
 		}
