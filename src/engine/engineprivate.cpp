@@ -73,6 +73,24 @@ bool CFileZillaEnginePrivate::ShouldQueueLogsFromOptions() const
 		m_options.GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) == 0;
 }
 
+namespace {
+// Removes item from a random access container,
+// filling the hole by moving the last item.
+template<typename C, typename V>
+void erase_unordered(C & container, V const& v) noexcept
+{
+	for (size_t i = 0; i < container.size(); ++i) {
+		if (container[i] == v) {
+			if (i + 1 < container.size()) {
+				container[i] = std::move(container[container.size()]);
+			}
+			container.pop_back();
+			return;
+		}
+	}
+}
+}
+
 CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 {
 	remove_handler();
@@ -91,13 +109,7 @@ CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 	// Remove ourself from the engine list
 	{
 		fz::scoped_lock lock(global_mutex_);
-		m_engineList.erase(std::remove(m_engineList.begin(), m_engineList.end(), this), m_engineList.end());
-		for (auto iter = m_engineList.begin(); iter != m_engineList.end(); ++iter) {
-			if (*iter == this) {
-				m_engineList.erase(iter);
-				break;
-			}
-		}
+		erase_unordered(m_engineList, this);
 	}
 }
 
@@ -618,11 +630,7 @@ void CFileZillaEnginePrivate::operator()(fz::event_base const& ev)
 
 int CFileZillaEnginePrivate::CheckCommandPreconditions(CCommand const& command, bool checkBusy)
 {
-	if (!command.valid()) {
-		logger_->log(logmsg::debug_warning, L"Command not valid");
-		return FZ_REPLY_SYNTAXERROR;
-	}
-	else if (checkBusy && IsBusy()) {
+	if (checkBusy && IsBusy()) {
 		return FZ_REPLY_BUSY;
 	}
 	else if (command.GetId() != Command::connect && command.GetId() != Command::disconnect && !IsConnected()) {
@@ -775,8 +783,13 @@ void CFileZillaEnginePrivate::OnSetAsyncRequestReplyEvent(std::unique_ptr<CAsync
 	controlSocket_->CallSetAsyncRequestReply(reply.get());
 }
 
-int CFileZillaEnginePrivate::Execute(const CCommand &command)
+int CFileZillaEnginePrivate::Execute(CCommand const& command)
 {
+	if (!command.valid()) {
+		logger_->log(logmsg::debug_warning, L"Command not valid");
+		return FZ_REPLY_SYNTAXERROR;
+	}
+
 	fz::scoped_lock lock(mutex_);
 
 	int res = CheckCommandPreconditions(command, true);
