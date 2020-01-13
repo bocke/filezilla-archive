@@ -416,8 +416,8 @@ void CUpdater::ProcessNotification(std::unique_ptr<CNotification> && notificatio
 						auto const& ca = certs.back();
 						std::vector<uint8_t> ca_data = ca.get_raw_data();
 
-						std::string updater_root = fz::base64_decode(s_update_cert);
-						if (ca_data.size() == updater_root.size() && !memcmp(&ca_data[0], updater_root.c_str(), ca_data.size())) {
+						auto const updater_root = fz::base64_decode(s_update_cert);
+						if (ca_data == updater_root) {
 							certNotification.trusted_ = true;
 						}
 					}
@@ -790,7 +790,7 @@ void CUpdater::ParseData()
 
 					if (!raw_sig.empty() || !raw_hash.empty()) {
 						auto const pub = fz::public_verification_key::from_base64("xrjuitldZT7pvIhK9q1GVNfptrepB/ctt5aK1QO5RaI");
-						valid_signature = fz::verify(std::string_view(reinterpret_cast<char const*>(raw_hash.data()), raw_hash.size()), raw_sig, pub);
+						valid_signature = fz::verify(raw_hash, raw_sig, pub);
 					}
 				}
 			}
