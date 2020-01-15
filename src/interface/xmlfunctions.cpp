@@ -134,14 +134,16 @@ void CXmlFile::UpdateMetadata()
 	SetTextAttributeUtf8(m_element, "platform", platform);
 }
 
-bool CXmlFile::Save(bool printError)
+bool CXmlFile::Save(bool printError, bool updateMetadata)
 {
 	m_error.clear();
 
 	wxCHECK(!m_fileName.empty(), false);
 	wxCHECK(m_document, false);
 
-	UpdateMetadata();
+	if (updateMetadata) {
+		UpdateMetadata();
+	}
 
 	bool res = SaveXmlFile();
 	m_modificationTime = fz::local_filesys::get_modification_time(fz::to_native(m_fileName));
@@ -590,10 +592,10 @@ void CXmlFile::GetRawDataHere(char* p, size_t size) // p has to big enough to ho
 	m_document.save(writer);
 }
 
-bool CXmlFile::ParseData(char* data)
+bool CXmlFile::ParseData(uint8_t const* data, size_t len)
 {
 	Close();
-	m_document.load_string(data);
+	m_document.load_buffer(data, len);
 	m_element = m_document.child(m_rootName.c_str());
 	if (!m_element) {
 		Close();
