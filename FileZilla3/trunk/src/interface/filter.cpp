@@ -842,7 +842,9 @@ bool CFilterManager::LoadFilter(pugi::xml_node& element, CFilter& filter)
 			continue;
 		}
 
-		filter.filters.push_back(condition);
+		if (filter.filters.size() < 1000) {
+			filter.filters.push_back(condition);
+		}
 	}
 
 	if (filter.filters.empty()) {

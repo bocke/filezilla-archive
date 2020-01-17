@@ -182,6 +182,10 @@ void CFilterConditionsDialog::SetSelectionFromType(wxChoice* pChoice, t_filterTy
 
 void CFilterConditionsDialog::OnMore()
 {
+	if (m_filterControls.size() > 1000) {
+		return;
+	}
+
 	CFilterCondition cond;
 	m_currentFilter.filters.push_back(cond);
 

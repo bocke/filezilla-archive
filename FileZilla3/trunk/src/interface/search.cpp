@@ -1354,8 +1354,9 @@ void CSearchDialog::LoadConditions()
 	}
 
 	auto filter = document.child("Filter");
-	if (!filter)
+	if (!filter) {
 		return;
+	}
 
 	if (!CFilterManager::LoadFilter(filter, m_search_filter)) {
 		m_search_filter = CFilter();
