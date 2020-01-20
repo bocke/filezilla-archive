@@ -695,7 +695,7 @@ void CUpdater::ParseData()
 				auto const& token = tokens[i];
 				if (token.substr(0, 4) == "sig:") {
 					auto const& sig = token.substr(4);
-					auto raw_sig = fz::base64_decode(fz::to_utf8(sig));
+					auto raw_sig = fz::base64_decode_s(fz::to_utf8(sig));
 
 					if (!raw_sig.empty()) {
 						auto const pub = fz::public_verification_key::from_base64("xrjuitldZT7pvIhK9q1GVNfptrepB/ctt5aK1QO5RaI");
