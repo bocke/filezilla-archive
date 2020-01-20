@@ -271,25 +271,18 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 			}
 		}
 
-		if (!m_bIsInCommand) {
-			COperationNotification *notification = new COperationNotification();
-			notification->nReplyCode = nErrorCode;
-			notification->commandId = m_pCurrentCommand->GetId();
-			AddNotification(notification);
-		}
-		else {
-			m_nControlSocketError |= nErrorCode;
-		}
+		COperationNotification *notification = new COperationNotification();
+		notification->nReplyCode = nErrorCode;
+		notification->commandId = m_pCurrentCommand->GetId();
+		AddNotification(notification);
 
 		m_pCurrentCommand.reset();
 	}
 	else if (nErrorCode & FZ_REPLY_DISCONNECTED) {
-		if (!m_bIsInCommand) {
-			COperationNotification *notification = new COperationNotification();
-			notification->nReplyCode = nErrorCode;
-			notification->commandId = Command::none;
-			AddNotification(notification);
-		}
+		COperationNotification *notification = new COperationNotification();
+		notification->nReplyCode = nErrorCode;
+		notification->commandId = Command::none;
+		AddNotification(notification);
 	}
 
 	if (nErrorCode != FZ_REPLY_OK) {
@@ -321,7 +314,6 @@ int CFileZillaEnginePrivate::Connect(CConnectCommand const& command)
 	// The destructor can call CFileZillaEnginePrivate::ResetOperation
 	// which would delete m_pCurrentCommand
 	controlSocket_.reset();
-	m_nControlSocketError = 0;
 
 	auto const& server = command.GetServer();
 	if (server.GetPort() != CServer::GetDefaultPort(server.GetProtocol())) {
@@ -522,9 +514,6 @@ void CFileZillaEnginePrivate::OnTimer(fz::timer_id)
 	controlSocket_.reset();
 
 	int res = ContinueConnect();
-	res |= m_nControlSocketError;
-	m_nControlSocketError = 0;
-
 	if (res == FZ_REPLY_CONTINUE) {
 		assert(controlSocket_);
 		controlSocket_->SendNextCommand();
@@ -702,13 +691,9 @@ void CFileZillaEnginePrivate::OnCommandEvent()
 			}
 		}
 
-		if (id != Command::disconnect) {
-			res |= m_nControlSocketError;
-		}
-		else if (res & FZ_REPLY_DISCONNECTED) {
+		if (id == Command::disconnect && (res & FZ_REPLY_DISCONNECTED)) {
 			res = FZ_REPLY_OK;
 		}
-		m_nControlSocketError = 0;
 
 		if (res == FZ_REPLY_CONTINUE) {
 			assert(controlSocket_);

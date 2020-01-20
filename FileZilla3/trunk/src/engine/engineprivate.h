@@ -177,9 +177,6 @@ protected:
 	bool m_maySendNotificationEvent{true};
 	unsigned int m_asyncRequestCounter{};
 
-	bool m_bIsInCommand{}; //true if Command is on the callstack
-	int m_nControlSocketError{};
-
 	COptionsBase& m_options;
 
 	std::unique_ptr<CLogging> logger_;
