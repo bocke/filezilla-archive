@@ -39,6 +39,8 @@ public:
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) override;
 
 protected:
+	virtual void Push(std::unique_ptr<COpData> && pNewOpData) override;
+
 	// Replaces filename"with"quotes with
 	// "filename""with""quotes"
 	std::wstring QuoteFilename(std::wstring const& filename);

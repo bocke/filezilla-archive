@@ -20,7 +20,6 @@
 #include "sftpcontrolsocket.h"
 
 #include <libfilezilla/event_loop.hpp>
-#include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>
 
 #include <algorithm>
@@ -44,45 +43,15 @@ CSftpControlSocket::~CSftpControlSocket()
 
 void CSftpControlSocket::Connect(CServer const& server, Credentials const& credentials)
 {
-	log(logmsg::status, _("Connecting to %s..."), server.Format(ServerFormat::with_optional_port, credentials));
-	SetWait(true);
-
-	m_sftpEncryptionDetails = CSftpEncryptionNotification();
-
 	if (server.GetEncodingType() == ENCODING_CUSTOM) {
 		log(logmsg::debug_info, L"Using custom encoding: %s", server.GetCustomEncoding());
 		m_useUTF8 = false;
 	}
-	else {
-		m_useUTF8 = true;
-	}
 
 	currentServer_ = server;
+	credentials_ = credentials;
 
-	auto pData = std::make_unique<CSftpConnectOpData>(*this, credentials);
-	if (!credentials.keyFile_.empty()) {
-		pData->keyfiles_ = fz::strtok(credentials.keyFile_, L"\r\n");
-	}
-	else {
-		pData->keyfiles_ = fz::strtok(engine_.GetOptions().GetOption(OPTION_SFTP_KEYFILES), L"\r\n");
-	}
-
-	pData->keyfiles_.erase(
-		std::remove_if(pData->keyfiles_.begin(), pData->keyfiles_.end(),
-			[this](std::wstring const& keyfile) {
-				if (fz::local_filesys::get_file_type(fz::to_native(keyfile), true) != fz::local_filesys::file) {
-					log(logmsg::status, _("Skipping non-existing key file \"%s\""), keyfile);
-					return true;
-				}
-				return false;
-		}), pData->keyfiles_.end());
-
-	pData->keyfile_ = pData->keyfiles_.cbegin();
-
-	process_ = std::make_unique<fz::process>();
-
-	engine_.GetRateLimiter().add(this);
-	Push(std::move(pData));
+	Push(std::make_unique<CSftpConnectOpData>(*this));
 }
 
 void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
@@ -185,7 +154,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 			std::wstring const challengeIdentifier = m_requestPreamble + L"\n" + m_requestInstruction + L"\n" + message.text[0];
 
 			CInteractiveLoginNotification::type t = CInteractiveLoginNotification::interactive;
-			if (data.credentials_.logonType_ == LogonType::interactive || m_requestPreamble == L"SSH key passphrase") {
+			if (credentials_.logonType_ == LogonType::interactive || m_requestPreamble == L"SSH key passphrase") {
 				if (m_requestPreamble == L"SSH key passphrase") {
 					t = CInteractiveLoginNotification::keyfile;
 				}
@@ -203,7 +172,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 				CInteractiveLoginNotification *pNotification = new CInteractiveLoginNotification(t, challenge, data.lastChallenge == challengeIdentifier);
 				pNotification->server = currentServer_;
 				pNotification->handle_ = handle_;
-				pNotification->credentials = data.credentials_;
+				pNotification->credentials = credentials_;
 
 				SendAsyncRequest(pNotification);
 			}
@@ -220,7 +189,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 					return;
 				}
 
-				std::wstring const pass = (data.credentials_.logonType_ == LogonType::anonymous) ? L"anonymous@example.com" : data.credentials_.GetPass();
+				std::wstring const pass = (credentials_.logonType_ == LogonType::anonymous) ? L"anonymous@example.com" : credentials_.GetPass();
 				std::wstring show = L"Pass: ";
 				show.append(pass.size(), '*');
 				SendCommand(pass, show);
@@ -417,8 +386,6 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 				return false;
 			}
 
-			auto & data = static_cast<CSftpConnectOpData&>(*operations_.back());
-
 			auto *pInteractiveLoginNotification = static_cast<CInteractiveLoginNotification *>(pNotification);
 
 			if (!pInteractiveLoginNotification->passwordSet) {
@@ -427,7 +394,7 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 			}
 			std::wstring const& pass = pInteractiveLoginNotification->credentials.GetPass();
 			if (pInteractiveLoginNotification->GetType() != CInteractiveLoginNotification::keyfile) {
-				data.credentials_.SetPass(pass);
+				credentials_.SetPass(pass);
 			}
 			std::wstring show = L"Pass: ";
 			show.append(pass.size(), '*');
@@ -444,21 +411,6 @@ bool CSftpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 
 void CSftpControlSocket::List(CServerPath const& path, std::wstring const& subDir, int flags)
 {
-	CServerPath newPath = currentPath_;
-	if (!path.empty()) {
-		newPath = path;
-	}
-	if (!newPath.ChangePath(subDir)) {
-		newPath.clear();
-	}
-
-	if (newPath.empty()) {
-		log(logmsg::status, _("Retrieving directory listing..."));
-	}
-	else {
-		log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
-	}
-
 	Push(std::make_unique<CSftpListOpData>(*this, path, subDir, flags));
 }
 
@@ -550,6 +502,9 @@ int CSftpControlSocket::DoClose(int nErrorCode)
 		event_loop_.filter_events(threadEventsFilter);
 	}
 	process_.reset();
+
+	m_sftpEncryptionDetails = CSftpEncryptionNotification();
+
 	return CControlSocket::DoClose(nErrorCode);
 }
 
@@ -562,15 +517,6 @@ void CSftpControlSocket::Cancel()
 
 void CSftpControlSocket::Mkdir(CServerPath const& path)
 {
-	/* Directory creation works like this: First find a parent directory into
-	 * which we can CWD, then create the subdirs one by one. If either part
-	 * fails, try MKD with the full path directly.
-	 */
-
-	if (operations_.empty()) {
-		log(logmsg::status, _("Creating directory '%s'..."), path.GetPath());
-	}
-
 	auto pData = std::make_unique<CSftpMkdirOpData>(*this);
 	pData->path_ = path;
 	Push(std::move(pData));
@@ -587,7 +533,7 @@ void CSftpControlSocket::Delete(const CServerPath& path, std::vector<std::wstrin
 	assert(!files.empty());
 
 	log(logmsg::debug_verbose, L"CSftpControlSocket::Delete");
-	
+
 	auto pData = std::make_unique<CSftpDeleteOpData>(*this);
 	pData->path_ = path;
 	pData->files_ = std::move(files);
@@ -606,13 +552,11 @@ void CSftpControlSocket::RemoveDir(CServerPath const& path, std::wstring const& 
 
 void CSftpControlSocket::Chmod(CChmodCommand const& command)
 {
-	log(logmsg::status, _("Setting permissions of '%s' to '%s'"), command.GetPath().FormatFilename(command.GetFile()), command.GetPermission());
 	Push(std::make_unique<CSftpChmodOpData>(*this, command));
 }
 
 void CSftpControlSocket::Rename(CRenameCommand const& command)
 {
-	log(logmsg::status, _("Renaming '%s' to '%s'"), command.GetFromPath().FormatFilename(command.GetFromFile()), command.GetToPath().FormatFilename(command.GetToFile()));
 	Push(std::make_unique<CSftpRenameOpData>(*this, command));
 }
 
@@ -655,4 +599,16 @@ void CSftpControlSocket::operator()(fz::event_base const& ev)
 	}
 
 	CControlSocket::operator()(ev);
+}
+
+void CSftpControlSocket::Push(std::unique_ptr<COpData> && pNewOpData)
+{
+	CControlSocket::Push(std::move(pNewOpData));
+	if (operations_.size() == 1 && operations_.back()->opId != Command::connect) {
+		if (!process_) {
+			std::unique_ptr<COpData> connOp = std::make_unique<CSftpConnectOpData>(*this);
+			connOp->topLevelOperation_ = true;
+			CControlSocket::Push(std::move(connOp));
+		}
+	}
 }

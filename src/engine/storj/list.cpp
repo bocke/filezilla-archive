@@ -15,21 +15,14 @@ int CStorjListOpData::Send()
 {
 	switch (opState) {
 	case list_init:
-		if (!subDir_.empty()) {
-			log(logmsg::error, _("Invalid path"));
-			return FZ_REPLY_ERROR;
-		}
-
+		path_ = CServerPath::GetChanged(currentPath_, path_, subDir_);
+		subDir_.clear();
 		if (path_.empty()) {
 			path_ = CServerPath(L"/");
 		}
-
 		currentPath_ = path_;
 
-		if (!currentServer_) {
-			log(logmsg::debug_warning, L"CStorjListOpData::Send called with m_pCurrenServer == 0");
-			return FZ_REPLY_INTERNALERROR;
-		}
+		log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), currentPath_.GetPath());
 
 		if (currentPath_.GetType() != ServerType::UNIX) {
 			log(logmsg::debug_warning, L"CStorjListOpData::Send called with incompatible server type %d in path", currentPath_.GetType());

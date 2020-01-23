@@ -758,12 +758,6 @@ bool CQueueView::TryStartNextTransfer()
 
 void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification const& notification)
 {
-	if (notification.nReplyCode & FZ_REPLY_DISCONNECTED &&
-		notification.commandId == ::Command::none)
-	{
-		// Queue is not interested in disconnect notifications
-		return;
-	}
 	wxASSERT(notification.commandId != ::Command::none);
 
 	// Cancel pending requests
@@ -856,10 +850,6 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 					return;
 				}
 			}
-
-			if (!pEngineData->transient) {
-				SwitchEngine(&pEngineData);
-			}
 		}
 		break;
 	case t_EngineData::transfer:
@@ -914,11 +904,6 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 				return;
 			}
 		}
-		if (replyCode & FZ_REPLY_DISCONNECTED) {
-			if (!SwitchEngine(&pEngineData)) {
-				pEngineData->state = t_EngineData::connect;
-			}
-		}
 		break;
 	case t_EngineData::mkdir:
 		if (replyCode == FZ_REPLY_OK) {
@@ -928,15 +913,6 @@ void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification 
 		if (replyCode & FZ_REPLY_DISCONNECTED) {
 			if (!IncreaseErrorCount(*pEngineData)) {
 				return;
-			}
-
-			if (pEngineData->transient) {
-				ResetEngine(*pEngineData, ResetReason::retry);
-				return;
-			}
-
-			if (!SwitchEngine(&pEngineData)) {
-				pEngineData->state = t_EngineData::connect;
 			}
 		}
 		else {
@@ -2886,72 +2862,6 @@ void CQueueView::OnActionAfterTimerTick()
 	}
 }
 #endif
-
-bool CQueueView::SwitchEngine(t_EngineData** ppEngineData)
-{
-	if (m_engineData.size() < 2) {
-		return false;
-	}
-
-	t_EngineData* pEngineData = *ppEngineData;
-	for (auto & pNewEngineData : m_engineData) {
-		if (pNewEngineData == pEngineData) {
-			continue;
-		}
-
-		if (pNewEngineData->active || pNewEngineData->transient) {
-			continue;
-		}
-
-		if (pNewEngineData->lastSite != pEngineData->lastSite) {
-			continue;
-		}
-
-		if (!pNewEngineData->pEngine->IsConnected()) {
-			continue;
-		}
-
-		wxASSERT(!pNewEngineData->pItem);
-		pNewEngineData->pItem = pEngineData->pItem;
-		pNewEngineData->pItem->m_pEngineData = pNewEngineData;
-		pEngineData->pItem = 0;
-
-		pNewEngineData->active = true;
-		pEngineData->active = false;
-
-		delete pNewEngineData->m_idleDisconnectTimer;
-		pNewEngineData->m_idleDisconnectTimer = 0;
-
-		// Swap status line
-		CStatusLineCtrl* pOldStatusLineCtrl = pNewEngineData->pStatusLineCtrl;
-		pNewEngineData->pStatusLineCtrl = pEngineData->pStatusLineCtrl;
-		if (pNewEngineData->pStatusLineCtrl) {
-			pNewEngineData->pStatusLineCtrl->SetEngineData(pNewEngineData);
-		}
-		if (pOldStatusLineCtrl) {
-			pEngineData->pStatusLineCtrl = pOldStatusLineCtrl;
-			pEngineData->pStatusLineCtrl->SetEngineData(pEngineData);
-		}
-
-		// Set new state
-		if (pNewEngineData->pItem->GetType() == QueueItemType::File) {
-			pNewEngineData->state = t_EngineData::transfer;
-		}
-		else {
-			pNewEngineData->state = t_EngineData::mkdir;
-		}
-		if (pNewEngineData->pStatusLineCtrl) {
-			pNewEngineData->pStatusLineCtrl->ClearTransferStatus();
-		}
-
-		pEngineData->state = t_EngineData::none;
-
-		*ppEngineData = pNewEngineData;
-		return true;
-	}
-
-	return false;
-}
 
 bool CQueueView::IsOtherEngineConnected(t_EngineData* pEngineData)
 {

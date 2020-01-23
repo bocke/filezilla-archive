@@ -59,7 +59,7 @@ Command CControlSocket::GetCurrentCommandId() const
 		return operations_.back()->opId;
 	}
 
-	return engine_.GetCurrentCommandId();
+	return Command::none;
 }
 
 void CControlSocket::LogTransferResultMessage(int nErrorCode, CFileTransferOpData *pData)
@@ -137,18 +137,18 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		nErrorCode = oldOperation->Reset(nErrorCode);
 	}
 	if (!operations_.empty()) {
-		int ret;
 		if (nErrorCode == FZ_REPLY_OK ||
 			nErrorCode == FZ_REPLY_ERROR ||
 			nErrorCode == FZ_REPLY_CRITICALERROR ||
 			nErrorCode == FZ_REPLY_ERROR_NOTFOUND)
 		{
-			ret = ParseSubcommandResult(nErrorCode, *oldOperation);
+			if (!oldOperation->topLevelOperation_) {
+				return ParseSubcommandResult(nErrorCode, *oldOperation);
+			}
 		}
 		else {
-			ret = ResetOperation(nErrorCode);
+			return ResetOperation(nErrorCode);
 		}
-		return ret;
 	}
 
 	std::wstring prefix;
@@ -215,14 +215,18 @@ int CControlSocket::ResetOperation(int nErrorCode)
 
 	engine_.transfer_status_.Reset();
 
-	SetWait(false);
-
 	if (m_invalidateCurrentPath) {
 		currentPath_.clear();
 		m_invalidateCurrentPath = false;
 	}
 
-	return engine_.ResetOperation(nErrorCode);
+	if (operations_.empty()) {
+		SetWait(false);
+		return engine_.ResetOperation(nErrorCode);
+	}
+	else {
+		return SendNextCommand();
+	}
 }
 
 void CControlSocket::UpdateCache(COpData const &, CServerPath const& serverPath, std::wstring const& remoteFile, int64_t fileSize)
@@ -236,18 +240,7 @@ void CControlSocket::UpdateCache(COpData const &, CServerPath const& serverPath,
 int CControlSocket::DoClose(int nErrorCode)
 {
 	log(logmsg::debug_debug, L"CControlSocket::DoClose(%d)", nErrorCode);
-	if (m_closed) {
-		assert(operations_.empty());
-		return nErrorCode;
-	}
-
-	m_closed = true;
-
-	nErrorCode = ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED | nErrorCode);
-
-	currentServer_.clear();
-
-	return nErrorCode;
+	return ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED | nErrorCode);
 }
 
 std::wstring CControlSocket::ConvertDomainName(std::wstring const& domain)
@@ -873,8 +866,6 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 		}
 	}
 
-	m_closed = false;
-
 	int res = active_layer_->connect(fz::to_native(ConvertDomainName(host)), port);
 
 	if (res) {
@@ -1125,6 +1116,16 @@ void CControlSocket::Chmod(CChmodCommand const&)
 	Push(std::make_unique<CNotSupportedOpData>());
 }
 
+void CControlSocket::Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry)
+{
+	Push(std::make_unique<LookupOpData>(*this, path, file, entry));
+}
+
+void CControlSocket::Lookup(CServerPath const& path, std::vector<std::wstring> const& files)
+{
+	Push(std::make_unique<LookupManyOpData>(*this, path, files));
+}
+
 void CControlSocket::operator()(fz::event_base const& ev)
 {
 	fz::dispatch<fz::timer_event, CObtainLockEvent>(ev, this,
@@ -1158,16 +1159,6 @@ void CControlSocket::CallSetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 
 	SetAlive();
 	SetAsyncRequestReply(pNotification);
-}
-
-void CControlSocket::Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry)
-{
-	Push(std::make_unique<LookupOpData>(*this, path, file, entry));
-}
-
-void CControlSocket::Lookup(CServerPath const& path, std::vector<std::wstring> const& files)
-{
-	Push(std::make_unique<LookupManyOpData>(*this, path, files));
 }
 
 int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::duration const& lastChunkDuration, int64_t minChunkSize, int64_t multiple, int64_t partCount, int64_t maxPartCount, int64_t maxChunkSize)

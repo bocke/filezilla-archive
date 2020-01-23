@@ -14,16 +14,19 @@ enum listStates
 int CSftpListOpData::Send()
 {
 	if (opState == list_init) {
-		if (!currentServer_) {
-			log(logmsg::debug_warning, L"currenServer_ is empty");
-			return FZ_REPLY_INTERNALERROR;
-		}
-
 		if (path_.GetType() == DEFAULT) {
 			path_.SetType(currentServer_.GetType());
 		}
 		refresh_ = (flags_ & LIST_FLAG_REFRESH) != 0;
 		fallback_to_current_ = !path_.empty() && (flags_ & LIST_FLAG_FALLBACK_CURRENT) != 0;
+
+		auto newPath = CServerPath::GetChanged(currentPath_, path_, subDir_);
+		if (newPath.empty()) {
+			log(logmsg::status, _("Retrieving directory listing..."));
+		}
+		else {
+			log(logmsg::status, _("Retrieving directory listing of \"%s\"..."), newPath.GetPath());
+		}
 
 		controlSocket_.ChangeDir(path_, subDir_, (flags_ & LIST_FLAG_LINK) != 0);
 		opState = list_waitcwd;

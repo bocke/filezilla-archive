@@ -222,11 +222,6 @@ protected:
 	CServerPath m_last_refresh_path;
 	fz::monotonic_clock m_last_refresh_listing_time;
 
-	// Called from Process Reply.
-	// After a disconnect, check if there's another idle engine that
-	// is already connected.
-	bool SwitchEngine(t_EngineData** ppEngineData);
-
 	bool IsOtherEngineConnected(t_EngineData* pEngineData);
 
 	t_EngineData* GetIdleEngine(Site const& site = Site(), bool allowTransient = false);

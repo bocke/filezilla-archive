@@ -64,9 +64,6 @@ public:
 	int Cancel();
 	int ResetOperation(int nErrorCode);
 
-	const CCommand *GetCurrentCommand() const;
-	Command GetCurrentCommandId() const;
-
 	bool IsBusy() const;
 	bool IsConnected() const;
 
@@ -170,7 +167,7 @@ protected:
 
 	std::unique_ptr<CControlSocket> controlSocket_;
 
-	std::unique_ptr<CCommand> m_pCurrentCommand;
+	std::unique_ptr<CCommand> currentCommand_;
 
 	// Protect access to these three with notification_mutex_
 	std::deque<CNotification*> m_NotificationList;
@@ -215,9 +212,6 @@ protected:
 
 	CFileZillaEngineContext& context_;
 };
-
-struct command_event_type{};
-typedef fz::simple_event<command_event_type> CCommandEvent;
 
 struct async_request_reply_event_type{};
 typedef fz::simple_event<async_request_reply_event_type, std::unique_ptr<CAsyncRequestNotification>> CAsyncRequestReplyEvent;

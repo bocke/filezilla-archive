@@ -145,10 +145,6 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 		return;
 	}
 	if (nReplyCode & FZ_REPLY_DISCONNECTED) {
-		if (commandId == Command::none && !m_CommandList.empty()) {
-			// Pending event, has no relevance during command execution
-			return;
-		}
 		if (nReplyCode & FZ_REPLY_PASSWORDFAILED) {
 			CLoginManager::Get().CachedPasswordFailed(m_state.GetSite().server);
 		}
@@ -162,19 +158,7 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 		commandId != Command::disconnect &&
 		(nReplyCode & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED)
 	{
-		bool reconnect = false;
 		if (nReplyCode == FZ_REPLY_NOTCONNECTED) {
-			reconnect = true;
-		}
-		else if (nReplyCode & FZ_REPLY_DISCONNECTED) {
-			auto & info = m_CommandList.front();
-			if (!info.didReconnect) {
-				info.didReconnect = true;
-				reconnect = true;
-			}
-		}
-
-		if (reconnect) {
 			// Try automatic reconnect
 			Site const& site = m_state.GetSite();
 			if (site) {
