@@ -12,6 +12,7 @@ CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket,
 	: CFileTransferOpData(L"CFtpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
 	, CFtpOpData(controlSocket)
 {
+	binary = settings.binary;
 }
 
 int CFtpFileTransferOpData::Send()

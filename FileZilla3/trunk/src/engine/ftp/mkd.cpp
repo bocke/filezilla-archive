@@ -12,6 +12,11 @@ enum mkdStates
 	mkd_tryfull
 };
 
+/* Directory creation works like this: First find a parent directory into
+ * which we can CWD, then create the subdirs one by one. If either part
+ * fails, try MKD with the full path directly.
+ */
+
 int CFtpMkdirOpData::Send()
 {
 	if (!opLock_) {
@@ -24,6 +29,10 @@ int CFtpMkdirOpData::Send()
 	switch (opState)
 	{
 	case mkd_init:
+		if (controlSocket_.operations_.size() == 1 && !path_.empty()) {
+			log(logmsg::status, _("Creating directory '%s'..."), path_.GetPath());
+		}
+
 		if (!currentPath_.empty()) {
 			// Unless the server is broken, a directory already exists if current directory is a subdir of it.
 			if (currentPath_ == path_ || currentPath_.IsSubdirOf(path_, false)) {

@@ -74,6 +74,8 @@ public:
 	bool AddSegment(std::wstring const& segment);
 
 	size_t SegmentCount() const;
+
+	static CServerPath GetChanged(CServerPath const& oldPath, CServerPath const& newPath, std::wstring const& newSubdir);
 private:
 	bool IsSeparator(wchar_t c) const;
 

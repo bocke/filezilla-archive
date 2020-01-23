@@ -34,13 +34,14 @@ public:
 	virtual int Send() = 0;
 	virtual int ParseResponse() = 0;
 
-	virtual int SubcommandResult(int, COpData const&) { return FZ_REPLY_INTERNALERROR; }
+	virtual int SubcommandResult(int prevResult, COpData const&) { return prevResult == FZ_REPLY_OK ? FZ_REPLY_CONTINUE : prevResult; }
 
 	// Called just prior to destructing the operation. Do not push a new operation here.
 	virtual int Reset(int result) { return result; }
 
 	int opState{};
 	Command const opId;
+	bool topLevelOperation_{}; // If set to true, if this command finishes, any other commands on the stack do not get a SubCommandResult
 
 	bool waitForAsyncRequest{};
 	OpLock opLock_;
@@ -202,8 +203,6 @@ public:
 
 	virtual bool Connected() const = 0;
 
-	// If m_pCurrentOpData is zero, this function returns the current command
-	// from the engine.
 	Command GetCurrentCommandId() const;
 
 	void SendAsyncRequest(CAsyncRequestNotification* pNotification);
@@ -264,7 +263,6 @@ protected:
 	fz::duration GetTimezoneOffset() const;
 
 	virtual int DoClose(int nErrorCode = FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR);
-	bool m_closed{};
 
 	virtual int ResetOperation(int nErrorCode);
 	virtual void UpdateCache(COpData const& data, CServerPath const& serverPath, std::wstring const& remoteFile, int64_t fileSize);
@@ -282,13 +280,14 @@ protected:
 
 	bool ParsePwdReply(std::wstring reply, bool unquoted = false, const CServerPath& defaultPath = CServerPath());
 
-	void Push(std::unique_ptr<COpData> && pNewOpData);
+	virtual void Push(std::unique_ptr<COpData> && pNewOpData);
 
 	OpLock Lock(locking_reason reason, CServerPath const& path, bool inclusive = false);
 
 	std::vector<std::unique_ptr<COpData>> operations_;
 	CFileZillaEnginePrivate & engine_;
 	CServer currentServer_;
+	Credentials credentials_;
 
 	CServerPath currentPath_;
 

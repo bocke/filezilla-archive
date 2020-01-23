@@ -35,6 +35,8 @@ public:
 
 protected:
 
+	virtual void Push(std::unique_ptr<COpData> && pNewOpData) override;
+
 	virtual int ResetOperation(int nErrorCode) override;
 
 	// Implicit FZ_REPLY_CONTINUE

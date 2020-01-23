@@ -14,6 +14,8 @@ int CStorjConnectOpData::Send()
 	{
 	case connect_init:
 		{
+			log(logmsg::status, _("Connecting to %s..."), currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_));
+
 			auto executable = fz::to_native(engine_.GetOptions().GetOption(OPTION_FZSTORJ_EXECUTABLE));
 			if (executable.empty()) {
 				executable = fzT("fzstorj");
@@ -21,6 +23,8 @@ int CStorjConnectOpData::Send()
 			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args;
+			engine_.GetRateLimiter().add(&controlSocket_);
+			controlSocket_.process_ = std::make_unique<fz::process>();
 			if (!controlSocket_.process_->spawn(executable, args)) {
 				log(logmsg::debug_warning, L"Could not create process");
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
@@ -74,7 +78,7 @@ int CStorjConnectOpData::Send()
 		return controlSocket_.SendCommand(fz::sprintf(L"user %s", currentServer_.GetUser()));
 	case connect_pass:
 		{
-			std::wstring pass = credentials_.GetPass();
+			std::wstring pass = controlSocket_.credentials_.GetPass();
 			size_t pos = pass.rfind('|');
 			if (pos == std::wstring::npos) {
 				log(logmsg::error, _("Password or encryption key is not set"));
@@ -85,7 +89,7 @@ int CStorjConnectOpData::Send()
 		}
 	case connect_key:
 		{
-			std::wstring key = credentials_.GetPass();
+			std::wstring key = controlSocket_.credentials_.GetPass();
 			size_t pos = key.rfind('|');
 			if (pos == std::wstring::npos) {
 				log(logmsg::error, _("Password or encryption key is not set"));

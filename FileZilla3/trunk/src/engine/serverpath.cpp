@@ -1173,3 +1173,12 @@ bool CServerPath::IsSeparator(wchar_t c) const
 
 	return false;
 }
+
+CServerPath CServerPath::GetChanged(CServerPath const& oldPath, CServerPath const& newPath, std::wstring const& newSubdir)
+{
+	CServerPath ret = newPath.empty() ? oldPath : newPath;
+	if (!ret.ChangePath(newSubdir)) {
+		ret.clear();
+	}
+	return ret;
+}
