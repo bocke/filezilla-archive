@@ -23,7 +23,6 @@ int CStorjConnectOpData::Send()
 			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args;
-			engine_.GetRateLimiter().add(&controlSocket_);
 			controlSocket_.process_ = std::make_unique<fz::process>();
 			if (!controlSocket_.process_->spawn(executable, args)) {
 				log(logmsg::debug_warning, L"Could not create process");
