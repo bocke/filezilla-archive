@@ -298,38 +298,36 @@ CServer const& CControlSocket::GetCurrentServer() const
 	return currentServer_;
 }
 
-bool CControlSocket::ParsePwdReply(std::wstring reply, bool unquoted, CServerPath const& defaultPath)
+bool CControlSocket::ParsePwdReply(std::wstring reply, CServerPath const& defaultPath)
 {
-	if (!unquoted) {
-		size_t pos1 = reply.find('"');
-		size_t pos2 = reply.rfind('"');
-		// Due to searching the same character, pos1 is npos iff pos2 is npos
+	size_t pos1 = reply.find('"');
+	size_t pos2 = reply.rfind('"');
+	// Due to searching the same character, pos1 is npos iff pos2 is npos
 
-		if (pos1 == std::wstring::npos || pos1 >= pos2) {
-			pos1 = reply.find('\'');
-			pos2 = reply.rfind('\'');
+	if (pos1 == std::wstring::npos || pos1 >= pos2) {
+		pos1 = reply.find('\'');
+		pos2 = reply.rfind('\'');
 
-			if (pos1 != std::wstring::npos && pos1 < pos2) {
-				log(logmsg::debug_info, L"Broken server sending single-quoted path instead of double-quoted path.");
-			}
+		if (pos1 != std::wstring::npos && pos1 < pos2) {
+			log(logmsg::debug_info, L"Broken server sending single-quoted path instead of double-quoted path.");
 		}
-		if (pos1 == std::wstring::npos || pos1 >= pos2) {
-			log(logmsg::debug_info, L"Broken server, no quoted path found in pwd reply, trying first token as path");
-			pos1 = reply.find(' ');
-			if (pos1 != std::wstring::npos) {
-				reply = reply.substr(pos1 + 1);
-				pos2 = reply.find(' ');
-				if (pos2 != std::wstring::npos)
-					reply = reply.substr(0, pos2);
-			}
-			else {
-				reply.clear();
-			}
+	}
+	if (pos1 == std::wstring::npos || pos1 >= pos2) {
+		log(logmsg::debug_info, L"Broken server, no quoted path found in pwd reply, trying first token as path");
+		pos1 = reply.find(' ');
+		if (pos1 != std::wstring::npos) {
+			reply = reply.substr(pos1 + 1);
+			pos2 = reply.find(' ');
+			if (pos2 != std::wstring::npos)
+				reply = reply.substr(0, pos2);
 		}
 		else {
-			reply = reply.substr(pos1 + 1, pos2 - pos1 - 1);
-			fz::replace_substrings(reply, L"\"\"", L"\"");
+			reply.clear();
 		}
+	}
+	else {
+		reply = reply.substr(pos1 + 1, pos2 - pos1 - 1);
+		fz::replace_substrings(reply, L"\"\"", L"\"");
 	}
 
 	currentPath_.SetType(currentServer_.GetType());
