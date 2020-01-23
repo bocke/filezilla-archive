@@ -29,6 +29,7 @@ public:
 	CServerPath& operator=(CServerPath const& op) = default;
 	CServerPath& operator=(CServerPath && op) noexcept = default;
 
+	explicit operator bool() const { return !empty(); }
 	bool empty() const { return !m_data; }
 	void clear();
 
