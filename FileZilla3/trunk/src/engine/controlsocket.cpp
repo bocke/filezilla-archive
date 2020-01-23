@@ -240,6 +240,7 @@ void CControlSocket::UpdateCache(COpData const &, CServerPath const& serverPath,
 int CControlSocket::DoClose(int nErrorCode)
 {
 	log(logmsg::debug_debug, L"CControlSocket::DoClose(%d)", nErrorCode);
+	currentPath_.clear();
 	return ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED | nErrorCode);
 }
 
