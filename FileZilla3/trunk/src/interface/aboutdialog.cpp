@@ -81,7 +81,7 @@ bool CAboutDialog::Create(wxWindow* parent)
 	}
 
 	{
-		auto [box, inner] = lay.createStatBox(main, _("Linked against"), 2);
+		auto [box, inner] = lay.createStatBox(main, _("System details"), 2);
 		auto os = wxGetOsDescription();
 		if (!os.empty()) {
 			inner->Add(new wxStaticText(box, -1, _("Operating System:")));
