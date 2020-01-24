@@ -103,10 +103,10 @@ bool CAboutDialog::Create(wxWindow* parent)
 #ifdef __WXMSW__
 		inner->Add(new wxStaticText(box, -1, _("Platform:")));
 		if (::wxIsPlatform64Bit()) {
-			inner->Add(new wxStaticText(box, -1, _("64-bit system"));
+			inner->Add(new wxStaticText(box, -1, _("64-bit system")));
 		}
 		else {
-			inner->Add(new wxStaticText(box, -1, _("32-bit system"));
+			inner->Add(new wxStaticText(box, -1, _("32-bit system")));
 		}
 #endif
 
