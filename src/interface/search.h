@@ -3,6 +3,7 @@
 
 #include "filter_conditions_dialog.h"
 #include "local_recursive_operation.h"
+#include "listingcomparison.h"
 #include "state.h"
 #include <set>
 
@@ -27,6 +28,8 @@ public:
 	bool Load();
 	void Run();
 
+	bool IsIdle();
+
 protected:
 	void ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> const& listing);
 	void ProcessDirectoryListing(CLocalRecursiveOperation::listing const& listing);
@@ -38,7 +41,10 @@ protected:
 
 	wxWindow* m_parent;
 	CSearchDialogFileList *m_results{};
+	CSearchDialogFileList *m_remoteResults{};
 	CQueueView* m_pQueue;
+
+	CFilelistStatusBar* m_remoteStatusBar{};
 
 	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
@@ -47,6 +53,7 @@ protected:
 	CFilter m_search_filter;
 
 	search_mode m_searching{};
+	bool m_comparative{};
 
 	CServerPath m_original_dir;
 
@@ -57,16 +64,20 @@ protected:
 	void OnDownload(wxCommandEvent&);
 	void OnUpload(wxCommandEvent&);
 	void OnEdit(wxCommandEvent&);
-	void OnDelete(wxCommandEvent&);
+	void OnDeleteLocal(wxCommandEvent&);
+	void OnDeleteRemote(wxCommandEvent&);
 	void OnCharHook(wxKeyEvent& event);
 	void OnChangeSearchMode(wxCommandEvent&);
 	void OnGetUrl(wxCommandEvent& event);
 	void OnOpen(wxCommandEvent& event);
+	void OnChangeCompareOption(wxCommandEvent& event);
 
 	std::set<CServerPath> m_visited;
 
 	CLocalPath m_local_search_root;
 	CServerPath m_remote_search_root;
+
+	CComparisonManager* m_pComparisonManager{};
 };
 
 #endif

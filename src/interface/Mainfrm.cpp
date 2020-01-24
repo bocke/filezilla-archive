@@ -2484,6 +2484,7 @@ void CMainFrame::OnDropdownComparisonMode(wxCommandEvent& event)
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 	if (old_mode != new_mode && pComparisonManager && pComparisonManager->IsComparing()) {
+		pComparisonManager->SetComparisonMode(new_mode);
 		pComparisonManager->CompareListings();
 	}
 }
@@ -2500,6 +2501,7 @@ void CMainFrame::OnDropdownComparisonHide(wxCommandEvent&)
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 	if (pComparisonManager && pComparisonManager->IsComparing()) {
+		pComparisonManager->SetHideIdentical(old_mode ? 0 : 1);
 		pComparisonManager->CompareListings();
 	}
 }

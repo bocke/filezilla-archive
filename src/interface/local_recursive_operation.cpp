@@ -35,14 +35,14 @@ void CLocalRecursiveOperation::AddRecursionRoot(local_recursion_root && root)
 	}
 }
 
-void CLocalRecursiveOperation::StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate)
+void CLocalRecursiveOperation::StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate, bool ignore_links)
 {
-	if (!DoStartRecursiveOperation(mode, filters, immediate)) {
+	if (!DoStartRecursiveOperation(mode, filters, immediate, ignore_links)) {
 		StopRecursiveOperation();
 	}
 }
 
-bool CLocalRecursiveOperation::DoStartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate)
+bool CLocalRecursiveOperation::DoStartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate, bool ignore_links)
 {
 	if (!m_pQueue) {
 		return false;
@@ -81,6 +81,7 @@ bool CLocalRecursiveOperation::DoStartRecursiveOperation(OperationMode mode, Act
 		m_operationMode = mode;
 
 		m_filters = filters;
+		m_ignoreLinks = ignore_links;
 
 		thread_ = m_state.pool_.spawn([this] {entry(); });
 		if (!thread_) {
@@ -198,7 +199,7 @@ void CLocalRecursiveOperation::entry()
 				fz::native_string name;
 				bool isDir{};
 				while (fs.get_next_file(name, isLink, isDir, &entry.size, &entry.time, &entry.attributes)) {
-					if (isLink) {
+					if (isLink && m_ignoreLinks) {
 						continue;
 					}
 					entry.name = fz::to_wstring(name);
