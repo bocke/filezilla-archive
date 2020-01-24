@@ -21,7 +21,7 @@ public:
 
 	virtual bool CanStartComparison();
 	virtual void StartComparison();
-	virtual bool get_next_file(std::wstring & name, bool &dir, int64_t &size, fz::datetime& date) override;
+	virtual bool get_next_file(std::wstring_view & name, std::wstring & path, bool &dir, int64_t &size, fz::datetime& date) override;
 	virtual void FinishComparison();
 	virtual void OnExitComparisonMode();
 
