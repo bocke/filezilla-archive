@@ -129,6 +129,7 @@ bool CAboutDialog::Create(wxWindow* parent)
 	copy->Bind(wxEVT_BUTTON, [this](wxEvent const&){ OnCopy(); });
 	buttons->Add(copy, lay.valign);
 	buttons->AddStretchSpacer();
+	buttons->AddGrowableCol(1);
 
 	auto ok = new wxButton(this, -1, _("OK"));
 	ok->Bind(wxEVT_BUTTON, [this](wxEvent const&){ EndModal(wxID_OK); });
