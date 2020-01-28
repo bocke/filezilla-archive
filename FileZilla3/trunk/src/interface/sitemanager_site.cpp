@@ -32,7 +32,6 @@
 BEGIN_EVENT_TABLE(CSiteManagerSite, wxNotebook)
 EVT_CHOICE(XRCID("ID_PROTOCOL"), CSiteManagerSite::OnProtocolSelChanged)
 EVT_CHOICE(XRCID("ID_LOGONTYPE"), CSiteManagerSite::OnLogontypeSelChanged)
-EVT_CHECKBOX(XRCID("ID_LIMITMULTIPLE"), CSiteManagerSite::OnLimitMultipleConnectionsChanged)
 EVT_BUTTON(XRCID("ID_BROWSE"), CSiteManagerSite::OnRemoteDirBrowse)
 EVT_BUTTON(XRCID("ID_KEYFILE_BROWSE"), CSiteManagerSite::OnKeyFileBrowse)
 EVT_BUTTON(XRCID("ID_ENCRYPTIONKEY_GENERATE"), CSiteManagerSite::OnGenerateEncryptionKey)
@@ -91,6 +90,7 @@ public:
 	virtual void SetSite(Site const& site, bool predefined) = 0;
 
 	virtual bool Verify(bool /*predefined*/) { return true; }
+	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/) {}
 
 	virtual void UpdateSite(Site &site) = 0;
 
@@ -183,6 +183,107 @@ public:
 		}
 	}
 };
+
+class TransferSettingsSiteControls final : public SiteControls
+{
+public:
+	TransferSettingsSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
+		: SiteControls(parent)
+	{
+		sizer.Add(new wxStaticText(&parent, XRCID("ID_TRANSFERMODE_LABEL"), _("&Transfer mode:")));
+		auto * row = lay.createFlex(0, 1);
+		sizer.Add(row);
+		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_DEFAULT"), _("D&efault"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), lay.valign);
+		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_ACTIVE"), _("&Active")), lay.valign);
+		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_PASSIVE"), _("&Passive")), lay.valign);
+		sizer.AddSpacer(0);
+
+		auto limit = new wxCheckBox(&parent, XRCID("ID_LIMITMULTIPLE"), _("&Limit number of simultaneous connections"));
+		sizer.Add(limit);
+		row = lay.createFlex(0, 1);
+		sizer.Add(row, 0, wxLEFT, lay.dlgUnits(10));
+		row->Add(new wxStaticText(&parent, -1, _("&Maximum number of connections:")), lay.valign);
+		auto * spin = new wxSpinCtrl(&parent, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		spin->SetRange(1, 10);
+		row->Add(spin, lay.valign);
+
+		limit->Bind(wxEVT_CHECKBOX, [spin](wxCommandEvent const& ev){ spin->Enable(ev.IsChecked()); });
+	}
+
+	virtual void SetSite(Site const& site, bool predefined) override
+	{
+		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
+		xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
+		xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
+		xrc_call(parent_, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
+
+		if (site) {
+			xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
+			xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, false);
+			xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
+			xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
+		}
+		else {
+			if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
+				PasvMode pasvMode = site.server.GetPasvMode();
+				if (pasvMode == MODE_ACTIVE) {
+					xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::SetValue, true);
+				}
+				else if (pasvMode == MODE_PASSIVE) {
+					xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::SetValue, true);
+				}
+				else {
+					xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
+				}
+			}
+
+			int const maxMultiple = site.server.MaximumMultipleConnections();
+			xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
+			if (maxMultiple != 0) {
+				xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
+				xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, maxMultiple);
+			}
+			else {
+				xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
+				xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
+			}
+
+		}
+	}
+
+	virtual void UpdateSite(Site & site) override
+	{
+		if (xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
+			site.server.SetPasvMode(MODE_ACTIVE);
+		}
+		else if (xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
+			site.server.SetPasvMode(MODE_PASSIVE);
+		}
+		else {
+			site.server.SetPasvMode(MODE_DEFAULT);
+		}
+
+		if (xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::GetValue)) {
+			site.server.MaximumMultipleConnections(xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::GetValue));
+		}
+		else {
+			site.server.MaximumMultipleConnections(0);
+		}
+	}
+
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType type) override
+	{
+		bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
+		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
+		xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
+		xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Show, hasTransferMode);
+		auto* transferModeLabel = XRCCTRL(parent_, "ID_TRANSFERMODE_LABEL", wxStaticText);
+		transferModeLabel->Show(hasTransferMode);
+		transferModeLabel->GetContainingSizer()->CalcMin();
+		transferModeLabel->GetContainingSizer()->Layout();
+	}
+};
+
 
 
 CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
@@ -339,33 +440,17 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	}
 
 	{
-		wxPanel* transferPage = new wxPanel(this);
-		AddPage(transferPage, _("Transfer Settings"));
-
-		auto * main = lay.createMain(transferPage, 1);
-		main->Add(new wxStaticText(transferPage, XRCID("ID_TRANSFERMODE_LABEL"), _("&Transfer mode:")));
-		auto * row = lay.createFlex(0, 1);
-		main->Add(row);
-		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_DEFAULT"), _("D&efault"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), lay.valign);
-		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_ACTIVE"), _("&Active")), lay.valign);
-		row->Add(new wxRadioButton(transferPage, XRCID("ID_TRANSFERMODE_PASSIVE"), _("&Passive")), lay.valign);
-		main->AddSpacer(0);
-
-		main->Add(new wxCheckBox(transferPage, XRCID("ID_LIMITMULTIPLE"), _("&Limit number of simultaneous connections")));
-		row = lay.createFlex(0, 1);
-		main->Add(row, 0, wxLEFT, lay.dlgUnits(10));
-		row->Add(new wxStaticText(transferPage, -1, _("&Maximum number of connections:")), lay.valign);
-		auto * spin = new wxSpinCtrl(transferPage, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(1, 10);
-		row->Add(spin, lay.valign);
+		transferPage_ = new wxPanel(this);
+		AddPage(transferPage_, _("Transfer Settings"));
+		auto * main = lay.createMain(transferPage_, 1);
+		transferControls_ = std::make_unique<TransferSettingsSiteControls>(*transferPage_, lay, *main);
 	}
 
 	{
 		charsetPage_ = new wxPanel(this);
 		AddPage(charsetPage_, _("Charset"));
-
 		auto * main = lay.createMain(charsetPage_, 1);
-		charsetControls_ = new CharsetSiteControls(*charsetPage_, lay, *main);
+		charsetControls_ = std::make_unique<CharsetSiteControls>(*charsetPage_, lay, *main);
 
 		int const charsetPageIndex = FindPage(charsetPage_);
 		m_charsetPageText = GetPageText(charsetPageIndex);
@@ -787,14 +872,12 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	serverTypeSizer->CalcMin();
 	serverTypeSizer->Layout();
 
-	bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
-	xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
-	xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
-	xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Show, hasTransferMode);
-	auto* transferModeLabel = XRCCTRL(*this, "ID_TRANSFERMODE_LABEL", wxStaticText);
-	transferModeLabel->Show(hasTransferMode);
-	transferModeLabel->GetContainingSizer()->CalcMin();
-	transferModeLabel->GetContainingSizer()->Layout();
+	if (transferControls_) {
+		transferControls_->SetControlVisibility(protocol, type);
+	}
+	if (charsetControls_) {
+		charsetControls_->SetControlVisibility(protocol, type);
+	}
 
 	if (charsetPage_) {
 		if (CServer::ProtocolHasFeature(protocol, ProtocolFeature::Charset)) {
@@ -1112,21 +1195,12 @@ void CSiteManagerSite::UpdateSite(Site &site)
 
 	site.server.SetTimezoneOffset(hours * 60 + minutes);
 
-	if (xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
-		site.server.SetPasvMode(MODE_ACTIVE);
-	}
-	else if (xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
-		site.server.SetPasvMode(MODE_PASSIVE);
-	}
-	else {
-		site.server.SetPasvMode(MODE_DEFAULT);
+	if (transferControls_) {
+		transferControls_->UpdateSite(site);
 	}
 
-	if (xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::GetValue)) {
-		site.server.MaximumMultipleConnections(xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::GetValue));
-	}
-	else {
-		site.server.MaximumMultipleConnections(0);
+	if (charsetControls_) {
+		charsetControls_->UpdateSite(site);
 	}
 
 	if (xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
@@ -1200,11 +1274,8 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
 	}
-	if (transferPage_) {
-		xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
+	if (transferControls_) {
+		transferControls_->SetSite(site, predefined);
 	}
 	if (charsetControls_) {
 		charsetControls_->SetSite(site, predefined);
@@ -1237,11 +1308,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_SYNC", &wxCheckBox::SetValue, false);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, 0);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, 0);
-
-		xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
-		xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, false);
-		xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
 	}
 	else {
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
@@ -1319,30 +1385,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() / 60);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() % 60);
 
-		if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
-			PasvMode pasvMode = site.server.GetPasvMode();
-			if (pasvMode == MODE_ACTIVE) {
-				xrc_call(*this, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::SetValue, true);
-			}
-			else if (pasvMode == MODE_PASSIVE) {
-				xrc_call(*this, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::SetValue, true);
-			}
-			else {
-				xrc_call(*this, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
-			}
-		}
-
-		int const maxMultiple = site.server.MaximumMultipleConnections();
-		xrc_call(*this, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
-		if (maxMultiple != 0) {
-			xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
-			xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, maxMultiple);
-		}
-		else {
-			xrc_call(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
-			xrc_call<wxSpinCtrl, int>(*this, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
-		}
-
 		xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
 		auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
 		if (ssealgorithm.empty()) {
@@ -1410,11 +1452,6 @@ void CSiteManagerSite::OnLogontypeSelChanged(wxCommandEvent&)
 	LogonType const t = GetLogonType();
 	SetControlVisibility(GetProtocol(), t);
 	SetLogonTypeCtrlState();
-}
-
-void CSiteManagerSite::OnLimitMultipleConnectionsChanged(wxCommandEvent& event)
-{
-	XRCCTRL(*this, "ID_MAXMULTIPLE", wxSpinCtrl)->Enable(event.IsChecked());
 }
 
 void CSiteManagerSite::OnRemoteDirBrowse(wxCommandEvent&)

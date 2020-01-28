@@ -36,7 +36,6 @@ private:
 	DECLARE_EVENT_TABLE()
 	void OnProtocolSelChanged(wxCommandEvent& event);
 	void OnLogontypeSelChanged(wxCommandEvent& event);
-	void OnLimitMultipleConnectionsChanged(wxCommandEvent& event);
 	void OnRemoteDirBrowse(wxCommandEvent& event);
 	void OnKeyFileBrowse(wxCommandEvent&);
 	void OnGenerateEncryptionKey(wxCommandEvent&);
@@ -48,7 +47,9 @@ private:
 	wxNotebookPage *advancedPage_{};
 	wxNotebookPage *charsetPage_{};
 	wxNotebookPage *transferPage_{};
-	SiteControls *charsetControls_{};
+
+	std::unique_ptr<SiteControls> transferControls_;
+	std::unique_ptr<SiteControls> charsetControls_;
 	wxString m_charsetPageText;
 	wxNotebookPage *S3Page_{};
 	size_t m_totalPages = -1;
