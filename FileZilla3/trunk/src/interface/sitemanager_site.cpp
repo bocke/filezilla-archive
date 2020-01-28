@@ -7,6 +7,7 @@
 #if USE_MAC_SANDBOX
 #include "osx_sandbox_userdirs.h"
 #endif
+#include "sitemanager_controls.h"
 #include "sitemanager_dialog.h"
 #if ENABLE_STORJ
 #include "storj_key_interface.h"
@@ -78,213 +79,6 @@ std::pair<std::array<ProtocolGroup, 2>::const_iterator, std::vector<std::pair<Se
 	return std::make_pair(groups.cend(), std::vector<std::pair<ServerProtocol, std::wstring>>::const_iterator());
 }
 }
-
-class SiteControls
-{
-public:
-	SiteControls(wxWindow & parent)
-		: parent_(parent)
-	{}
-
-	virtual ~SiteControls() = default;
-	virtual void SetSite(Site const& site, bool predefined) = 0;
-
-	virtual bool Verify(bool /*predefined*/) { return true; }
-	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/) {}
-
-	virtual void UpdateSite(Site &site) = 0;
-
-	wxWindow & parent_;
-};
-
-class CharsetSiteControls final : public SiteControls
-{
-public:
-	CharsetSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
-		: SiteControls(parent)
-	{
-		sizer.Add(new wxStaticText(&parent, -1, _("The server uses following charset encoding for filenames:")));
-		auto rbAuto = new wxRadioButton(&parent, XRCID("ID_CHARSET_AUTO"), _("&Autodetect"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-		sizer.Add(rbAuto);
-		sizer.Add(new wxStaticText(&parent, -1, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
-
-		auto rbUtf8 = new wxRadioButton(&parent, XRCID("ID_CHARSET_UTF8"), _("Force &UTF-8"));
-		sizer.Add(rbUtf8);
-		auto rbCustom = new wxRadioButton(&parent, XRCID("ID_CHARSET_CUSTOM"), _("Use &custom charset"));
-		sizer.Add(rbCustom);
-
-		auto * row = lay.createFlex(0, 1);
-		row->Add(new wxStaticText(&parent, -1, _("&Encoding:")), lay.valign);
-		auto * encoding = new wxTextCtrlEx(&parent, XRCID("ID_ENCODING"));
-		row->Add(encoding, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 18);
-		sizer.Add(row);
-		sizer.AddSpacer(lay.dlgUnits(6));
-		sizer.Add(new wxStaticText(&parent, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
-
-		rbAuto->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Disable(); });
-		rbUtf8->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Disable(); });
-		rbCustom->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Enable(); });
-	}
-
-	virtual void SetSite(Site const& site, bool predefined) override
-	{
-		xrc_call(parent_, "ID_CHARSET_AUTO", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_CHARSET_UTF8", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_ENCODING", &wxWindow::Enable, !predefined);
-
-		if (!site) {
-			xrc_call(parent_, "ID_CHARSET_AUTO", &wxRadioButton::SetValue, true);
-			xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::ChangeValue, wxString());
-			xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::Enable, false);
-		}
-		else {
-			switch (site.server.GetEncodingType()) {
-			default:
-			case ENCODING_AUTO:
-				xrc_call(parent_, "ID_CHARSET_AUTO", &wxRadioButton::SetValue, true);
-				break;
-			case ENCODING_UTF8:
-				xrc_call(parent_, "ID_CHARSET_UTF8", &wxRadioButton::SetValue, true);
-				break;
-			case ENCODING_CUSTOM:
-				xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxRadioButton::SetValue, true);
-				break;
-			}
-			xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server.GetEncodingType() == ENCODING_CUSTOM);
-			xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server.GetCustomEncoding());
-		}
-	}
-
-	virtual bool Verify(bool) override
-	{
-		if (XRCCTRL(parent_, "ID_CHARSET_CUSTOM", wxRadioButton)->GetValue()) {
-			if (XRCCTRL(parent_, "ID_ENCODING", wxTextCtrl)->GetValue().empty()) {
-				XRCCTRL(parent_, "ID_ENCODING", wxTextCtrl)->SetFocus();
-				wxMessageBoxEx(_("Need to specify a character encoding"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	virtual void UpdateSite(Site & site) override
-	{
-		if (xrc_call(parent_, "ID_CHARSET_UTF8", &wxRadioButton::GetValue)) {
-			site.server.SetEncodingType(ENCODING_UTF8);
-		}
-		else if (xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxRadioButton::GetValue)) {
-			std::wstring encoding = xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::GetValue).ToStdWstring();
-			site.server.SetEncodingType(ENCODING_CUSTOM, encoding);
-		}
-		else {
-			site.server.SetEncodingType(ENCODING_AUTO);
-		}
-	}
-};
-
-class TransferSettingsSiteControls final : public SiteControls
-{
-public:
-	TransferSettingsSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
-		: SiteControls(parent)
-	{
-		sizer.Add(new wxStaticText(&parent, XRCID("ID_TRANSFERMODE_LABEL"), _("&Transfer mode:")));
-		auto * row = lay.createFlex(0, 1);
-		sizer.Add(row);
-		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_DEFAULT"), _("D&efault"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), lay.valign);
-		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_ACTIVE"), _("&Active")), lay.valign);
-		row->Add(new wxRadioButton(&parent, XRCID("ID_TRANSFERMODE_PASSIVE"), _("&Passive")), lay.valign);
-		sizer.AddSpacer(0);
-
-		auto limit = new wxCheckBox(&parent, XRCID("ID_LIMITMULTIPLE"), _("&Limit number of simultaneous connections"));
-		sizer.Add(limit);
-		row = lay.createFlex(0, 1);
-		sizer.Add(row, 0, wxLEFT, lay.dlgUnits(10));
-		row->Add(new wxStaticText(&parent, -1, _("&Maximum number of connections:")), lay.valign);
-		auto * spin = new wxSpinCtrl(&parent, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(1, 10);
-		row->Add(spin, lay.valign);
-
-		limit->Bind(wxEVT_CHECKBOX, [spin](wxCommandEvent const& ev){ spin->Enable(ev.IsChecked()); });
-	}
-
-	virtual void SetSite(Site const& site, bool predefined) override
-	{
-		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
-		xrc_call(parent_, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
-
-		if (site) {
-			xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
-			xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, false);
-			xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
-			xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
-		}
-		else {
-			if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
-				PasvMode pasvMode = site.server.GetPasvMode();
-				if (pasvMode == MODE_ACTIVE) {
-					xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::SetValue, true);
-				}
-				else if (pasvMode == MODE_PASSIVE) {
-					xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::SetValue, true);
-				}
-				else {
-					xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
-				}
-			}
-
-			int const maxMultiple = site.server.MaximumMultipleConnections();
-			xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
-			if (maxMultiple != 0) {
-				xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
-				xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, maxMultiple);
-			}
-			else {
-				xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
-				xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, 1);
-			}
-
-		}
-	}
-
-	virtual void UpdateSite(Site & site) override
-	{
-		if (xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
-			site.server.SetPasvMode(MODE_ACTIVE);
-		}
-		else if (xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
-			site.server.SetPasvMode(MODE_PASSIVE);
-		}
-		else {
-			site.server.SetPasvMode(MODE_DEFAULT);
-		}
-
-		if (xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::GetValue)) {
-			site.server.MaximumMultipleConnections(xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::GetValue));
-		}
-		else {
-			site.server.MaximumMultipleConnections(0);
-		}
-	}
-
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType type) override
-	{
-		bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
-		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
-		xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
-		xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Show, hasTransferMode);
-		auto* transferModeLabel = XRCCTRL(parent_, "ID_TRANSFERMODE_LABEL", wxStaticText);
-		transferModeLabel->Show(hasTransferMode);
-		transferModeLabel->GetContainingSizer()->CalcMin();
-		transferModeLabel->GetContainingSizer()->Layout();
-	}
-};
-
-
 
 CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
     : sitemanager_(sitemanager)
@@ -443,14 +237,14 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		transferPage_ = new wxPanel(this);
 		AddPage(transferPage_, _("Transfer Settings"));
 		auto * main = lay.createMain(transferPage_, 1);
-		transferControls_ = std::make_unique<TransferSettingsSiteControls>(*transferPage_, lay, *main);
+		controls_.emplace_back(std::make_unique<TransferSettingsSiteControls>(*transferPage_, lay, *main));
 	}
 
 	{
 		charsetPage_ = new wxPanel(this);
 		AddPage(charsetPage_, _("Charset"));
 		auto * main = lay.createMain(charsetPage_, 1);
-		charsetControls_ = std::make_unique<CharsetSiteControls>(*charsetPage_, lay, *main);
+		controls_.emplace_back(std::make_unique<CharsetSiteControls>(*charsetPage_, lay, *main));
 
 		int const charsetPageIndex = FindPage(charsetPage_);
 		m_charsetPageText = GetPageText(charsetPageIndex);
@@ -458,35 +252,10 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	}
 
 	{
-		S3Page_ = new wxPanel(this);
-		AddPage(S3Page_, L"S3");
-
-		auto * main = lay.createMain(S3Page_, 1);
-		main->AddGrowableCol(0);
-		main->Add(new wxStaticText(S3Page_, -1, _("Server Side Encryption:")));
-
-		main->Add(new wxRadioButton(S3Page_, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
-
-		main->Add(new wxRadioButton(S3Page_, XRCID("ID_S3_AES256"), _("&AWS S3 encryption")));
-
-		main->Add(new wxRadioButton(S3Page_, XRCID("ID_S3_AWSKMS"), _("AWS &KMS encryption")));
-		auto * row = lay.createFlex(2);
-		row->AddGrowableCol(1);
-		main->Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
-		row->Add(new wxStaticText(S3Page_, -1, _("&Select a key:")), lay.valign);
-		auto * choice = new wxChoice(S3Page_, XRCID("ID_S3_KMSKEY"));
-		choice->Append(_("Default (AWS/S3)"));
-		choice->Append(_("Custom KMS ARN"));
-		row->Add(choice, lay.valigng);
-		row->Add(new wxStaticText(S3Page_, -1, _("C&ustom KMS ARN:")), lay.valign);
-		row->Add(new wxTextCtrlEx(S3Page_, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
-
-		main->Add(new wxRadioButton(S3Page_, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption")));
-		row = lay.createFlex(2);
-		row->AddGrowableCol(1);
-		main->Add(row, 0, wxLEFT | wxGROW, lay.dlgUnits(10));
-		row->Add(new wxStaticText(S3Page_, -1, _("Cus&tomer Key:")), lay.valign);
-		row->Add(new wxTextCtrlEx(S3Page_, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
+		s3Page_ = new wxPanel(this);
+		AddPage(s3Page_, L"S3");
+		auto * main = lay.createMain(s3Page_, 1);
+		controls_.emplace_back(std::make_unique<S3SiteControls>(*s3Page_, lay, *main));
 	}
 #endif
 
@@ -872,11 +641,8 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 	serverTypeSizer->CalcMin();
 	serverTypeSizer->Layout();
 
-	if (transferControls_) {
-		transferControls_->SetControlVisibility(protocol, type);
-	}
-	if (charsetControls_) {
-		charsetControls_->SetControlVisibility(protocol, type);
+	for (auto & controls : controls_) {
+		controls->SetControlVisibility(protocol, type);
 	}
 
 	if (charsetPage_) {
@@ -893,16 +659,16 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		}
 	}
 
-	if (S3Page_) {
+	if (s3Page_) {
 		if (protocol == S3) {
-			if (FindPage(S3Page_) == wxNOT_FOUND) {
-				AddPage(S3Page_, L"S3");
+			if (FindPage(s3Page_) == wxNOT_FOUND) {
+				AddPage(s3Page_, L"S3");
 			}
 		}
 		else {
-			int const s3PageIndex = FindPage(S3Page_);
-			if (s3PageIndex != wxNOT_FOUND) {
-				RemovePage(s3PageIndex);
+			int const s3pageIndex = FindPage(s3Page_);
+			if (s3pageIndex != wxNOT_FOUND) {
+				RemovePage(s3pageIndex);
 			}
 		}
 	}
@@ -1000,8 +766,10 @@ bool CSiteManagerSite::Verify(bool predefined)
 
 	SetProtocol(site.server.GetProtocol());
 
-	if (charsetControls_ && !charsetControls_->Verify(predefined)) {
-		return false;
+	for (auto & controls : controls_) {
+		if (!controls->Verify(predefined)) {
+			return false;
+		}
 	}
 
 	// Require username for non-anonymous, non-ask logon type
@@ -1195,12 +963,10 @@ void CSiteManagerSite::UpdateSite(Site &site)
 
 	site.server.SetTimezoneOffset(hours * 60 + minutes);
 
-	if (transferControls_) {
-		transferControls_->UpdateSite(site);
-	}
+	UpdateExtraParameters(site.server);
 
-	if (charsetControls_) {
-		charsetControls_->UpdateSite(site);
+	for (auto & controls : controls_) {
+		controls->UpdateSite(site);
 	}
 
 	if (xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
@@ -1209,8 +975,6 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	else {
 		site.server.SetBypassProxy(false);
 	}
-
-	UpdateExtraParameters(site.server);
 }
 
 void CSiteManagerSite::UpdateExtraParameters(CServer & server)
@@ -1230,26 +994,6 @@ void CSiteManagerSite::UpdateExtraParameters(CServer & server)
 		server.SetExtraParameter(trait.name_, paramIt[trait.section_]->second->GetValue().ToStdWstring());
 		++paramIt[trait.section_];
 	}
-
-	if (server.GetProtocol() == S3) {
-		if (xrc_call(*this, "ID_S3_NOENCRYPTION", &wxRadioButton::GetValue)) {
-			server.ClearExtraParameter("ssealgorithm");
-		}
-		else if (xrc_call(*this, "ID_S3_AES256", &wxRadioButton::GetValue)) {
-			server.SetExtraParameter("ssealgorithm", L"AES256");
-		}
-		else if (xrc_call(*this, "ID_S3_AWSKMS", &wxRadioButton::GetValue)) {
-			server.SetExtraParameter("ssealgorithm", L"aws:kms");
-			if (xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::GetSelection) == static_cast<int>(s3_sse::KmsKey::CUSTOM)) {
-				server.SetExtraParameter("ssekmskey", fz::to_wstring(xrc_call(*this, "ID_S3_CUSTOM_KMS", &wxTextCtrl::GetValue)));
-			}
-		}
-		else if (xrc_call(*this, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::GetValue)) {
-			server.SetExtraParameter("ssealgorithm", L"customer");
-			server.SetExtraParameter("ssecustomerkey", fz::to_wstring(xrc_call(*this, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue)));
-		}
-	}
-
 }
 
 void CSiteManagerSite::SetSite(Site const& site, bool predefined)
@@ -1274,11 +1018,8 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
 		xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
 	}
-	if (transferControls_) {
-		transferControls_->SetSite(site, predefined);
-	}
-	if (charsetControls_) {
-		charsetControls_->SetSite(site, predefined);
+	for (auto & controls : controls_) {
+		controls->SetSite(site, predefined);
 	}
 
 	if (!site) {
@@ -1384,28 +1125,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::SetValue, site.m_default_bookmark.m_comparison);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() / 60);
 		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() % 60);
-
-		xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
-		auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
-		if (ssealgorithm.empty()) {
-			xrc_call(*this, "ID_S3_NOENCRYPTION", &wxRadioButton::SetValue, true);
-		}
-		else if (ssealgorithm == "AES256") {
-			xrc_call(*this, "ID_S3_AES256", &wxRadioButton::SetValue, true);
-		}
-		else if (ssealgorithm == "aws:kms") {
-			xrc_call(*this, "ID_S3_AWSKMS", &wxRadioButton::SetValue, true);
-			auto sseKmsKey = site.server.GetExtraParameter("ssekmskey");
-			if (!sseKmsKey.empty()) {
-				xrc_call(*this, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::CUSTOM));
-				xrc_call(*this, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sseKmsKey);
-			}
-		}
-		else if (ssealgorithm == "customer") {
-			xrc_call(*this, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::SetValue, true);
-			auto customerKey = site.server.GetExtraParameter("ssecustomerkey");
-			xrc_call(*this, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
-		}
 	}
 }
 

@@ -47,11 +47,10 @@ private:
 	wxNotebookPage *advancedPage_{};
 	wxNotebookPage *charsetPage_{};
 	wxNotebookPage *transferPage_{};
+	wxNotebookPage *s3Page_{};
 
-	std::unique_ptr<SiteControls> transferControls_;
-	std::unique_ptr<SiteControls> charsetControls_;
+	std::vector<std::unique_ptr<SiteControls>> controls_;
 	wxString m_charsetPageText;
-	wxNotebookPage *S3Page_{};
 	size_t m_totalPages = -1;
 
 	ServerProtocol previousProtocol_{UNKNOWN};
