@@ -36,7 +36,6 @@ private:
 	DECLARE_EVENT_TABLE()
 	void OnProtocolSelChanged(wxCommandEvent& event);
 	void OnLogontypeSelChanged(wxCommandEvent& event);
-	void OnRemoteDirBrowse(wxCommandEvent& event);
 	void OnKeyFileBrowse(wxCommandEvent&);
 	void OnGenerateEncryptionKey(wxCommandEvent&);
 

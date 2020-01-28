@@ -33,7 +33,6 @@
 BEGIN_EVENT_TABLE(CSiteManagerSite, wxNotebook)
 EVT_CHOICE(XRCID("ID_PROTOCOL"), CSiteManagerSite::OnProtocolSelChanged)
 EVT_CHOICE(XRCID("ID_LOGONTYPE"), CSiteManagerSite::OnLogontypeSelChanged)
-EVT_BUTTON(XRCID("ID_BROWSE"), CSiteManagerSite::OnRemoteDirBrowse)
 EVT_BUTTON(XRCID("ID_KEYFILE_BROWSE"), CSiteManagerSite::OnKeyFileBrowse)
 EVT_BUTTON(XRCID("ID_ENCRYPTIONKEY_GENERATE"), CSiteManagerSite::OnGenerateEncryptionKey)
 END_EVENT_TABLE()
@@ -187,50 +186,11 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		main->AddGrowableRow(main->GetEffectiveRowsCount() - 1);
 	}
 
-#if 1
 	{
 		advancedPage_ = new wxPanel(this);
 		AddPage(advancedPage_, _("Advanced"));
-
 		auto * main = lay.createMain(advancedPage_, 1);
-		main->AddGrowableCol(0);
-		auto* row = lay.createFlex(0, 1);
-		main->Add(row);
-
-		row->Add(new wxStaticText(advancedPage_, XRCID("ID_SERVERTYPE_LABEL"), _("Server &type:")), lay.valign);
-		row->Add(new wxChoice(advancedPage_, XRCID("ID_SERVERTYPE")), lay.valign);
-		main->AddSpacer(0);
-		main->Add(new wxCheckBox(advancedPage_, XRCID("ID_BYPASSPROXY"), _("B&ypass proxy")));
-
-		main->Add(new wxStaticLine(advancedPage_), lay.grow);
-
-		main->Add(new wxStaticText(advancedPage_, -1, _("Default &local directory:")));
-
-		row = lay.createFlex(0, 1);
-		main->Add(row, lay.grow);
-		row->AddGrowableCol(0);
-		row->Add(new wxTextCtrlEx(advancedPage_, XRCID("ID_LOCALDIR")), lay.valigng);
-		row->Add(new wxButton(advancedPage_, XRCID("ID_BROWSE"), _("&Browse...")), lay.valign);
-		main->AddSpacer(0);
-		main->Add(new wxStaticText(advancedPage_, -1, _("Default r&emote directory:")));
-		main->Add(new wxTextCtrlEx(advancedPage_, XRCID("ID_REMOTEDIR")), lay.grow);
-		main->AddSpacer(0);
-		main->Add(new wxCheckBox(advancedPage_, XRCID("ID_SYNC"), _("&Use synchronized browsing")));
-		main->Add(new wxCheckBox(advancedPage_, XRCID("ID_COMPARISON"), _("Directory comparison")));
-
-		main->Add(new wxStaticLine(advancedPage_), lay.grow);
-
-		main->Add(new wxStaticText(advancedPage_, -1, _("&Adjust server time, offset by:")));
-		row = lay.createFlex(0, 1);
-		main->Add(row);
-		auto* hours = new wxSpinCtrl(advancedPage_, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		hours->SetRange(-24, 24);
-		row->Add(hours, lay.valign);
-		row->Add(new wxStaticText(advancedPage_, -1, _("Hours,")), lay.valign);
-		auto* minutes = new wxSpinCtrl(advancedPage_, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		minutes->SetRange(-59, 59);
-		row->Add(minutes, lay.valign);
-		row->Add(new wxStaticText(advancedPage_, -1, _("Minutes")), lay.valign);
+		controls_.emplace_back(std::make_unique<AdvancedSiteControls>(*advancedPage_, lay, *main));
 	}
 
 	{
@@ -257,7 +217,6 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		auto * main = lay.createMain(s3Page_, 1);
 		controls_.emplace_back(std::make_unique<S3SiteControls>(*s3Page_, lay, *main));
 	}
-#endif
 
 	extraParameters_[ParameterSection::host].emplace_back(XRCCTRL(*this, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_HOST", wxTextCtrl));
 	extraParameters_[ParameterSection::user].emplace_back(XRCCTRL(*this, "ID_EXTRA_USER_DESC", wxStaticText), XRCCTRL(*this, "ID_EXTRA_USER", wxTextCtrl));
@@ -346,14 +305,8 @@ void CSiteManagerSite::InitProtocols()
 		}
 	}
 
-	wxChoice *pChoice = dynamic_cast<wxChoice*>(FindWindow(XRCID("ID_SERVERTYPE")));
+	wxChoice* pChoice = XRCCTRL(*this, "ID_LOGONTYPE", wxChoice);
 	if (pChoice) {
-		for (int i = 0; i < SERVERTYPE_MAX; ++i) {
-			pChoice->Append(CServer::GetNameFromServerType(static_cast<ServerType>(i)));
-		}
-
-		pChoice = XRCCTRL(*this, "ID_LOGONTYPE", wxChoice);
-		wxASSERT(pChoice);
 		for (int i = 0; i < static_cast<int>(LogonType::count); ++i) {
 			pChoice->Append(GetNameFromLogonType(static_cast<LogonType>(i)));
 		}
@@ -634,13 +587,6 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 		encryptionkeySizer->Layout();
 	}
 
-	bool const hasServerType = CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType);
-	xrc_call(*this, "ID_SERVERTYPE_LABEL", &wxWindow::Show, hasServerType);
-	xrc_call(*this, "ID_SERVERTYPE", &wxWindow::Show, hasServerType);
-	auto * serverTypeSizer = xrc_call(*this, "ID_SERVERTYPE_LABEL", &wxWindow::GetContainingSizer)->GetContainingWindow()->GetSizer();
-	serverTypeSizer->CalcMin();
-	serverTypeSizer->Layout();
-
 	for (auto & controls : controls_) {
 		controls->SetControlVisibility(protocol, type);
 	}
@@ -855,28 +801,6 @@ bool CSiteManagerSite::Verify(bool predefined)
 #endif
 	}
 
-	std::wstring const remotePathRaw = XRCCTRL(*this, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
-	if (!remotePathRaw.empty()) {
-		std::wstring serverType = XRCCTRL(*this, "ID_SERVERTYPE", wxChoice)->GetStringSelection().ToStdWstring();
-
-		CServerPath remotePath;
-		remotePath.SetType(CServer::GetServerTypeFromName(serverType));
-		if (!remotePath.SetPath(remotePathRaw)) {
-			XRCCTRL(*this, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
-			wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
-			return false;
-		}
-	}
-
-	std::wstring const localPath = XRCCTRL(*this, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
-	if (XRCCTRL(*this, "ID_SYNC", wxCheckBox)->GetValue()) {
-		if (remotePathRaw.empty() || localPath.empty()) {
-			XRCCTRL(*this, "ID_SYNC", wxCheckBox)->SetFocus();
-			wxMessageBoxEx(_("You need to enter both a local and a remote path to enable synchronized browsing for this site."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, this);
-			return false;
-		}
-	}
-
 	std::vector<std::pair<wxStaticText*, wxTextCtrl*>>::iterator paramIt[ParameterSection::section_count];
 	for (int i = 0; i < ParameterSection::section_count; ++i) {
 		paramIt[i] = extraParameters_[i].begin();
@@ -948,32 +872,10 @@ void CSiteManagerSite::UpdateSite(Site &site)
 	site.comments_ = xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::GetValue).ToStdWstring();
 	site.m_colour = CSiteManager::GetColourFromIndex(xrc_call(*this, "ID_COLOR", &wxChoice::GetSelection));
 
-	std::wstring const serverType = xrc_call(*this, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
-	site.server.SetType(CServer::GetServerTypeFromName(serverType));
-
-	site.m_default_bookmark.m_localDir = xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
-	site.m_default_bookmark.m_remoteDir = CServerPath();
-	site.m_default_bookmark.m_remoteDir.SetType(site.server.GetType());
-	site.m_default_bookmark.m_remoteDir.SetPath(xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
-	site.m_default_bookmark.m_sync = xrc_call(*this, "ID_SYNC", &wxCheckBox::GetValue);
-	site.m_default_bookmark.m_comparison = xrc_call(*this, "ID_COMPARISON", &wxCheckBox::GetValue);
-
-	int hours = xrc_call(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::GetValue);
-	int minutes = xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::GetValue);
-
-	site.server.SetTimezoneOffset(hours * 60 + minutes);
-
 	UpdateExtraParameters(site.server);
 
 	for (auto & controls : controls_) {
 		controls->UpdateSite(site);
-	}
-
-	if (xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
-		site.server.SetBypassProxy(true);
-	}
-	else {
-		site.server.SetBypassProxy(false);
 	}
 }
 
@@ -1007,17 +909,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 	xrc_call(*this, "ID_LOGONTYPE", &wxWindow::Enable, !predefined);
 	xrc_call(*this, "ID_COLOR", &wxWindow::Enable, !predefined);
 	xrc_call(*this, "ID_COMMENTS", &wxWindow::Enable, !predefined);
-	if (advancedPage_) {
-		xrc_call(*this, "ID_SERVERTYPE", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_BYPASSPROXY", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_SYNC", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::Enable, !predefined);
-		xrc_call(*this, "ID_LOCALDIR", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_BROWSE", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_REMOTEDIR", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
-		xrc_call(*this, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
-	}
+
 	for (auto & controls : controls_) {
 		controls->SetSite(site, predefined);
 	}
@@ -1027,7 +919,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(*this, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
 		SetProtocol(FTP);
-		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, false);
 		bool const kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
 		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
@@ -1042,13 +933,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 
 		SetControlVisibility(FTP, logonType);
 		SetLogonTypeCtrlState();
-
-		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, 0);
-		xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, wxString());
-		xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, wxString());
-		xrc_call(*this, "ID_SYNC", &wxCheckBox::SetValue, false);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, 0);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, 0);
 	}
 	else {
 		xrc_call(*this, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
@@ -1063,7 +947,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 
 		ServerProtocol protocol = site.server.GetProtocol();
 		SetProtocol(protocol);
-		xrc_call(*this, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server.GetBypassProxy());
 
 		LogonType const logonType = site.credentials.logonType_;
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType));
@@ -1117,14 +1000,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		xrc_call(*this, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.credentials.keyFile_);
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.comments_);
 		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
-
-		xrc_call(*this, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server.GetType());
-		xrc_call(*this, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_localDir);
-		xrc_call(*this, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_remoteDir.GetPath());
-		xrc_call(*this, "ID_SYNC", &wxCheckBox::SetValue, site.m_default_bookmark.m_sync);
-		xrc_call(*this, "ID_COMPARISON", &wxCheckBox::SetValue, site.m_default_bookmark.m_comparison);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() / 60);
-		xrc_call<wxSpinCtrl, int>(*this, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() % 60);
 	}
 }
 
@@ -1171,14 +1046,6 @@ void CSiteManagerSite::OnLogontypeSelChanged(wxCommandEvent&)
 	LogonType const t = GetLogonType();
 	SetControlVisibility(GetProtocol(), t);
 	SetLogonTypeCtrlState();
-}
-
-void CSiteManagerSite::OnRemoteDirBrowse(wxCommandEvent&)
-{
-	wxDirDialog dlg(this, _("Choose the default local directory"), XRCCTRL(*this, "ID_LOCALDIR", wxTextCtrl)->GetValue(), wxDD_NEW_DIR_BUTTON);
-	if (dlg.ShowModal() == wxID_OK) {
-		XRCCTRL(*this, "ID_LOCALDIR", wxTextCtrl)->ChangeValue(dlg.GetPath());
-	}
 }
 
 void CSiteManagerSite::OnKeyFileBrowse(wxCommandEvent&)

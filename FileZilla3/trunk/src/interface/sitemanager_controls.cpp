@@ -8,6 +8,162 @@
 #include <s3sse.h>
 
 #include <wx/spinctrl.h>
+#include <wx/statline.h>
+
+AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
+    : SiteControls(parent)
+{
+	sizer.AddGrowableCol(0);
+	auto* row = lay.createFlex(0, 1);
+	sizer.Add(row);
+
+	row->Add(new wxStaticText(&parent, XRCID("ID_SERVERTYPE_LABEL"), _("Server &type:")), lay.valign);
+
+	auto types = new wxChoice(&parent, XRCID("ID_SERVERTYPE"));
+	row->Add(types, lay.valign);
+
+	for (int i = 0; i < SERVERTYPE_MAX; ++i) {
+		types->Append(CServer::GetNameFromServerType(static_cast<ServerType>(i)));
+	}
+
+	sizer.AddSpacer(0);
+	sizer.Add(new wxCheckBox(&parent, XRCID("ID_BYPASSPROXY"), _("B&ypass proxy")));
+
+	sizer.Add(new wxStaticLine(&parent), lay.grow);
+
+	sizer.Add(new wxStaticText(&parent, -1, _("Default &local directory:")));
+
+	row = lay.createFlex(0, 1);
+	sizer.Add(row, lay.grow);
+	row->AddGrowableCol(0);
+	auto localDir = new wxTextCtrlEx(&parent, XRCID("ID_LOCALDIR"));
+	row->Add(localDir, lay.valigng);
+	auto browse = new wxButton(&parent, XRCID("ID_BROWSE"), _("&Browse..."));
+	row->Add(browse, lay.valign);
+
+	browse->Bind(wxEVT_BUTTON, [localDir, p = &parent](wxEvent const&) {
+		wxDirDialog dlg(wxGetTopLevelParent(p), _("Choose the default local directory"), localDir->GetValue(), wxDD_NEW_DIR_BUTTON);
+		if (dlg.ShowModal() == wxID_OK) {
+			localDir->ChangeValue(dlg.GetPath());
+		}
+	});
+
+	sizer.AddSpacer(0);
+	sizer.Add(new wxStaticText(&parent, -1, _("Default r&emote directory:")));
+	sizer.Add(new wxTextCtrlEx(&parent, XRCID("ID_REMOTEDIR")), lay.grow);
+	sizer.AddSpacer(0);
+	sizer.Add(new wxCheckBox(&parent, XRCID("ID_SYNC"), _("&Use synchronized browsing")));
+	sizer.Add(new wxCheckBox(&parent, XRCID("ID_COMPARISON"), _("Directory comparison")));
+
+	sizer.Add(new wxStaticLine(&parent), lay.grow);
+
+	sizer.Add(new wxStaticText(&parent, -1, _("&Adjust server time, offset by:")));
+	row = lay.createFlex(0, 1);
+	sizer.Add(row);
+	auto* hours = new wxSpinCtrl(&parent, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	hours->SetRange(-24, 24);
+	row->Add(hours, lay.valign);
+	row->Add(new wxStaticText(&parent, -1, _("Hours,")), lay.valign);
+	auto* minutes = new wxSpinCtrl(&parent, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	minutes->SetRange(-59, 59);
+	row->Add(minutes, lay.valign);
+	row->Add(new wxStaticText(&parent, -1, _("Minutes")), lay.valign);
+}
+
+void AdvancedSiteControls::SetSite(Site const& site, bool predefined)
+{
+	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_BYPASSPROXY", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_SYNC", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::Enable, !predefined);
+	xrc_call(parent_, "ID_LOCALDIR", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_BROWSE", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_REMOTEDIR", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
+
+	if (site) {
+		xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server.GetType());
+		xrc_call(parent_, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_localDir);
+		xrc_call(parent_, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_remoteDir.GetPath());
+		xrc_call(parent_, "ID_SYNC", &wxCheckBox::SetValue, site.m_default_bookmark.m_sync);
+		xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::SetValue, site.m_default_bookmark.m_comparison);
+		xrc_call<wxSpinCtrl, int>(parent_, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() / 60);
+		xrc_call<wxSpinCtrl, int>(parent_, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, site.server.GetTimezoneOffset() % 60);
+	}
+	else {
+		xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::SetSelection, 0);
+		xrc_call(parent_, "ID_BYPASSPROXY", &wxCheckBox::SetValue, false);
+		xrc_call(parent_, "ID_SYNC", &wxCheckBox::SetValue, false);
+		xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::SetValue, false);
+		xrc_call(parent_, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call<wxSpinCtrl, int>(parent_, "ID_TIMEZONE_HOURS", &wxSpinCtrl::SetValue, 0);
+		xrc_call<wxSpinCtrl, int>(parent_, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::SetValue, 0);
+	}
+}
+
+bool AdvancedSiteControls::Verify(bool)
+{
+	std::wstring const remotePathRaw = XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
+	if (!remotePathRaw.empty()) {
+		std::wstring serverType = XRCCTRL(parent_, "ID_SERVERTYPE", wxChoice)->GetStringSelection().ToStdWstring();
+
+		CServerPath remotePath;
+		remotePath.SetType(CServer::GetServerTypeFromName(serverType));
+		if (!remotePath.SetPath(remotePathRaw)) {
+			XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
+			wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			return false;
+		}
+	}
+
+	std::wstring const localPath = XRCCTRL(parent_, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
+	if (XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->GetValue()) {
+		if (remotePathRaw.empty() || localPath.empty()) {
+			XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->SetFocus();
+			wxMessageBoxEx(_("You need to enter both a local and a remote path to enable synchronized browsing for this site."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType)
+{
+	bool const hasServerType = CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType);
+	xrc_call(parent_, "ID_SERVERTYPE_LABEL", &wxWindow::Show, hasServerType);
+	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Show, hasServerType);
+	auto * serverTypeSizer = xrc_call(parent_, "ID_SERVERTYPE_LABEL", &wxWindow::GetContainingSizer)->GetContainingWindow()->GetSizer();
+	serverTypeSizer->CalcMin();
+	serverTypeSizer->Layout();
+}
+
+void AdvancedSiteControls::UpdateSite(Site & site)
+{
+	std::wstring const serverType = xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
+	site.server.SetType(CServer::GetServerTypeFromName(serverType));
+
+	if (xrc_call(parent_, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
+		site.server.SetBypassProxy(true);
+	}
+	else {
+		site.server.SetBypassProxy(false);
+	}
+
+	site.m_default_bookmark.m_localDir = xrc_call(parent_, "ID_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
+	site.m_default_bookmark.m_remoteDir = CServerPath();
+	site.m_default_bookmark.m_remoteDir.SetType(site.server.GetType());
+	site.m_default_bookmark.m_remoteDir.SetPath(xrc_call(parent_, "ID_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
+	site.m_default_bookmark.m_sync = xrc_call(parent_, "ID_SYNC", &wxCheckBox::GetValue);
+	site.m_default_bookmark.m_comparison = xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::GetValue);
+
+	int hours = xrc_call(parent_, "ID_TIMEZONE_HOURS", &wxSpinCtrl::GetValue);
+	int minutes = xrc_call(parent_, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::GetValue);
+
+	site.server.SetTimezoneOffset(hours * 60 + minutes);
+}
 
 CharsetSiteControls::CharsetSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)

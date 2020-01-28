@@ -7,6 +7,7 @@ class DialogLayout;
 class Site;
 enum ServerProtocol;
 enum LogonType;
+
 class SiteControls
 {
 public:
@@ -23,6 +24,17 @@ public:
 	virtual void UpdateSite(Site &site) = 0;
 
 	wxWindow & parent_;
+};
+
+class AdvancedSiteControls final : public SiteControls
+{
+public:
+	AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
+
+	virtual void SetSite(Site const& site, bool predefined) override;
+	virtual bool Verify(bool predefined) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
+	virtual void UpdateSite(Site & site) override;
 };
 
 class CharsetSiteControls final : public SiteControls
