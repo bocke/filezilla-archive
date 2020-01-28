@@ -5,6 +5,7 @@
 
 class Site;
 class CSiteManagerDialog;
+class SiteControls;
 class CSiteManagerSite : public wxNotebook
 {
 public:
@@ -35,7 +36,6 @@ private:
 	DECLARE_EVENT_TABLE()
 	void OnProtocolSelChanged(wxCommandEvent& event);
 	void OnLogontypeSelChanged(wxCommandEvent& event);
-	void OnCharsetChange(wxCommandEvent& event);
 	void OnLimitMultipleConnectionsChanged(wxCommandEvent& event);
 	void OnRemoteDirBrowse(wxCommandEvent& event);
 	void OnKeyFileBrowse(wxCommandEvent&);
@@ -45,9 +45,12 @@ private:
 
 	std::map<ServerProtocol, int> mainProtocolListIndex_;
 
-	wxNotebookPage *m_pCharsetPage{};
+	wxNotebookPage *advancedPage_{};
+	wxNotebookPage *charsetPage_{};
+	wxNotebookPage *transferPage_{};
+	SiteControls *charsetControls_{};
 	wxString m_charsetPageText;
-	wxNotebookPage *m_pS3Page{};
+	wxNotebookPage *S3Page_{};
 	size_t m_totalPages = -1;
 
 	ServerProtocol previousProtocol_{UNKNOWN};
