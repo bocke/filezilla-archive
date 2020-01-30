@@ -400,10 +400,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 	site.server.MaximumMultipleConnections(maximumMultipleConnections);
 
 	wxString encodingType = GetTextElement(node, "EncodingType");
-	if (encodingType == _T("Auto")) {
-		site.server.SetEncodingType(ENCODING_AUTO);
-	}
-	else if (encodingType == _T("UTF-8")) {
+	if (encodingType == _T("UTF-8")) {
 		site.server.SetEncodingType(ENCODING_UTF8);
 	}
 	else if (encodingType == _T("Custom")) {
@@ -501,32 +498,39 @@ void SetServer(pugi::xml_node node, Site const& site)
 	AddTextElement(node, "Logontype", static_cast<int>(credentials.logonType_));
 
 	AddTextElement(node, "TimezoneOffset", site.server.GetTimezoneOffset());
-	switch (site.server.GetPasvMode())
-	{
-	case MODE_PASSIVE:
-		AddTextElementUtf8(node, "PasvMode", "MODE_PASSIVE");
-		break;
-	case MODE_ACTIVE:
-		AddTextElementUtf8(node, "PasvMode", "MODE_ACTIVE");
-		break;
-	default:
-		AddTextElementUtf8(node, "PasvMode", "MODE_DEFAULT");
-		break;
-	}
-	AddTextElement(node, "MaximumMultipleConnections", site.server.MaximumMultipleConnections());
 
-	switch (site.server.GetEncodingType())
-	{
-	case ENCODING_AUTO:
-		AddTextElementUtf8(node, "EncodingType", "Auto");
-		break;
-	case ENCODING_UTF8:
-		AddTextElementUtf8(node, "EncodingType", "UTF-8");
-		break;
-	case ENCODING_CUSTOM:
-		AddTextElementUtf8(node, "EncodingType", "Custom");
-		AddTextElement(node, "CustomEncoding", site.server.GetCustomEncoding());
-		break;
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
+		switch (site.server.GetPasvMode())
+		{
+		case MODE_PASSIVE:
+			AddTextElementUtf8(node, "PasvMode", "MODE_PASSIVE");
+			break;
+		case MODE_ACTIVE:
+			AddTextElementUtf8(node, "PasvMode", "MODE_ACTIVE");
+			break;
+		default:
+			AddTextElementUtf8(node, "PasvMode", "MODE_DEFAULT");
+			break;
+		}
+	}
+	if (site.server.MaximumMultipleConnections()) {
+		AddTextElement(node, "MaximumMultipleConnections", site.server.MaximumMultipleConnections());
+	}
+
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::Charset)) {
+		switch (site.server.GetEncodingType())
+		{
+		case ENCODING_AUTO:
+			AddTextElementUtf8(node, "EncodingType", "Auto");
+			break;
+		case ENCODING_UTF8:
+			AddTextElementUtf8(node, "EncodingType", "UTF-8");
+			break;
+		case ENCODING_CUSTOM:
+			AddTextElementUtf8(node, "EncodingType", "Custom");
+			AddTextElement(node, "CustomEncoding", site.server.GetCustomEncoding());
+			break;
+		}
 	}
 
 	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::PostLoginCommands)) {
