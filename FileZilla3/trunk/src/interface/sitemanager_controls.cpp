@@ -583,6 +583,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 
 		Site parsedSite;
 		std::wstring error;
+		site.m_default_bookmark.m_remoteDir = CServerPath();
 		if (!parsedSite.ParseUrl(host, port, user, pw, error, site.m_default_bookmark.m_remoteDir, protocol)) {
 			if (!silent) {
 				XRCCTRL(parent_, "ID_HOST", wxTextCtrl)->SetFocus();
@@ -1005,8 +1006,25 @@ void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTy
 
 bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 {
-	std::wstring const serverType = xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
-	site.server.SetType(CServer::GetServerTypeFromName(serverType));
+	ServerType serverType;
+	if (!site.m_default_bookmark.m_remoteDir.empty()) {
+		if (site.server.HasFeature(ProtocolFeature::ServerType)) {
+			serverType = site.m_default_bookmark.m_remoteDir.GetType();
+		}
+		else if (site.m_default_bookmark.m_remoteDir.GetType() != DEFAULT && site.m_default_bookmark.m_remoteDir.GetType() != UNIX) {
+			site.m_default_bookmark.m_remoteDir = CServerPath();
+		}
+	}
+	else {
+		if (site.server.HasFeature(ProtocolFeature::ServerType)) {
+			serverType = CServer::GetServerTypeFromName(xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring());
+		}
+		else {
+			serverType = DEFAULT;
+		}
+	}
+
+	site.server.SetType(serverType);
 
 	if (xrc_call(parent_, "ID_BYPASSPROXY", &wxCheckBox::GetValue)) {
 		site.server.SetBypassProxy(true);
@@ -1015,22 +1033,23 @@ bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 		site.server.SetBypassProxy(false);
 	}
 
-	std::wstring const remotePathRaw = XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
-	site.m_default_bookmark.m_remoteDir = CServerPath();
-	site.m_default_bookmark.m_remoteDir.SetType(site.server.GetType());
-	if (!remotePathRaw.empty()) {
-		if (!site.m_default_bookmark.m_remoteDir.SetPath(remotePathRaw)) {
-			if (!silent) {
-				XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
-				wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+	if (site.m_default_bookmark.m_remoteDir.empty()) {
+		std::wstring const remotePathRaw = XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
+		if (!remotePathRaw.empty()) {
+			site.m_default_bookmark.m_remoteDir.SetType(serverType);
+			if (!site.m_default_bookmark.m_remoteDir.SetPath(remotePathRaw)) {
+				if (!silent) {
+					XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
+					wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				}
+				return false;
 			}
-			return false;
 		}
 	}
 
 	std::wstring const localPath = XRCCTRL(parent_, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
 	if (XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->GetValue()) {
-		if (remotePathRaw.empty() || localPath.empty()) {
+		if (site.m_default_bookmark.m_remoteDir.empty() || localPath.empty()) {
 			if (!silent) {
 				XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->SetFocus();
 				wxMessageBoxEx(_("You need to enter both a local and a remote path to enable synchronized browsing for this site."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
