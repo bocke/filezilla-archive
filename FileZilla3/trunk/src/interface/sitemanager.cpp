@@ -849,16 +849,23 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 	SetServer(element, site);
 
 	// Save comments
-	AddTextElement(element, "Comments", site.comments_);
+	if (!site.comments_.empty()) {
+		AddTextElement(element, "Comments", site.comments_);
+	}
 
 	// Save colour
 	AddTextElement(element, "Colour", CSiteManager::GetColourIndex(site.m_colour));
 
 	// Save local dir
-	AddTextElement(element, "LocalDir", site.m_default_bookmark.m_localDir);
+	if (!site.m_default_bookmark.m_localDir.empty()) {
+		AddTextElement(element, "LocalDir", site.m_default_bookmark.m_localDir);
+	}
 
 	// Save remote dir
-	AddTextElement(element, "RemoteDir", site.m_default_bookmark.m_remoteDir.GetSafePath());
+	auto const sp = site.m_default_bookmark.m_remoteDir.GetSafePath();
+	if (!sp.empty()) {
+		AddTextElement(element, "RemoteDir", sp);
+	}
 
 	AddTextElementUtf8(element, "SyncBrowsing", site.m_default_bookmark.m_sync ? "1" : "0");
 	AddTextElementUtf8(element, "DirectoryComparison", site.m_default_bookmark.m_comparison ? "1" : "0");
@@ -869,10 +876,15 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 		AddTextElement(node, "Name", bookmark.m_name);
 
 		// Save local dir
-		AddTextElement(node, "LocalDir", bookmark.m_localDir);
+		if (!bookmark.m_localDir.empty()) {
+			AddTextElement(node, "LocalDir", bookmark.m_localDir);
+		}
 
 		// Save remote dir
-		AddTextElement(node, "RemoteDir", bookmark.m_remoteDir.GetSafePath());
+		auto const sp = bookmark.m_remoteDir.GetSafePath();
+		if (!sp.empty()) {
+			AddTextElement(node, "RemoteDir", sp);
+		}
 
 		AddTextElementUtf8(node, "SyncBrowsing", bookmark.m_sync ? "1" : "0");
 		AddTextElementUtf8(node, "DirectoryComparison", bookmark.m_comparison ? "1" : "0");
