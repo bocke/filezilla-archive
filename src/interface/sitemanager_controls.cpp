@@ -2,18 +2,905 @@
 #include "sitemanager_controls.h"
 
 #include "dialogex.h"
+#include "fzputtygen_interface.h"
+#include "Options.h"
+#include "sitemanager.h"
+#if ENABLE_STORJ
+#include "storj_key_interface.h"
+#endif
 #include "textctrlex.h"
 #include "xrc_helper.h"
 
 #include <s3sse.h>
 
+#include <libfilezilla/translate.hpp>
+
+#include <wx/gbsizer.h>
+#include <wx/hyperlink.h>
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
+
+#include <map>
+
+namespace {
+struct ProtocolGroup {
+	std::wstring name;
+	std::vector<std::pair<ServerProtocol, std::wstring>> protocols;
+};
+
+std::array<ProtocolGroup, 2> const& protocolGroups()
+{
+	static auto const groups = std::array<ProtocolGroup, 2>{{
+		{
+			fztranslate("FTP - File Transfer Protocol"), {
+				{ FTP, fztranslate("Use explicit FTP over TLS if available") },
+				{ FTPES, fztranslate("Require explicit FTP over TLS") },
+				{ FTPS, fztranslate("Require implicit FTP over TLS") },
+				{ INSECURE_FTP, fztranslate("Only use plain FTP (insecure)") }
+			}
+		},
+		{
+			fztranslate("WebDAV"), {
+				{ WEBDAV, fztranslate("Using secure HTTPS") },
+				{ INSECURE_WEBDAV, fztranslate("Using insecure HTTP") }
+			}
+		}
+	}};
+	return groups;
+}
+
+std::pair<std::array<ProtocolGroup, 2>::const_iterator, std::vector<std::pair<ServerProtocol, std::wstring>>::const_iterator> findGroup(ServerProtocol protocol)
+{
+	auto const& groups = protocolGroups();
+	for (auto group = groups.cbegin(); group != groups.cend(); ++group) {
+		for (auto entry = group->protocols.cbegin(); entry != group->protocols.cend(); ++entry) {
+			if (entry->first == protocol) {
+				return std::make_pair(group, entry);
+			}
+		}
+	}
+
+	return std::make_pair(groups.cend(), std::vector<std::pair<ServerProtocol, std::wstring>>::const_iterator());
+}
+}
+
+GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler)
+    : SiteControls(parent)
+    , changeHandler_(changeHandler)
+{
+	if (!sizer.IsColGrowable(0)) {
+		sizer.AddGrowableCol(0);
+	}
+
+	auto * bag = lay.createGridBag(2);
+	bag->AddGrowableCol(1);
+	sizer.Add(bag, 0, wxGROW);
+
+	bag->SetEmptyCellSize(wxSize(-bag->GetHGap(), -bag->GetVGap()));
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, -1, _("Pro&tocol:")), lay.valign);
+	auto protocols = new wxChoice(&parent, XRCID("ID_PROTOCOL"));
+	lay.gbAdd(bag, protocols, lay.valigng);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_HOST_DESC"), _("&Host:")), lay.valign);
+	auto * row = lay.createFlex(0, 1);
+	row->AddGrowableCol(0);
+	lay.gbAdd(bag, row, lay.valigng);
+	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_HOST")), lay.valigng);
+	row->Add(new wxStaticText(&parent, -1, _("&Port:")), lay.valign);
+	auto* port = new wxTextCtrlEx(&parent, XRCID("ID_PORT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(27), -1));
+	port->SetMaxLength(5);
+	row->Add(port, lay.valign);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_ENCRYPTION_DESC"), _("&Encryption:")), lay.valign);
+	auto brow = new wxBoxSizer(wxHORIZONTAL);
+	lay.gbAdd(bag, brow, lay.valigng);
+	brow->Add(new wxChoice(&parent, XRCID("ID_ENCRYPTION")), 1);
+	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_SIGNUP"), _("Signup"), L"https://app.storj.io/#/signup"), lay.valign)->Show(false);
+	brow->AddSpacer(0);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_EXTRA_HOST_DESC"), L""), lay.valign)->Show(false);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_EXTRA_HOST")), lay.valigng)->Show(false);
+
+	lay.gbAddRow(bag, new wxStaticLine(&parent), lay.grow);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, -1, _("&Logon Type:")), lay.valign);
+	auto logonTypes = new wxChoice(&parent, XRCID("ID_LOGONTYPE"));
+	lay.gbAdd(bag, logonTypes, lay.valigng);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_USER_DESC"), _("&User:")), lay.valign);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_USER")), lay.valigng);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_EXTRA_USER_DESC"), L""), lay.valign)->Show(false);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_EXTRA_USER")), lay.valigng)->Show(false);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_PASS_DESC"), _("Pass&word:")), lay.valign);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_PASS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_ACCOUNT_DESC"), _("&Account:")), lay.valign);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_ACCOUNT")), lay.valigng);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_KEYFILE_DESC"), _("&Key file:")), lay.valign)->Show(false);
+	row = lay.createFlex(0, 1);
+	row->AddGrowableCol(0);
+	lay.gbAdd(bag, row, lay.valigng);
+	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_KEYFILE")), lay.valigng)->Show(false);
+	auto keyfileBrowse = new wxButton(&parent, XRCID("ID_KEYFILE_BROWSE"), _("Browse..."));
+	row->Add(keyfileBrowse, lay.valign)->Show(false);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_ENCRYPTIONKEY_DESC"), _("Encryption &key:")), lay.valign)->Show(false);
+	row = lay.createFlex(0, 1);
+	row->AddGrowableCol(0);
+	lay.gbAdd(bag, row, lay.valigng);
+	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_ENCRYPTIONKEY")), lay.valigng)->Show(false);
+	auto storjKeyGenerate = new wxButton(&parent, XRCID("ID_ENCRYPTIONKEY_GENERATE"), _("Generate..."));
+	row->Add(storjKeyGenerate, lay.valign)->Show(false);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_EXTRA_CREDENTIALS_DESC"), L""), lay.valign)->Show(false);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_EXTRA_CREDENTIALS"), L"", wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng)->Show(false);
+
+	lay.gbNewRow(bag);
+	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_EXTRA_EXTRA_DESC"), L""), lay.valign)->Show(false);
+	lay.gbAdd(bag, new wxTextCtrlEx(&parent, XRCID("ID_EXTRA_EXTRA")), lay.valigng)->Show(false);
+
+	extraParameters_[ParameterSection::host].emplace_back("", XRCCTRL(parent_, "ID_EXTRA_HOST_DESC", wxStaticText), XRCCTRL(parent_, "ID_EXTRA_HOST", wxTextCtrl));
+	extraParameters_[ParameterSection::user].emplace_back("", XRCCTRL(parent_, "ID_EXTRA_USER_DESC", wxStaticText), XRCCTRL(parent_, "ID_EXTRA_USER", wxTextCtrl));
+	extraParameters_[ParameterSection::credentials].emplace_back("", XRCCTRL(parent_, "ID_EXTRA_CREDENTIALS_DESC", wxStaticText), XRCCTRL(parent_, "ID_EXTRA_CREDENTIALS", wxTextCtrl));
+	extraParameters_[ParameterSection::extra].emplace_back("", XRCCTRL(parent_, "ID_EXTRA_EXTRA_DESC", wxStaticText), XRCCTRL(parent_, "ID_EXTRA_EXTRA", wxTextCtrl));
+
+	for (auto const& proto : CServer::GetDefaultProtocols()) {
+		auto const entry = findGroup(proto);
+		if (entry.first != protocolGroups().cend()) {
+			if (entry.second == entry.first->protocols.cbegin()) {
+				mainProtocolListIndex_[proto] = protocols->Append(entry.first->name);
+			}
+			else {
+				mainProtocolListIndex_[proto] = mainProtocolListIndex_[entry.first->protocols.front().first];
+			}
+		}
+		else {
+			mainProtocolListIndex_[proto] = protocols->Append(CServer::GetProtocolName(proto));
+		}
+	}
+
+	for (int i = 0; i < static_cast<int>(LogonType::count); ++i) {
+		logonTypes->Append(GetNameFromLogonType(static_cast<LogonType>(i)));
+	}
+
+	protocols->Bind(wxEVT_CHOICE, [this](wxEvent const&) {
+		auto p = GetProtocol();
+		SetProtocol(p);
+		if (changeHandler_) {
+			changeHandler_(p, GetLogonType());
+		}
+	});
+
+	logonTypes->Bind(wxEVT_CHOICE, [this](wxEvent const&) {
+		auto t = GetLogonType();
+		SetLogonType(t);
+		if (changeHandler_) {
+			changeHandler_(GetProtocol(), t);
+		}
+	});
+
+	keyfileBrowse->Bind(wxEVT_BUTTON, [this](wxEvent const&) {
+		wxString wildcards(_T("PPK files|*.ppk|PEM files|*.pem|All files|*.*"));
+		wxFileDialog dlg(&parent_, _("Choose a key file"), wxString(), wxString(), wildcards, wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+
+		if (dlg.ShowModal() == wxID_OK) {
+			std::wstring keyFilePath = dlg.GetPath().ToStdWstring();
+			// If the selected file was a PEM file, LoadKeyFile() will automatically convert it to PPK
+			// and tell us the new location.
+			CFZPuttyGenInterface fzpg(&parent_);
+
+			std::wstring keyFileComment, keyFileData;
+			if (fzpg.LoadKeyFile(keyFilePath, false, keyFileComment, keyFileData)) {
+				XRCCTRL(parent_, "ID_KEYFILE", wxTextCtrl)->ChangeValue(keyFilePath);
+	#if USE_MAC_SANDBOX
+				OSXSandboxUserdirs::Get().AddFile(keyFilePath);
+	#endif
+			}
+			else {
+				xrc_call(parent_, "ID_KEYFILE", &wxWindow::SetFocus);
+			}
+		}
+	});
+
+#if ENABLE_STORJ
+	storjKeyGenerate->Bind(wxEVT_BUTTON, [this](wxEvent const&) {
+		CStorjKeyInterface generator(&parent_);
+		std::wstring key = generator.GenerateKey();
+		if (!key.empty()) {
+			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString(key));
+			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
+
+			wxDialogEx dlg;
+			if (dlg.Load(&parent_, "ID_STORJ_GENERATED_KEY")) {
+				dlg.WrapRecursive(&dlg, 2.5);
+				dlg.GetSizer()->Fit(&dlg);
+				dlg.GetSizer()->SetSizeHints(&dlg);
+				xrc_call(dlg, "ID_KEY", &wxTextCtrl::ChangeValue, wxString(key));
+				dlg.ShowModal();
+			}
+		}
+	});
+#endif
+}
+
+void GeneralSiteControls::SetSite(Site const& site)
+{
+	xrc_call(parent_, "ID_HOST", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_PORT", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_PROTOCOL", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_ENCRYPTION", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_LOGONTYPE", &wxWindow::Enable, !predefined_);
+
+	if (!site) {
+		// Empty all site information
+		xrc_call(parent_, "ID_HOST", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
+		SetProtocol(FTP);
+		bool const kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
+		xrc_call(parent_, "ID_USER", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
+		xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::ChangeValue, wxString());
+		xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
+
+		SetLogonType(logonType);
+	}
+	else {
+		xrc_call(parent_, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
+
+		unsigned int port = site.server.GetPort();
+		if (port != CServer::GetDefaultPort(site.server.GetProtocol())) {
+			xrc_call(parent_, "ID_PORT", &wxTextCtrl::ChangeValue, wxString::Format(_T("%d"), port));
+		}
+		else {
+			xrc_call(parent_, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
+		}
+
+		ServerProtocol protocol = site.server.GetProtocol();
+		SetProtocol(protocol);
+
+		LogonType const logonType = site.credentials.logonType_;
+		SetLogonType(logonType);
+
+		xrc_call(parent_, "ID_USER", &wxTextCtrl::ChangeValue, site.server.GetUser());
+		xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.credentials.account_);
+
+		std::wstring pass = site.credentials.GetPass();
+		std::wstring encryptionKey;
+		if (protocol == STORJ) {
+			size_t pos = pass.rfind('|');
+			if (pos != std::wstring::npos) {
+				encryptionKey = pass.substr(pos + 1);
+				pass = pass.substr(0, pos);
+			}
+		}
+
+		if (site.credentials.encrypted_) {
+			xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
+			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
+
+			// @translator: Keep this string as short as possible
+			xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, _("Leave empty to keep existing password."));
+			for (auto & control : extraParameters_[ParameterSection::credentials]) {
+				std::get<2>(control)->SetHint(_("Leave empty to keep existing data."));
+			}
+		}
+		else {
+			xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, pass);
+			xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
+			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, encryptionKey);
+
+			auto it = extraParameters_[ParameterSection::credentials].begin();
+
+			auto const& traits = ExtraServerParameterTraits(protocol);
+			for (auto const& trait : traits) {
+				if (trait.section_ != ParameterSection::credentials) {
+					continue;
+				}
+
+				std::get<2>(*it)->ChangeValue(site.credentials.GetExtraParameter(trait.name_));
+				++it;
+			}
+		}
+
+		std::vector<GeneralSiteControls::Parameter>::iterator paramIt[ParameterSection::section_count];
+		for (int i = 0; i < ParameterSection::section_count; ++i) {
+			paramIt[i] = extraParameters_[i].begin();
+		}
+		auto const& traits = ExtraServerParameterTraits(protocol);
+		for (auto const& trait : traits) {
+			if (trait.section_ == ParameterSection::credentials || trait.section_ == ParameterSection::custom) {
+				continue;
+			}
+
+			std::wstring value = site.server.GetExtraParameter(trait.name_);
+			std::get<2>(*paramIt[trait.section_])->ChangeValue(value.empty() ? trait.default_ : value);
+			++paramIt[trait.section_];
+		}
+
+		xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::ChangeValue, site.credentials.keyFile_);
+	}
+}
+
+void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType type, bool predefined)
+{
+	predefined_ = predefined;
+
+	auto const group = findGroup(protocol);
+	bool const isFtp = group.first != protocolGroups().cend() && group.first->protocols.front().first == FTP;
+
+	xrc_call(parent_, "ID_ENCRYPTION_DESC", &wxStaticText::Show, group.first != protocolGroups().cend());
+	xrc_call(parent_, "ID_ENCRYPTION", &wxChoice::Show, group.first != protocolGroups().cend());
+
+	xrc_call(parent_, "ID_SIGNUP", &wxControl::Show, protocol == STORJ);
+
+	auto const supportedlogonTypes = GetSupportedLogonTypes(protocol);
+	assert(!supportedlogonTypes.empty());
+
+	auto choice = XRCCTRL(parent_, "ID_LOGONTYPE", wxChoice);
+	choice->Clear();
+
+	if (std::find(supportedlogonTypes.cbegin(), supportedlogonTypes.cend(), type) == supportedlogonTypes.cend()) {
+		type = supportedlogonTypes.front();
+	}
+
+	for (auto const supportedLogonType : supportedlogonTypes) {
+		choice->Append(GetNameFromLogonType(supportedLogonType));
+		if (supportedLogonType == type) {
+			choice->SetSelection(choice->GetCount() - 1);
+		}
+	}
+
+	bool const hasUser = ProtocolHasUser(protocol) && type != LogonType::anonymous;
+
+	xrc_call(parent_, "ID_USER_DESC", &wxStaticText::Show, hasUser);
+	xrc_call(parent_, "ID_USER", &wxTextCtrl::Show, hasUser);
+	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::Show, type != LogonType::anonymous && type != LogonType::interactive  && (protocol != SFTP || type != LogonType::key));
+	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key));
+	xrc_call(parent_, "ID_ACCOUNT_DESC", &wxStaticText::Show, isFtp && type == LogonType::account);
+	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Show, isFtp && type == LogonType::account);
+	xrc_call(parent_, "ID_KEYFILE_DESC", &wxStaticText::Show, protocol == SFTP && type == LogonType::key);
+	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Show, protocol == SFTP && type == LogonType::key);
+	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Show, protocol == SFTP && type == LogonType::key);
+
+	xrc_call(parent_, "ID_ENCRYPTIONKEY_DESC", &wxStaticText::Show, protocol == STORJ);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Show, protocol == STORJ);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Show, protocol == STORJ);
+
+	wxString hostLabel = _("&Host:");
+	wxString hostHint;
+	wxString userHint;
+	wxString userLabel = _("&User:");
+	wxString passLabel = _("Pass&word:");
+	switch (protocol) {
+	case S3:
+		// @translator: Keep short
+		userLabel = _("&Access key ID:");
+		// @translator: Keep short
+		passLabel = _("Secret Access &Key:");
+		break;
+	case AZURE_FILE:
+	case AZURE_BLOB:
+		// @translator: Keep short
+		userLabel = _("Storage &account:");
+		passLabel = _("Access &Key:");
+		break;
+	case GOOGLE_CLOUD:
+		userLabel = _("Pro&ject ID:");
+		break;
+	case SWIFT:
+		// @translator: Keep short
+		hostLabel = _("Identity &host:");
+		// @translator: Keep short
+		hostHint = _("Host name of identity service");
+		userLabel = _("Pro&ject:");
+		// @translator: Keep short
+		userHint = _("Project (or tenant) name or ID");
+		break;
+	case B2:
+		// @translator: Keep short
+		userLabel = _("&Account ID:");
+		// @translator: Keep short
+		passLabel = _("Application &Key:");
+		break;
+	default:
+		break;
+	}
+	xrc_call(parent_, "ID_HOST_DESC", &wxStaticText::SetLabel, hostLabel);
+	xrc_call(parent_, "ID_HOST", &wxTextCtrl::SetHint, hostHint);
+	xrc_call(parent_, "ID_USER_DESC", &wxStaticText::SetLabel, userLabel);
+	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::SetLabel, passLabel);
+	xrc_call(parent_, "ID_USER", &wxTextCtrl::SetHint, userHint);
+
+	auto InsertRow = [this](std::vector<GeneralSiteControls::Parameter> & rows, std::string const &name, bool password) {
+
+		if (rows.empty()) {
+			return rows.end();
+		}
+
+		wxWindow* const parent = std::get<1>(rows.back())->GetParent();
+		wxGridBagSizer* const sizer = dynamic_cast<wxGridBagSizer*>(std::get<1>(rows.back())->GetContainingSizer());
+
+		if (!sizer) {
+			return rows.end();
+		}
+		auto pos = sizer->GetItemPosition(std::get<1>(rows.back()));
+
+		for (int row = sizer->GetRows() - 1; row > pos.GetRow(); --row) {
+			auto left = sizer->FindItemAtPosition(wxGBPosition(row, 0));
+			auto right = sizer->FindItemAtPosition(wxGBPosition(row, 1));
+			if (!left) {
+				break;
+			}
+			left->SetPos(wxGBPosition(row + 1, 0));
+			if (right) {
+				right->SetPos(wxGBPosition(row + 1, 1));
+			}
+		}
+		auto label = new wxStaticText(parent, wxID_ANY, L"");
+		auto text = new wxTextCtrlEx(parent, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
+		sizer->Add(label, wxGBPosition(pos.GetRow() + 1, 0), wxDefaultSpan, wxALIGN_CENTER_VERTICAL);
+		sizer->Add(text, wxGBPosition(pos.GetRow() + 1, 1), wxDefaultSpan, wxALIGN_CENTER_VERTICAL|wxGROW);
+
+		rows.emplace_back(name, label, text);
+		return rows.end() - 1;
+	};
+
+	auto SetLabel = [](wxStaticText & label, ServerProtocol const, std::string const& name) {
+		if (name == "login_hint") {
+			label.SetLabel(_("Login (optional):"));
+		}
+		else if (name == "identpath") {
+			// @translator: Keep short
+			label.SetLabel(_("Identity service path:"));
+		}
+		else if (name == "identuser") {
+			label.SetLabel(_("&User:"));
+		}
+		else {
+			label.SetLabel(name);
+		}
+	};
+
+	std::vector<GeneralSiteControls::Parameter>::iterator paramIt[ParameterSection::section_count];
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		paramIt[i] = extraParameters_[i].begin();
+	}
+
+	std::map<std::pair<std::string, ParameterSection::type>, std::wstring> values;
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		for (auto const& row : extraParameters_[i]) {
+			auto const& name = std::get<0>(row);
+			if (!name.empty()) {
+				auto value = std::get<2>(row)->GetValue().ToStdWstring();
+				if (!value.empty()) {
+					values[std::make_pair(name, static_cast<ParameterSection::type>(i))] = value;
+				}
+			}
+		}
+	}
+
+	std::vector<ParameterTraits> const& parameterTraits = ExtraServerParameterTraits(protocol);
+	for (auto const& trait : parameterTraits) {
+		if (trait.section_ == ParameterSection::custom) {
+			continue;
+		}
+		auto & parameters = extraParameters_[trait.section_];
+		auto & it = paramIt[trait.section_];
+
+		if (it == parameters.cend()) {
+			it = InsertRow(parameters, trait.name_, trait.section_ == ParameterSection::credentials);
+		}
+
+		if (it == parameters.cend()) {
+			continue;
+		}
+
+		std::get<0>(*it) = trait.name_;
+		std::get<1>(*it)->Show();
+		SetLabel(*std::get<1>(*it), protocol, trait.name_);
+
+		auto * pValue = std::get<2>(*it);
+		pValue->Show();
+		auto valueIt = values.find(std::make_pair(trait.name_, trait.section_));
+		if (valueIt != values.cend()) {
+			pValue->ChangeValue(valueIt->second);
+		}
+		else {
+			pValue->ChangeValue(wxString());
+		}
+		pValue->SetHint(trait.hint_);
+
+		++it;
+	}
+
+	auto encSizer = xrc_call(parent_, "ID_ENCRYPTION", &wxWindow::GetContainingSizer);
+	encSizer->Show(encSizer->GetItemCount() - 1, paramIt[ParameterSection::host] == extraParameters_[ParameterSection::host].cbegin());
+
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		for (; paramIt[i] != extraParameters_[i].cend(); ++paramIt[i]) {
+			std::get<0>(*paramIt[i]).clear();
+			std::get<1>(*paramIt[i])->Hide();
+			std::get<2>(*paramIt[i])->Hide();
+		}
+	}
+
+	auto keyfileSizer = xrc_call(parent_, "ID_KEYFILE_DESC", &wxStaticText::GetContainingSizer);
+	if (keyfileSizer) {
+		keyfileSizer->CalcMin();
+		keyfileSizer->Layout();
+	}
+
+	auto encryptionkeySizer = xrc_call(parent_, "ID_ENCRYPTIONKEY_DESC", &wxStaticText::GetContainingSizer);
+	if (encryptionkeySizer) {
+		encryptionkeySizer->CalcMin();
+		encryptionkeySizer->Layout();
+	}
+}
+
+bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
+{
+	ServerProtocol protocol = GetProtocol();
+	if (protocol == UNKNOWN) {
+		// How can this happen?
+		return false;
+	}
+
+	std::wstring user = xrc_call(parent_, "ID_USER", &wxTextCtrl::GetValue).ToStdWstring();
+	std::wstring pw = xrc_call(parent_, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring();
+
+	{
+		std::wstring const host = xrc_call(parent_, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
+		std::wstring const port = xrc_call(parent_, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
+
+		if (host.empty()) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_HOST", wxTextCtrl)->SetFocus();
+				wxMessageBoxEx(_("You have to enter a hostname."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+
+
+		Site parsedSite;
+		std::wstring error;
+		if (!parsedSite.ParseUrl(host, port, user, pw, error, site.m_default_bookmark.m_remoteDir, protocol)) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_HOST", wxTextCtrl)->SetFocus();
+				wxMessageBoxEx(error, _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+
+		protocol = parsedSite.server.GetProtocol();
+		site.server.SetProtocol(protocol);
+		site.server.SetHost(parsedSite.server.GetHost(), parsedSite.server.GetPort());
+
+		if (!parsedSite.server.GetUser().empty()) {
+			user = parsedSite.server.GetUser();
+		}
+		if (!parsedSite.credentials.GetPass().empty()) {
+			pw = parsedSite.credentials.GetPass();
+		}
+	}
+
+	auto logon_type = GetLogonType();
+	auto const supportedlogonTypes = GetSupportedLogonTypes(protocol);
+	if (std::find(supportedlogonTypes.cbegin(), supportedlogonTypes.cend(), logon_type) == supportedlogonTypes.cend()) {
+		logon_type = supportedlogonTypes.front();
+	}
+
+	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0 &&
+			!predefined_ &&
+	        (logon_type == LogonType::account || logon_type == LogonType::normal))
+	{
+		if (!silent) {
+			wxString msg;
+			if (COptions::Get()->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0) {
+				msg = _("Saving of password has been disabled by your system administrator.");
+			}
+			else {
+				msg = _("Saving of passwords has been disabled by you.");
+			}
+			msg += _T("\n");
+			msg += _("'Normal' and 'Account' logontypes are not available. Your entry has been changed to 'Ask for password'.");
+			wxMessageBoxEx(msg, _("Site Manager - Cannot remember password"), wxICON_INFORMATION, wxGetTopLevelParent(&parent_));
+		}
+		logon_type = LogonType::ask;
+	}
+
+	// At this point we got:
+	// - Valid protocol, host, port, logontype
+	// - Optional remotePath
+	// - Optional, unvalidated username, password
+
+	if (!ProtocolHasUser(protocol) || logon_type == LogonType::anonymous) {
+		user.clear();
+	}
+	else if (logon_type != LogonType::ask &&
+	         logon_type != LogonType::interactive &&
+	         user.empty())
+	{
+		// Require username for non-anonymous, non-ask logon type
+		if (!silent) {
+			XRCCTRL(parent_, "ID_USER", wxTextCtrl)->SetFocus();
+			wxMessageBoxEx(_("You have to specify a user name"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+		}
+		return false;
+	}
+	site.SetUser(user);
+
+	// We don't allow username of only spaces, confuses both users and XML libraries
+	if (!site.server.GetUser().empty()) {
+		bool space_only = true;
+		for (auto const& c : site.server.GetUser()) {
+			if (c != ' ') {
+				space_only = false;
+				break;
+			}
+		}
+		if (space_only) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_USER", wxTextCtrl)->SetFocus();
+				wxMessageBoxEx(_("Username cannot be a series of spaces"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+	}
+
+	// At this point username has been validated
+
+	// Require account for account logon type
+	if (logon_type == LogonType::account) {
+		std::wstring account = XRCCTRL(parent_, "ID_ACCOUNT", wxTextCtrl)->GetValue().ToStdWstring();
+		if (account.empty()) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_ACCOUNT", wxTextCtrl)->SetFocus();
+				wxMessageBoxEx(_("You have to enter an account name"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+		site.credentials.account_ = account;
+	}
+
+	// In key file logon type, check that the provided key file exists
+	if (logon_type == LogonType::key) {
+		std::wstring keyFile = xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::GetValue).ToStdWstring();
+		if (keyFile.empty()) {
+			if (!silent) {
+				wxMessageBoxEx(_("You have to enter a key file path"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				xrc_call(parent_, "ID_KEYFILE", &wxWindow::SetFocus);
+			}
+			return false;
+		}
+
+		// Check (again) that the key file is in the correct format since it might have been changed in the meantime
+		CFZPuttyGenInterface cfzg(wxGetTopLevelParent(&parent_));
+
+		std::wstring keyFileComment, keyFileData;
+		if (!cfzg.LoadKeyFile(keyFile, silent, keyFileComment, keyFileData)) {
+			if (!silent) {
+				xrc_call(parent_, "ID_KEYFILE", &wxWindow::SetFocus);
+			}
+			return false;
+		}
+
+		site.credentials.keyFile_ = keyFile;
+	}
+
+	if (protocol == STORJ && logon_type == LogonType::normal) {
+		std::wstring encryptionKey = xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
+
+		bool encrypted = !xrc_call(parent_, "ID_PASS", &wxTextCtrl::GetHint).empty();
+		if (encrypted) {
+			if (pw.empty() != encryptionKey.empty()) {
+				if (!silent) {
+					wxMessageBoxEx(_("You cannot change password and encryption key individually if using a master password."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+					xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
+				}
+				return false;
+			}
+		}
+#if ENABLE_STORJ
+		if (!encryptionKey.empty() || !encrypted) {
+			CStorjKeyInterface validator(this);
+			if (!validator.ValidateKey(encryptionKey, false)) {
+				if (!silent) {
+					wxMessageBoxEx(_("You have to enter a valid encryption key"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+					xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
+				}
+				return false;
+			}
+		}
+#endif
+		if (!pw.empty() || !site.credentials.encrypted_) {
+			pw += '|';
+			pw += encryptionKey;
+		}
+	}
+
+
+	site.server.ClearExtraParameters();
+
+	std::vector<ParameterTraits> const& parameterTraits = ExtraServerParameterTraits(protocol);
+	for (auto const& trait : parameterTraits) {
+		if (trait.section_ == ParameterSection::custom || trait.section_ == ParameterSection::credentials) {
+			continue;
+		}
+		for (auto const& row : extraParameters_[trait.section_]) {
+			if (std::get<0>(row) == trait.name_) {
+				std::wstring value = std::get<2>(row)->GetValue().ToStdWstring();
+				if (!(trait.flags_ & ParameterTraits::optional)) {
+					if (value.empty()) {
+						if (!silent) {
+							std::get<2>(row)->SetFocus();
+							wxMessageBoxEx(_("You need to enter a value."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+						}
+						return false;
+					}
+				}
+				site.server.SetExtraParameter(trait.name_, value);
+				break;
+			}
+		}
+
+	}
+
+	if (site.credentials.encrypted_) {
+		if (!pw.empty()) {
+			site.credentials.encrypted_ = fz::public_key();
+			site.credentials.SetPass(pw);
+		}
+	}
+	else {
+		site.credentials.SetPass(pw);
+	}
+
+	return true;
+}
+
+LogonType GeneralSiteControls::GetLogonType() const
+{
+	return GetLogonTypeFromName(xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring());
+}
+
+void GeneralSiteControls::SetLogonType(LogonType t)
+{
+	xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(t));
+
+	xrc_call(parent_, "ID_USER", &wxTextCtrl::Enable, !predefined_ && t != LogonType::anonymous);
+	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && (t == LogonType::normal || t == LogonType::account));
+	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && t == LogonType::account);
+	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && t == LogonType::key);
+	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && t == LogonType::key);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined_ && t == LogonType::normal);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined_ && t == LogonType::normal);
+
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		for (auto & param : extraParameters_[i]) {
+			std::get<2>(param)->Enable(!predefined_);
+		}
+	}
+}
+
+void GeneralSiteControls::SetProtocol(ServerProtocol protocol)
+{
+	wxChoice* pProtocol = XRCCTRL(parent_, "ID_PROTOCOL", wxChoice);
+	wxChoice* pEncryption = XRCCTRL(parent_, "ID_ENCRYPTION", wxChoice);
+	wxStaticText* pEncryptionDesc = XRCCTRL(parent_, "ID_ENCRYPTION_DESC", wxStaticText);
+
+	auto const entry = findGroup(protocol);
+	if (entry.first != protocolGroups().cend()) {
+		pEncryption->Clear();
+		for (auto const& prot : entry.first->protocols) {
+			std::wstring name = prot.second;
+			if (!CServer::ProtocolHasFeature(prot.first, ProtocolFeature::Security)) {
+				name += ' ';
+				name += 0x26a0; // Unicode's warning emoji
+				name += 0xfe0f; // Variant selector, makes it colorful
+			}
+			pEncryption->AppendString(name);
+		}
+		pEncryption->Show();
+		pEncryptionDesc->Show();
+		pEncryption->SetSelection(entry.second - entry.first->protocols.cbegin());
+	}
+	else {
+		pEncryption->Hide();
+		pEncryptionDesc->Hide();
+	}
+
+	auto const protoIt = mainProtocolListIndex_.find(protocol);
+	if (protoIt != mainProtocolListIndex_.cend()) {
+		pProtocol->SetSelection(protoIt->second);
+	}
+	else if (protocol != ServerProtocol::UNKNOWN) {
+		auto const entry = findGroup(protocol);
+		if (entry.first != protocolGroups().cend()) {
+			mainProtocolListIndex_[protocol] = pProtocol->Append(entry.first->name);
+			for (auto const& sub : entry.first->protocols) {
+				mainProtocolListIndex_[sub.first] = mainProtocolListIndex_[protocol];
+			}
+		}
+		else {
+			mainProtocolListIndex_[protocol] = pProtocol->Append(CServer::GetProtocolName(protocol));
+		}
+
+		pProtocol->SetSelection(mainProtocolListIndex_[protocol]);
+	}
+	else {
+		pProtocol->SetSelection(mainProtocolListIndex_[FTP]);
+	}
+	UpdateHostFromDefaults(GetProtocol());
+
+	previousProtocol_ = protocol;
+}
+
+ServerProtocol GeneralSiteControls::GetProtocol() const
+{
+	int const sel = xrc_call(parent_, "ID_PROTOCOL", &wxChoice::GetSelection);
+
+	ServerProtocol protocol = UNKNOWN;
+	for (auto const it : mainProtocolListIndex_) {
+		if (it.second == sel) {
+			protocol = it.first;
+			break;
+		}
+	}
+
+	auto const group = findGroup(protocol);
+	if (group.first != protocolGroups().cend()) {
+		int encSel = xrc_call(parent_, "ID_ENCRYPTION", &wxChoice::GetSelection);
+		if (encSel < 0 || encSel >= static_cast<int>(group.first->protocols.size())) {
+			encSel = 0;
+		}
+		protocol = group.first->protocols[encSel].first;
+	}
+
+	return protocol;
+}
+
+
+void GeneralSiteControls::UpdateHostFromDefaults(ServerProtocol const protocol)
+{
+	if (protocol != previousProtocol_) {
+		auto const oldDefault = std::get<0>(GetDefaultHost(previousProtocol_));
+		auto const newDefault = GetDefaultHost(protocol);
+
+		std::wstring const host = xrc_call(parent_, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
+		if (host.empty() || host == oldDefault) {
+			xrc_call(parent_, "ID_HOST", &wxTextCtrl::ChangeValue, std::get<0>(newDefault));
+		}
+		xrc_call(parent_, "ID_HOST", &wxTextCtrl::SetHint, std::get<1>(newDefault));
+	}
+}
+
 
 AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)
 {
-	sizer.AddGrowableCol(0);
+	if (!sizer.IsColGrowable(0)) {
+		sizer.AddGrowableCol(0);
+	}
+
 	auto* row = lay.createFlex(0, 1);
 	sizer.Add(row);
 
@@ -70,17 +957,17 @@ AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const
 	row->Add(new wxStaticText(&parent, -1, _("Minutes")), lay.valign);
 }
 
-void AdvancedSiteControls::SetSite(Site const& site, bool predefined)
+void AdvancedSiteControls::SetSite(Site const& site)
 {
-	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_BYPASSPROXY", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_SYNC", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::Enable, !predefined);
-	xrc_call(parent_, "ID_LOCALDIR", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_BROWSE", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_REMOTEDIR", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_BYPASSPROXY", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_SYNC", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::Enable, !predefined_);
+	xrc_call(parent_, "ID_LOCALDIR", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_BROWSE", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_REMOTEDIR", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_TIMEZONE_HOURS", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_TIMEZONE_MINUTES", &wxWindow::Enable, !predefined_);
 
 	if (site) {
 		xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server.GetType());
@@ -103,35 +990,10 @@ void AdvancedSiteControls::SetSite(Site const& site, bool predefined)
 	}
 }
 
-bool AdvancedSiteControls::Verify(bool)
+void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined)
 {
-	std::wstring const remotePathRaw = XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
-	if (!remotePathRaw.empty()) {
-		std::wstring serverType = XRCCTRL(parent_, "ID_SERVERTYPE", wxChoice)->GetStringSelection().ToStdWstring();
+	predefined_ = predefined;
 
-		CServerPath remotePath;
-		remotePath.SetType(CServer::GetServerTypeFromName(serverType));
-		if (!remotePath.SetPath(remotePathRaw)) {
-			XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
-			wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-			return false;
-		}
-	}
-
-	std::wstring const localPath = XRCCTRL(parent_, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
-	if (XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->GetValue()) {
-		if (remotePathRaw.empty() || localPath.empty()) {
-			XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->SetFocus();
-			wxMessageBoxEx(_("You need to enter both a local and a remote path to enable synchronized browsing for this site."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType)
-{
 	bool const hasServerType = CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType);
 	xrc_call(parent_, "ID_SERVERTYPE_LABEL", &wxWindow::Show, hasServerType);
 	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Show, hasServerType);
@@ -140,7 +1002,7 @@ void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTy
 	serverTypeSizer->Layout();
 }
 
-void AdvancedSiteControls::UpdateSite(Site & site)
+bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 {
 	std::wstring const serverType = xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring();
 	site.server.SetType(CServer::GetServerTypeFromName(serverType));
@@ -152,10 +1014,31 @@ void AdvancedSiteControls::UpdateSite(Site & site)
 		site.server.SetBypassProxy(false);
 	}
 
-	site.m_default_bookmark.m_localDir = xrc_call(parent_, "ID_LOCALDIR", &wxTextCtrl::GetValue).ToStdWstring();
+	std::wstring const remotePathRaw = XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->GetValue().ToStdWstring();
 	site.m_default_bookmark.m_remoteDir = CServerPath();
 	site.m_default_bookmark.m_remoteDir.SetType(site.server.GetType());
-	site.m_default_bookmark.m_remoteDir.SetPath(xrc_call(parent_, "ID_REMOTEDIR", &wxTextCtrl::GetValue).ToStdWstring());
+	if (!remotePathRaw.empty()) {
+		if (!site.m_default_bookmark.m_remoteDir.SetPath(remotePathRaw)) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_REMOTEDIR", wxTextCtrl)->SetFocus();
+				wxMessageBoxEx(_("Default remote path cannot be parsed. Make sure it is a valid absolute path for the selected server type."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+	}
+
+	std::wstring const localPath = XRCCTRL(parent_, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
+	if (XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->GetValue()) {
+		if (remotePathRaw.empty() || localPath.empty()) {
+			if (!silent) {
+				XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->SetFocus();
+				wxMessageBoxEx(_("You need to enter both a local and a remote path to enable synchronized browsing for this site."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+			}
+			return false;
+		}
+	}
+
+
 	site.m_default_bookmark.m_sync = xrc_call(parent_, "ID_SYNC", &wxCheckBox::GetValue);
 	site.m_default_bookmark.m_comparison = xrc_call(parent_, "ID_COMPARISON", &wxCheckBox::GetValue);
 
@@ -163,6 +1046,8 @@ void AdvancedSiteControls::UpdateSite(Site & site)
 	int minutes = xrc_call(parent_, "ID_TIMEZONE_MINUTES", &wxSpinCtrl::GetValue);
 
 	site.server.SetTimezoneOffset(hours * 60 + minutes);
+
+	return true;
 }
 
 CharsetSiteControls::CharsetSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
@@ -191,12 +1076,12 @@ CharsetSiteControls::CharsetSiteControls(wxWindow & parent, DialogLayout const& 
 	rbCustom->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Enable(); });
 }
 
-void CharsetSiteControls::SetSite(Site const& site, bool predefined)
+void CharsetSiteControls::SetSite(Site const& site)
 {
-	xrc_call(parent_, "ID_CHARSET_AUTO", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_CHARSET_UTF8", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_ENCODING", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_CHARSET_AUTO", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_CHARSET_UTF8", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_ENCODING", &wxWindow::Enable, !predefined_);
 
 	if (!site) {
 		xrc_call(parent_, "ID_CHARSET_AUTO", &wxRadioButton::SetValue, true);
@@ -216,36 +1101,39 @@ void CharsetSiteControls::SetSite(Site const& site, bool predefined)
 			xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxRadioButton::SetValue, true);
 			break;
 		}
-		xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::Enable, !predefined && site.server.GetEncodingType() == ENCODING_CUSTOM);
+		xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::Enable, !predefined_ && site.server.GetEncodingType() == ENCODING_CUSTOM);
 		xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::ChangeValue, site.server.GetCustomEncoding());
 	}
 }
 
-bool CharsetSiteControls::Verify(bool)
+bool CharsetSiteControls::UpdateSite(Site & site, bool silent)
 {
-	if (XRCCTRL(parent_, "ID_CHARSET_CUSTOM", wxRadioButton)->GetValue()) {
-		if (XRCCTRL(parent_, "ID_ENCODING", wxTextCtrl)->GetValue().empty()) {
-			XRCCTRL(parent_, "ID_ENCODING", wxTextCtrl)->SetFocus();
-			wxMessageBoxEx(_("Need to specify a character encoding"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-			return false;
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::Charset)) {
+		if (xrc_call(parent_, "ID_CHARSET_UTF8", &wxRadioButton::GetValue)) {
+			site.server.SetEncodingType(ENCODING_UTF8);
 		}
-	}
+		else if (xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxRadioButton::GetValue)) {
+			std::wstring encoding = xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::GetValue).ToStdWstring();
 
-	return true;
-}
+			if (encoding.empty()) {
+				if (!silent) {
+					XRCCTRL(parent_, "ID_ENCODING", wxTextCtrl)->SetFocus();
+					wxMessageBoxEx(_("Need to specify a character encoding"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				}
+				return false;
+			}
 
-void CharsetSiteControls::UpdateSite(Site & site)
-{
-	if (xrc_call(parent_, "ID_CHARSET_UTF8", &wxRadioButton::GetValue)) {
-		site.server.SetEncodingType(ENCODING_UTF8);
-	}
-	else if (xrc_call(parent_, "ID_CHARSET_CUSTOM", &wxRadioButton::GetValue)) {
-		std::wstring encoding = xrc_call(parent_, "ID_ENCODING", &wxTextCtrl::GetValue).ToStdWstring();
-		site.server.SetEncodingType(ENCODING_CUSTOM, encoding);
+			site.server.SetEncodingType(ENCODING_CUSTOM, encoding);
+		}
+		else {
+			site.server.SetEncodingType(ENCODING_AUTO);
+		}
 	}
 	else {
 		site.server.SetEncodingType(ENCODING_AUTO);
 	}
+
+	return true;
 }
 
 TransferSettingsSiteControls::TransferSettingsSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
@@ -271,12 +1159,12 @@ TransferSettingsSiteControls::TransferSettingsSiteControls(wxWindow & parent, Di
 	limit->Bind(wxEVT_CHECKBOX, [spin](wxCommandEvent const& ev){ spin->Enable(ev.IsChecked()); });
 }
 
-void TransferSettingsSiteControls::SetSite(Site const& site, bool predefined)
+void TransferSettingsSiteControls::SetSite(Site const& site)
 {
-	xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined_);
 
 	if (site) {
 		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
@@ -301,7 +1189,7 @@ void TransferSettingsSiteControls::SetSite(Site const& site, bool predefined)
 		int const maxMultiple = site.server.MaximumMultipleConnections();
 		xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, maxMultiple != 0);
 		if (maxMultiple != 0) {
-			xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined);
+			xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, !predefined_);
 			xrc_call<wxSpinCtrl, int>(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::SetValue, maxMultiple);
 		}
 		else {
@@ -312,13 +1200,18 @@ void TransferSettingsSiteControls::SetSite(Site const& site, bool predefined)
 	}
 }
 
-void TransferSettingsSiteControls::UpdateSite(Site & site)
+bool TransferSettingsSiteControls::UpdateSite(Site & site, bool)
 {
-	if (xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
-		site.server.SetPasvMode(MODE_ACTIVE);
-	}
-	else if (xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
-		site.server.SetPasvMode(MODE_PASSIVE);
+	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
+		if (xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxRadioButton::GetValue)) {
+			site.server.SetPasvMode(MODE_ACTIVE);
+		}
+		else if (xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxRadioButton::GetValue)) {
+			site.server.SetPasvMode(MODE_PASSIVE);
+		}
+		else {
+			site.server.SetPasvMode(MODE_DEFAULT);
+		}
 	}
 	else {
 		site.server.SetPasvMode(MODE_DEFAULT);
@@ -330,10 +1223,14 @@ void TransferSettingsSiteControls::UpdateSite(Site & site)
 	else {
 		site.server.MaximumMultipleConnections(0);
 	}
+
+	return true;
 }
 
-void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType)
+void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined)
 {
+	predefined_ = predefined;
+
 	bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
 	xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
 	xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
@@ -348,7 +1245,10 @@ void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol,
 S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)
 {
-	sizer.AddGrowableCol(0);
+	if (!sizer.IsColGrowable(0)) {
+		sizer.AddGrowableCol(0);
+	}
+
 	sizer.Add(new wxStaticText(&parent, -1, _("Server Side Encryption:")));
 
 	sizer.Add(new wxRadioButton(&parent, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
@@ -376,16 +1276,16 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 
 }
 
-void S3SiteControls::SetSite(Site const& site, bool predefined)
+void S3SiteControls::SetSite(Site const& site)
 {
-	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_AES256", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_AWSKMS", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxWindow::Enable, !predefined);
-	xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::Enable, !predefined);
+	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_AES256", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_AWSKMS", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::Enable, !predefined_);
 
 	xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
 	auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
@@ -410,7 +1310,7 @@ void S3SiteControls::SetSite(Site const& site, bool predefined)
 	}
 }
 
-void S3SiteControls::UpdateSite(Site & site)
+bool S3SiteControls::UpdateSite(Site & site, bool)
 {
 	CServer & server = site.server;
 	if (server.GetProtocol() == S3) {
@@ -431,4 +1331,6 @@ void S3SiteControls::UpdateSite(Site & site)
 			server.SetExtraParameter("ssecustomerkey", fz::to_wstring(xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue)));
 		}
 	}
+
+	return true;
 }

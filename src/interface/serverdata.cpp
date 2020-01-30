@@ -205,6 +205,9 @@ bool Site::ParseUrl(std::wstring host, unsigned int port, std::wstring user, std
 		}
 		server.SetProtocol(p);
 	}
+	else {
+		server.SetProtocol(hint);
+	}
 
 	pos = host.find('@');
 	if (pos != std::wstring::npos) {

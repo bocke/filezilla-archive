@@ -40,7 +40,7 @@ protected:
 	bool Load();
 	bool Save(pugi::xml_node element = pugi::xml_node(), wxTreeItemId treeId = wxTreeItemId());
 	bool SaveChild(pugi::xml_node element, wxTreeItemId child);
-	void UpdateServer(Site & site, wxString const& name);
+	bool UpdateServer(Site & site, wxString const& name);
 	void SetCtrlState();
 	bool LoadDefaultSites();
 
