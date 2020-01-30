@@ -417,18 +417,6 @@ bool CServer::SetEncodingType(CharsetEncoding type, std::wstring const& encoding
 	return true;
 }
 
-bool CServer::SetCustomEncoding(std::wstring const& encoding)
-{
-	if (encoding.empty()) {
-		return false;
-	}
-
-	m_encodingType = ENCODING_CUSTOM;
-	m_customEncoding = encoding;
-
-	return true;
-}
-
 CharsetEncoding CServer::GetEncodingType() const
 {
 	return m_encodingType;
@@ -673,7 +661,7 @@ void CServer::SetExtraParameter(std::string_view const& name, std::wstring const
 	}
 	else {
 		bool found = false;
-		auto const& traits  = ExtraServerParameterTraits(m_protocol);
+		auto const& traits = ExtraServerParameterTraits(m_protocol);
 		for (auto const& trait : traits) {
 			if (trait.section_ != ParameterSection::credentials && name == trait.name_) {
 				found = true;

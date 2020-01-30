@@ -167,7 +167,6 @@ public:
 	std::wstring Format(ServerFormat formatType, Credentials const& credentials) const;
 
 	bool SetEncodingType(CharsetEncoding type, std::wstring const& encoding = std::wstring());
-	bool SetCustomEncoding(std::wstring const& encoding);
 	CharsetEncoding GetEncodingType() const;
 	std::wstring GetCustomEncoding() const;
 
