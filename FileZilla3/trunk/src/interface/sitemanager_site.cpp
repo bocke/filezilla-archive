@@ -23,8 +23,6 @@
 #include "commctrl.h"
 #endif
 
-#include <array>
-
 CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
     : sitemanager_(sitemanager)
 {

@@ -20,6 +20,7 @@
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
 
+#include <array>
 #include <map>
 
 namespace {
