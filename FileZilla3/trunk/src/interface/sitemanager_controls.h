@@ -3,10 +3,10 @@
 
 #include "serverdata.h"
 
-class DialogLayout;
+struct DialogLayout;
 class Site;
 enum ServerProtocol;
-enum LogonType;
+enum class LogonType;
 
 class SiteControls
 {
@@ -16,14 +16,42 @@ public:
 	{}
 
 	virtual ~SiteControls() = default;
-	virtual void SetSite(Site const& site, bool predefined) = 0;
+	virtual void SetSite(Site const& site) = 0;
 
-	virtual bool Verify(bool /*predefined*/) { return true; }
-	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/) {}
+	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/, bool predefined) { predefined_ = predefined; }
 
-	virtual void UpdateSite(Site &site) = 0;
+	virtual bool UpdateSite(Site & site, bool silent) = 0;
 
 	wxWindow & parent_;
+
+	bool predefined_{};
+};
+
+class GeneralSiteControls final : public SiteControls
+{
+public:
+	GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler = nullptr);
+
+	virtual void SetSite(Site const& site) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
+
+private:
+	void SetProtocol(ServerProtocol protocol);
+	ServerProtocol GetProtocol() const;
+
+	void SetLogonType(LogonType t);
+	LogonType GetLogonType() const;
+
+	void UpdateHostFromDefaults(ServerProtocol const protocol);
+
+	std::map<ServerProtocol, int> mainProtocolListIndex_;
+	typedef std::tuple<std::string, wxStaticText*, wxTextCtrl*> Parameter;
+	std::vector<Parameter> extraParameters_[ParameterSection::section_count];
+
+	ServerProtocol previousProtocol_{UNKNOWN};
+
+	std::function<void(ServerProtocol protocol, LogonType logon_type)> const changeHandler_;
 };
 
 class AdvancedSiteControls final : public SiteControls
@@ -31,10 +59,9 @@ class AdvancedSiteControls final : public SiteControls
 public:
 	AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
-	virtual void SetSite(Site const& site, bool predefined) override;
-	virtual bool Verify(bool predefined) override;
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
-	virtual void UpdateSite(Site & site) override;
+	virtual void SetSite(Site const& site) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
 class CharsetSiteControls final : public SiteControls
@@ -42,9 +69,8 @@ class CharsetSiteControls final : public SiteControls
 public:
 	CharsetSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
-	virtual void SetSite(Site const& site, bool predefined) override;
-	virtual bool Verify(bool predefined) override;
-	virtual void UpdateSite(Site & site) override;
+	virtual void SetSite(Site const& site) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
 class TransferSettingsSiteControls final : public SiteControls
@@ -52,9 +78,9 @@ class TransferSettingsSiteControls final : public SiteControls
 public:
 	TransferSettingsSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
-	virtual void SetSite(Site const& site, bool predefined) override;
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
-	virtual void UpdateSite(Site & site) override;
+	virtual void SetSite(Site const& site) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
 
@@ -63,8 +89,8 @@ class S3SiteControls final : public SiteControls
 public:
 	S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
-	virtual void SetSite(Site const& site, bool predefined) override;
-	virtual void UpdateSite(Site & site) override;
+	virtual void SetSite(Site const& site) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
 #endif

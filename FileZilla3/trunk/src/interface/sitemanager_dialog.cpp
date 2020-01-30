@@ -920,8 +920,8 @@ bool CSiteManagerDialog::Verify()
 	}
 
 	if (data->m_site) {
-		bool const predefined = IsPredefinedItem(item);
-		if (!m_pNotebook_Site->Verify(predefined)) {
+		Site newSite = *data->m_site;
+		if (!m_pNotebook_Site->UpdateSite(newSite, false)) {
 			return false;
 		}
 	}
@@ -1195,8 +1195,7 @@ bool CSiteManagerDialog::UpdateItem()
 	}
 
 	if (data->m_site) {
-		UpdateServer(*data->m_site, tree_->GetItemText(item));
-		return true;
+		return UpdateServer(*data->m_site, tree_->GetItemText(item));
 	}
 	else {
 		wxASSERT(data->m_bookmark);
@@ -1222,11 +1221,16 @@ bool CSiteManagerDialog::UpdateBookmark(Bookmark &bookmark, Site const& site)
 	return true;
 }
 
-void CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
+bool CSiteManagerDialog::UpdateServer(Site & site, const wxString &name)
 {
-	m_pNotebook_Site->UpdateSite(site);
+	Site newSite = site;
+	newSite.SetName(name.ToStdWstring());
+	if (!m_pNotebook_Site->UpdateSite(newSite, true)) {
+		return false;
+	}
 
-	site.SetName(name.ToStdWstring());
+	site = newSite;
+	return true;
 }
 
 bool CSiteManagerDialog::GetServer(Site& data, Bookmark& bookmark)
