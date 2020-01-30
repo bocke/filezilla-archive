@@ -721,7 +721,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		}
 #if ENABLE_STORJ
 		if (!encryptionKey.empty() || !encrypted) {
-			CStorjKeyInterface validator(this);
+			CStorjKeyInterface validator(&parent_);
 			if (!validator.ValidateKey(encryptionKey, false)) {
 				if (!silent) {
 					wxMessageBoxEx(_("You have to enter a valid encryption key"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
