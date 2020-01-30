@@ -428,7 +428,7 @@ bool CServerPath::DoSetSafePath(std::wstring const& path)
 
 bool CServerPath::SetType(ServerType type)
 {
-	if (!empty() && m_type != DEFAULT) {
+	if (!empty() && m_type != DEFAULT && m_type != type) {
 		return false;
 	}
 
