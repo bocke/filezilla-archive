@@ -91,6 +91,9 @@ public:
 
 	virtual void SetSite(Site const& site) override;
 	virtual bool UpdateSite(Site & site, bool silent) override;
+
+private:
+	void SetCtrlState();
 };
 
 #endif

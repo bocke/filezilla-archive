@@ -1271,11 +1271,15 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 
 	sizer.Add(new wxStaticText(&parent, -1, _("Server Side Encryption:")));
 
-	sizer.Add(new wxRadioButton(&parent, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
+	auto none = new wxRadioButton(&parent, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	sizer.Add(none);
 
-	sizer.Add(new wxRadioButton(&parent, XRCID("ID_S3_AES256"), _("&AWS S3 encryption")));
+	auto aes = new wxRadioButton(&parent, XRCID("ID_S3_AES256"), _("&AWS S3 encryption"));
+	sizer.Add(aes);
 
-	sizer.Add(new wxRadioButton(&parent, XRCID("ID_S3_AWSKMS"), _("AWS &KMS encryption")));
+	auto kms = new wxRadioButton(&parent, XRCID("ID_S3_AWSKMS"), _("AWS &KMS encryption"));
+	sizer.Add(kms);
+
 	auto * row = lay.createFlex(2);
 	row->AddGrowableCol(1);
 	sizer.Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
@@ -1287,13 +1291,39 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 	row->Add(new wxStaticText(&parent, -1, _("C&ustom KMS ARN:")), lay.valign);
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
 
-	sizer.Add(new wxRadioButton(&parent, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption")));
+	auto customer = new wxRadioButton(&parent, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption"));
+	sizer.Add(customer);
 	row = lay.createFlex(2);
 	row->AddGrowableCol(1);
 	sizer.Add(row, 0, wxLEFT | wxGROW, lay.dlgUnits(10));
 	row->Add(new wxStaticText(&parent, -1, _("Cus&tomer Key:")), lay.valign);
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
 
+	auto l = [this](wxEvent const&) { SetCtrlState(); };
+	none->Bind(wxEVT_RADIOBUTTON, l);
+	aes->Bind(wxEVT_RADIOBUTTON, l);
+	kms->Bind(wxEVT_RADIOBUTTON, l);
+	customer->Bind(wxEVT_RADIOBUTTON, l);
+	choice->Bind(wxEVT_CHOICE, l);
+}
+
+void S3SiteControls::SetCtrlState()
+{
+	bool enableKey{};
+	bool enableKMS{};
+	bool enableCustomer{};
+	if (xrc_call(parent_, "ID_S3_AWSKMS", &wxRadioButton::GetValue)) {
+		enableKey = true;
+		if (xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::GetSelection) == static_cast<int>(s3_sse::KmsKey::CUSTOM)) {
+			enableKMS = true;
+		}
+	}
+	else if (xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::GetValue)) {
+		enableCustomer = true;
+	}
+	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined_ && enableKey);
+	xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxWindow::Enable, !predefined_ && enableKMS);
+	xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::Enable, !predefined_ && enableCustomer);
 }
 
 void S3SiteControls::SetSite(Site const& site)
@@ -1302,35 +1332,38 @@ void S3SiteControls::SetSite(Site const& site)
 	xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxWindow::Enable, !predefined_);
 	xrc_call(parent_, "ID_S3_AES256", &wxWindow::Enable, !predefined_);
 	xrc_call(parent_, "ID_S3_AWSKMS", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_S3_KMSKEY", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxWindow::Enable, !predefined_);
 	xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::Enable, !predefined_);
 
-	xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
-	auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
-	if (ssealgorithm.empty()) {
-		xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxRadioButton::SetValue, true);
-	}
-	else if (ssealgorithm == "AES256") {
-		xrc_call(parent_, "ID_S3_AES256", &wxRadioButton::SetValue, true);
-	}
-	else if (ssealgorithm == "aws:kms") {
-		xrc_call(parent_, "ID_S3_AWSKMS", &wxRadioButton::SetValue, true);
-		auto sseKmsKey = site.server.GetExtraParameter("ssekmskey");
-		if (!sseKmsKey.empty()) {
-			xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::CUSTOM));
-			xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sseKmsKey);
+	if (site.server.GetProtocol() == S3) {
+		xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
+		auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
+		if (ssealgorithm.empty()) {
+			xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxRadioButton::SetValue, true);
+		}
+		else if (ssealgorithm == "AES256") {
+			xrc_call(parent_, "ID_S3_AES256", &wxRadioButton::SetValue, true);
+		}
+		else if (ssealgorithm == "aws:kms") {
+			xrc_call(parent_, "ID_S3_AWSKMS", &wxRadioButton::SetValue, true);
+			auto sseKmsKey = site.server.GetExtraParameter("ssekmskey");
+			if (!sseKmsKey.empty()) {
+				xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::CUSTOM));
+				xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sseKmsKey);
+			}
+			else {
+				xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
+			}
+		}
+		else if (ssealgorithm == "customer") {
+			xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::SetValue, true);
+			auto customerKey = site.server.GetExtraParameter("ssecustomerkey");
+			xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
 		}
 	}
-	else if (ssealgorithm == "customer") {
-		xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::SetValue, true);
-		auto customerKey = site.server.GetExtraParameter("ssecustomerkey");
-		xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
-	}
+	SetCtrlState();
 }
 
-bool S3SiteControls::UpdateSite(Site & site, bool)
+bool S3SiteControls::UpdateSite(Site & site, bool silent)
 {
 	CServer & server = site.server;
 	if (server.GetProtocol() == S3) {
@@ -1343,10 +1376,41 @@ bool S3SiteControls::UpdateSite(Site & site, bool)
 		else if (xrc_call(parent_, "ID_S3_AWSKMS", &wxRadioButton::GetValue)) {
 			server.SetExtraParameter("ssealgorithm", L"aws:kms");
 			if (xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::GetSelection) == static_cast<int>(s3_sse::KmsKey::CUSTOM)) {
+				auto keyId = xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::GetValue).ToStdWstring();
+				if (keyId.empty()) {
+					if (!silent) {
+						xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxWindow::SetFocus);
+						wxMessageBoxEx(_("Custom KMS ARN id cannot be empty."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+					}
+					return false;
+				}
 				server.SetExtraParameter("ssekmskey", fz::to_wstring(xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::GetValue)));
 			}
 		}
 		else if (xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::GetValue)) {
+			auto keyId = xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue).ToStdString();
+			if (keyId.empty()) {
+				if (!silent) {
+					xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::SetFocus);
+					wxMessageBoxEx(_("Custom key cannot be empty."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				}
+				return false;
+			}
+
+			std::string const base64prefix = "base64:";
+			if (fz::starts_with(keyId, base64prefix)) {
+				keyId = keyId.substr(base64prefix.size());
+				keyId = fz::base64_decode_s(keyId);
+			}
+
+			if (keyId.size() != 32) {		// 256-bit encryption key
+				if (!silent) {
+					xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxWindow::SetFocus);
+					wxMessageBoxEx(_("Custom key length must be 256-bit."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				}
+				return false;
+			}
+
 			server.SetExtraParameter("ssealgorithm", L"customer");
 			server.SetExtraParameter("ssecustomerkey", fz::to_wstring(xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue)));
 		}
