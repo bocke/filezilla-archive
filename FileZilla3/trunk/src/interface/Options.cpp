@@ -226,7 +226,9 @@ t_OptionsCache& t_OptionsCache::operator=(int v)
 t_OptionsCache& t_OptionsCache::operator=(std::unique_ptr<pugi::xml_document> const& v)
 {
 	xmlValue = std::make_unique<pugi::xml_document>();
-	xmlValue->append_copy(v->first_child());
+	for (auto c = v->first_child(); c; c = c.next_sibling()) {
+		xmlValue->append_copy(c);
+	}
 
 	return *this;
 }
@@ -301,7 +303,9 @@ std::unique_ptr<pugi::xml_document> COptions::GetOptionXml(unsigned int nID)
 	}
 
 	auto value = std::make_unique<pugi::xml_document>();
-	value->append_copy(m_optionsCache[nID].xmlValue->first_child());
+	for (auto c = m_optionsCache[nID].xmlValue->first_child(); c; c = c.next_sibling()) {
+		value->append_copy(c);
+	}
 
 	return value;
 }
@@ -334,11 +338,6 @@ bool COptions::SetOption(unsigned int nID, std::wstring const& value)
 	return true;
 }
 
-bool COptions::SetOptionXml(unsigned int nID, pugi::xml_document const& value)
-{
-	return SetOptionXml(nID, value.first_child());
-}
-
 bool COptions::SetOptionXml(unsigned int nID, pugi::xml_node const& value)
 {
 	if (nID >= OPTIONS_NUM) {
@@ -351,7 +350,16 @@ bool COptions::SetOptionXml(unsigned int nID, pugi::xml_node const& value)
 
 	auto doc = std::make_unique<pugi::xml_document>();
 	if (value) {
-		doc->append_copy(value);
+		if (value.type() == pugi::node_document) {
+			for (auto c = value.first_child(); c; c = c.next_sibling()) {
+				if (c.type() == pugi::node_element) {
+					doc->append_copy(c);
+				}
+			}
+		}
+		else {
+			doc->append_copy(value);
+		}
 	}
 
 	ContinueSetOption(nID, doc);
@@ -719,7 +727,9 @@ void COptions::LoadOptionFromElement(pugi::xml_node option, std::map<std::string
 			fz::scoped_lock l(m_sync_);
 			if (!option.first_child().empty()) {
 				m_optionsCache[iter->second].xmlValue = std::make_unique<pugi::xml_document>();
-				m_optionsCache[iter->second].xmlValue->append_copy(option.first_child());
+				for (auto c = option.first_child(); c; c = c.next_sibling()) {
+					m_optionsCache[iter->second].xmlValue->append_copy(c);
+				}
 			}
 		}
 	}

@@ -102,7 +102,6 @@ public:
 	virtual bool SetOption(unsigned int nID, int value) = 0;
 	virtual bool SetOption(unsigned int nID, std::wstring const& value) = 0;
 	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value) = 0;
-	virtual bool SetOptionXml(unsigned int nID, pugi::xml_document const& value) = 0;
 };
 
 #endif

@@ -136,7 +136,6 @@ public:
 	virtual bool SetOption(unsigned int nID, int value);
 	virtual bool SetOption(unsigned int nID, std::wstring const& value);
 	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value);
-	virtual bool SetOptionXml(unsigned int nID, pugi::xml_document const& value);
 
 	bool OptionFromFzDefaultsXml(unsigned int nID);
 
