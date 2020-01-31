@@ -461,7 +461,9 @@ void SetServer(pugi::xml_node node, Site const& site)
 	AddTextElement(node, "Host", site.server.GetHost());
 	AddTextElement(node, "Port", site.server.GetPort());
 	AddTextElement(node, "Protocol", protocol);
-	AddTextElement(node, "Type", site.server.GetType());
+	if (site.server.HasFeature(ProtocolFeature::ServerType)) {
+		AddTextElement(node, "Type", site.server.GetType());
+	}
 
 	ProtectedCredentials credentials = site.credentials;
 
@@ -497,7 +499,9 @@ void SetServer(pugi::xml_node node, Site const& site)
 	}
 	AddTextElement(node, "Logontype", static_cast<int>(credentials.logonType_));
 
-	AddTextElement(node, "TimezoneOffset", site.server.GetTimezoneOffset());
+	if (site.server.GetTimezoneOffset()) {
+		AddTextElement(node, "TimezoneOffset", site.server.GetTimezoneOffset());
+	}
 
 	if (CServer::ProtocolHasFeature(site.server.GetProtocol(), ProtocolFeature::TransferMode)) {
 		switch (site.server.GetPasvMode())

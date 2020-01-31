@@ -854,7 +854,10 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 	}
 
 	// Save colour
-	AddTextElement(element, "Colour", CSiteManager::GetColourIndex(site.m_colour));
+	int col = CSiteManager::GetColourIndex(site.m_colour);
+	if (col) {
+		AddTextElement(element, "Colour", col);
+	}
 
 	// Save local dir
 	if (!site.m_default_bookmark.m_localDir.empty()) {
