@@ -628,6 +628,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		}
 		logon_type = LogonType::ask;
 	}
+	site.SetLogonType(logon_type);
 
 	// At this point we got:
 	// - Valid protocol, host, port, logontype
@@ -648,12 +649,11 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		}
 		return false;
 	}
-	site.SetUser(user);
 
 	// We don't allow username of only spaces, confuses both users and XML libraries
-	if (!site.server.GetUser().empty()) {
+	if (!user.empty()) {
 		bool space_only = true;
-		for (auto const& c : site.server.GetUser()) {
+		for (auto const& c : user) {
 			if (c != ' ') {
 				space_only = false;
 				break;
@@ -667,6 +667,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 			return false;
 		}
 	}
+	site.SetUser(user);
 
 	// At this point username has been validated
 
