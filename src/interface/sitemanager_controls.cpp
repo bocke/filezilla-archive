@@ -1007,7 +1007,7 @@ void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTy
 
 bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 {
-	ServerType serverType;
+	ServerType serverType = DEFAULT;
 	if (!site.m_default_bookmark.m_remoteDir.empty()) {
 		if (site.server.HasFeature(ProtocolFeature::ServerType)) {
 			serverType = site.m_default_bookmark.m_remoteDir.GetType();
@@ -1019,9 +1019,6 @@ bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 	else {
 		if (site.server.HasFeature(ProtocolFeature::ServerType)) {
 			serverType = CServer::GetServerTypeFromName(xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::GetStringSelection).ToStdWstring());
-		}
-		else {
-			serverType = DEFAULT;
 		}
 	}
 
