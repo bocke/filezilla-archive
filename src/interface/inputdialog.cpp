@@ -35,7 +35,9 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 	buttons->AddButton(cancel);
 	buttons->Realize();
 
-	Bind(wxEVT_BUTTON, [this](wxEvent& evt) {EndModal(evt.GetId()); });
+	auto onButton = [this](wxEvent& evt) {EndModal(evt.GetId()); };
+	ok->Bind(wxEVT_BUTTON, onButton);
+	cancel->Bind(wxEVT_BUTTON, onButton);
 
 	WrapRecursive(this, 2.0);
 
