@@ -73,7 +73,7 @@ bool CertStore::DoIsTrusted(std::string const& host, unsigned int port, std::vec
 	}
 
 	bool const dnsname = fz::get_address_type(host) == fz::address_type::unknown;
-	
+
 	for (auto const& cert : trustedCerts) {
 		if (port != cert.port) {
 			continue;
@@ -788,7 +788,9 @@ void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecure
 	}
 	buttons->AddButton(cancel);
 
-	dlg.Bind(wxEVT_BUTTON, [&dlg](wxEvent & evt) {dlg.EndModal(evt.GetId()); });
+	auto onButton = [&dlg](wxEvent & evt) {dlg.EndModal(evt.GetId()); };
+	ok->Bind(wxEVT_BUTTON, onButton);
+	cancel->Bind(wxEVT_BUTTON, onButton);
 
 	buttons->Realize();
 
