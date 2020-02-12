@@ -84,7 +84,7 @@ void erase_unordered(C & container, V const& v) noexcept
 	for (size_t i = 0; i < container.size(); ++i) {
 		if (container[i] == v) {
 			if (i + 1 < container.size()) {
-				container[i] = std::move(container[container.size()]);
+				container[i] = std::move(container.back());
 			}
 			container.pop_back();
 			return;
