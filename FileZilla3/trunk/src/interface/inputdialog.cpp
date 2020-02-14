@@ -20,7 +20,7 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 	main->Add(new wxStaticText(this, -1, text));
 
 	m_pTextCtrl = new wxTextCtrlEx(this, XRCID("ID_STRING"), wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
-	main->Add(m_pTextCtrl, lay.grow);
+	main->Add(m_pTextCtrl, lay.grow)->SetMinSize(lay.dlgUnits(150), -1);
 	if (max_len != -1) {
 		m_pTextCtrl->SetMaxLength(max_len);
 	}
