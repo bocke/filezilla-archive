@@ -10,7 +10,6 @@ public:
 
 	bool Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len = -1, bool password = false);
 
-	bool SetPasswordMode(bool password);
 	void AllowEmpty(bool allowEmpty);
 
 	void SetValue(wxString const& value);
@@ -19,11 +18,8 @@ public:
 	bool SelectText(int start, int end);
 
 protected:
-	DECLARE_EVENT_TABLE()
-	void OnValueChanged(wxCommandEvent& event);
-
-	bool m_allowEmpty{};
-	wxTextCtrl* m_pTextCtrl{};
+	bool allowEmpty_{};
+	wxTextCtrl* textCtrl_{};
 };
 
 #endif

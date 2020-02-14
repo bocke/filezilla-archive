@@ -2,10 +2,6 @@
 #include "inputdialog.h"
 #include "textctrlex.h"
 
-BEGIN_EVENT_TABLE(CInputDialog, wxDialogEx)
-EVT_TEXT(XRCID("ID_STRING"), CInputDialog::OnValueChanged)
-END_EVENT_TABLE()
-
 bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString const& text, int max_len, bool password)
 {
 	SetParent(parent);
@@ -19,10 +15,11 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 
 	main->Add(new wxStaticText(this, -1, text));
 
-	m_pTextCtrl = new wxTextCtrlEx(this, XRCID("ID_STRING"), wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
-	main->Add(m_pTextCtrl, lay.grow)->SetMinSize(lay.dlgUnits(150), -1);
+	textCtrl_ = new wxTextCtrlEx(this, -1, wxString(), wxDefaultPosition, wxDefaultSize, password ? wxTE_PASSWORD : 0);
+
+	main->Add(textCtrl_, lay.grow)->SetMinSize(lay.dlgUnits(150), -1);
 	if (max_len != -1) {
-		m_pTextCtrl->SetMaxLength(max_len);
+		textCtrl_->SetMaxLength(max_len);
 	}
 
 	auto * buttons = lay.createButtonSizer(this, main, true);
@@ -41,32 +38,30 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 
 	WrapRecursive(this, 2.0);
 
-	m_pTextCtrl->SetFocus();
+	textCtrl_->SetFocus();
 	ok->Disable();
+
+	textCtrl_->Bind(wxEVT_TEXT, [this, ok](wxEvent const&){
+		ok->Enable(allowEmpty_ || !textCtrl_->GetValue().empty());
+	});
 
 	return true;
 }
 
 void CInputDialog::AllowEmpty(bool allowEmpty)
 {
-	m_allowEmpty = allowEmpty;
-	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(m_allowEmpty ? true : (!m_pTextCtrl->GetValue().empty()));
-}
-
-void CInputDialog::OnValueChanged(wxCommandEvent&)
-{
-	wxString value = m_pTextCtrl->GetValue();
-	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(m_allowEmpty ? true : !value.empty());
+	allowEmpty_ = allowEmpty;
+	XRCCTRL(*this, "wxID_OK", wxButton)->Enable(allowEmpty_ ? true : (!textCtrl_->GetValue().empty()));
 }
 
 void CInputDialog::SetValue(wxString const& value)
 {
-	m_pTextCtrl->SetValue(value);
+	textCtrl_->SetValue(value);
 }
 
 wxString CInputDialog::GetValue() const
 {
-	return m_pTextCtrl->GetValue();
+	return textCtrl_->GetValue();
 }
 
 bool CInputDialog::SelectText(int start, int end)
@@ -74,22 +69,7 @@ bool CInputDialog::SelectText(int start, int end)
 #ifdef __WXGTK__
 	Show();
 #endif
-	m_pTextCtrl->SetFocus();
-	m_pTextCtrl->SetSelection(start, end);
-	return true;
-}
-
-bool CInputDialog::SetPasswordMode(bool password)
-{
-	if (password) {
-		m_pTextCtrl = XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl);
-		m_pTextCtrl->Show();
-		XRCCTRL(*this, "ID_STRING", wxTextCtrl)->Hide();
-	}
-	else {
-		m_pTextCtrl = XRCCTRL(*this, "ID_STRING", wxTextCtrl);
-		m_pTextCtrl->Show();
-		XRCCTRL(*this, "ID_STRING_PW", wxTextCtrl)->Hide();
-	}
+	textCtrl_->SetFocus();
+	textCtrl_->SetSelection(start, end);
 	return true;
 }
