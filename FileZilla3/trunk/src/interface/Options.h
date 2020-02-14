@@ -112,10 +112,11 @@ enum interfaceOptions
 
 struct t_OptionsCache
 {
-	bool operator==(std::wstring const& v) const { return strValue == v; }
+	bool operator==(std::wstring_view const& v) const { return strValue == v; }
 	bool operator==(int v) const { return numValue == v; }
 	bool operator==(std::unique_ptr<pugi::xml_document> const& v) const { return *xmlValue == *v; }
-	t_OptionsCache& operator=(std::wstring const& v);
+	t_OptionsCache& operator=(std::wstring_view const& v);
+	t_OptionsCache& operator=(std::wstring && v);
 	t_OptionsCache& operator=(int v);
 	t_OptionsCache& operator=(std::unique_ptr<pugi::xml_document> const& v);
 
@@ -134,7 +135,7 @@ public:
 	virtual std::unique_ptr<pugi::xml_document> GetOptionXml(unsigned int nID);
 
 	virtual bool SetOption(unsigned int nID, int value);
-	virtual bool SetOption(unsigned int nID, std::wstring const& value);
+	virtual bool SetOption(unsigned int nID, std::wstring_view const& value);
 	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value);
 
 	bool OptionFromFzDefaultsXml(unsigned int nID);
@@ -156,12 +157,12 @@ protected:
 	virtual ~COptions();
 
 	int Validate(unsigned int nID, int value);
-	std::wstring Validate(unsigned int nID, std::wstring const& value);
+	std::wstring Validate(unsigned int nID, std::wstring_view const& value);
 	std::unique_ptr<pugi::xml_document> Validate(unsigned int nID, std::unique_ptr<pugi::xml_document> const& value);
 
 	template<typename T> void ContinueSetOption(unsigned int nID, T const& value);
 	void SetXmlValue(unsigned int nID, int value);
-	void SetXmlValue(unsigned int nID, std::wstring const& value);
+	void SetXmlValue(unsigned int nID, std::wstring_view const& value);
 	void SetXmlValue(unsigned int nID, std::unique_ptr<pugi::xml_document> const& value);
 
 	pugi::xml_node CreateSettingsXmlElement();
