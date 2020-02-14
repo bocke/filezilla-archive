@@ -385,11 +385,11 @@ bool GetServer(pugi::xml_node node, Site & site)
 		return false;
 	}
 
-	wxString pasvMode = GetTextElement(node, "PasvMode");
-	if (pasvMode == _T("MODE_PASSIVE")) {
+	std::string_view pasvMode = node.child_value("PasvMode");
+	if (pasvMode == "MODE_PASSIVE") {
 		site.server.SetPasvMode(MODE_PASSIVE);
 	}
-	else if (pasvMode == _T("MODE_ACTIVE")) {
+	else if (pasvMode == "MODE_ACTIVE") {
 		site.server.SetPasvMode(MODE_ACTIVE);
 	}
 	else {
@@ -399,11 +399,11 @@ bool GetServer(pugi::xml_node node, Site & site)
 	int maximumMultipleConnections = GetTextElementInt(node, "MaximumMultipleConnections");
 	site.server.MaximumMultipleConnections(maximumMultipleConnections);
 
-	wxString encodingType = GetTextElement(node, "EncodingType");
-	if (encodingType == _T("UTF-8")) {
+	std::string_view encodingType = node.child_value("EncodingType");
+	if (encodingType == "UTF-8") {
 		site.server.SetEncodingType(ENCODING_UTF8);
 	}
-	else if (encodingType == _T("Custom")) {
+	else if (encodingType == "Custom") {
 		std::wstring customEncoding = GetTextElement(node, "CustomEncoding");
 		if (customEncoding.empty()) {
 			return false;
@@ -479,7 +479,7 @@ void SetServer(pugi::xml_node node, Site const& site)
 				pugi::xml_node passElement = AddTextElementUtf8(node, "Pass", pass);
 				if (passElement) {
 					SetTextAttribute(passElement, "encoding", _T("crypt"));
-					SetTextAttributeUtf8(passElement, "pubkey", credentials.encrypted_.to_base64());
+					SetTextAttributeUtf8(passElement, "pubkey", credentials.encrypted_.to_base64(false));
 				}
 			}
 			else {
