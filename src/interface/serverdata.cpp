@@ -421,7 +421,7 @@ void ProtectedCredentials::Protect(fz::public_key const& key)
 		password_.clear();
 	}
 	else {
-		password_ = fz::to_wstring_from_utf8(fz::base64_encode(std::string(encrypted.begin(), encrypted.end())));
+		password_ = fz::to_wstring_from_utf8(fz::base64_encode(std::string(encrypted.begin(), encrypted.end()), fz::base64_type::standard, false));
 		encrypted_ = key;
 	}
 }
