@@ -37,6 +37,9 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 	{
 		auto onChange = [this](ServerProtocol protocol, LogonType type) {
 			SetControlVisibility(protocol, type);
+			for (auto & controls : controls_) {
+				controls->SetControlState();
+			}
 		};
 
 		generalPage_ = new wxPanel(this);
@@ -157,7 +160,8 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType type)
 {
 	for (auto & controls : controls_) {
-		controls->SetControlVisibility(protocol, type, predefined_);
+		controls->SetPredefined(predefined_);
+		controls->SetControlVisibility(protocol, type);
 	}
 
 	if (charsetPage_) {
@@ -224,6 +228,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 
 	for (auto & controls : controls_) {
 		controls->SetSite(site);
+		controls->SetControlState();
 	}
 
 	if (!site) {
