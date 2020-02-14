@@ -189,10 +189,8 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	});
 
 	logonTypes->Bind(wxEVT_CHOICE, [this](wxEvent const&) {
-		auto t = GetLogonType();
-		SetLogonType(t);
 		if (changeHandler_) {
-			changeHandler_(GetProtocol(), t);
+			changeHandler_(GetProtocol(), GetLogonType());
 		}
 	});
 
@@ -242,19 +240,11 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 
 void GeneralSiteControls::SetSite(Site const& site)
 {
-	xrc_call(parent_, "ID_HOST", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_PORT", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_PROTOCOL", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_ENCRYPTION", &wxWindow::Enable, !predefined_);
-	xrc_call(parent_, "ID_LOGONTYPE", &wxWindow::Enable, !predefined_);
-
 	if (!site) {
 		// Empty all site information
 		xrc_call(parent_, "ID_HOST", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(parent_, "ID_PORT", &wxTextCtrl::ChangeValue, wxString());
 		SetProtocol(FTP);
-		bool const kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
-		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
 		xrc_call(parent_, "ID_USER", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
@@ -262,7 +252,7 @@ void GeneralSiteControls::SetSite(Site const& site)
 		xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
 
-		SetLogonType(logonType);
+		xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType_));
 	}
 	else {
 		xrc_call(parent_, "ID_HOST", &wxTextCtrl::ChangeValue, site.Format(ServerFormat::host_only));
@@ -278,8 +268,7 @@ void GeneralSiteControls::SetSite(Site const& site)
 		ServerProtocol protocol = site.server.GetProtocol();
 		SetProtocol(protocol);
 
-		LogonType const logonType = site.credentials.logonType_;
-		SetLogonType(logonType);
+		xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(site.credentials.logonType_));
 
 		xrc_call(parent_, "ID_USER", &wxTextCtrl::ChangeValue, site.server.GetUser());
 		xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.credentials.account_);
@@ -294,32 +283,38 @@ void GeneralSiteControls::SetSite(Site const& site)
 			}
 		}
 
-		if (site.credentials.encrypted_) {
-			xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
-			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
+		if (logonType_ != LogonType::anonymous && logonType_ != LogonType::interactive && (protocol != SFTP || logonType_ != LogonType::key)) {
+			if (site.credentials.encrypted_) {
+				xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
+				xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
 
-			// @translator: Keep this string as short as possible
-			xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, _("Leave empty to keep existing password."));
-			for (auto & control : extraParameters_[ParameterSection::credentials]) {
-				std::get<2>(control)->SetHint(_("Leave empty to keep existing data."));
+				// @translator: Keep this string as short as possible
+				xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, _("Leave empty to keep existing password."));
+				for (auto & control : extraParameters_[ParameterSection::credentials]) {
+					std::get<2>(control)->SetHint(_("Leave empty to keep existing data."));
+				}
+			}
+			else {
+				xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, pass);
+				xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
+				xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, encryptionKey);
+
+				auto it = extraParameters_[ParameterSection::credentials].begin();
+
+				auto const& traits = ExtraServerParameterTraits(protocol);
+				for (auto const& trait : traits) {
+					if (trait.section_ != ParameterSection::credentials) {
+						continue;
+					}
+
+					std::get<2>(*it)->ChangeValue(site.credentials.GetExtraParameter(trait.name_));
+					++it;
+				}
 			}
 		}
 		else {
-			xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, pass);
+			xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
 			xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
-			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, encryptionKey);
-
-			auto it = extraParameters_[ParameterSection::credentials].begin();
-
-			auto const& traits = ExtraServerParameterTraits(protocol);
-			for (auto const& trait : traits) {
-				if (trait.section_ != ParameterSection::credentials) {
-					continue;
-				}
-
-				std::get<2>(*it)->ChangeValue(site.credentials.GetExtraParameter(trait.name_));
-				++it;
-			}
 		}
 
 		std::vector<GeneralSiteControls::Parameter>::iterator paramIt[ParameterSection::section_count];
@@ -341,9 +336,10 @@ void GeneralSiteControls::SetSite(Site const& site)
 	}
 }
 
-void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType type, bool predefined)
+void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType type)
 {
-	predefined_ = predefined;
+	protocol_ = protocol;
+	logonType_ = type;
 
 	auto const group = findGroup(protocol);
 	bool const isFtp = group.first != protocolGroups().cend() && group.first->protocols.front().first == FTP;
@@ -785,27 +781,11 @@ LogonType GeneralSiteControls::GetLogonType() const
 	return GetLogonTypeFromName(xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::GetStringSelection).ToStdWstring());
 }
 
-void GeneralSiteControls::SetLogonType(LogonType t)
-{
-	xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(t));
-
-	xrc_call(parent_, "ID_USER", &wxTextCtrl::Enable, !predefined_ && t != LogonType::anonymous);
-	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && (t == LogonType::normal || t == LogonType::account));
-	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && t == LogonType::account);
-	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && t == LogonType::key);
-	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && t == LogonType::key);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined_ && t == LogonType::normal);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined_ && t == LogonType::normal);
-
-	for (int i = 0; i < ParameterSection::section_count; ++i) {
-		for (auto & param : extraParameters_[i]) {
-			std::get<2>(param)->Enable(!predefined_);
-		}
-	}
-}
-
 void GeneralSiteControls::SetProtocol(ServerProtocol protocol)
 {
+	if (protocol == UNKNOWN) {
+		protocol = FTP;
+	}
 	wxChoice* pProtocol = XRCCTRL(parent_, "ID_PROTOCOL", wxChoice);
 	wxChoice* pEncryption = XRCCTRL(parent_, "ID_ENCRYPTION", wxChoice);
 	wxStaticText* pEncryptionDesc = XRCCTRL(parent_, "ID_ENCRYPTION_DESC", wxStaticText);
@@ -853,8 +833,6 @@ void GeneralSiteControls::SetProtocol(ServerProtocol protocol)
 		pProtocol->SetSelection(mainProtocolListIndex_[FTP]);
 	}
 	UpdateHostFromDefaults(GetProtocol());
-
-	previousProtocol_ = protocol;
 }
 
 ServerProtocol GeneralSiteControls::GetProtocol() const
@@ -882,11 +860,11 @@ ServerProtocol GeneralSiteControls::GetProtocol() const
 }
 
 
-void GeneralSiteControls::UpdateHostFromDefaults(ServerProtocol const protocol)
+void GeneralSiteControls::UpdateHostFromDefaults(ServerProtocol const newProtocol)
 {
-	if (protocol != previousProtocol_) {
-		auto const oldDefault = std::get<0>(GetDefaultHost(previousProtocol_));
-		auto const newDefault = GetDefaultHost(protocol);
+	if (newProtocol != protocol_) {
+		auto const oldDefault = std::get<0>(GetDefaultHost(protocol_));
+		auto const newDefault = GetDefaultHost(newProtocol);
 
 		std::wstring const host = xrc_call(parent_, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
 		if (host.empty() || host == oldDefault) {
@@ -896,6 +874,28 @@ void GeneralSiteControls::UpdateHostFromDefaults(ServerProtocol const protocol)
 	}
 }
 
+void GeneralSiteControls::SetControlState()
+{
+	xrc_call(parent_, "ID_HOST", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_PORT", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_PROTOCOL", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_ENCRYPTION", &wxWindow::Enable, !predefined_);
+	xrc_call(parent_, "ID_LOGONTYPE", &wxWindow::Enable, !predefined_);
+
+	xrc_call(parent_, "ID_USER", &wxTextCtrl::Enable, !predefined_ && logonType_ != LogonType::anonymous);
+	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Enable, !predefined_ && (logonType_ == LogonType::normal || logonType_ == LogonType::account));
+	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::account);
+	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::key);
+	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && logonType_ == LogonType::key);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::normal);
+	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined_ && logonType_ == LogonType::normal);
+
+	for (int i = 0; i < ParameterSection::section_count; ++i) {
+		for (auto & param : extraParameters_[i]) {
+			std::get<2>(param)->Enable(!predefined_);
+		}
+	}
+}
 
 AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)
@@ -993,10 +993,8 @@ void AdvancedSiteControls::SetSite(Site const& site)
 	}
 }
 
-void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined)
+void AdvancedSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType)
 {
-	predefined_ = predefined;
-
 	bool const hasServerType = CServer::ProtocolHasFeature(protocol, ProtocolFeature::ServerType);
 	xrc_call(parent_, "ID_SERVERTYPE_LABEL", &wxWindow::Show, hasServerType);
 	xrc_call(parent_, "ID_SERVERTYPE", &wxWindow::Show, hasServerType);
@@ -1245,10 +1243,8 @@ bool TransferSettingsSiteControls::UpdateSite(Site & site, bool)
 	return true;
 }
 
-void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined)
+void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol, LogonType)
 {
-	predefined_ = predefined;
-
 	bool const hasTransferMode = CServer::ProtocolHasFeature(protocol, ProtocolFeature::TransferMode);
 	xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxWindow::Show, hasTransferMode);
 	xrc_call(parent_, "ID_TRANSFERMODE_ACTIVE", &wxWindow::Show, hasTransferMode);
@@ -1297,7 +1293,7 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 	row->Add(new wxStaticText(&parent, -1, _("Cus&tomer Key:")), lay.valign);
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
 
-	auto l = [this](wxEvent const&) { SetCtrlState(); };
+	auto l = [this](wxEvent const&) { SetControlState(); };
 	none->Bind(wxEVT_RADIOBUTTON, l);
 	aes->Bind(wxEVT_RADIOBUTTON, l);
 	kms->Bind(wxEVT_RADIOBUTTON, l);
@@ -1305,7 +1301,7 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 	choice->Bind(wxEVT_CHOICE, l);
 }
 
-void S3SiteControls::SetCtrlState()
+void S3SiteControls::SetControlState()
 {
 	bool enableKey{};
 	bool enableKMS{};
@@ -1358,7 +1354,6 @@ void S3SiteControls::SetSite(Site const& site)
 			xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
 		}
 	}
-	SetCtrlState();
 }
 
 bool S3SiteControls::UpdateSite(Site & site, bool silent)

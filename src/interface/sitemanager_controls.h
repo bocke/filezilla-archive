@@ -18,13 +18,17 @@ public:
 	virtual ~SiteControls() = default;
 	virtual void SetSite(Site const& site) = 0;
 
-	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/, bool predefined) { predefined_ = predefined; }
+	void SetPredefined(bool predefined) { predefined_ = predefined; }
+	virtual void SetControlVisibility(ServerProtocol /*protocol*/, LogonType /*type*/) {}
 
 	virtual bool UpdateSite(Site & site, bool silent) = 0;
+	virtual void SetControlState() {}
 
 	wxWindow & parent_;
 
 	bool predefined_{};
+	ServerProtocol protocol_{UNKNOWN};
+	LogonType logonType_{};
 };
 
 class GeneralSiteControls final : public SiteControls
@@ -32,8 +36,10 @@ class GeneralSiteControls final : public SiteControls
 public:
 	GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler = nullptr);
 
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
 	virtual void SetSite(Site const& site) override;
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual void SetControlState() override;
+
 	virtual bool UpdateSite(Site & site, bool silent) override;
 
 private:
@@ -43,13 +49,11 @@ private:
 	void SetLogonType(LogonType t);
 	LogonType GetLogonType() const;
 
-	void UpdateHostFromDefaults(ServerProtocol const protocol);
+	void UpdateHostFromDefaults(ServerProtocol const newProtocol);
 
 	std::map<ServerProtocol, int> mainProtocolListIndex_;
 	typedef std::tuple<std::string, wxStaticText*, wxTextCtrl*> Parameter;
 	std::vector<Parameter> extraParameters_[ParameterSection::section_count];
-
-	ServerProtocol previousProtocol_{UNKNOWN};
 
 	std::function<void(ServerProtocol protocol, LogonType logon_type)> const changeHandler_;
 };
@@ -60,7 +64,7 @@ public:
 	AdvancedSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
 	virtual void SetSite(Site const& site) override;
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
 	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
@@ -79,7 +83,7 @@ public:
 	TransferSettingsSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
 	virtual void SetSite(Site const& site) override;
-	virtual void SetControlVisibility(ServerProtocol protocol, LogonType, bool predefined) override;
+	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
 	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
@@ -93,7 +97,7 @@ public:
 	virtual bool UpdateSite(Site & site, bool silent) override;
 
 private:
-	void SetCtrlState();
+	virtual void SetControlState() override;
 };
 
 #endif
