@@ -33,7 +33,7 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 
-#ifndef __WXGTK__
+#if !defined(__WXGTK__) && !defined(__MINGW32__)
 IMPLEMENT_APP(CFileZillaApp)
 #else
 IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
@@ -795,3 +795,15 @@ std::wstring CFileZillaApp::GetSettingsFile(std::wstring const& name) const
 {
 	return COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR) + name + _T(".xml");
 }
+
+#if defined(__MINGW32__)
+extern "C" {
+__declspec(dllexport) // This forces ld to not strip relocations so that ASLR can work on MSW.
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR, int nCmdShow)
+{
+	wxDISABLE_DEBUG_SUPPORT();
+	return wxEntry(hInstance, hPrevInstance, NULL, nCmdShow);
+}
+}
+#endif
+

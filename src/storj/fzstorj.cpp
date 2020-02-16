@@ -370,6 +370,9 @@ extern "C" void delete_bucket_callback(uv_work_t *work_req, int status)
 }
 }
 
+#if defined(__MINGW32__)
+__declspec(dllexport) // This forces ld to not strip relocations so that ASLR can work on MSW.
+#endif
 int main()
 {
 	fzprintf(storjEvent::Reply, "fzStorj started, protocol_version=%d", FZSTORJ_PROTOCOL_VERSION);
