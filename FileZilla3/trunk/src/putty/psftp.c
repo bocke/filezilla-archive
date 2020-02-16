@@ -2121,6 +2121,9 @@ static StripCtrlChars *stderr_scc;
 /*
  * Main program. Parse arguments etc.
  */
+#if defined(__MINGW32__)
+__declspec(dllexport) // This forces ld to not strip relocations so that ASLR can work on MSW.
+#endif
 int psftp_main(int argc, char *argv[])
 {
     int i, ret;

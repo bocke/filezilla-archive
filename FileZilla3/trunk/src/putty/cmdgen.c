@@ -33,6 +33,9 @@ void sk_cleanup(void)
 /* For Unix in particular, but harmless if this main() is reused elsewhere */
 const bool buildinfo_gtk_relevant = false;
 
+#if defined(__MINGW32__)
+__declspec(dllexport) // This forces ld to not strip relocations so that ASLR can work on MSW.
+#endif
 int main(int argc, char **argv)
 {
     Filename *infilename = NULL;
