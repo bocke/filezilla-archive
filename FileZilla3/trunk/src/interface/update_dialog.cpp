@@ -110,10 +110,12 @@ int CUpdateDialog::ShowModal()
 		
 		row->Add(new wxStaticText(p, -1, _("Checking for updates...")), lay.valign);
 
-		auto anim = new wxAnimationCtrl(p, -1, throbber);
-		anim->SetMinSize(throbber.GetSize());
-		anim->Play();
-		row->Add(anim, lay.valign);
+		if (throbber.IsOk()) {
+			auto anim = new wxAnimationCtrl(p, -1, throbber);
+			anim->SetMinSize(throbber.GetSize());
+			anim->Play();
+			row->Add(anim, lay.valign);
+		}
 
 		s->AddStretchSpacer();
 	}
@@ -156,10 +158,12 @@ int CUpdateDialog::ShowModal()
 		s->Add(dl, lay.halign);
 		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_LABEL"), _("Downloading update...")), lay.valign);
 
-		auto anim = new wxAnimationCtrl(p, XRCID("ID_WAIT_DOWNLOAD"), throbber);
-		anim->SetMinSize(throbber.GetSize());
-		anim->Play();
-		dl->Add(anim, lay.valign);
+		if (throbber.IsOk()) {
+			auto anim = new wxAnimationCtrl(p, XRCID("ID_WAIT_DOWNLOAD"), throbber);
+			anim->SetMinSize(throbber.GetSize());
+			anim->Play();
+			dl->Add(anim, lay.valign);
+		}
 
 		dl->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_PROGRESS"), L"12% downloaded"), lay.valign);
 
@@ -354,7 +358,10 @@ void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 		}
 		bool downloading = s == UpdaterState::newversion_downloading;
 		XRCCTRL(*this, "ID_DOWNLOAD_LABEL", wxStaticText)->Show(downloading);
-		XRCCTRL(*this, "ID_WAIT_DOWNLOAD", wxAnimationCtrl)->Show(downloading);
+		auto anim = FindWindow(XRCID("ID_WAIT_DOWNLOAD"));
+		if (anim) {
+			anim->Show(downloading);
+		}
 		XRCCTRL(*this, "ID_DOWNLOAD_PROGRESS", wxStaticText)->Show(downloading);
 		if (downloading) {
 			timer_.Start(500);
