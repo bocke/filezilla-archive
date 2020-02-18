@@ -34,9 +34,8 @@ CLed::CLed(wxWindow *parent, unsigned int index)
 	if (bmp.IsOk()) {
 		m_leds[0] = bmp.GetSubBitmap(wxRect(0, index * size.y, size.x, size.y));
 		m_leds[1] = bmp.GetSubBitmap(wxRect(size.x, index * size.y, size.x, size.y));
+		m_loaded = true;
 	}
-
-	m_loaded = true;
 }
 
 void CLed::OnPaint(wxPaintEvent&)
