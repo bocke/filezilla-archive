@@ -10,6 +10,7 @@
 #endif
 #include "textctrlex.h"
 #include "xrc_helper.h"
+#include "wxext/spinctrlex.h"
 
 #include <s3sse.h>
 
@@ -17,7 +18,6 @@
 
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 
 #include <array>
@@ -950,12 +950,14 @@ AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const
 	sizer.Add(new wxStaticText(&parent, -1, _("&Adjust server time, offset by:")));
 	row = lay.createFlex(0, 1);
 	sizer.Add(row);
-	auto* hours = new wxSpinCtrl(&parent, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	auto* hours = new wxSpinCtrlEx(&parent, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 	hours->SetRange(-24, 24);
+	hours->SetMaxLength(3);
 	row->Add(hours, lay.valign);
 	row->Add(new wxStaticText(&parent, -1, _("Hours,")), lay.valign);
-	auto* minutes = new wxSpinCtrl(&parent, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	auto* minutes = new wxSpinCtrlEx(&parent, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 	minutes->SetRange(-59, 59);
+	minutes->SetMaxLength(3);
 	row->Add(minutes, lay.valign);
 	row->Add(new wxStaticText(&parent, -1, _("Minutes")), lay.valign);
 }
@@ -1168,7 +1170,8 @@ TransferSettingsSiteControls::TransferSettingsSiteControls(wxWindow & parent, Di
 	row = lay.createFlex(0, 1);
 	sizer.Add(row, 0, wxLEFT, lay.dlgUnits(10));
 	row->Add(new wxStaticText(&parent, -1, _("&Maximum number of connections:")), lay.valign);
-	auto * spin = new wxSpinCtrl(&parent, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	auto * spin = new wxSpinCtrlEx(&parent, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+	spin->SetMaxLength(2);
 	spin->SetRange(1, 10);
 	row->Add(spin, lay.valign);
 

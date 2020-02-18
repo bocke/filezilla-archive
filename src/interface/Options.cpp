@@ -629,6 +629,14 @@ int COptions::Validate(unsigned int nID, int value)
 			value = 60 * 60 * 24;
 		}
 		break;
+	case OPTION_ICONS_SCALE:
+		if (value < 25) {
+			value = 25;
+		}
+		else if (value > 400) {
+			value = 400;
+		}
+		break;
 	}
 	return value;
 }

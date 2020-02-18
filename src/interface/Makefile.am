@@ -140,6 +140,7 @@ filezilla_SOURCES = \
 		welcome_dialog.cpp \
 		window_state_manager.cpp \
 		wrapengine.cpp \
+		wxext/spinctrlex.cpp \
 		wxfilesystem_blob_handler.cpp \
 		xh_text_ex.cpp \
 		xmlfunctions.cpp \
@@ -266,6 +267,7 @@ noinst_HEADERS =
 		welcome_dialog.h \
 		window_state_manager.h \
 		wrapengine.h \
+		wxext/spinctrlex.h \
 		wxfilesystem_blob_handler.h \
 		xh_text_ex.h \
 		xmlfunctions.h \
