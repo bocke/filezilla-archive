@@ -144,6 +144,7 @@ bool COptionsPageThemes::CreatePage(COptions* pOptions, CSettingsDialog* pOwner,
 		scale->SetIncrement(0.25);
 		scale->SetValue(1.25);
 		scale->SetDigits(2);
+		scale->GetText()->SetMaxLength(10);
 		sizer->Add(scale, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
 		sizer->Layout();
 		GetSizer()->Layout();
