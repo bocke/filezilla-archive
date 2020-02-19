@@ -20,6 +20,7 @@ public:
 
 	wxFlexGridSizer* createMain(wxWindow* parent, int cols, int rows = 0) const;
 	wxFlexGridSizer* createFlex(int cols, int rows = 0) const;
+	wxGridSizer* createGrid(int cols, int rows = 0) const;
 	wxGridBagSizer* createGridBag(int cols, int rows = 0) const;
 	wxStdDialogButtonSizer* createButtonSizer(wxWindow* parent, wxSizer * sizer, bool hline) const;
 

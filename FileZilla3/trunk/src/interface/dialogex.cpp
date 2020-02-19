@@ -253,6 +253,12 @@ wxFlexGridSizer* DialogLayout::createFlex(int cols, int rows) const
 	return new wxFlexGridSizer(rows, cols, g, g);
 }
 
+wxGridSizer* DialogLayout::createGrid(int cols, int rows) const
+{
+	int const g = gap;
+	return new wxGridSizer(rows, cols, g, g);
+}
+
 wxGridBagSizer* DialogLayout::createGridBag(int cols, int rows) const
 {
 	int const g = gap;
