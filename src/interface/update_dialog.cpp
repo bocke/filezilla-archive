@@ -6,6 +6,7 @@
 #include "filezillaapp.h"
 #include "file_utils.h"
 #include "update_dialog.h"
+#include "textctrlex.h"
 #include "themeprovider.h"
 #include "xrc_helper.h"
 #include "Options.h"
@@ -131,7 +132,7 @@ int CUpdateDialog::ShowModal()
 		s->Add(new wxStaticText(p, -1, _("Information about the latest version of FileZilla could not be retrieved. Please try again later.")));
 		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_RETRY"), _("Try again"), wxString()));
 
-		s->Add(new wxTextCtrl(p, XRCID("ID_DETAILS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 200));
+		s->Add(new wxTextCtrlEx(p, XRCID("ID_DETAILS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 200));
 		s->Add(new wxHyperlinkCtrl(p, XRCID("ID_SHOW_DETAILS"), _("Show details"), wxString()), lay.valign);
 
 		s->AddSpacer(lay.dlgUnits(5));

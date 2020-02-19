@@ -16,6 +16,7 @@ public:
 	static wxSizerFlags const halign;
 	static wxSizerFlags const valign;
 	static wxSizerFlags const valigng;
+	static wxSizerFlags const ralign;
 
 	wxFlexGridSizer* createMain(wxWindow* parent, int cols, int rows = 0) const;
 	wxFlexGridSizer* createFlex(int cols, int rows = 0) const;

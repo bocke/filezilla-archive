@@ -11,6 +11,7 @@
 #include "queue.h"
 #include "remote_recursive_operation.h"
 #include "sizeformatting.h"
+#include "textctrlex.h"
 #include "timeformatting.h"
 #include "window_state_manager.h"
 #include "xrc_helper.h"
@@ -658,10 +659,10 @@ bool CSearchDialog::Load()
 
 	optionsSizer->Add(new wxButton(this, XRCID("ID_START"), "&Search"), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxStaticText(this, XRCID("ID_PATH_LABEL"), "Search &directory:"), 0, wxALIGN_CENTRE_VERTICAL);
-	optionsSizer->Add(new wxTextCtrl(this, XRCID("ID_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
+	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
 	optionsSizer->Add(new wxButton(this, XRCID("ID_STOP"), "S&top"), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_PATH_LABEL"), "Search &directory:"), 0, wxALIGN_CENTRE_VERTICAL);
-	optionsSizer->Add(new wxTextCtrl(this, XRCID("ID_REMOTE_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
+	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_REMOTE_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
 	optionsSizer->AddSpacer(0);
 	optionsSizer->Add(new wxStaticText(this, wxID_ANY, "Search &conditions:"), 0, wxALIGN_CENTRE_VERTICAL);
 

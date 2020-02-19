@@ -222,6 +222,7 @@ wxSizerFlags const DialogLayout::grow(wxSizerFlags().Expand());
 wxSizerFlags const DialogLayout::valign(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
 wxSizerFlags const DialogLayout::halign(wxSizerFlags().Align(wxALIGN_CENTER_HORIZONTAL));
 wxSizerFlags const DialogLayout::valigng(wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Expand());
+wxSizerFlags const DialogLayout::ralign(wxSizerFlags().Align(wxALIGN_RIGHT));
 
 DialogLayout::DialogLayout(wxTopLevelWindow * parent)
 	: parent_(parent)
