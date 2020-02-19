@@ -5,6 +5,7 @@
 #include "optionspage.h"
 #include "optionspage_themes.h"
 #include "../themeprovider.h"
+#include "wxext/spinctrlex.h"
 
 #include <wx/dcclient.h>
 #include <wx/scrolwin.h>
@@ -139,12 +140,12 @@ bool COptionsPageThemes::CreatePage(COptions* pOptions, CSettingsDialog* pOwner,
 		sizer->Detach(dummy);
 		delete dummy;
 
-		auto scale = new wxSpinCtrlDouble(sizerParent, XRCID("ID_SCALE"));
+		auto scale = new wxSpinCtrlDoubleEx(sizerParent, XRCID("ID_SCALE"));
 		scale->SetRange(0.5, 4);
 		scale->SetIncrement(0.25);
 		scale->SetValue(1.25);
 		scale->SetDigits(2);
-		scale->GetText()->SetMaxLength(10);
+		scale->SetMaxLength(10);
 		sizer->Add(scale, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
 		sizer->Layout();
 		GetSizer()->Layout();

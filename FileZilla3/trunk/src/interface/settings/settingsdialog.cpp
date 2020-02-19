@@ -193,7 +193,10 @@ bool CSettingsDialog::LoadPages()
 	// Keep track of maximum page size
 	size = wxSize(0, 0);
 	for (auto const& page : m_pages) {
-		size.IncTo(page.page->GetSizer()->GetMinSize());
+		auto sizer = page.page->GetSizer();
+		if (sizer) {
+			size.IncTo(sizer->GetMinSize());
+		}
 	}
 
 	wxSize panelSize = size;
@@ -204,9 +207,12 @@ bool CSettingsDialog::LoadPages()
 
 	// Adjust pages sizes according to maximum size
 	for (auto const& page : m_pages) {
-		page.page->GetSizer()->SetMinSize(size);
-		page.page->GetSizer()->Fit(page.page);
-		page.page->GetSizer()->SetSizeHints(page.page);
+		auto sizer = page.page->GetSizer();
+		if (sizer) {
+			sizer->SetMinSize(size);
+			sizer->Fit(page.page);
+			sizer->SetSizeHints(page.page);
+		}
 		if (GetLayoutDirection() == wxLayout_RightToLeft) {
 			page.page->Move(wxPoint(1, 0));
 		}

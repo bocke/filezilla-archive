@@ -46,11 +46,9 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxStaticBitmapXmlHandler);
 	res.AddHandler(new wxListCtrlXmlHandler);
 	res.AddHandler(new wxCheckListBoxXmlHandler);
-	res.AddHandler(new wxSpinCtrlXmlHandler);
 	res.AddHandler(new wxListBoxXmlHandler);
 	res.AddHandler(new wxScrolledWindowXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);
-	res.AddHandler(new wxAnimationCtrlXmlHandler);
 }
 
 namespace {
