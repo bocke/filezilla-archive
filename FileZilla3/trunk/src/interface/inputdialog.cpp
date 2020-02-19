@@ -36,6 +36,8 @@ bool CInputDialog::Create(wxWindow* parent, wxString const& title, wxString cons
 	ok->Bind(wxEVT_BUTTON, onButton);
 	cancel->Bind(wxEVT_BUTTON, onButton);
 
+	GetSizer()->Fit(this);
+
 	WrapRecursive(this, 2.0);
 
 	textCtrl_->SetFocus();
