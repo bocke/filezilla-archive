@@ -153,7 +153,7 @@ int CUpdateDialog::ShowModal()
 		s->Add(new wxStaticText(p, XRCID("ID_VERSION"), L"1.2.3.4"));
 		s->AddSpacer(0);
 		s->Add(new wxStaticText(p, XRCID("ID_NEWS_LABEL"), _("What's new:")));
-		s->Add(new wxTextCtrl(p, XRCID("ID_NEWS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY), 1, wxGROW)->SetMinSize(400, 150);
+		s->Add(new wxTextCtrlEx(p, XRCID("ID_NEWS"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY), 1, wxGROW)->SetMinSize(400, 150);
 
 		auto dl = lay.createFlex(0, 1);
 		s->Add(dl, lay.halign);
@@ -176,7 +176,7 @@ int CUpdateDialog::ShowModal()
 		s->Add(new wxStaticText(p, XRCID("ID_DISABLED_CHECK"), _("Either you or your system administrator has disabled checking for updates. Please re-enable checking for updates to obtain more information.")));
 		s->Add(new wxStaticText(p, XRCID("ID_DOWNLOAD_FAIL"), _("The new version could not be downloaded, please retry later.")));
 
-		s->Add(new wxTextCtrl(p, XRCID("ID_DETAILS_DL"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 0));
+		s->Add(new wxTextCtrlEx(p, XRCID("ID_DETAILS_DL"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxTE_DONTWRAP), 1, wxGROW)->SetMinSize(wxSize(-1, 0));
 		auto retry = lay.createFlex(0, 1);
 		s->Add(retry);
 		retry->Add(new wxHyperlinkCtrl(p, XRCID("ID_DOWNLOAD_RETRY"), _("Try again"), wxString()), lay.valign);
