@@ -147,7 +147,7 @@ filezilla_SOURCES = \
 		xrc_helper.cpp
 
 
-noinst_HEADERS =
+noinst_HEADERS = \
 		aboutdialog.h \
 		asksavepassworddialog.h \
 		asyncrequestqueue.h \
