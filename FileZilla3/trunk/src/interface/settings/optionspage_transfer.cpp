@@ -80,7 +80,7 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 	
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Filter invalid characters in filenames"), 1);
-		inner->Add(new wxCheckBox(box, XRCID("ID_ENABLE_REPLACE"), _("Enable invalid character &amp;filtering")));
+		inner->Add(new wxCheckBox(box, XRCID("ID_ENABLE_REPLACE"), _("Enable invalid character &filtering")));
 		inner->Add(new wxStaticText(box, -1, _("When enabled, characters that are not supported by the local operating system in filenames are replaced if downloading such a file.")));
 		auto innermost = lay.createFlex(2);
 		inner->Add(innermost);
