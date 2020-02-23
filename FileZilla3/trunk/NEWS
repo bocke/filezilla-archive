@@ -15,7 +15,7 @@ Legend:
 + Added new search mode: Comparative search
 + Pressing F7 now switches focus between local and remote panes
 - MSW: Work around a linker bug breaking ASLR
-- macOS: Avoid spurious button events button events consuming keyboard shortcuts
+- macOS: Avoid spurious button events consuming keyboard shortcuts
 - Increased minimum width of text field in generic input dialogs
 - Refactored Site Manager controls to increase modularity and fixed some minor GUI inconsistencies
 - Refactored engine connection logic
