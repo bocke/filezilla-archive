@@ -203,15 +203,15 @@ int CComparisonManager::CompareFiles(const int dirSortMode, std::wstring_view co
 	}
 
 #ifdef __WXMSW__
-	auto cmp = fz::stricmp(local_path, remote_path);
+	auto cmp = fz::stricmp(local, remote);
 	if (!cmp) {
-		return fz::stricmp(local, remote);
+		return fz::stricmp(local_path, remote_path);
 	}
 	return cmp;
 #else
-	auto cmp = local_path.compare(remote_path);
+	auto cmp = local.compare(remote);
 	if (!cmp) {
-		return local.compare(remote);
+		return local_path.compare(remote_path);
 	}
 	return cmp;
 #endif
