@@ -174,6 +174,7 @@ void CFtpControlSocket::ParseLine(std::wstring line)
 void CFtpControlSocket::OnConnect()
 {
 	m_lastTypeBinary = -1;
+	m_sentRestartOffset = false;
 
 	SetAlive();
 
@@ -203,7 +204,6 @@ void CFtpControlSocket::OnConnect()
 		log(logmsg::status, _("Connection established, waiting for welcome message..."));
 	}
 	m_pendingReplies = 1;
-	m_repliesToSkip = 0;
 }
 
 void CFtpControlSocket::ParseResponse()
@@ -788,6 +788,7 @@ void CFtpControlSocket::ResetSocket()
 {
 	receiveBuffer_.clear();
 	tls_layer_.reset();
+	m_pendingReplies = 0;
 	CRealControlSocket::ResetSocket();
 }
 
