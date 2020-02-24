@@ -976,6 +976,7 @@ void AdvancedSiteControls::SetSite(Site const& site)
 
 	if (site) {
 		xrc_call(parent_, "ID_SERVERTYPE", &wxChoice::SetSelection, site.server.GetType());
+		xrc_call(parent_, "ID_BYPASSPROXY", &wxCheckBox::SetValue, site.server.GetBypassProxy());
 		xrc_call(parent_, "ID_LOCALDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_localDir);
 		xrc_call(parent_, "ID_REMOTEDIR", &wxTextCtrl::ChangeValue, site.m_default_bookmark.m_remoteDir.GetPath());
 		xrc_call(parent_, "ID_SYNC", &wxCheckBox::SetValue, site.m_default_bookmark.m_sync);
@@ -1046,6 +1047,7 @@ bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 	}
 
 	std::wstring const localPath = XRCCTRL(parent_, "ID_LOCALDIR", wxTextCtrl)->GetValue().ToStdWstring();
+	site.m_default_bookmark.m_localDir = localPath;
 	if (XRCCTRL(parent_, "ID_SYNC", wxCheckBox)->GetValue()) {
 		if (site.m_default_bookmark.m_remoteDir.empty() || localPath.empty()) {
 			if (!silent) {
