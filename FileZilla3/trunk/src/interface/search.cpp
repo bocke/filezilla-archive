@@ -141,7 +141,6 @@ private:
 	std::vector<CLocalSearchFileData> localFileData_;
 	std::vector<CRemoteSearchFileData> remoteFileData_;
 
-	int m_comparisonIndex{-1};
 	bool m_canStartComparison{};
 
 	DECLARE_EVENT_TABLE()
@@ -488,22 +487,21 @@ bool CSearchDialogFileList::get_next_file(std::vector<CLocalSearchFileData> cons
 	auto const& data = fileData[index];
 
 	name = data.name;
-	path = L"/";
+	path.clear();
 
 	CLocalPath const& rootPath = m_searchDialog->m_local_search_root;
 	CLocalPath dataPath = data.path;
 	if (dataPath.IsSubdirOf(rootPath)) {
-		CLocalPath newPath(L"/");
-		std::deque<std::wstring> segments;
+		std::vector<std::wstring> segments;
 		do {
-			segments.push_front(dataPath.GetLastSegment());
+			segments.push_back(dataPath.GetLastSegment());
 			dataPath.MakeParent();
 		}
 		while (dataPath != rootPath);
-		for (auto const& s: segments) {
-			newPath.AddSegment(s);
+		for (auto it = segments.rbegin(); it != segments.rend(); ++it) {
+			path += *it;
+			path += L"\x1d";
 		}
-		path = newPath.GetPath();
 		path.pop_back();
 	}
 
@@ -523,23 +521,24 @@ bool CSearchDialogFileList::get_next_file(std::vector<CRemoteSearchFileData> con
 	auto const& data = fileData[index];
 
 	name = data.name;
+	path.clear();
 
-	CServerPath newPath(L"/");
 	CServerPath const& rootPath = m_searchDialog->m_remote_search_root;
 	CServerPath dataPath = data.path;
 	if (dataPath.IsSubdirOf(rootPath, false)) {
-		std::deque<std::wstring> segments;
+		std::vector<std::wstring> segments;
 		do {
-			segments.push_front(dataPath.GetLastSegment());
+			segments.push_back(dataPath.GetLastSegment());
 			dataPath.MakeParent();
 		}
 		while (dataPath != rootPath);
-		for (auto const& s: segments) {
-			newPath.AddSegment(s);
+		for (auto it = segments.rbegin(); it != segments.rend(); ++it) {
+			path += *it;
+			path += L"\x1d";
 		}
+		path.pop_back();
 	}
 
-	path = newPath.GetPath();
 	dir = data.is_dir();
 	size = data.size;
 	date = data.time;
