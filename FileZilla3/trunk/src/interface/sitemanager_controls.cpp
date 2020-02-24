@@ -1185,7 +1185,7 @@ void TransferSettingsSiteControls::SetSite(Site const& site)
 	xrc_call(parent_, "ID_TRANSFERMODE_PASSIVE", &wxWindow::Enable, !predefined_);
 	xrc_call(parent_, "ID_LIMITMULTIPLE", &wxWindow::Enable, !predefined_);
 
-	if (site) {
+	if (!site) {
 		xrc_call(parent_, "ID_TRANSFERMODE_DEFAULT", &wxRadioButton::SetValue, true);
 		xrc_call(parent_, "ID_LIMITMULTIPLE", &wxCheckBox::SetValue, false);
 		xrc_call(parent_, "ID_MAXMULTIPLE", &wxSpinCtrl::Enable, false);
