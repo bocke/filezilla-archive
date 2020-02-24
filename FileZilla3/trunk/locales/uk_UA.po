@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2020-02-16 14:42+0100\n"
-"PO-Revision-Date: 2020-02-11 12:56+0200\n"
+"POT-Creation-Date: 2020-02-24 11:06+0100\n"
+"PO-Revision-Date: 2020-02-21 10:08+0200\n"
 "Last-Translator: Igor Chomko <igor.chomko@gmail.com>\n"
 "Language-Team: Igor Chomko <igorchomko@gmail.com>\n"
 "Language: uk_UA\n"
@@ -52,8 +52,8 @@ msgstr[0] "%d каталог"
 msgstr[1] "%d каталоги"
 msgstr[2] "%d каталогів"
 
-#: ../src/interface/RemoteListView.cpp:1431 ../src/interface/search.cpp:1265
-#: ../src/interface/search.cpp:1666
+#: ../src/interface/RemoteListView.cpp:1431 ../src/interface/search.cpp:1266
+#: ../src/interface/search.cpp:1667
 #, c-format
 msgid "%d directory with its contents"
 msgid_plural "%d directories with their contents"
@@ -63,8 +63,8 @@ msgstr[2] "%d каталогів зі своїм вмістом"
 
 #: ../src/interface/filelist_statusbar.cpp:50
 #: ../src/interface/filelist_statusbar.cpp:75
-#: ../src/interface/RemoteListView.cpp:1430 ../src/interface/search.cpp:1264
-#: ../src/interface/search.cpp:1665
+#: ../src/interface/RemoteListView.cpp:1430 ../src/interface/search.cpp:1265
+#: ../src/interface/search.cpp:1666
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
@@ -200,11 +200,11 @@ msgstr "%u - Ім'я користувача"
 msgid "%w - Proxy password"
 msgstr "%w - Пароль проксі"
 
-#: ../src/interface/sitemanager_controls.cpp:1271
+#: ../src/interface/sitemanager_controls.cpp:1274
 msgid "&AWS S3 encryption"
 msgstr "Шифрування &AWS S3"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2634
+#: ../src/interface/resources/xrc/dialogs.xrc:2284
 msgid "&Abort previous connection and connect in current tab"
 msgstr "&Завершити попереднє з'єднання і з'єднати у поточній вкладці"
 
@@ -222,14 +222,14 @@ msgstr "ID ключа доступу:"
 msgid "&Account ID:"
 msgstr "&ID облікового запису:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1993
+#: ../src/interface/resources/xrc/dialogs.xrc:1643
 #: ../src/interface/sitemanager_controls.cpp:130
 msgid "&Account:"
 msgstr "&Обліковий запис:"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:80
 #: ../src/interface/resources/xrc/settings.xrc:153
-#: ../src/interface/sitemanager_controls.cpp:1162
+#: ../src/interface/sitemanager_controls.cpp:1164
 msgid "&Active"
 msgstr "&Активний"
 
@@ -237,7 +237,7 @@ msgstr "&Активний"
 msgid "&Add bookmark..."
 msgstr "&Додати закладку..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2971
+#: ../src/interface/resources/xrc/dialogs.xrc:2621
 msgid "&Add directory..."
 msgstr "&Додати каталог..."
 
@@ -272,11 +272,11 @@ msgstr "&У майбутніх сесіях завжди довіряти сер
 msgid "&Always trust this host, add this key to the cache"
 msgstr "&Завжди довіряти цьому хосту,додати вказаний ключ у каше"
 
-#: ../src/interface/resources/xrc/settings.xrc:1760
+#: ../src/interface/resources/xrc/settings.xrc:1329
 msgid "&Always use default editor"
 msgstr "&Завжди використовувати типовий редактор"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2308
+#: ../src/interface/resources/xrc/dialogs.xrc:1958
 msgid "&Always use selection for unassociated files"
 msgstr "&Завжди використовувати вибране для неасоційованих файлів"
 
@@ -288,12 +288,12 @@ msgstr "&Завжди виконувати цю дію"
 msgid "&Ask your operating system for the external IP address"
 msgstr "&Здійснювати запит в операційної системи щодо завнішньої ІР адреси"
 
-#: ../src/interface/resources/xrc/settings.xrc:999
+#: ../src/interface/resources/xrc/settings.xrc:762
 #: ../src/interface/menu_bar.cpp:118 ../src/interface/statusbar.cpp:562
 msgid "&Auto"
 msgstr "&Автоматичний"
 
-#: ../src/interface/sitemanager_controls.cpp:1073
+#: ../src/interface/sitemanager_controls.cpp:1075
 msgid "&Autodetect"
 msgstr "&Автовизначення"
 
@@ -301,12 +301,12 @@ msgstr "&Автовизначення"
 msgid "&Background color:"
 msgstr "&Колір тла:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1014
+#: ../src/interface/resources/xrc/settings.xrc:777
 #: ../src/interface/menu_bar.cpp:120 ../src/interface/statusbar.cpp:564
 msgid "&Binary"
 msgstr "&Бінарний"
 
-#: ../src/interface/resources/xrc/settings.xrc:1423
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:30
 msgid "&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"
 msgstr ""
 "&Бінарні префікси з використанням символів SI. (наприклад, 1 КБ = 1024 байти)"
@@ -315,24 +315,24 @@ msgstr ""
 msgid "&Bookmarks"
 msgstr "&Закладки"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1766
-#: ../src/interface/resources/xrc/dialogs.xrc:2177
-#: ../src/interface/resources/xrc/dialogs.xrc:2295
-#: ../src/interface/resources/xrc/dialogs.xrc:2365
-#: ../src/interface/resources/xrc/settings.xrc:1732
-#: ../src/interface/resources/xrc/settings.xrc:1947
+#: ../src/interface/resources/xrc/dialogs.xrc:1416
+#: ../src/interface/resources/xrc/dialogs.xrc:1827
+#: ../src/interface/resources/xrc/dialogs.xrc:1945
+#: ../src/interface/resources/xrc/dialogs.xrc:2015
+#: ../src/interface/resources/xrc/settings.xrc:1301
+#: ../src/interface/resources/xrc/settings.xrc:1516
 #: ../src/interface/sitemanager_controls.cpp:931
 #: ../src/interface/sitemanager_dialog.cpp:298
 msgid "&Browse..."
 msgstr "&Перегляд..."
 
-#: ../src/interface/resources/xrc/settings.xrc:900
+#: ../src/interface/settings/optionspage_transfer.cpp:67
 msgid "&Burst tolerance:"
 msgstr "&Стійкість пакету:"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:486
-#: ../src/interface/resources/xrc/dialogs.xrc:2761
-#: ../src/interface/resources/xrc/dialogs.xrc:2863
+#: ../src/interface/resources/xrc/dialogs.xrc:2411
+#: ../src/interface/resources/xrc/dialogs.xrc:2513
 #: ../src/interface/inputdialog.cpp:31
 #: ../src/interface/settings/settingsdialog.cpp:75
 #: ../src/interface/verifycertdialog.cpp:784
@@ -343,7 +343,7 @@ msgstr "&Скасувати"
 msgid "&Clear private data..."
 msgstr "&Очистити особисті дані..."
 
-#: ../src/interface/update_dialog.cpp:92
+#: ../src/interface/update_dialog.cpp:93
 msgid "&Close"
 msgstr "&Закрити"
 
@@ -390,11 +390,11 @@ msgstr "&Створити нову вкладку"
 msgid "&Debug"
 msgstr "&Відлагодити"
 
-#: ../src/interface/resources/xrc/settings.xrc:2036
+#: ../src/interface/resources/xrc/settings.xrc:1605
 msgid "&Debug information in message log:"
 msgstr "&Відлагодити інформацію в журналі повідомлень:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1702
+#: ../src/interface/resources/xrc/settings.xrc:1271
 msgid "&Default editor:"
 msgstr "&Типовий редактор:"
 
@@ -406,18 +406,20 @@ msgstr "&Типова дія щодо існуючого файлу..."
 msgid "&Delay between failed login attempts:"
 msgstr "&Затримка між невдалими спробами входу:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:530
-#: ../src/interface/resources/xrc/dialogs.xrc:699
 #: ../src/interface/bookmarks_dialog.cpp:274
-#: ../src/interface/LocalListView.cpp:823
+#: ../src/interface/filteredit.cpp:100 ../src/interface/LocalListView.cpp:823
 #: ../src/interface/LocalTreeView.cpp:1121
 #: ../src/interface/sitemanager_dialog.cpp:355
 msgid "&Delete"
 msgstr "&Видалити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2557
+#: ../src/interface/resources/xrc/dialogs.xrc:2207
 msgid "&Delete symlink"
 msgstr "&Видалити символічне посилання"
+
+#: ../src/interface/filter.cpp:143
+msgid "&Delete..."
+msgstr "&Видалити..."
 
 #: ../src/interface/menu_bar.cpp:74
 msgid "&Directory access permissions..."
@@ -441,7 +443,7 @@ msgstr ""
 "&Вимкнути синхронізований перегляд і продовжити змінювання віддаленого "
 "каталогу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1289
+#: ../src/interface/resources/xrc/dialogs.xrc:939
 msgid "&Discard local file then download and edit file anew"
 msgstr ""
 "&Проігнорувати локальний файл з подальшим його завантаженням та поновленям "
@@ -455,7 +457,7 @@ msgstr "&Від'єднати"
 msgid "&Display momentary transfer speed instead of average speed"
 msgstr "&Показувати миттєву швидкість передачі замість середньої швидкості"
 
-#: ../src/interface/resources/xrc/settings.xrc:1410
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:28
 msgid "&Display size in bytes"
 msgstr "&Показати розмір в байтах"
 
@@ -467,7 +469,7 @@ msgstr "&Даний діалог більше не показувати."
 msgid "&Don't use external IP address on local connections."
 msgstr "&Не використовувати зовнішню ІР адресу при локальному з'єднанні."
 
-#: ../src/interface/resources/xrc/settings.xrc:1617
+#: ../src/interface/resources/xrc/settings.xrc:1186
 msgid "&Double-click action on files:"
 msgstr "&Подвійне клацання на файлах:"
 
@@ -476,24 +478,28 @@ msgstr "&Подвійне клацання на файлах:"
 msgid "&Download"
 msgstr "&Завантажити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2351
+#: ../src/interface/resources/xrc/dialogs.xrc:2001
 msgid "&Download to:"
 msgstr "&Завантажити до:"
 
-#: ../src/interface/search.cpp:1215
+#: ../src/interface/search.cpp:1216
 msgid "&Download..."
 msgstr "&Завантажити..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:866
-#: ../src/interface/resources/xrc/settings.xrc:1124
+#: ../src/interface/resources/xrc/dialogs.xrc:516
+#: ../src/interface/resources/xrc/settings.xrc:887
 msgid "&Downloads:"
 msgstr "&Завантаження:"
+
+#: ../src/interface/filteredit.cpp:102
+msgid "&Duplicate"
+msgstr "&Дублювати"
 
 #: ../src/interface/LocalListView.cpp:815 ../src/interface/menu_bar.cpp:68
 msgid "&Edit"
 msgstr "&Редагувати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:626
+#: ../src/interface/filter.cpp:193
 msgid "&Edit filter rules..."
 msgstr "&Редагувати правила фільтрування..."
 
@@ -506,12 +512,12 @@ msgstr "&Розблокувати"
 msgid "&Enable compression"
 msgstr "&Увімкнути стиснення даних"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2689
-#: ../src/interface/resources/xrc/settings.xrc:841
+#: ../src/interface/resources/xrc/dialogs.xrc:2339
+#: ../src/interface/settings/optionspage_transfer.cpp:46
 msgid "&Enable speed limits"
 msgstr "&Увімкнути обмеження швидкості"
 
-#: ../src/interface/sitemanager_controls.cpp:1083
+#: ../src/interface/sitemanager_controls.cpp:1085
 msgid "&Encoding:"
 msgstr "&Кодування:"
 
@@ -523,7 +529,7 @@ msgstr "&Кодування:"
 msgid "&Enter custom command..."
 msgstr "&Ввести настроювану команду..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2627
+#: ../src/interface/resources/xrc/dialogs.xrc:2277
 msgid "&Establish connection in a new tab"
 msgstr "&Встановити з'єднання у новій вкладці"
 
@@ -531,7 +537,7 @@ msgstr "&Встановити з'єднання у новій вкладці"
 msgid "&Execute"
 msgstr "&Виконати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1040
+#: ../src/interface/resources/xrc/dialogs.xrc:690
 msgid "&Export Site Manager entries"
 msgstr "&Експортувати записи Сайт Менеджера"
 
@@ -556,31 +562,31 @@ msgstr "&Атрибути файлу..."
 msgid "&File permissions..."
 msgstr "&Дозволи файла..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1754
+#: ../src/interface/resources/xrc/dialogs.xrc:1404
 msgid "&File:"
 msgstr "&Файл:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:751
+#: ../src/interface/filteredit.cpp:119
 msgid "&Filter conditions:"
 msgstr "&Стан фільтру:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:507
+#: ../src/interface/filter.cpp:137
 msgid "&Filter sets:"
 msgstr "&Налаштування фільтру:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1115
+#: ../src/interface/resources/xrc/dialogs.xrc:765
 msgid "&Filters"
 msgstr "&Фільтри"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:677
+#: ../src/interface/filteredit.cpp:91
 msgid "&Filters:"
 msgstr "&Фільтри:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1228
+#: ../src/interface/resources/xrc/dialogs.xrc:878
 msgid "&Finish editing and delete local file"
 msgstr "&Завершити редагування і видалити локальний файл"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2482
+#: ../src/interface/resources/xrc/dialogs.xrc:2132
 msgid ""
 "&Flatten local paths, upload all contained files directly into target "
 "directory"
@@ -588,7 +594,7 @@ msgstr ""
 "&Вирівняти локальні шляхи, відвантажити усі вміщені файли безпосередньо до "
 "кінцевого каталогу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2387
+#: ../src/interface/resources/xrc/dialogs.xrc:2037
 msgid ""
 "&Flatten remote paths, download all contained files directly into target "
 "directory"
@@ -596,7 +602,7 @@ msgstr ""
 "&Вирівняти віддалені шляхи, завантажити усі вміщені файли прямо до кінцевого "
 "каталогу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2564
+#: ../src/interface/resources/xrc/dialogs.xrc:2214
 msgid "&Follow symlink, delete target directory contents"
 msgstr "&Відстежити символічне посилання, видалити вміст кінцевого каталогу"
 
@@ -608,7 +614,7 @@ msgstr "&Отримати зовнішню ІР адресу з такого URL
 msgid "&Getting help..."
 msgstr "&Отримання допомоги..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2106
+#: ../src/interface/resources/xrc/dialogs.xrc:1756
 msgid "&Global bookmark"
 msgstr "&Глобальна закладка"
 
@@ -632,18 +638,18 @@ msgstr "&Найвищий"
 msgid "&Highest available port:"
 msgstr "&Найвищий доступний порт:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1901
+#: ../src/interface/resources/xrc/dialogs.xrc:1551
 #: ../src/interface/quickconnectbar.cpp:42
 #: ../src/interface/sitemanager_controls.cpp:88
 #: ../src/interface/sitemanager_controls.cpp:385
 msgid "&Host:"
 msgstr "&Хост:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1418
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:29
 msgid "&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"
 msgstr "&Бінарні префікси ІЕС (наприклад,1 KiБ =1024 байт)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1304
+#: ../src/interface/resources/xrc/settings.xrc:990
 msgid "&ISO 8601 (example: 2007-09-15)"
 msgstr "&ISO 8601 (приклад: 2007-09-15)"
 
@@ -651,20 +657,20 @@ msgstr "&ISO 8601 (приклад: 2007-09-15)"
 msgid "&Import..."
 msgstr "&Імпорт..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1793
+#: ../src/interface/resources/xrc/settings.xrc:1362
 msgid "&Inherit system's filetype associations"
 msgstr "&Зберегти асоціації типів файлів"
 
-#: ../src/interface/update_dialog.cpp:167
+#: ../src/interface/update_dialog.cpp:172
 msgid "&Install new version"
 msgstr "&Встановити нову версію"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2475
+#: ../src/interface/resources/xrc/dialogs.xrc:2125
 msgid "&Keep local path structure relative to search root"
 msgstr ""
 "&Зберігати структуру локального шляху співвідносною кореневій папці пошуку"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2380
+#: ../src/interface/resources/xrc/dialogs.xrc:2030
 msgid "&Keep remote path structure relative to search root"
 msgstr ""
 "&Утримувати структуру віддаленого шляху відносно кореневої папки пошуку"
@@ -681,7 +687,7 @@ msgstr "&Розташування файлів та областей катал�
 msgid "&Limit local ports used by FileZilla"
 msgstr "&Обмежити локальні порти, що використовуються FileZillа"
 
-#: ../src/interface/sitemanager_controls.cpp:1166
+#: ../src/interface/sitemanager_controls.cpp:1168
 msgid "&Limit number of simultaneous connections"
 msgstr "&Обмежити кількість одночасних з'єднань"
 
@@ -689,12 +695,12 @@ msgstr "&Обмежити кількість одночасних з'єднан�
 msgid "&Local directory tree"
 msgstr "&Локальне дерево каталогів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2162
+#: ../src/interface/resources/xrc/dialogs.xrc:1812
 #: ../src/interface/sitemanager_dialog.cpp:292
 msgid "&Local directory:"
 msgstr "&Локальний каталог:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1924
+#: ../src/interface/resources/xrc/settings.xrc:1493
 msgid "&Log to file"
 msgstr "&Увійти до файлу"
 
@@ -702,7 +708,7 @@ msgstr "&Увійти до файлу"
 msgid "&Logon Type:"
 msgstr "&Тип входу:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1956
+#: ../src/interface/resources/xrc/dialogs.xrc:1606
 msgid "&Logontype:"
 msgstr "&Тип входження:"
 
@@ -718,7 +724,7 @@ msgstr "&Керування закладками..."
 msgid "&Manual transfer..."
 msgstr "&Ручна передача..."
 
-#: ../src/interface/sitemanager_controls.cpp:1170
+#: ../src/interface/sitemanager_controls.cpp:1172
 msgid "&Maximum number of connections:"
 msgstr "&Максимальна кількість з'єднань:"
 
@@ -734,11 +740,11 @@ msgstr "&Журнал повідомлень"
 msgid "&Minimize to tray"
 msgstr "&Зменшити до трею"
 
-#: ../src/interface/resources/xrc/settings.xrc:1544
+#: ../src/interface/resources/xrc/settings.xrc:1113
 msgid "&Name sorting mode:"
 msgstr "&Спосіб сортування імені:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2133
+#: ../src/interface/resources/xrc/dialogs.xrc:1783
 msgid "&Name:"
 msgstr "&Ім'я:"
 
@@ -746,7 +752,7 @@ msgstr "&Ім'я:"
 msgid "&Network configuration wizard..."
 msgstr "&Майстер налаштування мережі..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:693
+#: ../src/interface/filteredit.cpp:99
 msgid "&New"
 msgstr "&Новий"
 
@@ -762,8 +768,8 @@ msgstr "&Доступна нова версія!"
 msgid "&Next >"
 msgstr "&Далі>"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1241
-#: ../src/interface/resources/xrc/dialogs.xrc:1364
+#: ../src/interface/resources/xrc/dialogs.xrc:891
+#: ../src/interface/resources/xrc/dialogs.xrc:1014
 msgid "&No"
 msgstr "&Ні"
 
@@ -802,7 +808,7 @@ msgstr "&Відкрити"
 msgid "&Overwrite"
 msgstr "&Переписати"
 
-#: ../src/interface/sitemanager_controls.cpp:1163
+#: ../src/interface/sitemanager_controls.cpp:1165
 msgid "&Passive"
 msgstr "&Пасивний"
 
@@ -814,8 +820,8 @@ msgstr "&Пароль:"
 msgid "&Play sound"
 msgstr "&Відтворити звук"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1914
-#: ../src/interface/quickconnectbar.cpp:55
+#: ../src/interface/resources/xrc/dialogs.xrc:1564
+#: ../src/interface/quickconnectbar.cpp:58
 #: ../src/interface/sitemanager_controls.cpp:93
 msgid "&Port:"
 msgstr "&Порт:"
@@ -824,11 +830,11 @@ msgstr "&Порт:"
 msgid "&Preserve timestamps of transferred files"
 msgstr "&Зберегти часові позначки переданих файлів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1109
+#: ../src/interface/resources/xrc/dialogs.xrc:759
 msgid "&Queue"
 msgstr "&Черга"
 
-#: ../src/interface/quickconnectbar.cpp:63
+#: ../src/interface/quickconnectbar.cpp:66
 msgid "&Quickconnect"
 msgstr "&Швидке з'єднання"
 
@@ -836,7 +842,7 @@ msgstr "&Швидке з'єднання"
 msgid "&Quickconnect bar"
 msgstr "&Панель швидкого з'єднання"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:973
+#: ../src/interface/resources/xrc/dialogs.xrc:623
 msgid "&Quickconnect history"
 msgstr "&Історія Швидкого з'єднання"
 
@@ -848,7 +854,7 @@ msgstr "&Читати"
 msgid "&Reconnect"
 msgstr "&Відновити з'єднання"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:980
+#: ../src/interface/resources/xrc/dialogs.xrc:630
 msgid "&Reconnect information"
 msgstr "&Інформація повторного з'єднання"
 
@@ -864,16 +870,16 @@ msgstr "&Пам'ятати головний пароль до завершенн
 msgid "&Remember password until FileZilla is closed"
 msgstr "&Пам'ятати пароль до завершення роботи FileZilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2189
+#: ../src/interface/resources/xrc/dialogs.xrc:1839
 #: ../src/interface/sitemanager_dialog.cpp:300
 msgid "&Remote directory:"
 msgstr "&Віддалений каталог:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1790
+#: ../src/interface/resources/xrc/dialogs.xrc:1440
 msgid "&Remote path:"
 msgstr "&Віддалений шлях:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1062
+#: ../src/interface/resources/xrc/settings.xrc:825
 msgid "&Remove"
 msgstr "&Забрати"
 
@@ -881,14 +887,13 @@ msgstr "&Забрати"
 msgid "&Remove key"
 msgstr "&Вилучити ключ"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2976
+#: ../src/interface/resources/xrc/dialogs.xrc:2626
 #: ../src/interface/QueueView.cpp:1798
 msgid "&Remove selected"
 msgstr "&Забрати вибране"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:705
 #: ../src/interface/bookmarks_dialog.cpp:273
-#: ../src/interface/LocalListView.cpp:824
+#: ../src/interface/filteredit.cpp:101 ../src/interface/LocalListView.cpp:824
 #: ../src/interface/LocalTreeView.cpp:1122
 #: ../src/interface/RemoteListView.cpp:1078
 #: ../src/interface/RemoteTreeView.cpp:928
@@ -896,15 +901,15 @@ msgstr "&Забрати вибране"
 msgid "&Rename"
 msgstr "&Перейменувати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:525
+#: ../src/interface/filter.cpp:142
 msgid "&Rename..."
 msgstr "&Перейменувати..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1282
+#: ../src/interface/resources/xrc/dialogs.xrc:932
 msgid "&Reopen local file"
 msgstr "&Перевідкрити локальний файл"
 
-#: ../src/interface/resources/xrc/settings.xrc:944
+#: ../src/interface/settings/optionspage_transfer.cpp:87
 msgid "&Replace invalid characters with:"
 msgstr "&Замінити недійсні символи на:"
 
@@ -936,7 +941,7 @@ msgstr "&Команда на виконання..."
 msgid "&Run configuration wizard now..."
 msgstr "&Запустити майстра налаштувань..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1886
+#: ../src/interface/resources/xrc/settings.xrc:1455
 msgid "&Run update check now..."
 msgstr "&Виконати перевірку оновлень..."
 
@@ -948,7 +953,7 @@ msgstr "&САЙТ"
 msgid "&SOCKS 5"
 msgstr "&SOCKS 5"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:519
+#: ../src/interface/filter.cpp:141
 msgid "&Save as..."
 msgstr "&Зберегти як..."
 
@@ -956,7 +961,7 @@ msgstr "&Зберегти як..."
 msgid "&Search remote files..."
 msgstr "&Пошук віддалених файлів..."
 
-#: ../src/interface/sitemanager_controls.cpp:1280
+#: ../src/interface/sitemanager_controls.cpp:1283
 msgid "&Select a key:"
 msgstr "&Вибрати ключ:"
 
@@ -964,20 +969,20 @@ msgstr "&Вибрати ключ:"
 msgid "&Select entry:"
 msgstr "&Вибрати запис:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1669
+#: ../src/interface/resources/xrc/settings.xrc:1238
 msgid "&Select language:"
 msgstr "&Вибрати мову:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1642
+#: ../src/interface/resources/xrc/dialogs.xrc:1292
 msgid "&Select the columns that should be displayed:"
 msgstr "&Вибрати стовпці для:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1829
+#: ../src/interface/resources/xrc/dialogs.xrc:1479
 #: ../src/interface/menu_bar.cpp:136
 msgid "&Server"
 msgstr "&Сервер"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1103
+#: ../src/interface/resources/xrc/dialogs.xrc:753
 msgid "&Settings"
 msgstr "&Налаштування"
 
@@ -985,7 +990,7 @@ msgstr "&Налаштування"
 msgid "&Settings..."
 msgstr "&Налаштування..."
 
-#: ../src/interface/resources/xrc/settings.xrc:2025
+#: ../src/interface/resources/xrc/settings.xrc:1594
 msgid "&Show debug menu"
 msgstr "&Показати меню відлагодження"
 
@@ -993,11 +998,11 @@ msgstr "&Показати меню відлагодження"
 msgid "&Show detailed log"
 msgstr "&Показати деталізований журнал повідомлень"
 
-#: ../src/interface/resources/xrc/settings.xrc:1919
+#: ../src/interface/resources/xrc/settings.xrc:1488
 msgid "&Show timestamps in message log"
 msgstr "&Показати часові позначки в журналі повідомлень"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:986
+#: ../src/interface/resources/xrc/dialogs.xrc:636
 msgid "&Site Manager entries"
 msgstr "&Записи в Сайт Менеджері"
 
@@ -1005,7 +1010,7 @@ msgstr "&Записи в Сайт Менеджері"
 msgid "&Site Manager..."
 msgstr "&Сайт Менеджер..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2114
+#: ../src/interface/resources/xrc/dialogs.xrc:1764
 msgid "&Site-specific bookmark"
 msgstr "&Специфічна закладка сайту"
 
@@ -1017,8 +1022,8 @@ msgstr "&Оминути"
 msgid "&Speed limits"
 msgstr "&Обмеження швидкості"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2398
-#: ../src/interface/resources/xrc/dialogs.xrc:2493
+#: ../src/interface/resources/xrc/dialogs.xrc:2048
+#: ../src/interface/resources/xrc/dialogs.xrc:2143
 msgid "&Start transfer immediately"
 msgstr "&Розпочати передачу негайно"
 
@@ -1034,7 +1039,7 @@ msgstr "&Шифри TLS"
 msgid "&Test"
 msgstr "&Тест"
 
-#: ../src/interface/resources/xrc/settings.xrc:1222
+#: ../src/interface/settings/optionspage_themes.cpp:138
 msgid "&Theme:"
 msgstr "&Тема:"
 
@@ -1042,16 +1047,16 @@ msgstr "&Тема:"
 msgid "&Transfer"
 msgstr "&Передача"
 
-#: ../src/interface/sitemanager_controls.cpp:1158
+#: ../src/interface/sitemanager_controls.cpp:1160
 msgid "&Transfer mode:"
 msgstr "&Спосіб передачі:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:992
+#: ../src/interface/resources/xrc/dialogs.xrc:642
 #: ../src/interface/menu_bar.cpp:105
 msgid "&Transfer queue"
 msgstr "&Почерговість передачі"
 
-#: ../src/interface/resources/xrc/settings.xrc:1086
+#: ../src/interface/resources/xrc/settings.xrc:849
 msgid "&Treat dotfiles as ASCII files"
 msgstr "&Трактувати файли з розширенням .dot як файли ASCII"
 
@@ -1059,7 +1064,7 @@ msgstr "&Трактувати файли з розширенням .dot як ф�
 msgid "&Trust this certificate on the listed alternative hostnames."
 msgstr "&Довіряти цьому сертифікату з-поміж списку альтернативних імен хоста."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1404
+#: ../src/interface/resources/xrc/dialogs.xrc:1054
 msgid "&Unedit"
 msgstr "&Відмінити редагування"
 
@@ -1072,20 +1077,20 @@ msgstr "&Обновити кешований ключ для даного хос
 msgid "&Upload"
 msgstr "&Відвантажити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2452
+#: ../src/interface/resources/xrc/dialogs.xrc:2102
 msgid "&Upload to:"
 msgstr "&Відвантажити до:"
 
-#: ../src/interface/search.cpp:1207
+#: ../src/interface/search.cpp:1208
 msgid "&Upload..."
 msgstr "&Відвантажити..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:889
-#: ../src/interface/resources/xrc/settings.xrc:1145
+#: ../src/interface/resources/xrc/dialogs.xrc:539
+#: ../src/interface/resources/xrc/settings.xrc:908
 msgid "&Uploads:"
 msgstr "&Відвантаження:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2283
+#: ../src/interface/resources/xrc/dialogs.xrc:1933
 msgid "&Use custom program"
 msgstr "&Використати користувацьку програму"
 
@@ -1093,7 +1098,7 @@ msgstr "&Використати користувацьку програму"
 msgid "&Use synchronized browsing"
 msgstr "&Використовувати синхронізований перегляд"
 
-#: ../src/interface/resources/xrc/settings.xrc:1713
+#: ../src/interface/resources/xrc/settings.xrc:1282
 msgid "&Use system's default editor for text files"
 msgstr "&Використати типовий системний редактор для текстових файлів"
 
@@ -1105,11 +1110,11 @@ msgstr "&Використовувати наступні ІР адреси:"
 msgid "&Use the server's external IP address instead"
 msgstr "&Використати натомість зовнішню ІР адресу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1433
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:32
 msgid "&Use thousands separator"
 msgstr "&Використати розділювач тисячних"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1968
+#: ../src/interface/resources/xrc/dialogs.xrc:1618
 #: ../src/interface/loginmanager.cpp:228
 #: ../src/interface/sitemanager_controls.cpp:118
 #: ../src/interface/sitemanager_controls.cpp:388
@@ -1117,7 +1122,7 @@ msgstr "&Використати розділювач тисячних"
 msgid "&User:"
 msgstr "&Користувач:"
 
-#: ../src/interface/quickconnectbar.cpp:47
+#: ../src/interface/quickconnectbar.cpp:48
 msgid "&Username:"
 msgstr "&Ім'я користувача:"
 
@@ -1130,17 +1135,17 @@ msgstr "&Версія %s"
 msgid "&View"
 msgstr "&Вигляд"
 
-#: ../src/interface/RemoteListView.cpp:1068 ../src/interface/search.cpp:1216
+#: ../src/interface/RemoteListView.cpp:1068 ../src/interface/search.cpp:1217
 msgid "&View/Edit"
 msgstr "&Перегляд/Редагування"
 
-#: ../src/interface/resources/xrc/settings.xrc:1770
+#: ../src/interface/resources/xrc/settings.xrc:1339
 msgid "&Watch locally edited files and prompt to upload modifications"
 msgstr ""
 "&Стежити за локально редагованими файлами та нагадувати про відвантаження "
 "модифікацій"
 
-#: ../src/interface/resources/xrc/settings.xrc:1862
+#: ../src/interface/resources/xrc/settings.xrc:1431
 msgid "&When checking for updates, check for:"
 msgstr "&При перевірці наявних оновлень, перевірити:"
 
@@ -1148,8 +1153,8 @@ msgstr "&При перевірці наявних оновлень, переві
 msgid "&Write"
 msgstr "&Писати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1235
-#: ../src/interface/resources/xrc/dialogs.xrc:1358
+#: ../src/interface/resources/xrc/dialogs.xrc:885
+#: ../src/interface/resources/xrc/dialogs.xrc:1008
 msgid "&Yes"
 msgstr "&Так"
 
@@ -1209,13 +1214,13 @@ msgstr[0] "(%d фільтрований об'єкт )"
 msgstr[1] "(%d фільтрованих об'єкти)"
 msgstr[2] "(%d фільтрованих об'єктів)"
 
-#: ../src/interface/update_dialog.cpp:433
+#: ../src/interface/update_dialog.cpp:441
 #, c-format
 msgid "(%u%% downloaded)"
 msgstr "(%u%% завантажено)"
 
-#: ../src/interface/resources/xrc/settings.xrc:803
-#: ../src/interface/resources/xrc/settings.xrc:824
+#: ../src/interface/settings/optionspage_transfer.cpp:34
+#: ../src/interface/settings/optionspage_transfer.cpp:40
 msgid "(0 for no limit)"
 msgstr "(0 для безліміту)"
 
@@ -1227,7 +1232,7 @@ msgstr "(0-99)"
 msgid "(0-999 seconds)"
 msgstr "(0-999 секунд)"
 
-#: ../src/interface/resources/xrc/settings.xrc:782
+#: ../src/interface/settings/optionspage_transfer.cpp:28
 msgid "(1-10)"
 msgstr "(1-10)"
 
@@ -1240,18 +1245,18 @@ msgstr "(10-9999, 0 щоб вимкнути)"
 msgid "(app-compat is set to %d.%d)"
 msgstr "(сумісність програм встановлено до %d.%d)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1371
+#: ../src/interface/resources/xrc/settings.xrc:1057
 msgid "(example: %H:%M)"
 msgstr "(приклад: %H:%M)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1322
+#: ../src/interface/resources/xrc/settings.xrc:1008
 msgid "(example: %Y-%m-%d)"
 msgstr "(приклад: %Y-%m-%d)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2708
-#: ../src/interface/resources/xrc/dialogs.xrc:2725
-#: ../src/interface/resources/xrc/settings.xrc:864
-#: ../src/interface/resources/xrc/settings.xrc:889
+#: ../src/interface/resources/xrc/dialogs.xrc:2358
+#: ../src/interface/resources/xrc/dialogs.xrc:2375
+#: ../src/interface/settings/optionspage_transfer.cpp:57
+#: ../src/interface/settings/optionspage_transfer.cpp:65
 #, c-format
 msgid "(in %s/s)"
 msgstr "(в %s/s)"
@@ -1280,19 +1285,19 @@ msgstr "-s та -c не можуть співіснувати одночасно
 msgid "-s cannot be used together with an FTP URL."
 msgstr "-s не можна використовувати разом з адресою FTP."
 
-#: ../src/interface/resources/xrc/settings.xrc:2046
+#: ../src/interface/resources/xrc/settings.xrc:1615
 msgid "0 - None"
 msgstr "0 - Жодного"
 
-#: ../src/interface/resources/xrc/settings.xrc:2047
+#: ../src/interface/resources/xrc/settings.xrc:1616
 msgid "1 - Warning"
 msgstr "1 - Попередження"
 
-#: ../src/interface/resources/xrc/settings.xrc:2048
+#: ../src/interface/resources/xrc/settings.xrc:1617
 msgid "2 - Info"
 msgstr "2 - Інформація"
 
-#: ../src/interface/resources/xrc/settings.xrc:2049
+#: ../src/interface/resources/xrc/settings.xrc:1618
 msgid "3 - Verbose"
 msgstr "3 - Детально"
 
@@ -1300,7 +1305,7 @@ msgstr "3 - Детально"
 msgid "32-bit system"
 msgstr "32-бітна система"
 
-#: ../src/interface/resources/xrc/settings.xrc:2050
+#: ../src/interface/resources/xrc/settings.xrc:1619
 msgid "4 - Debug"
 msgstr "4 - Відлагодити"
 
@@ -1336,7 +1341,7 @@ msgstr ""
 "сконфігуровані. В таких випадках вам необхідно використати активний режим. В "
 "активному режимі FileZilla відкриває порт і просить сервер про з'єднання."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1154
+#: ../src/interface/resources/xrc/dialogs.xrc:804
 msgid "A file previously opened has been changed."
 msgstr "Попередньо відкритий файл було змінено."
 
@@ -1365,7 +1370,7 @@ msgstr ""
 "Якщо ви не полагодите цієї проблеми,файли будуть відсутні у списках файлів.\n"
 "Більше попереджень упродовж цього з'єднання не буде."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2844
+#: ../src/interface/resources/xrc/dialogs.xrc:2494
 #: ../src/interface/settings/optionspage_passwords.cpp:190
 msgid ""
 "A lost master password cannot be recovered! Please thoroughly memorize your "
@@ -1374,7 +1379,7 @@ msgstr ""
 "Втрачений головний пароль відновленню не підлягає! Ретельно запам'ятайте "
 "його,будь ласка."
 
-#: ../src/interface/update_dialog.cpp:149
+#: ../src/interface/update_dialog.cpp:152
 msgid "A new version of FileZilla is available:"
 msgstr "Доступна нова версія FileZilla:"
 
@@ -1403,16 +1408,16 @@ msgstr ""
 "Виконується віддалений процес і синхронну навігацію увімкнено.\n"
 "Вимкнути синхронізовану навігацію і продовжити змінювати локальний каталог?"
 
-#: ../src/interface/resources/xrc/settings.xrc:1007
+#: ../src/interface/resources/xrc/settings.xrc:770
 #: ../src/interface/menu_bar.cpp:119 ../src/interface/statusbar.cpp:563
 msgid "A&SCII"
 msgstr "A&SCII"
 
-#: ../src/interface/resources/xrc/settings.xrc:1055
+#: ../src/interface/resources/xrc/settings.xrc:818
 msgid "A&dd"
 msgstr "До&дати"
 
-#: ../src/interface/resources/xrc/settings.xrc:1192
+#: ../src/interface/resources/xrc/settings.xrc:955
 msgid "A&llow resume of ASCII files"
 msgstr "До&зволити відновлення файлів ASCII"
 
@@ -1432,11 +1437,11 @@ msgstr "За&стосувати до всіх файлів та каталогі
 msgid "A&utomatically remove successful transfers"
 msgstr "А&втоматично видалити успішну передачу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2045
+#: ../src/interface/resources/xrc/dialogs.xrc:1695
 msgid "ASCII"
 msgstr "ASCII"
 
-#: ../src/interface/sitemanager_controls.cpp:1274
+#: ../src/interface/sitemanager_controls.cpp:1277
 msgid "AWS &KMS encryption"
 msgstr "Шифрування AWS &KMS"
 
@@ -1469,11 +1474,11 @@ msgstr "Обліковий запис"
 msgid "Action after queue &completion"
 msgstr "Дія після &завершення черги"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1397
+#: ../src/interface/resources/xrc/dialogs.xrc:1047
 msgid "Action on selected file:"
 msgstr "Дія над вибраним файлом:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1277
+#: ../src/interface/resources/xrc/dialogs.xrc:927
 msgid "Action to perform:"
 msgstr "Дія до виконання:"
 
@@ -1515,8 +1520,8 @@ msgstr ""
 msgid "Active mode IP"
 msgstr "ІР активного режиму"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2405
-#: ../src/interface/resources/xrc/dialogs.xrc:2500
+#: ../src/interface/resources/xrc/dialogs.xrc:2055
+#: ../src/interface/resources/xrc/dialogs.xrc:2150
 msgid "Add files to &queue only"
 msgstr "Лише додати файли до &черги"
 
@@ -1530,8 +1535,8 @@ msgstr "Додати вибрану директорію до черги пер�
 msgid "Add selected files and folders to the transfer queue"
 msgstr "Додати вибрані файли і папки до черги передачі"
 
-#: ../src/interface/resources/xrc/settings.xrc:1625
-#: ../src/interface/resources/xrc/settings.xrc:1645
+#: ../src/interface/resources/xrc/settings.xrc:1194
+#: ../src/interface/resources/xrc/settings.xrc:1214
 msgid "Add to queue"
 msgstr "Додати до черги"
 
@@ -1543,7 +1548,7 @@ msgstr "Тип адреси не підтримується"
 msgid "Advanced"
 msgstr "Додатково"
 
-#: ../src/interface/resources/xrc/settings.xrc:1877
+#: ../src/interface/resources/xrc/settings.xrc:1446
 msgid ""
 "Advice: Unless you want to test new features, please keep using stable "
 "versions only. Beta versions and nightly builds are development versions "
@@ -1557,12 +1562,12 @@ msgstr ""
 "давати збої і навіть пошкодити вашу систему. Використовуйте бета версії і "
 "нічні збірки на власний ризик."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2644
+#: ../src/interface/resources/xrc/dialogs.xrc:2294
 msgid "Al&ways perform this action"
 msgstr "Зав&жди виконувати цю дію"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1476
-#: ../src/interface/resources/xrc/dialogs.xrc:1522
+#: ../src/interface/resources/xrc/dialogs.xrc:1126
+#: ../src/interface/resources/xrc/dialogs.xrc:1172
 msgid "Algorithm:"
 msgstr "Алгоритм:"
 
@@ -1591,7 +1596,7 @@ msgstr "Дозволити &звернутися до іншого режиму 
 msgid "Allow fallback to other transfer mode on failure"
 msgstr "Дозволити звернутися до іншого режиму передачі при виникненні збою"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2604
+#: ../src/interface/resources/xrc/dialogs.xrc:2254
 msgid "Already connected"
 msgstr "Існуюче з'єднання"
 
@@ -1618,7 +1623,7 @@ msgstr ""
 "Як альтернативу, ви можете використати свій системний агент SSH. Задля цього "
 "переконайтесь, що встановлено перемінну середовища SSH_AUTH_SOCK."
 
-#: ../src/interface/update_dialog.cpp:180
+#: ../src/interface/update_dialog.cpp:185
 msgid ""
 "Alternatively, you can also download the latest version from the FileZilla "
 "website:"
@@ -1669,11 +1674,11 @@ msgstr ""
 msgid "Any changes made in the Site Manager could not be saved."
 msgstr "Внесення будь-яких змін в Сайт Менеджері не може бути збереженим."
 
-#: ../src/interface/filter.cpp:967
+#: ../src/interface/filter.cpp:1033
 msgid "Any changes made to the filters could not be saved."
 msgstr "Внесення будь-яких змін до фільтрів не може бути збережено."
 
-#: ../src/interface/filter.cpp:876
+#: ../src/interface/filter.cpp:942
 msgid "Any changes made to the filters will not be saved."
 msgstr "Внесення будь-яких змін до фільтрів не будуть збережені."
 
@@ -1686,7 +1691,7 @@ msgstr "За&стосувати лише до каталогів"
 msgid "Application &Key:"
 msgstr "Ключ &програми:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:652
+#: ../src/interface/filter.cpp:202
 msgid "Apply"
 msgstr "Застосувати"
 
@@ -1698,7 +1703,7 @@ msgstr "Застосувати лише до &поточної черги"
 msgid "Apply to &files only"
 msgstr "Застосувати лише до &файлів"
 
-#: ../src/interface/filter_conditions_dialog.cpp:77
+#: ../src/interface/filter_conditions_dialog.cpp:76
 msgid "Archive"
 msgstr "Архів"
 
@@ -1710,10 +1715,10 @@ msgstr "Аргумент переповнення буфера"
 msgid "As tab in the transfer queue pane"
 msgstr "Як вкладка в панелі черги передачі"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:874
-#: ../src/interface/resources/xrc/dialogs.xrc:897
-#: ../src/interface/resources/xrc/settings.xrc:1131
-#: ../src/interface/resources/xrc/settings.xrc:1152
+#: ../src/interface/resources/xrc/dialogs.xrc:524
+#: ../src/interface/resources/xrc/dialogs.xrc:547
+#: ../src/interface/resources/xrc/settings.xrc:894
+#: ../src/interface/resources/xrc/settings.xrc:915
 #: ../src/interface/settings/optionspage_interface.cpp:159
 msgid "Ask for action"
 msgstr "Запит на виконання"
@@ -1739,7 +1744,7 @@ msgstr "Задавати питання у форумах FileZilla"
 msgid "Associated program not found:"
 msgstr "Допоміжної програми не знайдено:"
 
-#: ../src/interface/filter_conditions_dialog.cpp:477
+#: ../src/interface/filter_conditions_dialog.cpp:480
 msgid "At least one filter condition is incomplete"
 msgstr "Принаймні одна умова фільтрації не повна"
 
@@ -1747,7 +1752,7 @@ msgstr "Принаймні одна умова фільтрації не пов�
 msgid "At this point, all required information has been gathered."
 msgstr "На цьому етапі усю необхідну інформацію зібрано."
 
-#: ../src/interface/filter_conditions_dialog.cpp:109
+#: ../src/interface/filter_conditions_dialog.cpp:108
 msgid "Attribute"
 msgstr "Атрибут"
 
@@ -1755,15 +1760,15 @@ msgstr "Атрибут"
 msgid "Authentication failed."
 msgstr "Невдала автентифікація."
 
-#: ../src/interface/resources/xrc/settings.xrc:1231
+#: ../src/interface/settings/optionspage_themes.cpp:140
 msgid "Author:"
 msgstr "Автор:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2023
+#: ../src/interface/resources/xrc/dialogs.xrc:1673
 msgid "Auto"
 msgstr "Авто"
 
-#: ../src/interface/resources/xrc/settings.xrc:1025
+#: ../src/interface/resources/xrc/settings.xrc:788
 msgid "Automatic file type classification"
 msgstr "Автоматичне класифікування типу файлів"
 
@@ -1792,7 +1797,7 @@ msgstr "Поведінка"
 msgid "Being edited"
 msgstr "В процесі редагування"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2050
+#: ../src/interface/resources/xrc/dialogs.xrc:1700
 msgid "Binary"
 msgstr "Бінарний"
 
@@ -1858,24 +1863,24 @@ msgid "C&lear all"
 msgstr "О&чистити усе"
 
 #: ../src/interface/RemoteListView.cpp:1079
-#: ../src/interface/RemoteTreeView.cpp:929 ../src/interface/search.cpp:1223
+#: ../src/interface/RemoteTreeView.cpp:929 ../src/interface/search.cpp:1224
 msgid "C&opy URL(s) to clipboard"
 msgstr "К&опіювати адресу(-и) до буферу обміну"
 
 #: ../src/interface/RemoteListView.cpp:1080
-#: ../src/interface/RemoteTreeView.cpp:930 ../src/interface/search.cpp:1220
+#: ../src/interface/RemoteTreeView.cpp:930 ../src/interface/search.cpp:1221
 msgid "C&opy URL(s) with password to clipboard"
 msgstr "К&опіювати адресу(-и) URL з паролем до буферу обміну"
 
-#: ../src/interface/resources/xrc/settings.xrc:1309
+#: ../src/interface/resources/xrc/settings.xrc:995
 msgid "C&ustom"
 msgstr "На&строюваний"
 
-#: ../src/interface/sitemanager_controls.cpp:1285
+#: ../src/interface/sitemanager_controls.cpp:1288
 msgid "C&ustom KMS ARN:"
 msgstr "На&строюваний KMS ARN:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1798
+#: ../src/interface/resources/xrc/settings.xrc:1367
 msgid "C&ustom filetype associations:"
 msgstr "На&строювані асоціації типів файлів:"
 
@@ -1906,25 +1911,24 @@ msgstr "Не можу записати дані в файл: %s"
 #: ../src/interface/resources/xrc/dialogs.xrc:64
 #: ../src/interface/resources/xrc/dialogs.xrc:256
 #: ../src/interface/resources/xrc/dialogs.xrc:365
-#: ../src/interface/resources/xrc/dialogs.xrc:646
-#: ../src/interface/resources/xrc/dialogs.xrc:834
-#: ../src/interface/resources/xrc/dialogs.xrc:941
-#: ../src/interface/resources/xrc/dialogs.xrc:1012
-#: ../src/interface/resources/xrc/dialogs.xrc:1070
-#: ../src/interface/resources/xrc/dialogs.xrc:1135
-#: ../src/interface/resources/xrc/dialogs.xrc:1309
-#: ../src/interface/resources/xrc/dialogs.xrc:1694
-#: ../src/interface/resources/xrc/dialogs.xrc:2076
-#: ../src/interface/resources/xrc/dialogs.xrc:2231
-#: ../src/interface/resources/xrc/dialogs.xrc:2325
-#: ../src/interface/resources/xrc/dialogs.xrc:2422
-#: ../src/interface/resources/xrc/dialogs.xrc:2517
-#: ../src/interface/resources/xrc/dialogs.xrc:2587
-#: ../src/interface/resources/xrc/dialogs.xrc:2662
-#: ../src/interface/resources/xrc/dialogs.xrc:2925
-#: ../src/interface/resources/xrc/dialogs.xrc:2996
+#: ../src/interface/resources/xrc/dialogs.xrc:591
+#: ../src/interface/resources/xrc/dialogs.xrc:662
+#: ../src/interface/resources/xrc/dialogs.xrc:720
+#: ../src/interface/resources/xrc/dialogs.xrc:785
+#: ../src/interface/resources/xrc/dialogs.xrc:959
+#: ../src/interface/resources/xrc/dialogs.xrc:1344
+#: ../src/interface/resources/xrc/dialogs.xrc:1726
+#: ../src/interface/resources/xrc/dialogs.xrc:1881
+#: ../src/interface/resources/xrc/dialogs.xrc:1975
+#: ../src/interface/resources/xrc/dialogs.xrc:2072
+#: ../src/interface/resources/xrc/dialogs.xrc:2167
+#: ../src/interface/resources/xrc/dialogs.xrc:2237
+#: ../src/interface/resources/xrc/dialogs.xrc:2312
+#: ../src/interface/resources/xrc/dialogs.xrc:2575
+#: ../src/interface/resources/xrc/dialogs.xrc:2646
 #: ../src/interface/bookmarks_dialog.cpp:283
-#: ../src/interface/fileexistsdlg.cpp:99 ../src/interface/loginmanager.cpp:124
+#: ../src/interface/fileexistsdlg.cpp:99 ../src/interface/filter.cpp:201
+#: ../src/interface/filteredit.cpp:143 ../src/interface/loginmanager.cpp:124
 #: ../src/interface/loginmanager.cpp:266
 #: ../src/interface/sitemanager_dialog.cpp:370
 msgid "Cancel"
@@ -1973,13 +1977,13 @@ msgid ""
 msgstr ""
 "Неможливо порівняти каталоги, увімкнено різні фільтри та віддалені каталоги"
 
-#: ../src/interface/filteredit.cpp:150
+#: ../src/interface/filteredit.cpp:216
 msgid "Cannot create new filter"
 msgstr "Неможливо створити новий фільтр"
 
 #: ../src/interface/edithandler.cpp:1727 ../src/interface/edithandler.cpp:1776
-#: ../src/interface/LocalListView.cpp:1929 ../src/interface/search.cpp:1609
-#: ../src/interface/search.cpp:1988
+#: ../src/interface/LocalListView.cpp:1929 ../src/interface/search.cpp:1610
+#: ../src/interface/search.cpp:1989
 msgid "Cannot edit file"
 msgstr "Неможливо редагувати файл"
 
@@ -2020,11 +2024,11 @@ msgstr "Неможливо перейменувати компонент"
 msgid "Cannot rename file"
 msgstr "Неможливо перейменувати файл"
 
-#: ../src/interface/filter.cpp:269 ../src/interface/filter.cpp:339
+#: ../src/interface/filter.cpp:335 ../src/interface/filter.cpp:405
 msgid "Cannot save filterset"
 msgstr "Неможливо зберегти налаштування фільтру"
 
-#: ../src/interface/filter.cpp:230
+#: ../src/interface/filter.cpp:296
 msgid "Cannot select filter"
 msgstr "Неможливо вибрати фільтр"
 
@@ -2045,23 +2049,23 @@ msgstr "Перегляд / редагування обраного файлу н
 msgid "Case Insensitive"
 msgstr "Нечутливий до регістру"
 
-#: ../src/interface/resources/xrc/settings.xrc:1553
+#: ../src/interface/resources/xrc/settings.xrc:1122
 msgid "Case insensitive"
 msgstr "Нечутливий до регістру"
 
-#: ../src/interface/resources/xrc/settings.xrc:1552
+#: ../src/interface/resources/xrc/settings.xrc:1121
 msgid "Case insensitive (default)"
 msgstr "Нечутливий до регістру (типово)"
 
-#: ../src/interface/resources/xrc/settings.xrc:1554
+#: ../src/interface/resources/xrc/settings.xrc:1123
 msgid "Case sensitive"
 msgstr "Чутливий до регістру"
 
-#: ../src/interface/resources/xrc/settings.xrc:1555
+#: ../src/interface/resources/xrc/settings.xrc:1124
 msgid "Case sensitive (default)"
 msgstr "Чутливий до регістру (типово)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:966
+#: ../src/interface/resources/xrc/dialogs.xrc:616
 msgid "Categories to clear"
 msgstr "Категорії, щоб очистити"
 
@@ -2090,7 +2094,7 @@ msgstr "Змінити атрибути"
 msgid "Change the file permissions."
 msgstr "Змінити дозволи для файлу."
 
-#: ../src/interface/resources/xrc/settings.xrc:1997
+#: ../src/interface/resources/xrc/settings.xrc:1566
 msgid "Changing logfile settings requires restart of FileZilla."
 msgstr "Зміна налаштувань файлу журналу вимагає перезавантаження FileZilla."
 
@@ -2106,11 +2110,11 @@ msgstr "Набір символів"
 msgid "Check for &updates..."
 msgstr "Перевірити &оновлення..."
 
-#: ../src/interface/resources/xrc/settings.xrc:1844
+#: ../src/interface/resources/xrc/settings.xrc:1413
 msgid "Check for FileZilla &updates automatically:"
 msgstr "Перевіряти &оновлення FileZilla автоматично:"
 
-#: ../src/interface/update_dialog.cpp:64
+#: ../src/interface/update_dialog.cpp:65
 msgid "Check for Updates"
 msgstr "Перевірити оновлення"
 
@@ -2118,7 +2122,7 @@ msgstr "Перевірити оновлення"
 msgid "Check for newer versions of FileZilla"
 msgstr "Перевірити наявність новішої версії FileZilla"
 
-#: ../src/interface/update_dialog.cpp:60
+#: ../src/interface/update_dialog.cpp:61
 msgid "Check for updates failed"
 msgstr "Перевірити невдалі оновлення"
 
@@ -2142,7 +2146,7 @@ msgstr ""
 msgid "Checking for correct external IP address"
 msgstr "Перевірка правильності зовнішньої ІР адреси"
 
-#: ../src/interface/update_dialog.cpp:111
+#: ../src/interface/update_dialog.cpp:112
 msgid "Checking for updates..."
 msgstr "Перевірка оновлень..."
 
@@ -2194,11 +2198,11 @@ msgstr "Очистити &каше формату"
 msgid "Clear auto&update data"
 msgstr "Очистити авто&оновлені дані"
 
-#: ../src/interface/quickconnectbar.cpp:199
+#: ../src/interface/quickconnectbar.cpp:202
 msgid "Clear history"
 msgstr "Очистити історію"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:954
+#: ../src/interface/resources/xrc/dialogs.xrc:604
 #: ../src/interface/clearprivatedata.cpp:38
 #: ../src/interface/clearprivatedata.cpp:44
 #: ../src/interface/clearprivatedata.cpp:50
@@ -2207,7 +2211,7 @@ msgstr "Очистити історію"
 msgid "Clear private data"
 msgstr "Очистити особисті дані"
 
-#: ../src/interface/quickconnectbar.cpp:198
+#: ../src/interface/quickconnectbar.cpp:201
 msgid "Clear quickconnect bar"
 msgstr "Очистити панель Швидкого З'єднання"
 
@@ -2215,11 +2219,11 @@ msgstr "Очистити панель Швидкого З'єднання"
 msgid "Click on Finish to save your configuration."
 msgstr "Щоб зберегти свою конфігурацію натисніть кнопку Завершити."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1568
+#: ../src/interface/resources/xrc/dialogs.xrc:1218
 msgid "Client to server MAC:"
 msgstr "Клієнт для МАС сервера:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1558
+#: ../src/interface/resources/xrc/dialogs.xrc:1208
 msgid "Client to server cipher:"
 msgstr "Клієнт для серверного шифру:"
 
@@ -2256,11 +2260,11 @@ msgstr "Ко&ментарі:"
 msgid "Column properties"
 msgstr "Властивості стовпців"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1627
+#: ../src/interface/resources/xrc/dialogs.xrc:1277
 msgid "Column setup"
 msgstr "Встановлення стовпців"
 
-#: ../src/interface/resources/xrc/settings.xrc:1742
+#: ../src/interface/resources/xrc/settings.xrc:1311
 msgid "Command and its arguments should be properly quoted."
 msgstr "Команда та її параметри мають бути правильно залапковані."
 
@@ -2305,7 +2309,7 @@ msgstr "Порівняти &час модифікації"
 msgid "Compare file&size"
 msgstr "Порівняти розмір &файлу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1586
+#: ../src/interface/resources/xrc/settings.xrc:1155
 msgid "Comparison &threshold (in minutes):"
 msgstr "Порівняння &порогової величини (в хвилинах):"
 
@@ -2330,15 +2334,15 @@ msgstr "Зібрано з:"
 msgid "Compiler flags:"
 msgstr "Ознаки компілятора:"
 
-#: ../src/interface/filter_conditions_dialog.cpp:78
+#: ../src/interface/filter_conditions_dialog.cpp:77
 msgid "Compressed"
 msgstr "Стиснуто"
 
-#: ../src/interface/resources/xrc/settings.xrc:758
+#: ../src/interface/settings/optionspage_transfer.cpp:22
 msgid "Concurrent transfers"
 msgstr "Поточні передачі"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:784
+#: ../src/interface/filteredit.cpp:132
 msgid "Conditions are c&ase sensitive"
 msgstr "Умови чутливі до ре&гістру"
 
@@ -2358,15 +2362,15 @@ msgstr "Конфігурувати діапазон портів"
 msgid "Configuring FileZilla and your network"
 msgstr "Конфігурування FileZilla та вашої мережі"
 
-#: ../src/interface/search.cpp:1670
+#: ../src/interface/search.cpp:1671
 msgid "Confirm deletion"
 msgstr "Підтвердити видалення"
 
 #: ../src/interface/edithandler.cpp:1739 ../src/interface/file_utils.h:47
 #: ../src/interface/LocalListView.cpp:1891
 #: ../src/interface/RemoteListView.cpp:1435
-#: ../src/interface/RemoteTreeView.cpp:1128 ../src/interface/search.cpp:1621
-#: ../src/interface/search.cpp:1948
+#: ../src/interface/RemoteTreeView.cpp:1128 ../src/interface/search.cpp:1622
+#: ../src/interface/search.cpp:1949
 msgid "Confirmation needed"
 msgstr "Необхідне підтвердження"
 
@@ -2374,7 +2378,7 @@ msgstr "Необхідне підтвердження"
 msgid "Congratulations, your configuration seems to be working."
 msgstr "Вітаємо, Ваша конфігурація виглядає працездатною."
 
-#: ../src/interface/quickconnectbar.cpp:196
+#: ../src/interface/quickconnectbar.cpp:199
 msgid "Connect bypassing proxy settings"
 msgstr "Під'єднати налаштування обхідного проксі"
 
@@ -2510,7 +2514,7 @@ msgstr[2] "Час очікування вичерпано після %d секу
 msgid "Connection timed out."
 msgstr "Час з 'єднання вичерпано."
 
-#: ../src/interface/search.cpp:1043
+#: ../src/interface/search.cpp:1044
 msgid "Connection to server lost."
 msgstr "З'єднання з сервером втрачено."
 
@@ -2592,7 +2596,7 @@ msgid "Could not convert private key"
 msgstr "Неможливо сконвертувати приватний ключ"
 
 #: ../src/interface/RemoteListView.cpp:2680
-#: ../src/interface/RemoteTreeView.cpp:1492 ../src/interface/search.cpp:1879
+#: ../src/interface/RemoteTreeView.cpp:1492 ../src/interface/search.cpp:1880
 msgid "Could not copy URLs"
 msgstr "Неможливо скопіювати адреси"
 
@@ -2677,7 +2681,7 @@ msgstr "Неможливо отримати шлях з адреси URL"
 msgid "Could not get reply from fzputtygen."
 msgstr "Неможливо отримати відповідь від fzputtygen."
 
-#: ../src/interface/edithandler.cpp:1727 ../src/interface/search.cpp:1609
+#: ../src/interface/edithandler.cpp:1727 ../src/interface/search.cpp:1610
 msgid "Could not get temporary directory to download file into."
 msgstr "Неможливо отримати тимчасовий каталог для завантаження файлів."
 
@@ -2755,7 +2759,7 @@ msgstr "Неможливо відкрити '%s'"
 
 #: ../src/interface/aboutdialog.cpp:228
 #: ../src/interface/RemoteListView.cpp:2680
-#: ../src/interface/RemoteTreeView.cpp:1492 ../src/interface/search.cpp:1879
+#: ../src/interface/RemoteTreeView.cpp:1492 ../src/interface/search.cpp:1880
 msgid "Could not open clipboard"
 msgstr "Неможливо відкрити буфер обміну"
 
@@ -2770,7 +2774,7 @@ msgstr "Неможливо відкрити файл журналу: %s"
 msgid "Could not parse remote path."
 msgstr "Аналіз віддаленого шляху неможливий."
 
-#: ../src/interface/quickconnectbar.cpp:118
+#: ../src/interface/quickconnectbar.cpp:121
 msgid "Could not parse server address:"
 msgstr "Неможливо визначити адресу сервера :"
 
@@ -2973,7 +2977,7 @@ msgstr "Критична помилка передачі файлу"
 msgid "Critical file transfer error after transferring %s in %s"
 msgstr "Критична помилка передачі файлу після передачі %s до %s"
 
-#: ../src/interface/sitemanager_controls.cpp:1288
+#: ../src/interface/sitemanager_controls.cpp:1291
 msgid "Cu&stomer encryption"
 msgstr "Клі&єнтське шифрування"
 
@@ -2998,41 +3002,41 @@ msgstr "Тип поточної передачі встановлено за п�
 msgid "Current transfer type is set to binary."
 msgstr "Тип поточної передачі встановлено за бінарним параметром."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1486
+#: ../src/interface/resources/xrc/dialogs.xrc:1136
 msgid "Curve:"
 msgstr "Крива:"
 
 #: ../src/interface/resources/xrc/settings.xrc:423
-#: ../src/interface/resources/xrc/settings.xrc:1358
+#: ../src/interface/resources/xrc/settings.xrc:1044
 msgid "Cus&tom"
 msgstr "Нас&троюваний"
 
-#: ../src/interface/sitemanager_controls.cpp:1293
+#: ../src/interface/sitemanager_controls.cpp:1296
 msgid "Cus&tomer Key:"
 msgstr "Кл&ієнтський ключ:"
 
-#: ../src/interface/sitemanager_controls.cpp:1283
+#: ../src/interface/sitemanager_controls.cpp:1286
 msgid "Custom KMS ARN"
 msgstr "Настроюваний KMS ARN"
 
-#: ../src/interface/sitemanager_controls.cpp:1376
+#: ../src/interface/sitemanager_controls.cpp:1379
 msgid "Custom KMS ARN id cannot be empty."
 msgstr "Настроюваний ідентифікатор KMS ARN не може бути порожнім."
 
-#: ../src/interface/filter.cpp:135
+#: ../src/interface/filter.cpp:145
 msgid "Custom filter set"
 msgstr "Встановлено настроюваний фільтр"
 
-#: ../src/interface/sitemanager_controls.cpp:1388
+#: ../src/interface/sitemanager_controls.cpp:1391
 msgid "Custom key cannot be empty."
 msgstr "Настроюваний ключ не може бути порожнім."
 
-#: ../src/interface/sitemanager_controls.cpp:1402
+#: ../src/interface/sitemanager_controls.cpp:1405
 msgid "Custom key length must be 256-bit."
 msgstr "Довжина настроюваного ключа має бути 256 біт."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1880
-#: ../src/interface/resources/xrc/dialogs.xrc:1894
+#: ../src/interface/resources/xrc/dialogs.xrc:1530
+#: ../src/interface/resources/xrc/dialogs.xrc:1544
 msgid "Custom server"
 msgstr "Настроюваний сервер"
 
@@ -3040,44 +3044,43 @@ msgstr "Настроюваний сервер"
 msgid "Cyan"
 msgstr "Блакитний"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2014
+#: ../src/interface/resources/xrc/dialogs.xrc:1664
 msgid "D&ata type"
 msgstr "Т&ип Даних"
 
-#: ../src/interface/resources/xrc/settings.xrc:1428
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:31
 msgid "D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"
 msgstr ""
 "Де&сятиричні префікси, що використовують SI символи (наприклад 1 KБ = 1000 "
 "байт)"
 
-#: ../src/interface/sitemanager_controls.cpp:1161
+#: ../src/interface/sitemanager_controls.cpp:1163
 msgid "D&efault"
 msgstr "Ти&повий"
 
 #: ../src/interface/RemoteListView.cpp:1077
-#: ../src/interface/RemoteTreeView.cpp:927 ../src/interface/search.cpp:1210
-#: ../src/interface/search.cpp:1217
+#: ../src/interface/RemoteTreeView.cpp:927 ../src/interface/search.cpp:1211
+#: ../src/interface/search.cpp:1218
 msgid "D&elete"
 msgstr "Ви&далити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2212
+#: ../src/interface/resources/xrc/dialogs.xrc:1862
 msgid "D&irectory comparison"
 msgstr "П&орівняння каталогів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:561
+#: ../src/interface/filter.cpp:164
 msgid "D&isable all"
 msgstr "Вим&кнути все"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2800
+#: ../src/interface/resources/xrc/dialogs.xrc:2450
 #: ../src/interface/settings/optionspage_passwords.cpp:178
 msgid "D&o not save passwords"
 msgstr "Н&е зберігати паролі"
 
-#: ../src/interface/resources/xrc/settings.xrc:1634
+#: ../src/interface/resources/xrc/settings.xrc:1203
 msgid "D&ouble-click action on directories:"
 msgstr "Дія по&двійного клацання на каталогах:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:711
 #: ../src/interface/bookmarks_dialog.cpp:275
 msgid "D&uplicate"
 msgstr "Д&ублювати"
@@ -3099,11 +3102,11 @@ msgstr "Дані"
 msgid "Data socket closed too early."
 msgstr "Сокет даних закрився дуже рано."
 
-#: ../src/interface/filter_conditions_dialog.cpp:121
+#: ../src/interface/filter_conditions_dialog.cpp:120
 msgid "Date"
 msgstr "Дата"
 
-#: ../src/interface/resources/xrc/settings.xrc:1292
+#: ../src/interface/resources/xrc/settings.xrc:978
 msgid "Date formatting"
 msgstr "Форматування даних"
 
@@ -3119,7 +3122,7 @@ msgstr "Дата/час невідомі"
 msgid "Debug"
 msgstr "Відлагодження"
 
-#: ../src/interface/resources/xrc/settings.xrc:2018
+#: ../src/interface/resources/xrc/settings.xrc:1587
 msgid "Debugging settings"
 msgstr "Налаштування відлагодження"
 
@@ -3127,7 +3130,7 @@ msgstr "Налаштування відлагодження"
 msgid "Default &local directory:"
 msgstr "Типовий &локальний каталог:"
 
-#: ../src/interface/sitemanager_controls.cpp:1282
+#: ../src/interface/sitemanager_controls.cpp:1285
 msgid "Default (AWS/S3)"
 msgstr "Типовий (AWS/S3)"
 
@@ -3139,9 +3142,9 @@ msgstr "Типово (Атовизначення)"
 msgid "Default editor not properly quoted."
 msgstr "Типовий редактор неправильно взятий в лапки."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:846
-#: ../src/interface/resources/xrc/dialogs.xrc:916
-#: ../src/interface/resources/xrc/settings.xrc:1171
+#: ../src/interface/resources/xrc/dialogs.xrc:496
+#: ../src/interface/resources/xrc/dialogs.xrc:566
+#: ../src/interface/resources/xrc/settings.xrc:934
 msgid "Default file exists action"
 msgstr "Типова дія щодо існуючого файлу"
 
@@ -3149,7 +3152,7 @@ msgstr "Типова дія щодо існуючого файлу"
 msgid "Default r&emote directory:"
 msgstr "Типовий віддалений ка&талог:"
 
-#: ../src/interface/sitemanager_controls.cpp:1039
+#: ../src/interface/sitemanager_controls.cpp:1041
 msgid ""
 "Default remote path cannot be parsed. Make sure it is a valid absolute path "
 "for the selected server type."
@@ -3165,7 +3168,7 @@ msgstr "Типова мова системи"
 msgid "Default transfer mode:"
 msgstr "Типовий режим передач:"
 
-#: ../src/interface/resources/xrc/settings.xrc:995
+#: ../src/interface/resources/xrc/settings.xrc:758
 msgid "Default transfer type:"
 msgstr "Типовий тип передачі:"
 
@@ -3223,7 +3226,7 @@ msgstr "Видалення \"%s\""
 msgid "Deleting %u files from \"%s\""
 msgstr "Видалення %u файлів з \"%s\""
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2535
+#: ../src/interface/resources/xrc/dialogs.xrc:2185
 msgid "Deleting symbolic link"
 msgstr "Видалення символічного посилання"
 
@@ -3244,7 +3247,7 @@ msgstr "Подробиці стосовно нового ключа:"
 msgid "Detected newer version of FileZilla"
 msgstr "Виявлено наявність новішої версії FileZilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:803
+#: ../src/interface/filteredit.cpp:137
 msgid "Dire&ctories"
 msgstr "Ка&талоги"
 
@@ -3252,7 +3255,7 @@ msgstr "Ка&талоги"
 msgid "Direction"
 msgstr "Напрямок"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2958
+#: ../src/interface/resources/xrc/dialogs.xrc:2608
 msgid "Directories:"
 msgstr "Каталоги:"
 
@@ -3260,11 +3263,11 @@ msgstr "Каталоги:"
 msgid "Directory"
 msgstr "Каталог"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:3006
+#: ../src/interface/resources/xrc/dialogs.xrc:2656
 msgid "Directory access permissions"
 msgstr "Дозволи доступу до каталогу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1572
+#: ../src/interface/resources/xrc/settings.xrc:1141
 #: ../src/interface/filelistctrl.cpp:477 ../src/interface/Mainfrm.cpp:2372
 #: ../src/interface/Mainfrm.cpp:2392
 #: ../src/interface/sitemanager_controls.cpp:946
@@ -3293,7 +3296,7 @@ msgstr "Список каталогів припинено користувач�
 msgid "Directory listing failed"
 msgstr "Невдалий список каталогів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:496
+#: ../src/interface/filter.cpp:126
 msgid "Directory listing filters"
 msgstr "Фільтри списку каталогів"
 
@@ -3306,7 +3309,7 @@ msgstr "Список каталогу \"%s\" вдалий"
 msgid "Directory listing successful"
 msgstr "Вдалий список каталогів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:596
+#: ../src/interface/filter.cpp:178
 msgid "Disa&ble all"
 msgstr "Вимк&нути все"
 
@@ -3352,12 +3355,12 @@ msgstr "Від'єднати від поточного видимого серв�
 msgid "Display about dialog"
 msgstr "Показати вікно діалогу Про"
 
-#: ../src/interface/resources/xrc/settings.xrc:1707
+#: ../src/interface/resources/xrc/settings.xrc:1276
 msgid "Do &not use default editor"
 msgstr "Не &використовувати типовий редактор"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1296
-#: ../src/interface/resources/xrc/dialogs.xrc:1351
+#: ../src/interface/resources/xrc/dialogs.xrc:946
+#: ../src/interface/resources/xrc/dialogs.xrc:1001
 msgid "Do the same with &all selected files already being edited"
 msgstr "Повторіть дію з &усіма обраними файлами, що уже редагуються"
 
@@ -3388,7 +3391,7 @@ msgstr "Ви дійсно бажаєте видалити чергу перед�
 msgid "Do you really want to send '%s' to the server?"
 msgstr "Ви дійсно бажаєте надіслати '%s' до сервера?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1344
+#: ../src/interface/resources/xrc/dialogs.xrc:994
 msgid "Do you want to reopen this file?"
 msgstr "Бажаєте повторно відкрити цей файл?"
 
@@ -3400,22 +3403,22 @@ msgstr "Документація"
 msgid "Don't use external IP address on &local connections."
 msgstr "Не використовувати зовнішню ІР адресу при &локальних з'єднаннях."
 
-#: ../src/interface/resources/xrc/settings.xrc:1092
+#: ../src/interface/resources/xrc/settings.xrc:855
 msgid "Dotfiles are filenames starting with a dot, e.g. .htaccess"
 msgstr ""
 "Дот файли є файлами чиї імена розпочинаються з розширенням знака крапки, "
 "наприклад: .htaccess"
 
-#: ../src/interface/resources/xrc/settings.xrc:1610
+#: ../src/interface/resources/xrc/settings.xrc:1179
 msgid "Double-click action"
 msgstr "Дія при подвійному клацанні"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1723
+#: ../src/interface/resources/xrc/dialogs.xrc:1373
 msgid "Download"
 msgstr "Завантажити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2697
-#: ../src/interface/resources/xrc/settings.xrc:850
+#: ../src/interface/resources/xrc/dialogs.xrc:2347
+#: ../src/interface/settings/optionspage_transfer.cpp:51
 msgid "Download &limit:"
 msgstr "Обмеження &завантаження:"
 
@@ -3428,8 +3431,8 @@ msgstr "Обмеження завантаження: %s/s"
 msgid "Download limit: none"
 msgstr "Обмеження завантаження: жодного"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2339
-#: ../src/interface/search.cpp:1316 ../src/interface/search.cpp:1321
+#: ../src/interface/resources/xrc/dialogs.xrc:1989
+#: ../src/interface/search.cpp:1317 ../src/interface/search.cpp:1322
 msgid "Download search results"
 msgstr "Завантажити результати пошуку"
 
@@ -3459,7 +3462,7 @@ msgstr "Завантаження"
 msgid "Downloading %s"
 msgstr "Завантаження %s"
 
-#: ../src/interface/update_dialog.cpp:157
+#: ../src/interface/update_dialog.cpp:160
 msgid "Downloading update..."
 msgstr "Завантаження оновлення..."
 
@@ -3487,7 +3490,7 @@ msgstr ""
 msgid "Dupl&icate"
 msgstr "Дубл&ювати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:554
+#: ../src/interface/filter.cpp:163
 msgid "E&nable all"
 msgstr "Уві&мкнути все"
 
@@ -3513,11 +3516,11 @@ msgstr "Е&кспорт..."
 msgid "E-Mail:"
 msgstr "Ел. пошта:"
 
-#: ../src/interface/filter_conditions_dialog.cpp:455
+#: ../src/interface/filter_conditions_dialog.cpp:458
 msgid "Each filter needs at least one condition."
 msgstr "Кожен фільтр потребує щонайменше однієї умови."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:842
+#: ../src/interface/filteredit.cpp:73
 msgid "Edit filters"
 msgstr "Редагувати фільтри"
 
@@ -3528,7 +3531,7 @@ msgstr ""
 "Редагувати файл з відконфігурованим редактором і відвантажити зміни на "
 "сервер."
 
-#: ../src/interface/search.cpp:1597
+#: ../src/interface/search.cpp:1598
 msgid "Editing directories is not supported"
 msgstr "Редагування каталогів не підтримується"
 
@@ -3537,11 +3540,11 @@ msgstr "Редагування каталогів не підтримуєтьс�
 msgid "Editing failed"
 msgstr "Невдале редагування"
 
-#: ../src/interface/search.cpp:1597
+#: ../src/interface/search.cpp:1598
 msgid "Editing search results"
 msgstr "Редагування результатів пошуку"
 
-#: ../src/interface/update_dialog.cpp:171
+#: ../src/interface/update_dialog.cpp:176
 msgid ""
 "Either you or your system administrator has disabled checking for updates. "
 "Please re-enable checking for updates to obtain more information."
@@ -3550,7 +3553,7 @@ msgstr ""
 "отримати додаткову інформацію, ввімкніть функцію перевірки наявності "
 "оновлень ще раз."
 
-#: ../src/interface/resources/xrc/settings.xrc:1242
+#: ../src/interface/settings/optionspage_themes.cpp:142
 msgid "Email:"
 msgstr "Ел. пошта:"
 
@@ -3574,11 +3577,11 @@ msgstr "Порожній каталог."
 msgid "Empty file extension."
 msgstr "Порожні розширення файлу."
 
-#: ../src/interface/filteredit.cpp:211 ../src/interface/filteredit.cpp:256
+#: ../src/interface/filteredit.cpp:283 ../src/interface/filteredit.cpp:328
 msgid "Empty filter names are not allowed."
 msgstr "Порожні імена фільтрів не дозволяються."
 
-#: ../src/interface/filteredit.cpp:211 ../src/interface/filteredit.cpp:256
+#: ../src/interface/filteredit.cpp:283 ../src/interface/filteredit.cpp:328
 msgid "Empty name"
 msgstr "Порожнє іім'я"
 
@@ -3586,19 +3589,19 @@ msgstr "Порожнє іім'я"
 msgid "Empty quoted string."
 msgstr "Порожній залапкований рядок."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:589
+#: ../src/interface/filter.cpp:177
 msgid "En&able all"
 msgstr "Уві&мкнути все"
 
-#: ../src/interface/resources/xrc/settings.xrc:931
+#: ../src/interface/settings/optionspage_transfer.cpp:83
 msgid "Enable invalid character &filtering"
 msgstr "Увімкнути &фільтрування недійсних символів"
 
-#: ../src/interface/filter_conditions_dialog.cpp:79
+#: ../src/interface/filter_conditions_dialog.cpp:78
 msgid "Encrypted"
 msgstr "Кодовано"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1551
+#: ../src/interface/resources/xrc/dialogs.xrc:1201
 msgid "Encryption"
 msgstr "Кодування"
 
@@ -3607,7 +3610,7 @@ msgstr "Кодування"
 msgid "Encryption &key:"
 msgstr "&Ключ шифрування:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1461
+#: ../src/interface/resources/xrc/dialogs.xrc:1111
 msgid "Encryption details"
 msgstr "Подробиці кодування"
 
@@ -3623,7 +3626,7 @@ msgstr "Закінчити порівняння та відкрити швидк
 msgid "Enter &custom command..."
 msgstr "Ввести &настроювану команду ..."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2738
+#: ../src/interface/resources/xrc/dialogs.xrc:2388
 msgid "Enter 0 for unlimited speed."
 msgstr "Введіть 0 для необмеженої швидкості."
 
@@ -3635,12 +3638,12 @@ msgstr "Ввести команду"
 msgid "Enter custom command"
 msgstr "Ввести настроювану команду"
 
-#: ../src/interface/resources/xrc/settings.xrc:1643
+#: ../src/interface/resources/xrc/settings.xrc:1212
 msgid "Enter directory"
 msgstr "Ввести каталог"
 
-#: ../src/interface/filteredit.cpp:143 ../src/interface/filteredit.cpp:200
-#: ../src/interface/filteredit.cpp:249
+#: ../src/interface/filteredit.cpp:209 ../src/interface/filteredit.cpp:272
+#: ../src/interface/filteredit.cpp:321
 msgid "Enter filter name"
 msgstr "Ввести ім'я файлу"
 
@@ -3649,11 +3652,11 @@ msgstr "Ввести ім'я файлу"
 msgid "Enter master password"
 msgstr "Введіть головний пароль"
 
-#: ../src/interface/filter.cpp:262
+#: ../src/interface/filter.cpp:328
 msgid "Enter name for filterset"
 msgstr "Ввести ім`я для набору фільтру"
 
-#: ../src/interface/filter.cpp:326
+#: ../src/interface/filter.cpp:392
 msgid "Enter new name for filterset"
 msgstr "Ввести нове ім'я для встановленого фільтру"
 
@@ -3701,7 +3704,7 @@ msgstr ""
 "Введіть пароль для файлу '%s'.\n"
 "Конвертований файл буде захищений тим самим паролем."
 
-#: ../src/interface/quickconnectbar.cpp:57
+#: ../src/interface/quickconnectbar.cpp:60
 msgid ""
 "Enter the port on which the server listens. The default for FTP is 21, the "
 "default for SFTP is 22."
@@ -3738,12 +3741,12 @@ msgstr "Помилка завантаження черги"
 #: ../src/interface/bookmarks_dialog.cpp:338
 #: ../src/interface/bookmarks_dialog.cpp:794
 #: ../src/interface/bookmarks_dialog.cpp:834
-#: ../src/interface/bookmarks_dialog.cpp:887 ../src/interface/filter.cpp:877
-#: ../src/interface/filter.cpp:968 ../src/interface/Options.cpp:260
+#: ../src/interface/bookmarks_dialog.cpp:887 ../src/interface/filter.cpp:943
+#: ../src/interface/filter.cpp:1034 ../src/interface/Options.cpp:260
 #: ../src/interface/osx_sandbox_userdirs.cpp:65
 #: ../src/interface/osx_sandbox_userdirs.cpp:136
-#: ../src/interface/QueueView.cpp:1560 ../src/interface/search.cpp:1755
-#: ../src/interface/search.cpp:1789 ../src/interface/sitemanager.cpp:39
+#: ../src/interface/QueueView.cpp:1560 ../src/interface/search.cpp:1756
+#: ../src/interface/search.cpp:1790 ../src/interface/sitemanager.cpp:39
 #: ../src/interface/sitemanager.cpp:470 ../src/interface/sitemanager.cpp:530
 #: ../src/interface/sitemanager.cpp:639 ../src/interface/sitemanager.cpp:727
 #: ../src/interface/sitemanager.cpp:833 ../src/interface/sitemanager.cpp:939
@@ -3779,11 +3782,11 @@ msgstr "Помилка запису файлу xml"
 msgid "Error:"
 msgstr "Помилка:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1815
+#: ../src/interface/resources/xrc/settings.xrc:1384
 msgid "Example: png \"c:\\program files\\viewer\\viewer.exe\" -open"
 msgstr "Зразок: png \"c:\\program files\\viewer\\viewer.exe\" -open"
 
-#: ../src/interface/resources/xrc/settings.xrc:1465
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:44
 msgid "Examples"
 msgstr "Приклади"
 
@@ -3791,7 +3794,7 @@ msgstr "Приклади"
 msgid "Exe&cute"
 msgstr "Вико&нати"
 
-#: ../src/interface/update_dialog.cpp:60
+#: ../src/interface/update_dialog.cpp:61
 msgid "Executable contains no version info, cannot check for updates."
 msgstr ""
 "У виконуваному файлі відсутня інформація про версію, неможливо перевірити "
@@ -3801,23 +3804,23 @@ msgstr ""
 msgid "Explorer"
 msgstr "Провідник"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1056
+#: ../src/interface/resources/xrc/dialogs.xrc:706
 msgid "Export &Filters"
 msgstr "Експортувати &фільтри"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1051
+#: ../src/interface/resources/xrc/dialogs.xrc:701
 msgid "Export &Queue"
 msgstr "Експорт &Черги"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1046
+#: ../src/interface/resources/xrc/dialogs.xrc:696
 msgid "Export &Settings"
 msgstr "Експорт &Установок"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1027
+#: ../src/interface/resources/xrc/dialogs.xrc:677
 msgid "Export settings"
 msgstr "Експорт налаштувань"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:730
+#: ../src/interface/filteredit.cpp:113
 msgid "F&ilter name:"
 msgstr "І&м'я фільтру:"
 
@@ -3837,7 +3840,7 @@ msgstr "FTP - Протокол Передачі Файлів з вибірков
 msgid "FTP - Insecure File Transfer Protocol"
 msgstr "FTP - Протокол Незахищеної Передачі Файлів"
 
-#: ../src/interface/quickconnectbar.cpp:103
+#: ../src/interface/quickconnectbar.cpp:106
 msgid "FTP Engine not initialized, can't connect"
 msgstr "Двигун FTP не ініціалізується, неможливо з'єднатись"
 
@@ -3879,7 +3882,7 @@ msgstr "FTPS - FTP по неявній TLS"
 #: ../src/interface/LocalListView.cpp:976
 #: ../src/interface/LocalListView.cpp:2012
 #: ../src/interface/LocalTreeView.cpp:907
-#: ../src/interface/LocalTreeView.cpp:1209 ../src/interface/viewheader.cpp:503
+#: ../src/interface/LocalTreeView.cpp:1209 ../src/interface/viewheader.cpp:504
 msgid "Failed to change directory"
 msgstr "Помилка зміни каталогу"
 
@@ -4052,11 +4055,11 @@ msgstr "Помилка передач"
 msgid "Fall back to active mode"
 msgstr "Повернутися до активного режиму"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1802
+#: ../src/interface/resources/xrc/dialogs.xrc:1452
 msgid "Fil&e:"
 msgstr "Фай&л:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:798
+#: ../src/interface/filteredit.cpp:136
 msgid "Fil&es"
 msgstr "Фай&ли"
 
@@ -4084,7 +4087,7 @@ msgstr "Файл існує"
 msgid "File exists action"
 msgstr "Дія стосовно існуючого файлу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1149
+#: ../src/interface/resources/xrc/dialogs.xrc:799
 msgid "File has changed"
 msgstr "Файл змінився"
 
@@ -4098,7 +4101,7 @@ msgstr "Списки файлів"
 msgid "File not found"
 msgstr "Файл не знайдено"
 
-#: ../src/interface/search.cpp:637 ../src/interface/search.cpp:1060
+#: ../src/interface/search.cpp:638 ../src/interface/search.cpp:1061
 #: ../src/interface/toolbar.cpp:53
 msgid "File search"
 msgstr "Пошук файлу"
@@ -4138,15 +4141,15 @@ msgstr "Файл передано успішно, передано %s до %s"
 msgid "File transfers still in progress."
 msgstr "Передачі файлів усе ще виконуються."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2033
+#: ../src/interface/resources/xrc/dialogs.xrc:1683
 msgid "File would transfer with ASCII data type."
 msgstr "Файл пропонує свою передачу через тип даних ASCII."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2038
+#: ../src/interface/resources/xrc/dialogs.xrc:1688
 msgid "File would transfer with binary data type."
 msgstr "Файл пропонує свою передачу через бінарний тип даних."
 
-#: ../src/interface/FileZilla.cpp:470 ../src/interface/quickconnectbar.cpp:103
+#: ../src/interface/FileZilla.cpp:470 ../src/interface/quickconnectbar.cpp:106
 msgid "FileZilla Error"
 msgstr "Помилка FilеZilla"
 
@@ -4158,7 +4161,7 @@ msgstr ""
 "FileZilla тепер може перевірити вашу конфігурацію, щоб переконатися у її "
 "правильностії."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2622
+#: ../src/interface/resources/xrc/dialogs.xrc:2272
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla уже підключено до сервера."
 
@@ -4168,7 +4171,7 @@ msgstr ""
 "FileZilla потребує перезавантаження для того, щоб зміни у виборі мови набули "
 "чинності."
 
-#: ../src/interface/resources/xrc/settings.xrc:1903
+#: ../src/interface/resources/xrc/settings.xrc:1472
 msgid "FileZilla updates"
 msgstr "Оновлення FilеZilla"
 
@@ -4177,9 +4180,9 @@ msgid "Filelist status &bars"
 msgstr "Секції статусу списку &файлів"
 
 #: ../src/interface/edithandler.cpp:1200
-#: ../src/interface/filter_conditions_dialog.cpp:101
+#: ../src/interface/filter_conditions_dialog.cpp:100
 #: ../src/interface/LocalListView.cpp:285
-#: ../src/interface/RemoteListView.cpp:336 ../src/interface/search.cpp:173
+#: ../src/interface/RemoteListView.cpp:336 ../src/interface/search.cpp:174
 #: ../src/interface/settings/optionspage_connection_sftp.cpp:35
 msgid "Filename"
 msgstr "Ім'я файлу"
@@ -4197,8 +4200,8 @@ msgstr "Ім'я файлу не дійсне"
 msgid "Filename unchanged"
 msgstr "Ім'я файлу не змінено"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1166
-#: ../src/interface/resources/xrc/settings.xrc:1935
+#: ../src/interface/resources/xrc/dialogs.xrc:816
+#: ../src/interface/resources/xrc/settings.xrc:1504
 msgid "Filename:"
 msgstr "Ім'я файлу:"
 
@@ -4215,7 +4218,7 @@ msgstr ""
 "Імена файлів не можуть вміщувати будь-які з наступних символів: / \\ : * ? "
 "\" < > |"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1457
+#: ../src/interface/resources/xrc/dialogs.xrc:1107
 msgid "Files currently being edited"
 msgstr "Файли зараз редагуються"
 
@@ -4227,9 +4230,9 @@ msgstr "Файли, що співпадають з фільтром вилуча
 msgid "Files not found"
 msgstr "Файлів не знайдено"
 
-#: ../src/interface/filter_conditions_dialog.cpp:105
+#: ../src/interface/filter_conditions_dialog.cpp:104
 #: ../src/interface/LocalListView.cpp:286
-#: ../src/interface/RemoteListView.cpp:337 ../src/interface/search.cpp:175
+#: ../src/interface/RemoteListView.cpp:337 ../src/interface/search.cpp:176
 msgid "Filesize"
 msgstr "Розмір файлу"
 
@@ -4238,45 +4241,45 @@ msgid "Filesize format"
 msgstr "Формат розміру файлу"
 
 #: ../src/interface/LocalListView.cpp:287
-#: ../src/interface/RemoteListView.cpp:338 ../src/interface/search.cpp:176
+#: ../src/interface/RemoteListView.cpp:338 ../src/interface/search.cpp:177
 msgid "Filetype"
 msgstr "Тип файлу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1827
+#: ../src/interface/resources/xrc/settings.xrc:1396
 #: ../src/interface/settings/settingsdialog.cpp:136
 msgid "Filetype associations"
 msgstr "Асоціації типу файла"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:791
+#: ../src/interface/filteredit.cpp:135
 msgid "Filter applies to:"
 msgstr "Фільтр застосовується до:"
 
-#: ../src/interface/resources/xrc/settings.xrc:925
+#: ../src/interface/settings/optionspage_transfer.cpp:82
 msgid "Filter invalid characters in filenames"
 msgstr "Фільтрувати недійсні символи в іменах файлів"
 
-#: ../src/interface/filteredit.cpp:155 ../src/interface/filteredit.cpp:220
-#: ../src/interface/filteredit.cpp:261 ../src/interface/filteredit.cpp:362
+#: ../src/interface/filteredit.cpp:221 ../src/interface/filteredit.cpp:292
+#: ../src/interface/filteredit.cpp:333 ../src/interface/filteredit.cpp:434
 msgid "Filter name already exists"
 msgstr "Ім'я фільтру вже існує"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:758
+#: ../src/interface/filteredit.cpp:123
 msgid "Filter out items matching all of the following"
 msgstr "Фільтрувати елементи, що співпадають з усіма такими"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:759
+#: ../src/interface/filteredit.cpp:124
 msgid "Filter out items matching any of the following"
 msgstr "Фільтрувати елементи, що співпадають з будь-яким з таких"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:760
+#: ../src/interface/filteredit.cpp:125
 msgid "Filter out items matching none of the following"
 msgstr "Фільтрувати елементи, які не співпадають з жодним з наступних"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:761
+#: ../src/interface/filteredit.cpp:126
 msgid "Filter out items matching not all of the following"
 msgstr "Фільтрувати елементи, що співпадають не з усіма такими"
 
-#: ../src/interface/filter.cpp:285 ../src/interface/filter.cpp:345
+#: ../src/interface/filter.cpp:351 ../src/interface/filter.cpp:411
 msgid "Filter set already exists"
 msgstr "Встановлений фільтр вже існує"
 
@@ -4284,8 +4287,8 @@ msgstr "Встановлений фільтр вже існує"
 msgid "Filter the directory listings"
 msgstr "Фільтрувати списки каталогів"
 
-#: ../src/interface/filteredit.cpp:346 ../src/interface/filteredit.cpp:354
-#: ../src/interface/filteredit.cpp:362
+#: ../src/interface/filteredit.cpp:418 ../src/interface/filteredit.cpp:426
+#: ../src/interface/filteredit.cpp:434
 msgid "Filter validation failed"
 msgstr "Відмова перевірки достовірності фільтру"
 
@@ -4299,7 +4302,7 @@ msgstr "Ключ шифру (SHA-256):"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:319
 #: ../src/interface/resources/xrc/dialogs.xrc:440
-#: ../src/interface/resources/xrc/dialogs.xrc:1532
+#: ../src/interface/resources/xrc/dialogs.xrc:1182
 msgid "Fingerprints:"
 msgstr "Відбитки пальців:"
 
@@ -4327,7 +4330,7 @@ msgstr ""
 "Для цього сеансу будуть використані типові налаштування. Будь-які зміни в "
 "налаштуваннях не будуть збереженими."
 
-#: ../src/interface/sitemanager_controls.cpp:1077
+#: ../src/interface/sitemanager_controls.cpp:1079
 msgid "Force &UTF-8"
 msgstr "Примусове &UTF-8"
 
@@ -4343,7 +4346,7 @@ msgstr "Примусити показ прихованих файлів"
 msgid "Format specifications:"
 msgstr "Специфікації формату:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1810
+#: ../src/interface/resources/xrc/settings.xrc:1379
 msgid "Format: Extension followed by properly quoted command and arguments."
 msgstr ""
 "Формат: Розширення, після якого ідуть правильно залапковані команда і "
@@ -4389,7 +4392,7 @@ msgstr "Отримати зовнішню ІР адресу з наступно�
 msgid "Getting help"
 msgstr "Отримання допомоги"
 
-#: ../src/interface/filter.cpp:285 ../src/interface/filter.cpp:345
+#: ../src/interface/filter.cpp:351 ../src/interface/filter.cpp:411
 msgid "Given filterset name already exists, overwrite filter set?"
 msgstr "Ім'я встановленого фільтру вже існує, переписати встановлений фільтр?"
 
@@ -4417,16 +4420,16 @@ msgstr "Ви&сокий"
 msgid "HTTPS - HTTP over TLS"
 msgstr "HTTPS - HTTP через TLS"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1496
+#: ../src/interface/resources/xrc/dialogs.xrc:1146
 msgid "Hash:"
 msgstr "Хешований:"
 
-#: ../src/interface/filter_conditions_dialog.cpp:80
+#: ../src/interface/filter_conditions_dialog.cpp:79
 msgid "Hidden"
 msgstr "Прихований"
 
-#: ../src/interface/resources/xrc/settings.xrc:908
 #: ../src/interface/queue.cpp:997 ../src/interface/queue.cpp:1059
+#: ../src/interface/settings/optionspage_transfer.cpp:70
 msgid "High"
 msgstr "Високий"
 
@@ -4438,7 +4441,7 @@ msgstr "Найвищий"
 msgid "Highest available port has to be a number between 1024 and 65535."
 msgstr "Найвищий наявний порт повинен стояти під номером поміж 1024 та 65535."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:612
+#: ../src/interface/filter.cpp:185
 msgid ""
 "Hold the shift key to toggle the filter state on both sides simultaneously."
 msgstr ""
@@ -4482,7 +4485,7 @@ msgstr "Хост:"
 msgid "Hostkey algorithm:"
 msgstr "Алгоритм ключа хоста:"
 
-#: ../src/interface/sitemanager_controls.cpp:956
+#: ../src/interface/sitemanager_controls.cpp:957
 msgid "Hours,"
 msgstr "Години,"
 
@@ -4493,7 +4496,7 @@ msgstr ""
 "Я &забув свій головний пароль. Видалити усі паролі, збережені за допомогою "
 "цього ключа."
 
-#: ../src/interface/resources/xrc/settings.xrc:1353
+#: ../src/interface/resources/xrc/settings.xrc:1039
 msgid "I&SO 8601 (example: 15:47)"
 msgstr "I&SO 8601 (приклад: 15:47)"
 
@@ -4521,7 +4524,7 @@ msgstr ""
 "часу від вказаного, тоді з'єднання буде припинено і FileZilla намагатиметься "
 "підключитися повторно."
 
-#: ../src/interface/resources/xrc/settings.xrc:2067
+#: ../src/interface/resources/xrc/settings.xrc:1636
 msgid "If reporting bugs, please provide logs with \"Verbose\" logging level."
 msgstr ""
 "Якщо з'явиться повідомлення про дефект, тоді для журналів встановіть рівень "
@@ -4573,7 +4576,7 @@ msgstr ""
 "Якщо дана проблема не зникає, - це означає, що якийсь маршрутизатор та/або "
 "файєрвол перешкоджає з'єднанню."
 
-#: ../src/interface/resources/xrc/settings.xrc:1990
+#: ../src/interface/resources/xrc/settings.xrc:1559
 msgid ""
 "If the size of the logfile reaches the limit, it gets renamed by adding "
 "\".1\" to the end of the filename (possibly overwriting older logfiles) and "
@@ -4583,7 +4586,7 @@ msgstr ""
 "додавання \".1\" в кінець імені файлу (з можливістю переписування старіших "
 "файлів журналу) і створюється новий файл."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2547
+#: ../src/interface/resources/xrc/dialogs.xrc:2197
 msgid ""
 "If the symlink points to a directory, FileZilla can either delete the "
 "symbolic link or remove the contents of the linked directory."
@@ -4605,8 +4608,8 @@ msgstr ""
 "Якщо дана проблема не зникає, тоді зверніться до виробника вашого "
 "маршрутизатора."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:925
-#: ../src/interface/resources/xrc/settings.xrc:1184
+#: ../src/interface/resources/xrc/dialogs.xrc:575
+#: ../src/interface/resources/xrc/settings.xrc:947
 msgid ""
 "If using 'overwrite if newer', your system time has to be synchronized with "
 "the server. If the time differs (e.g. different timezone), specify a time "
@@ -4616,7 +4619,7 @@ msgstr ""
 "синхронізувати свій системний час із серверним. Якщо час відрізняється "
 "(напр. інший часовий пояс), вкажіть період часового зсуву у Сайт Менеджері."
 
-#: ../src/interface/resources/xrc/settings.xrc:1579
+#: ../src/interface/resources/xrc/settings.xrc:1148
 msgid ""
 "If using timestamp based comparison, consider two files equal if their "
 "timestamp difference does not exceed this threshold."
@@ -4625,7 +4628,7 @@ msgstr ""
 "як одинакові, при умові, що різниця їхньої позначки часу не перевищує його "
 "граничного значення."
 
-#: ../src/interface/resources/xrc/settings.xrc:1684
+#: ../src/interface/resources/xrc/settings.xrc:1253
 msgid "If you change the language, you need to restart FileZilla."
 msgstr "При зміні мови необхідно перезавантажити FileZilla."
 
@@ -4649,7 +4652,7 @@ msgstr ""
 "Якщо продовжите, ваш пароль і файли будуть надіслані через Інтернет у "
 "незашифрованому вигляді."
 
-#: ../src/interface/resources/xrc/settings.xrc:1072
+#: ../src/interface/resources/xrc/settings.xrc:835
 msgid ""
 "If you enter the wrong filetypes, those files may get corrupted when "
 "transferred."
@@ -4714,7 +4717,7 @@ msgstr ""
 "Якщо ваш маршрутизатор постійно змінює ІР адреси,зверніться до вашого "
 "виробника маршрутизатора."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1084
+#: ../src/interface/resources/xrc/dialogs.xrc:734
 msgid "Import settings"
 msgstr "Імпортувати установки"
 
@@ -4766,7 +4769,7 @@ msgstr ""
 msgid "Incorrect password"
 msgstr "Неправильний пароль"
 
-#: ../src/interface/update_dialog.cpp:129
+#: ../src/interface/update_dialog.cpp:132
 msgid ""
 "Information about the latest version of FileZilla could not be retrieved. "
 "Please try again later."
@@ -4887,7 +4890,7 @@ msgid "Invalid port given. The port has to be a value from 1 to 65535."
 msgstr ""
 "Недійсний заданий порт. Значення порту повинно становити від 1 до 65535."
 
-#: ../src/interface/quickconnectbar.cpp:164 ../src/interface/serverdata.cpp:203
+#: ../src/interface/quickconnectbar.cpp:167 ../src/interface/serverdata.cpp:203
 msgid ""
 "Invalid protocol specified. Valid protocols are:\n"
 "ftp:// for normal FTP with optional encryption,\n"
@@ -4907,7 +4910,7 @@ msgid ""
 msgstr ""
 "Недійсний проксі, після закриваючої дужки може слідувати лише кома і порт."
 
-#: ../src/interface/filter_conditions_dialog.cpp:496
+#: ../src/interface/filter_conditions_dialog.cpp:499
 msgid "Invalid regular expression"
 msgstr "Недійсний сталий вираз"
 
@@ -4915,7 +4918,7 @@ msgstr "Недійсний сталий вираз"
 msgid "Invalid response code"
 msgstr "Недійсний код відгуку"
 
-#: ../src/interface/search.cpp:1060
+#: ../src/interface/search.cpp:1061
 #, c-format
 msgid "Invalid search conditions: %s"
 msgstr "Недійсні умови пошуку: %s"
@@ -4925,7 +4928,7 @@ msgstr "Недійсні умови пошуку: %s"
 msgid "Invalid site path"
 msgstr "Недійсний шлях до сайту"
 
-#: ../src/interface/filter_conditions_dialog.cpp:511
+#: ../src/interface/filter_conditions_dialog.cpp:514
 msgid "Invalid size in condition"
 msgstr "Недійсний розмір в умовах"
 
@@ -4957,7 +4960,7 @@ msgstr "Розташування юрисдикції:"
 msgid "Jurisdiction state or province:"
 msgstr "Штат або провінція юрисдикції:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1536
+#: ../src/interface/resources/xrc/settings.xrc:1105
 msgid "Keep directories on top"
 msgstr "Каталоги тримати зверху"
 
@@ -4972,7 +4975,7 @@ msgstr ""
 "деякі тести з метою перевірки серверної підтримки даного елементу, тест може "
 "бути невдалим."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1469
+#: ../src/interface/resources/xrc/dialogs.xrc:1119
 msgid "Key exchange"
 msgstr "Обмін ключами"
 
@@ -4993,7 +4996,7 @@ msgstr "Ідентифікатор ключа:"
 msgid "L&owest"
 msgstr "Най&нижчий"
 
-#: ../src/interface/resources/xrc/settings.xrc:1665
+#: ../src/interface/resources/xrc/settings.xrc:1234
 #: ../src/interface/settings/settingsdialog.cpp:134
 msgid "Language"
 msgstr "Мова"
@@ -5003,7 +5006,7 @@ msgid "Language changed"
 msgstr "Зміна мови"
 
 #: ../src/interface/LocalListView.cpp:288
-#: ../src/interface/RemoteListView.cpp:339 ../src/interface/search.cpp:177
+#: ../src/interface/RemoteListView.cpp:339 ../src/interface/search.cpp:178
 msgid "Last modified"
 msgstr "Востаннє модифіковано"
 
@@ -5021,11 +5024,11 @@ msgstr "Залишити порожнім, щоб зберегти існуюч�
 msgid "Leave empty to keep existing password."
 msgstr "Залишити порожнім, щоб зберегти існуючі паролі."
 
-#: ../src/interface/resources/xrc/settings.xrc:788
+#: ../src/interface/settings/optionspage_transfer.cpp:29
 msgid "Limit for concurrent &downloads:"
 msgstr "Обмеження для одночасних &завантажень:"
 
-#: ../src/interface/resources/xrc/settings.xrc:809
+#: ../src/interface/settings/optionspage_transfer.cpp:35
 msgid "Limit for concurrent &uploads:"
 msgstr "Обмеження для одночасних &відвантажень:"
 
@@ -5033,11 +5036,11 @@ msgstr "Обмеження для одночасних &відвантажень
 msgid "Limit local ports"
 msgstr "Обмежити локальні порти"
 
-#: ../src/interface/resources/xrc/settings.xrc:1959
+#: ../src/interface/resources/xrc/settings.xrc:1528
 msgid "Limit size of logfile"
 msgstr "Обмежити розмір файлу журналу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1967
+#: ../src/interface/resources/xrc/settings.xrc:1536
 msgid "Limit:"
 msgstr "Обмежити:"
 
@@ -5074,7 +5077,7 @@ msgstr "Використовується локальна адреса"
 msgid "Local endpoint has been closed"
 msgstr "Локальну кінцеву точку закрито"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1746
+#: ../src/interface/resources/xrc/dialogs.xrc:1396
 msgid "Local file"
 msgstr "Локальний файл"
 
@@ -5095,19 +5098,19 @@ msgstr "Локальний файл є каталогом, а не просто 
 msgid "Local file is not a valid filename."
 msgstr "Локальний файл має недійсне ім'я."
 
-#: ../src/interface/search.cpp:1022 ../src/interface/search.cpp:1028
+#: ../src/interface/search.cpp:1023 ../src/interface/search.cpp:1029
 msgid "Local file search"
 msgstr "Пошук локального файлу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:540
+#: ../src/interface/filter.cpp:157
 msgid "Local filters:"
 msgstr "Локальні фільтри:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2470
+#: ../src/interface/resources/xrc/dialogs.xrc:2120
 msgid "Local path handling:"
 msgstr "Обробка локального шляху:"
 
-#: ../src/interface/viewheader.cpp:341
+#: ../src/interface/viewheader.cpp:342
 msgid "Local site:"
 msgstr "Локальний сайт:"
 
@@ -5128,7 +5131,7 @@ msgstr "Файл журналу"
 msgid "Logged in"
 msgstr "Вхід виконано"
 
-#: ../src/interface/resources/xrc/settings.xrc:1913
+#: ../src/interface/resources/xrc/settings.xrc:1482
 #: ../src/interface/settings/settingsdialog.cpp:142
 msgid "Logging"
 msgstr "Вхід"
@@ -5224,7 +5227,7 @@ msgstr "Неправильний формат заголовка відпові�
 msgid "Malformed response: %s"
 msgstr "Неправильний формат відповіді: %s"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2088
+#: ../src/interface/resources/xrc/dialogs.xrc:1738
 #: ../src/interface/manual_transfer.cpp:288
 #: ../src/interface/manual_transfer.cpp:294
 #: ../src/interface/manual_transfer.cpp:300
@@ -5241,12 +5244,12 @@ msgstr "Ручна передача"
 msgid "Master &Password:"
 msgstr "Головний &Пароль:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2816
+#: ../src/interface/resources/xrc/dialogs.xrc:2466
 #: ../src/interface/settings/optionspage_passwords.cpp:183
 msgid "Master password:"
 msgstr "Головний пароль:"
 
-#: ../src/interface/resources/xrc/settings.xrc:767
+#: ../src/interface/settings/optionspage_transfer.cpp:23
 msgid "Maximum simultaneous &transfers:"
 msgstr "Максимум одночасних &передач:"
 
@@ -5266,19 +5269,19 @@ msgstr "Розташуван&ня журналу повідомлень:"
 msgid "Message too large"
 msgstr "Повідомлення занадто велике"
 
-#: ../src/interface/resources/xrc/settings.xrc:1979
+#: ../src/interface/resources/xrc/settings.xrc:1548
 msgid "MiB"
 msgstr "MiB"
 
-#: ../src/interface/sitemanager_controls.cpp:960
+#: ../src/interface/sitemanager_controls.cpp:962
 msgid "Minutes"
 msgstr "Хвилини"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1661
+#: ../src/interface/resources/xrc/dialogs.xrc:1311
 msgid "Move &down"
 msgstr "Перемістити &вниз"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1655
+#: ../src/interface/resources/xrc/dialogs.xrc:1305
 msgid "Move &up"
 msgstr "Перемістити &вверх"
 
@@ -5296,16 +5299,16 @@ msgstr "Мої Документи"
 msgid "My Sites"
 msgstr "Мої Сайти"
 
-#: ../src/interface/sitemanager_controls.cpp:1268
+#: ../src/interface/sitemanager_controls.cpp:1271
 msgid "N&o encryption"
 msgstr "Бе&з шифрування"
 
-#: ../src/interface/settings/optionspage_themes.cpp:197
-#: ../src/interface/settings/optionspage_themes.cpp:200
+#: ../src/interface/settings/optionspage_themes.cpp:207
+#: ../src/interface/settings/optionspage_themes.cpp:210
 msgid "N/a"
 msgstr "N/a"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2126
+#: ../src/interface/resources/xrc/dialogs.xrc:1776
 msgid "Name"
 msgstr "Ім'я"
 
@@ -5329,23 +5332,23 @@ msgstr "Ім'я або адреса електронної пошти"
 msgid "Name:"
 msgstr "Ім'я:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1556
+#: ../src/interface/resources/xrc/settings.xrc:1125
 msgid "Natural sort"
 msgstr "Звичайне сортування"
 
-#: ../src/interface/filteredit.cpp:354
+#: ../src/interface/filteredit.cpp:426
 msgid "Need to enter filter name"
 msgstr "Потрібно ввести ім'я фільтру"
 
-#: ../src/interface/search.cpp:1022
+#: ../src/interface/search.cpp:1023
 msgid "Need to enter valid local path"
 msgstr "Потрібно ввести дійсний локальний шлях"
 
-#: ../src/interface/search.cpp:1050
+#: ../src/interface/search.cpp:1051
 msgid "Need to enter valid remote path"
 msgstr "Потрібно ввести дійсний віддалений шлях"
 
-#: ../src/interface/sitemanager_controls.cpp:1137
+#: ../src/interface/sitemanager_controls.cpp:1139
 msgid "Need to specify a character encoding"
 msgstr "Потрібно вказати спосіб кодування знаків"
 
@@ -5363,7 +5366,7 @@ msgstr "Хост мережі немає адреси мережі у запит
 msgid "Network unreachable"
 msgstr "Мережа недосяжна"
 
-#: ../src/interface/resources/xrc/settings.xrc:1850
+#: ../src/interface/resources/xrc/settings.xrc:1419
 msgid "Never"
 msgstr "Ніколи"
 
@@ -5380,7 +5383,7 @@ msgstr "Нова &вкладка"
 msgid "New Book&mark"
 msgstr "Нова Заклад&ка"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2091
+#: ../src/interface/resources/xrc/dialogs.xrc:1741
 #: ../src/interface/bookmarks_dialog.cpp:63
 #: ../src/interface/bookmarks_dialog.cpp:76
 #: ../src/interface/bookmarks_dialog.cpp:82
@@ -5410,7 +5413,7 @@ msgstr "Нова директорія"
 msgid "New features and improvements in %s"
 msgstr "Нові функції та вдосконалення в %s"
 
-#: ../src/interface/filteredit.cpp:137
+#: ../src/interface/filteredit.cpp:203
 msgid "New filter"
 msgstr "Новий фільтр"
 
@@ -5461,7 +5464,7 @@ msgstr ""
 msgid "No files are currently being edited."
 msgstr "Ніякі файли зараз не редагуються."
 
-#: ../src/interface/filteredit.cpp:150
+#: ../src/interface/filteredit.cpp:216
 msgid "No filter name given"
 msgstr "Не задано імені фільтру"
 
@@ -5470,19 +5473,19 @@ msgstr "Не задано імені фільтру"
 msgid "No host given, please enter a host."
 msgstr "Не вказаний хост, введіть ім'я хоста."
 
-#: ../src/interface/settings/optionspage_themes.cpp:94
+#: ../src/interface/settings/optionspage_themes.cpp:96
 msgid "No images available"
 msgstr "Відсутні зображення"
 
-#: ../src/interface/filter.cpp:269 ../src/interface/filter.cpp:339
+#: ../src/interface/filter.cpp:335 ../src/interface/filter.cpp:405
 msgid "No name for the filterset given."
 msgstr "Не задано імені встановленого фільтру."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2336
+#: ../src/interface/resources/xrc/dialogs.xrc:1986
 msgid "No program associated with filetype"
 msgstr "Жодна програма не асоціюються з даним типом файлу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2253
+#: ../src/interface/resources/xrc/dialogs.xrc:1903
 #, c-format
 msgid "No program has been associated to edit files with the extension '%s'."
 msgstr ""
@@ -5492,7 +5495,7 @@ msgstr ""
 msgid "No route to host"
 msgstr "Нема шляху до хоста"
 
-#: ../src/interface/search.cpp:711 ../src/interface/search.cpp:717
+#: ../src/interface/search.cpp:712 ../src/interface/search.cpp:718
 msgid "No search results"
 msgstr "Нема результатів пошуку"
 
@@ -5508,14 +5511,14 @@ msgstr "Непідтримуваний метод автентифікації �
 msgid "No username given."
 msgstr "Не задано імені користувача."
 
-#: ../src/interface/resources/xrc/settings.xrc:1627
-#: ../src/interface/resources/xrc/settings.xrc:1646
+#: ../src/interface/resources/xrc/settings.xrc:1196
+#: ../src/interface/resources/xrc/settings.xrc:1215
 #: ../src/interface/sitemanager.cpp:20
 #: ../src/interface/verifycertdialog.cpp:394
 msgid "None"
 msgstr "Жодного"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1862
+#: ../src/interface/resources/xrc/dialogs.xrc:1512
 msgid "None selected yet"
 msgstr "Нічого не вибрано"
 
@@ -5523,11 +5526,12 @@ msgstr "Нічого не вибрано"
 msgid "Nonrecoverable failure in name resolution"
 msgstr "Невиправна помилка в визначенні імен"
 
-#: ../src/interface/resources/xrc/settings.xrc:907 ../src/engine/server.cpp:693
-#: ../src/engine/server.cpp:720 ../src/interface/manual_transfer.cpp:148
+#: ../src/engine/server.cpp:693 ../src/engine/server.cpp:720
+#: ../src/interface/manual_transfer.cpp:148
 #: ../src/interface/manual_transfer.cpp:176
 #: ../src/interface/manual_transfer.cpp:535 ../src/interface/queue.cpp:995
 #: ../src/interface/queue.cpp:1057
+#: ../src/interface/settings/optionspage_transfer.cpp:69
 msgid "Normal"
 msgstr "Звичайний"
 
@@ -5579,7 +5583,7 @@ msgstr ""
 msgid "Null character in line"
 msgstr "Символ з Null-значенням у рядку"
 
-#: ../src/interface/resources/xrc/settings.xrc:1440
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:36
 msgid "Number of decimal places:"
 msgstr "Кількість десяткових розташувань:"
 
@@ -5587,7 +5591,7 @@ msgstr "Кількість десяткових розташувань:"
 msgid "Number of retries has to be between 0 and 99."
 msgstr "Кількість повторів повинна знаходитись у проміжку між 0 та 99."
 
-#: ../src/interface/search.cpp:1208
+#: ../src/interface/search.cpp:1209
 msgid "O&pen"
 msgstr "Від&крити"
 
@@ -5596,27 +5600,26 @@ msgstr "Від&крити"
 #: ../src/interface/resources/xrc/dialogs.xrc:250
 #: ../src/interface/resources/xrc/dialogs.xrc:359
 #: ../src/interface/resources/xrc/dialogs.xrc:480
-#: ../src/interface/resources/xrc/dialogs.xrc:639
-#: ../src/interface/resources/xrc/dialogs.xrc:828
-#: ../src/interface/resources/xrc/dialogs.xrc:935
-#: ../src/interface/resources/xrc/dialogs.xrc:1006
-#: ../src/interface/resources/xrc/dialogs.xrc:1064
-#: ../src/interface/resources/xrc/dialogs.xrc:1129
-#: ../src/interface/resources/xrc/dialogs.xrc:1303
-#: ../src/interface/resources/xrc/dialogs.xrc:1440
-#: ../src/interface/resources/xrc/dialogs.xrc:1612
-#: ../src/interface/resources/xrc/dialogs.xrc:1687
-#: ../src/interface/resources/xrc/dialogs.xrc:2070
-#: ../src/interface/resources/xrc/dialogs.xrc:2225
-#: ../src/interface/resources/xrc/dialogs.xrc:2319
-#: ../src/interface/resources/xrc/dialogs.xrc:2416
-#: ../src/interface/resources/xrc/dialogs.xrc:2511
-#: ../src/interface/resources/xrc/dialogs.xrc:2580
-#: ../src/interface/resources/xrc/dialogs.xrc:2755
-#: ../src/interface/resources/xrc/dialogs.xrc:2857
-#: ../src/interface/resources/xrc/dialogs.xrc:2990
+#: ../src/interface/resources/xrc/dialogs.xrc:585
+#: ../src/interface/resources/xrc/dialogs.xrc:656
+#: ../src/interface/resources/xrc/dialogs.xrc:714
+#: ../src/interface/resources/xrc/dialogs.xrc:779
+#: ../src/interface/resources/xrc/dialogs.xrc:953
+#: ../src/interface/resources/xrc/dialogs.xrc:1090
+#: ../src/interface/resources/xrc/dialogs.xrc:1262
+#: ../src/interface/resources/xrc/dialogs.xrc:1337
+#: ../src/interface/resources/xrc/dialogs.xrc:1720
+#: ../src/interface/resources/xrc/dialogs.xrc:1875
+#: ../src/interface/resources/xrc/dialogs.xrc:1969
+#: ../src/interface/resources/xrc/dialogs.xrc:2066
+#: ../src/interface/resources/xrc/dialogs.xrc:2161
+#: ../src/interface/resources/xrc/dialogs.xrc:2230
+#: ../src/interface/resources/xrc/dialogs.xrc:2405
+#: ../src/interface/resources/xrc/dialogs.xrc:2507
+#: ../src/interface/resources/xrc/dialogs.xrc:2640
 #: ../src/interface/resources/xrc/storj.xrc:37
-#: ../src/interface/aboutdialog.cpp:134
+#: ../src/interface/aboutdialog.cpp:134 ../src/interface/filter.cpp:198
+#: ../src/interface/filteredit.cpp:140
 #: ../src/interface/settings/settingsdialog.cpp:72
 #: ../src/interface/welcome_dialog.cpp:114
 msgid "OK"
@@ -5642,11 +5645,11 @@ msgstr ""
 msgid "Once"
 msgstr "Один раз"
 
-#: ../src/interface/resources/xrc/settings.xrc:1851
+#: ../src/interface/resources/xrc/settings.xrc:1420
 msgid "Once a day"
 msgstr "Раз в день"
 
-#: ../src/interface/resources/xrc/settings.xrc:1852
+#: ../src/interface/resources/xrc/settings.xrc:1421
 msgid "Once a week"
 msgstr "Раз в тиждень"
 
@@ -5654,7 +5657,7 @@ msgstr "Раз в тиждень"
 msgid "Only use plain FTP (insecure)"
 msgstr "Використовувати лише простий FTP (незахищений)"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1425
+#: ../src/interface/resources/xrc/dialogs.xrc:1075
 msgid "Op&en file"
 msgstr "Ві&дкрити файл"
 
@@ -5691,14 +5694,14 @@ msgstr "Відкрити цей файл."
 msgid "Open the settings dialog of FileZilla"
 msgstr "Відкрити діалог налаштувань FileZilla"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1176
+#: ../src/interface/resources/xrc/dialogs.xrc:826
 msgid "Opened as:"
 msgstr "Відкрито як:"
 
 #: ../src/interface/edithandler.cpp:1770 ../src/interface/edithandler.cpp:1889
 #: ../src/interface/LocalListView.cpp:1924
-#: ../src/interface/LocalListView.cpp:1937 ../src/interface/search.cpp:1983
-#: ../src/interface/search.cpp:1996
+#: ../src/interface/LocalListView.cpp:1937 ../src/interface/search.cpp:1984
+#: ../src/interface/search.cpp:1997
 msgid "Opening failed"
 msgstr "Невдале відкриття"
 
@@ -5769,31 +5772,31 @@ msgstr "Переглянути"
 msgid "Overwrite &if source newer"
 msgstr "Переписати &якщо джерело новіше"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:875
-#: ../src/interface/resources/xrc/dialogs.xrc:898
-#: ../src/interface/resources/xrc/settings.xrc:1132
-#: ../src/interface/resources/xrc/settings.xrc:1153
+#: ../src/interface/resources/xrc/dialogs.xrc:525
+#: ../src/interface/resources/xrc/dialogs.xrc:548
+#: ../src/interface/resources/xrc/settings.xrc:895
+#: ../src/interface/resources/xrc/settings.xrc:916
 msgid "Overwrite file"
 msgstr "Переписати файл"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:877
-#: ../src/interface/resources/xrc/dialogs.xrc:900
-#: ../src/interface/resources/xrc/settings.xrc:1134
-#: ../src/interface/resources/xrc/settings.xrc:1155
+#: ../src/interface/resources/xrc/dialogs.xrc:527
+#: ../src/interface/resources/xrc/dialogs.xrc:550
+#: ../src/interface/resources/xrc/settings.xrc:897
+#: ../src/interface/resources/xrc/settings.xrc:918
 msgid "Overwrite file if size differs"
 msgstr "Переписати файл, якщо розмір відрізняється"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:878
-#: ../src/interface/resources/xrc/dialogs.xrc:901
-#: ../src/interface/resources/xrc/settings.xrc:1135
-#: ../src/interface/resources/xrc/settings.xrc:1156
+#: ../src/interface/resources/xrc/dialogs.xrc:528
+#: ../src/interface/resources/xrc/dialogs.xrc:551
+#: ../src/interface/resources/xrc/settings.xrc:898
+#: ../src/interface/resources/xrc/settings.xrc:919
 msgid "Overwrite file if size differs or source file is newer"
 msgstr "Переписати файл, якщо розмір відрізняється, або вихідний файл новіший"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:876
-#: ../src/interface/resources/xrc/dialogs.xrc:899
-#: ../src/interface/resources/xrc/settings.xrc:1133
-#: ../src/interface/resources/xrc/settings.xrc:1154
+#: ../src/interface/resources/xrc/dialogs.xrc:526
+#: ../src/interface/resources/xrc/dialogs.xrc:549
+#: ../src/interface/resources/xrc/settings.xrc:896
+#: ../src/interface/resources/xrc/settings.xrc:917
 msgid "Overwrite file if source file newer"
 msgstr "Переписати файл, якщо вихідний файл новіший"
 
@@ -5814,7 +5817,7 @@ msgstr "Власний тип збірки: %s\n"
 msgid "Owner permissions"
 msgstr "Дозволи власника"
 
-#: ../src/interface/RemoteListView.cpp:341 ../src/interface/search.cpp:179
+#: ../src/interface/RemoteListView.cpp:341 ../src/interface/search.cpp:180
 msgid "Owner/Group"
 msgstr "Власник/Група"
 
@@ -5848,8 +5851,8 @@ msgstr "Значення параметру - це недійсна URL адре
 msgid "Parsing %d bytes of version information.\n"
 msgstr "Аналіз %d байт інформації версії.\n"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1978
-#: ../src/interface/quickconnectbar.cpp:51
+#: ../src/interface/resources/xrc/dialogs.xrc:1628
+#: ../src/interface/quickconnectbar.cpp:53
 #: ../src/interface/sitemanager_controls.cpp:126
 #: ../src/interface/sitemanager_controls.cpp:389
 msgid "Pass&word:"
@@ -5883,8 +5886,8 @@ msgstr "Вимагається пароль"
 msgid "Passwords"
 msgstr "Паролі"
 
-#: ../src/interface/filter_conditions_dialog.cpp:117
-#: ../src/interface/search.cpp:174
+#: ../src/interface/filter_conditions_dialog.cpp:116
+#: ../src/interface/search.cpp:175
 msgid "Path"
 msgstr "Шлях"
 
@@ -5902,7 +5905,7 @@ msgstr "Шляху не знайдено:"
 msgid "Path of identity service"
 msgstr "Шлях ідентифікаційної служби"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2155
+#: ../src/interface/resources/xrc/dialogs.xrc:1805
 msgid "Paths"
 msgstr "Шляхи"
 
@@ -5911,7 +5914,7 @@ msgstr "Шляхи"
 msgid "Pending removal"
 msgstr "Вилучення очікування"
 
-#: ../src/interface/filter_conditions_dialog.cpp:113
+#: ../src/interface/filter_conditions_dialog.cpp:112
 msgid "Permission"
 msgstr "Дозвіл"
 
@@ -5919,7 +5922,7 @@ msgstr "Дозвіл"
 msgid "Permission denied"
 msgstr "Не дозволено"
 
-#: ../src/interface/RemoteListView.cpp:340 ../src/interface/search.cpp:178
+#: ../src/interface/RemoteListView.cpp:340 ../src/interface/search.cpp:179
 msgid "Permissions"
 msgstr "Дозволи"
 
@@ -5938,7 +5941,7 @@ msgid ""
 msgstr ""
 "Додайте принаймні один каталог для завантаження або відвантаження файлів."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2950
+#: ../src/interface/resources/xrc/dialogs.xrc:2600
 msgid "Please add the local directories you want to use FileZilla with."
 msgstr ""
 "Додайте ті локальні каталоги, які бажаєте використати за допомогою FileZilla."
@@ -5989,49 +5992,49 @@ msgstr "Введіть настроюваний формат даних."
 msgid "Please enter a custom time format."
 msgstr "Введіть настроюваний формат часу."
 
-#: ../src/interface/filter_conditions_dialog.cpp:525
+#: ../src/interface/filter_conditions_dialog.cpp:528
 msgid ""
 "Please enter a date of the form YYYY-MM-DD such as for example 2010-07-18."
 msgstr "Введіть дату у форматі YYYY-MM-DD, як, наприклад, 2010-07-18."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:123
+#: ../src/interface/settings/optionspage_transfer.cpp:196
 #: ../src/interface/speedlimits_dialog.cpp:64
 #, c-format
 msgid "Please enter a download speed limit greater or equal to 0 %s/s."
 msgstr ""
 "Введіть значення обмеження швидкості завантаження більшим або рівним 0 %s/s."
 
-#: ../src/interface/filteredit.cpp:143
+#: ../src/interface/filteredit.cpp:209
 msgid "Please enter a name for the new filter."
 msgstr "Введіть ім'я для нового фільтру."
 
-#: ../src/interface/filteredit.cpp:249
+#: ../src/interface/filteredit.cpp:321
 msgid "Please enter a new name for the copied filter."
 msgstr "Введіть нове ім'я для скопійованого фільтру."
 
-#: ../src/interface/filter.cpp:324
+#: ../src/interface/filter.cpp:390
 #, c-format
 msgid "Please enter a new name for the filter set \"%s\""
 msgstr "Введіть нове ім'я для налаштувань фільтру \"%s\""
 
-#: ../src/interface/filteredit.cpp:200
+#: ../src/interface/filteredit.cpp:272
 msgid "Please enter a new name for the filter."
 msgstr "Введіть нове ім'я для фільтру."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:112
+#: ../src/interface/settings/optionspage_transfer.cpp:184
 msgid ""
 "Please enter a number between 0 and 10 for the number of concurrent "
 "downloads."
 msgstr ""
 "Введіть число між 0 і 10 для позначення кількості одночасних завантажень."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:117
+#: ../src/interface/settings/optionspage_transfer.cpp:190
 msgid ""
 "Please enter a number between 0 and 10 for the number of concurrent uploads."
 msgstr ""
 "Введіть число між 0 і 10 для позначення кількості одночасних відвантажень."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:107
+#: ../src/interface/settings/optionspage_transfer.cpp:178
 msgid ""
 "Please enter a number between 1 and 10 for the number of concurrent "
 "transfers."
@@ -6048,7 +6051,7 @@ msgstr ""
 "Будь-ласка, введіть час очікування в проміжку між 10 і 9999 секунд або 0 для "
 "вимкнення часу очікування."
 
-#: ../src/interface/filter.cpp:262
+#: ../src/interface/filter.cpp:328
 msgid "Please enter a unique name for this filter set"
 msgstr "Введіть унікальне ім'я для цих установок фільтру"
 
@@ -6065,7 +6068,7 @@ msgid "Please enter an URL where to get your external address from"
 msgstr ""
 "Будь-ласка, введіть адресу URL звідки можна отримати вашу зовнішню адресу"
 
-#: ../src/interface/settings/optionspage_transfer.cpp:130
+#: ../src/interface/settings/optionspage_transfer.cpp:202
 #: ../src/interface/speedlimits_dialog.cpp:72
 #, c-format
 msgid "Please enter an upload speed limit greater or equal to 0 %s/s."
@@ -6222,11 +6225,11 @@ msgstr ""
 "Збережіть цей ключ у безпечному місці. Без правильного ключа завантажені "
 "файлі стають недоступними."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2552
+#: ../src/interface/resources/xrc/dialogs.xrc:2202
 msgid "Please select an action:"
 msgstr "Оберіть дію:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1122
+#: ../src/interface/resources/xrc/dialogs.xrc:772
 msgid "Please select the categories you would like to import."
 msgstr "Виберіть категорії, які ви бажаєте імпортувати."
 
@@ -6280,11 +6283,11 @@ msgstr "Порт:"
 msgid "Postal code:"
 msgstr "Поштовий індекс:"
 
-#: ../src/interface/resources/xrc/settings.xrc:976
+#: ../src/interface/settings/optionspage_transfer.cpp:103
 msgid "Pre&allocate space before downloading"
 msgstr "Попередньо &виділити місце перед завантаженням"
 
-#: ../src/interface/resources/xrc/settings.xrc:972
+#: ../src/interface/settings/optionspage_transfer.cpp:102
 msgid "Preallocation"
 msgstr "Попереднє виділення"
 
@@ -6297,7 +6300,7 @@ msgstr "Попередньо вказані Сайти"
 msgid "Preserving file timestamps"
 msgstr "Збереження файлу часових позначок"
 
-#: ../src/interface/resources/xrc/settings.xrc:1273
+#: ../src/interface/settings/optionspage_themes.cpp:156
 msgid "Preview"
 msgstr "Перегляд"
 
@@ -6309,7 +6312,7 @@ msgstr "Друкувати діагностичну інформацію пов'
 msgid "Print version information to stdout and exit"
 msgstr "Надрукувати інформацію версії на обраний принтер і вийти"
 
-#: ../src/interface/resources/xrc/settings.xrc:1535
+#: ../src/interface/resources/xrc/settings.xrc:1104
 msgid "Prioritize directories (default)"
 msgstr "Визначення пріоритетних каталогів (типових)"
 
@@ -6317,7 +6320,7 @@ msgstr "Визначення пріоритетних каталогів (тип
 msgid "Priority"
 msgstr "Пріоритет"
 
-#: ../src/interface/resources/xrc/settings.xrc:1891
+#: ../src/interface/resources/xrc/settings.xrc:1460
 msgid ""
 "Privacy policy: Only your version of FileZilla, your used operating system "
 "and your CPU architecture will be submitted to the server."
@@ -6460,8 +6463,8 @@ msgstr "Черга: пусто"
 msgid "Queued files"
 msgstr "Файли в черзі"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2393
-#: ../src/interface/resources/xrc/dialogs.xrc:2488
+#: ../src/interface/resources/xrc/dialogs.xrc:2043
+#: ../src/interface/resources/xrc/dialogs.xrc:2138
 msgid "Queueing:"
 msgstr "Система черги:"
 
@@ -6515,7 +6518,7 @@ msgstr ""
 msgid "Rea&d"
 msgstr "Чи&тати"
 
-#: ../src/interface/filter_conditions_dialog.cpp:81
+#: ../src/interface/filter_conditions_dialog.cpp:80
 msgid "Read-only"
 msgstr "Лише читати"
 
@@ -6527,7 +6530,7 @@ msgstr "Помилка читання з локального файлу"
 msgid "Really cancel current operation?"
 msgstr "Дійсно скасувати дану операцію?"
 
-#: ../src/interface/RemoteListView.cpp:1427 ../src/interface/search.cpp:1662
+#: ../src/interface/RemoteListView.cpp:1427 ../src/interface/search.cpp:1663
 #, c-format
 msgid "Really delete %d directory with its contents from the server?"
 msgid_plural ""
@@ -6536,7 +6539,7 @@ msgstr[0] "Дійсно видалити %d каталог з усім його 
 msgstr[1] "Дійсно видалити %d каталоги з усім їхнім вмістом з сервера?"
 msgstr[2] "Дійсно видалити %d каталогів з усім їхнім вмістом з сервера?"
 
-#: ../src/interface/RemoteListView.cpp:1424 ../src/interface/search.cpp:1659
+#: ../src/interface/RemoteListView.cpp:1424 ../src/interface/search.cpp:1660
 #, c-format
 msgid "Really delete %d file from the server?"
 msgid_plural "Really delete %d files from the server?"
@@ -6544,7 +6547,7 @@ msgstr[0] "Дійсно видалити %d файл з сервера?"
 msgstr[1] "Дійсно видалити %d файли з сервера?"
 msgstr[2] "Дійсно видалити %d файлів з сервера?"
 
-#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1667
+#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1668
 #, c-format
 msgid "Really delete %s and %s from the server?"
 msgstr "Дійсно видалити %s і %s з сервера?"
@@ -6647,7 +6650,7 @@ msgstr "Перенаправлення до недійсної, або непі�
 msgid "Refresh the file and folder lists"
 msgstr "Оновити списки файлу та папки"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2877
+#: ../src/interface/resources/xrc/dialogs.xrc:2527
 msgid "Remember passwords?"
 msgstr "Пам'ятати паролі?"
 
@@ -6655,16 +6658,16 @@ msgstr "Пам'ятати паролі?"
 msgid "Remote"
 msgstr "Віддалений"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1781
+#: ../src/interface/resources/xrc/dialogs.xrc:1431
 #: ../src/interface/queue.cpp:1275
 msgid "Remote file"
 msgstr "Віддалений файл"
 
-#: ../src/interface/search.cpp:1043 ../src/interface/search.cpp:1050
+#: ../src/interface/search.cpp:1044 ../src/interface/search.cpp:1051
 msgid "Remote file search"
 msgstr "Пошук віддаленого файлу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:575
+#: ../src/interface/filter.cpp:171
 msgid "Remote filters:"
 msgstr "Віддалені фільтри:"
 
@@ -6703,15 +6706,15 @@ msgstr ""
 msgid "Remote path could not be parsed."
 msgstr "ВІддалений шлях неможливо проаналізувати."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2375
+#: ../src/interface/resources/xrc/dialogs.xrc:2025
 msgid "Remote path handling:"
 msgstr "Обробка віддаленого шляху:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1196
+#: ../src/interface/resources/xrc/dialogs.xrc:846
 msgid "Remote path:"
 msgstr "Віддалений шлях:"
 
-#: ../src/interface/viewheader.cpp:533
+#: ../src/interface/viewheader.cpp:534
 msgid "Remote site:"
 msgstr "Віддалений сайт:"
 
@@ -6725,10 +6728,10 @@ msgstr "Видалити &все"
 msgid "Remove &selected"
 msgstr "Видалити &обране"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:880
-#: ../src/interface/resources/xrc/dialogs.xrc:903
-#: ../src/interface/resources/xrc/settings.xrc:1137
-#: ../src/interface/resources/xrc/settings.xrc:1158
+#: ../src/interface/resources/xrc/dialogs.xrc:530
+#: ../src/interface/resources/xrc/dialogs.xrc:553
+#: ../src/interface/resources/xrc/settings.xrc:900
+#: ../src/interface/resources/xrc/settings.xrc:921
 #: ../src/interface/asyncrequestqueue.cpp:353
 msgid "Rename file"
 msgstr "Перейменувати файл"
@@ -6748,7 +6751,7 @@ msgstr "Перейменувати обрані файли і каталоги"
 msgid "Renaming '%s' to '%s'"
 msgstr "Перейменування '%s' в '%s'"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2828
+#: ../src/interface/resources/xrc/dialogs.xrc:2478
 #: ../src/interface/settings/optionspage_passwords.cpp:186
 msgid "Repeat password:"
 msgstr "Повторіть пароль:"
@@ -6812,14 +6815,14 @@ msgstr "Відповідь:"
 msgid "Restore ta&bs and reconnect"
 msgstr "Відновити вкла&дки і перепід'єднати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:879
-#: ../src/interface/resources/xrc/dialogs.xrc:902
-#: ../src/interface/resources/xrc/settings.xrc:1136
-#: ../src/interface/resources/xrc/settings.xrc:1157
+#: ../src/interface/resources/xrc/dialogs.xrc:529
+#: ../src/interface/resources/xrc/dialogs.xrc:552
+#: ../src/interface/resources/xrc/settings.xrc:899
+#: ../src/interface/resources/xrc/settings.xrc:920
 msgid "Resume file transfer"
 msgstr "Відновити передачу файлу"
 
-#: ../src/interface/resources/xrc/settings.xrc:1197
+#: ../src/interface/resources/xrc/settings.xrc:960
 msgid ""
 "Resuming ASCII files can cause problems if server uses a different line "
 "ending format than the client."
@@ -6894,12 +6897,12 @@ msgstr ""
 msgid "SQLite:"
 msgstr "SQLite:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2805
+#: ../src/interface/resources/xrc/dialogs.xrc:2455
 #: ../src/interface/settings/optionspage_passwords.cpp:179
 msgid "Sa&ve passwords protected by a master password"
 msgstr "Збе&регти паролі, захищені головним паролем"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2795
+#: ../src/interface/resources/xrc/dialogs.xrc:2445
 #: ../src/interface/settings/optionspage_passwords.cpp:177
 msgid "Sav&e passwords"
 msgstr "Збе&регти паролі"
@@ -6918,7 +6921,7 @@ msgstr "Збереження паролів вимкнуто вашим сист
 msgid "Saving of passwords has been disabled by you."
 msgstr "Збереження паролів вимкнуто вами."
 
-#: ../src/interface/resources/xrc/settings.xrc:1253
+#: ../src/interface/settings/optionspage_themes.cpp:144
 msgid "Scale factor:"
 msgstr "Коефіцієнт масштабування:"
 
@@ -6942,7 +6945,7 @@ msgstr "Пошук файлів на сервері"
 msgid "Search sites"
 msgstr "Пошук сайтів"
 
-#: ../src/interface/search.cpp:650
+#: ../src/interface/search.cpp:651
 msgid "Search type:"
 msgstr "Тип пошуку:"
 
@@ -6961,7 +6964,7 @@ msgid "See also: https://wiki.filezilla-project.org/Network_Configuration"
 msgstr ""
 "Дивіться також: https://wiki.filezilla-project.org/Network_Configuration"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1869
+#: ../src/interface/resources/xrc/dialogs.xrc:1519
 msgid "Sele&ct server"
 msgstr "Обр&ати сервер"
 
@@ -6969,11 +6972,11 @@ msgstr "Обр&ати сервер"
 msgid "Select &page:"
 msgstr "Обрати &сторінку:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1215
+#: ../src/interface/settings/optionspage_themes.cpp:137
 msgid "Select Theme"
 msgstr "Обрати тему"
 
-#: ../src/interface/resources/xrc/settings.xrc:1112
+#: ../src/interface/resources/xrc/settings.xrc:875
 msgid ""
 "Select default action to perform if target file of a transfer already exists."
 msgstr ""
@@ -7036,11 +7039,11 @@ msgstr "Обрати файл для відвантаження"
 msgid "Select filename for converted key file"
 msgstr "Обрати ім'я файлу для конвертованого файлу ключа"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2258
+#: ../src/interface/resources/xrc/dialogs.xrc:1908
 msgid "Select how these files should be opened."
 msgstr "Обрати спосіб, щоб відкрити ці файли."
 
-#: ../src/interface/search.cpp:1304
+#: ../src/interface/search.cpp:1305
 msgid "Select target download directory"
 msgstr "Обрати кінцевий каталог завантаження"
 
@@ -7048,15 +7051,15 @@ msgstr "Обрати кінцевий каталог завантаження"
 msgid "Select target filename"
 msgstr "Обрати ім'я кінцевого файлу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1035
+#: ../src/interface/resources/xrc/dialogs.xrc:685
 msgid "Select the categories to export:"
 msgstr "Обрати категорії для експорту:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:961
+#: ../src/interface/resources/xrc/dialogs.xrc:611
 msgid "Select the private data you would like to delete."
 msgstr "Оберіть свої приватні дані для видалення."
 
-#: ../src/interface/search.cpp:1261
+#: ../src/interface/search.cpp:1262
 #, c-format
 msgid "Selected %d directory with its contents for transfer."
 msgid_plural "Selected %d directories with their contents for transfer."
@@ -7072,7 +7075,7 @@ msgstr[0] "Обрано %d каталог."
 msgstr[1] "Обрано %d каталоги."
 msgstr[2] "Обрано %d каталогів."
 
-#: ../src/interface/search.cpp:1258
+#: ../src/interface/search.cpp:1259
 #, c-format
 msgid "Selected %d file for transfer."
 msgid_plural "Selected %d files for transfer."
@@ -7096,7 +7099,7 @@ msgstr[0] "Обрано %d файл. Загальний розмір: Прина
 msgstr[1] "Обрано %d файли. Загальний розмір: Принаймні %s"
 msgstr[2] "Обрано %d файлів. Загальний розмір: Принаймні %s"
 
-#: ../src/interface/search.cpp:1266
+#: ../src/interface/search.cpp:1267
 #, c-format
 msgid "Selected %s and %s for transfer."
 msgstr "Обрано %s і %s для передачі."
@@ -7116,8 +7119,8 @@ msgstr "Обраний %s і %s. Загальний розмір: Принайм
 msgid "Selected editor does not exist."
 msgstr "Обраного редактора не існує."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1255
-#: ../src/interface/resources/xrc/dialogs.xrc:1322
+#: ../src/interface/resources/xrc/dialogs.xrc:905
+#: ../src/interface/resources/xrc/dialogs.xrc:972
 msgid "Selected file already being edited"
 msgstr "Обраний файл уже редагується"
 
@@ -7133,7 +7136,7 @@ msgstr "Обраний файл уже відкрито"
 msgid "Selected file is still being edited"
 msgstr "Обраний файл усе ще редагується"
 
-#: ../src/interface/filter.cpp:230
+#: ../src/interface/filter.cpp:296
 msgid "Selected filter only works for local files."
 msgstr "Обраний фільтр працює лише з локальними файлами."
 
@@ -7172,7 +7175,7 @@ msgstr "Серійний номер:"
 msgid "Server &type:"
 msgstr "&Тип сервера:"
 
-#: ../src/interface/sitemanager_controls.cpp:1266
+#: ../src/interface/sitemanager_controls.cpp:1269
 msgid "Server Side Encryption:"
 msgstr "Шифрування з боку сервера:"
 
@@ -7202,7 +7205,7 @@ msgstr "Сервер не підтримує відновлення файлів
 msgid "Server does not support resume of files > 4GB."
 msgstr "Сервер не підтримує відновлення файлів > 4GB."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1515
+#: ../src/interface/resources/xrc/dialogs.xrc:1165
 msgid "Server host key"
 msgstr "Ключ хоста сервера"
 
@@ -7284,15 +7287,15 @@ msgstr "Сервер надіслав занадто багато даних."
 msgid "Server sent unexpected reply."
 msgstr "Сервер надіслав неочікувану відповідь."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1588
+#: ../src/interface/resources/xrc/dialogs.xrc:1238
 msgid "Server to client MAC:"
 msgstr "Сервер до клієнта MAC:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1578
+#: ../src/interface/resources/xrc/dialogs.xrc:1228
 msgid "Server to client cipher:"
 msgstr "Сервер до клієнтських символів:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1932
+#: ../src/interface/resources/xrc/dialogs.xrc:1582
 msgid "Server&type:"
 msgstr "Тип &сервера:"
 
@@ -7300,8 +7303,8 @@ msgstr "Тип &сервера:"
 msgid "Server/Local file"
 msgstr "Сервер/Локальний файл"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1186
-#: ../src/interface/resources/xrc/dialogs.xrc:1855
+#: ../src/interface/resources/xrc/dialogs.xrc:836
+#: ../src/interface/resources/xrc/dialogs.xrc:1505
 msgid "Server:"
 msgstr "Сервер:"
 
@@ -7330,7 +7333,7 @@ msgstr "Каталог налаштувань:"
 msgid "Sh&ow notification bubble"
 msgstr "По&казати сповіщення"
 
-#: ../src/interface/resources/xrc/settings.xrc:2075
+#: ../src/interface/resources/xrc/settings.xrc:1644
 msgid "Show &raw directory listing"
 msgstr "Показати список &простих каталогів"
 
@@ -7342,16 +7345,16 @@ msgstr "Показати діалог &привітання..."
 msgid "Show both directory trees and continue comparing?"
 msgstr "Показати обидва дерева каталогів і продовжити порівняння?"
 
-#: ../src/interface/update_dialog.cpp:133
-#: ../src/interface/update_dialog.cpp:178
+#: ../src/interface/update_dialog.cpp:136
+#: ../src/interface/update_dialog.cpp:183
 msgid "Show details"
 msgstr "Показати подробиці"
 
-#: ../src/interface/resources/xrc/settings.xrc:1390
+#: ../src/interface/resources/xrc/settings.xrc:1076
 msgid "Show details about custom date and time formats"
 msgstr "Показати подробиці форматів настроюваних дати і часу"
 
-#: ../src/interface/search.cpp:1209
+#: ../src/interface/search.cpp:1210
 msgid "Show in file &manager"
 msgstr "Показати у файловому &менеджері"
 
@@ -7375,7 +7378,7 @@ msgstr "Алгоритм підпису:"
 msgid "Signup"
 msgstr "Реєстрація"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1097
+#: ../src/interface/resources/xrc/dialogs.xrc:747
 msgid "Site &Manager entries"
 msgstr "Введені дані &в Сайт Менеджер"
 
@@ -7400,12 +7403,12 @@ msgstr "Сайт Менеджер - Згенерований ключ"
 #: ../src/interface/sitemanager_controls.cpp:715
 #: ../src/interface/sitemanager_controls.cpp:726
 #: ../src/interface/sitemanager_controls.cpp:754
-#: ../src/interface/sitemanager_controls.cpp:1039
-#: ../src/interface/sitemanager_controls.cpp:1051
-#: ../src/interface/sitemanager_controls.cpp:1137
-#: ../src/interface/sitemanager_controls.cpp:1376
-#: ../src/interface/sitemanager_controls.cpp:1388
-#: ../src/interface/sitemanager_controls.cpp:1402
+#: ../src/interface/sitemanager_controls.cpp:1041
+#: ../src/interface/sitemanager_controls.cpp:1053
+#: ../src/interface/sitemanager_controls.cpp:1139
+#: ../src/interface/sitemanager_controls.cpp:1379
+#: ../src/interface/sitemanager_controls.cpp:1391
+#: ../src/interface/sitemanager_controls.cpp:1405
 #: ../src/interface/sitemanager_dialog.cpp:951
 #: ../src/interface/sitemanager_dialog.cpp:960
 #: ../src/interface/sitemanager_dialog.cpp:967
@@ -7449,7 +7452,7 @@ msgstr ""
 msgid "Size"
 msgstr "Розмір"
 
-#: ../src/interface/resources/xrc/settings.xrc:1404
+#: ../src/interface/settings/optionspage_sizeformatting.cpp:27
 msgid "Size formatting"
 msgstr "Форматування розміру"
 
@@ -7457,10 +7460,10 @@ msgstr "Форматування розміру"
 msgid "Size unknown"
 msgstr "Розмір невідомий"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:881
-#: ../src/interface/resources/xrc/dialogs.xrc:904
-#: ../src/interface/resources/xrc/settings.xrc:1138
-#: ../src/interface/resources/xrc/settings.xrc:1159
+#: ../src/interface/resources/xrc/dialogs.xrc:531
+#: ../src/interface/resources/xrc/dialogs.xrc:554
+#: ../src/interface/resources/xrc/settings.xrc:901
+#: ../src/interface/resources/xrc/settings.xrc:922
 msgid "Skip file"
 msgstr "Пропустити файл"
 
@@ -7514,7 +7517,7 @@ msgstr ""
 "Деякі неправильно сконфігуровані віддалені сервери позаду свого "
 "маршрутизатора при відповіді можуть видати свою локальну ІР адресу."
 
-#: ../src/interface/resources/xrc/settings.xrc:1537
+#: ../src/interface/resources/xrc/settings.xrc:1106
 msgid "Sort directories inline"
 msgstr "Сортувати каталоги у тексті"
 
@@ -7522,11 +7525,11 @@ msgstr "Сортувати каталоги у тексті"
 msgid "Sort order cannot be changed if comparing directories."
 msgstr "Послідовність сортування неможливо змінити при порівнянні каталогів."
 
-#: ../src/interface/resources/xrc/settings.xrc:1521
+#: ../src/interface/resources/xrc/settings.xrc:1090
 msgid "Sorting"
 msgstr "Сортування"
 
-#: ../src/interface/resources/xrc/settings.xrc:1528
+#: ../src/interface/resources/xrc/settings.xrc:1097
 msgid "Sorting &mode:"
 msgstr "Спосіб &сортування:"
 
@@ -7546,13 +7549,13 @@ msgstr "Вихідна і кінцева операції drop ідентичн�
 msgid "Source file:"
 msgstr "Вихідний файл:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2773
+#: ../src/interface/resources/xrc/dialogs.xrc:2423
 #: ../src/interface/speedlimits_dialog.cpp:64
 #: ../src/interface/speedlimits_dialog.cpp:72
 msgid "Speed Limits"
 msgstr "Обмеження швидкості"
 
-#: ../src/interface/resources/xrc/settings.xrc:837
+#: ../src/interface/settings/optionspage_transfer.cpp:44
 msgid "Speed limits"
 msgstr "Обмеження швидкості"
 
@@ -7564,19 +7567,19 @@ msgstr "Обмеження швидкості вимкнуто, клацніть
 msgid "Speed limits are enabled, click to change."
 msgstr "Обмеження швидкості увімкнуто, клацніть, щоб змінити."
 
-#: ../src/interface/resources/xrc/settings.xrc:1869
+#: ../src/interface/resources/xrc/settings.xrc:1438
 msgid "Stable and beta versions"
 msgstr "Стабільна і бета версії"
 
-#: ../src/interface/resources/xrc/settings.xrc:1868
+#: ../src/interface/resources/xrc/settings.xrc:1437
 msgid "Stable versions only"
 msgstr "Лише стабільні версії"
 
-#: ../src/interface/resources/xrc/settings.xrc:1870
+#: ../src/interface/resources/xrc/settings.xrc:1439
 msgid "Stable, beta and nightly versions"
 msgstr "Стабільна, бета і нічні версії"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2063
+#: ../src/interface/resources/xrc/dialogs.xrc:1713
 msgid "Start transfer &immediately"
 msgstr "Розпочати передачу &негайно"
 
@@ -7659,7 +7662,7 @@ msgstr "Підсумок результатів тесту:"
 msgid "Suspend now"
 msgstr "Призупинити зараз"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2569
+#: ../src/interface/resources/xrc/dialogs.xrc:2219
 msgid ""
 "Symlinks to files are not affected by this choice, such symlinks are always "
 "deleted."
@@ -7667,7 +7670,7 @@ msgstr ""
 "Даний вибір не зачіпає символічне посилання на файли, такі символічні "
 "посилання завжди видаляються."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2880
+#: ../src/interface/resources/xrc/dialogs.xrc:2530
 #: ../src/interface/state.cpp:275 ../src/interface/state.cpp:290
 #: ../src/interface/state.cpp:297 ../src/interface/state.cpp:308
 #: ../src/interface/state.cpp:407 ../src/interface/state.cpp:415
@@ -7686,8 +7689,8 @@ msgstr "Синхронізовану навігацію вимкнуто."
 msgid "Synchronizing directories."
 msgstr "Снинхронізація каталогів."
 
-#: ../src/interface/quickconnectbar.cpp:121
-#: ../src/interface/quickconnectbar.cpp:165
+#: ../src/interface/quickconnectbar.cpp:124
+#: ../src/interface/quickconnectbar.cpp:168
 msgid "Syntax error"
 msgstr "Помилка синтаксису"
 
@@ -7698,7 +7701,7 @@ msgstr "Помилка синтаксису"
 msgid "Syntax error in command line"
 msgstr "Помилка синтаксису у командній лінійці"
 
-#: ../src/interface/filter_conditions_dialog.cpp:82
+#: ../src/interface/filter_conditions_dialog.cpp:81
 msgid "System"
 msgstr "Система"
 
@@ -7770,7 +7773,7 @@ msgstr "Результати тестування"
 msgid "Testing resume capabilities of server"
 msgstr "Спроможність сервера до відновлення тестування"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1383
+#: ../src/interface/resources/xrc/dialogs.xrc:1033
 msgid "The &following files are currently being edited:"
 msgstr "Наст&упні файли зараз редагуються:"
 
@@ -7845,18 +7848,18 @@ msgstr ""
 msgid "The data connection could not be established: %s"
 msgstr "Передачу даних не вдається установити: %s"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2276
+#: ../src/interface/resources/xrc/dialogs.xrc:1926
 #: ../src/interface/edithandler.cpp:1658
 msgid "The default editor for text files could not be found."
 msgstr "Неможливо знайти типового редактора текстових файлів."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2269
+#: ../src/interface/resources/xrc/dialogs.xrc:1919
 #, c-format
 msgid "The default editor for text files is '%s'."
 msgstr "Типовим редактором текстових файлів є '%s'."
 
-#: ../src/interface/filteredit.cpp:155 ../src/interface/filteredit.cpp:220
-#: ../src/interface/filteredit.cpp:261
+#: ../src/interface/filteredit.cpp:221 ../src/interface/filteredit.cpp:292
+#: ../src/interface/filteredit.cpp:333
 msgid "The entered filter name already exists, please choose a different name."
 msgstr "Введене ім'я фільтру вже існує, оберіть інше ім'я."
 
@@ -7881,7 +7884,7 @@ msgstr ""
 "Введіть нове ім'я:"
 
 #: ../src/interface/edithandler.cpp:1775
-#: ../src/interface/LocalListView.cpp:1928 ../src/interface/search.cpp:1987
+#: ../src/interface/LocalListView.cpp:1928 ../src/interface/search.cpp:1988
 #, c-format
 msgid ""
 "The file '%s' cannot be opened:\n"
@@ -7912,7 +7915,7 @@ msgid "The file '%s' could not be loaded."
 msgstr "Файл '%s' неможливо завантажити."
 
 #: ../src/interface/edithandler.cpp:1770
-#: ../src/interface/LocalListView.cpp:1924 ../src/interface/search.cpp:1983
+#: ../src/interface/LocalListView.cpp:1924 ../src/interface/search.cpp:1984
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -7922,7 +7925,7 @@ msgstr ""
 "У вашій системі жодна програма не асоціюється з даним типом файлів."
 
 #: ../src/interface/edithandler.cpp:1889
-#: ../src/interface/LocalListView.cpp:1937 ../src/interface/search.cpp:1996
+#: ../src/interface/LocalListView.cpp:1937 ../src/interface/search.cpp:1997
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -7963,12 +7966,12 @@ msgstr "Стовпець імен файлів не можна ані прихо
 msgid "The filename column cannot be hidden."
 msgstr "Стовпець імен файлів неможливо приховати."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:69
+#: ../src/interface/settings/optionspage_transfer.cpp:96
 #, c-format
 msgid "The following character will be replaced: %s"
 msgstr "Даний символ буде замінено на: %s"
 
-#: ../src/interface/settings/optionspage_transfer.cpp:66
+#: ../src/interface/settings/optionspage_transfer.cpp:93
 #, c-format
 msgid "The following characters will be replaced: %s"
 msgstr "Дані символи буде замінено на: %s"
@@ -7985,7 +7988,7 @@ msgstr "Згенерований ключ шифрування:"
 msgid "The global bookmarks could not be saved."
 msgstr "Глобальні закладки зберегти було неможливо."
 
-#: ../src/interface/resources/xrc/settings.xrc:2062
+#: ../src/interface/resources/xrc/settings.xrc:1631
 msgid ""
 "The higher the debug level, the more information will be displayed in the "
 "message log. Displaying debug information has a negative impact on "
@@ -8031,11 +8034,11 @@ msgstr ""
 msgid "The master password needs to be at least 8 characters long."
 msgstr "Довжина головного паролю повинна становити щонайменше 8 символів."
 
-#: ../src/interface/update_dialog.cpp:172
+#: ../src/interface/update_dialog.cpp:177
 msgid "The new version could not be downloaded, please retry later."
 msgstr "Нову версію завантажити було неможливо, спробуйте пізніше."
 
-#: ../src/interface/update_dialog.cpp:166
+#: ../src/interface/update_dialog.cpp:171
 msgid "The new version has been saved in your Downloads directory."
 msgstr "Нову версію було збережено у вашому каталозі завантажень."
 
@@ -8061,14 +8064,14 @@ msgstr ""
 msgid "The selected categories have been imported."
 msgstr "Обрані категорії імпортовано."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1092
+#: ../src/interface/resources/xrc/dialogs.xrc:742
 msgid ""
 "The selected file contains importable data for the following categories:"
 msgstr ""
 "Обраний файл вміщує дані, що придатні для імпорту в наступних категоріях:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1262
-#: ../src/interface/resources/xrc/dialogs.xrc:1329
+#: ../src/interface/resources/xrc/dialogs.xrc:912
+#: ../src/interface/resources/xrc/dialogs.xrc:979
 msgid "The selected file is already being edited:"
 msgstr "Обраний файл уже знаходиться в процесі редагування:"
 
@@ -8095,7 +8098,7 @@ msgstr "Додати сервер неможливо."
 msgid "The server sent an unexpected or unrecognized reply."
 msgstr "Сервер надіслав неочікувану, або неопізнану відповідь."
 
-#: ../src/interface/sitemanager_controls.cpp:1072
+#: ../src/interface/sitemanager_controls.cpp:1074
 msgid "The server uses following charset encoding for filenames:"
 msgstr ""
 "Сервер використовує наступне кодування набору символів для імен файлів:"
@@ -8176,11 +8179,11 @@ msgstr "Дійсний файл резервної копії '%s' неможл�
 msgid "Themes"
 msgstr "Теми"
 
-#: ../src/interface/filter.cpp:382
+#: ../src/interface/filter.cpp:448
 msgid "This filter set cannot be removed."
 msgstr "Встановлений фільтр неможливо перемістити."
 
-#: ../src/interface/filter.cpp:318
+#: ../src/interface/filter.cpp:384
 msgid "This filter set cannot be renamed."
 msgstr "Встановлений фільтр не може бути переіменованим."
 
@@ -8224,7 +8227,7 @@ msgstr ""
 msgid "Time"
 msgstr "Час"
 
-#: ../src/interface/resources/xrc/settings.xrc:1341
+#: ../src/interface/resources/xrc/settings.xrc:1027
 msgid "Time formatting"
 msgstr "Форматування часу"
 
@@ -8324,12 +8327,12 @@ msgstr "Занадто багато перенаправлень"
 msgid "Trace:"
 msgstr "Відстежити:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1624
-#: ../src/interface/resources/xrc/settings.xrc:1644
+#: ../src/interface/resources/xrc/settings.xrc:1193
+#: ../src/interface/resources/xrc/settings.xrc:1213
 msgid "Transfer"
 msgstr "Передача"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1719
+#: ../src/interface/resources/xrc/dialogs.xrc:1369
 msgid "Transfer &direction"
 msgstr "Напрямок &передачі"
 
@@ -8370,11 +8373,11 @@ msgstr "Передачі"
 msgid "Transfers finished"
 msgstr "Передачі завершено"
 
-#: ../src/interface/resources/xrc/settings.xrc:1080
+#: ../src/interface/resources/xrc/settings.xrc:843
 msgid "Treat files &without extension as ASCII file"
 msgstr "Трактувати файли &без розширення як файли ASCII"
 
-#: ../src/interface/resources/xrc/settings.xrc:1032
+#: ../src/interface/resources/xrc/settings.xrc:795
 msgid "Treat the &following filetypes as ASCII files:"
 msgstr "Трактувати &наступні типи файлів, як файли ASCII:"
 
@@ -8398,12 +8401,12 @@ msgstr "Довіряти цьому сертифікату і продовжит
 msgid "Trust this host and carry on connecting?"
 msgstr "Довіряти цьому хосту і продовжити з'єднання?"
 
-#: ../src/interface/update_dialog.cpp:130
-#: ../src/interface/update_dialog.cpp:177
+#: ../src/interface/update_dialog.cpp:133
+#: ../src/interface/update_dialog.cpp:182
 msgid "Try again"
 msgstr "Повторити спробу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2099
+#: ../src/interface/resources/xrc/dialogs.xrc:1749
 #: ../src/interface/edithandler.cpp:1201
 msgid "Type"
 msgstr "Тип"
@@ -8416,20 +8419,19 @@ msgstr "Тип проксі FTP:"
 msgid "Type of generic proxy:"
 msgstr "Тип загального проксі:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1410
+#: ../src/interface/resources/xrc/dialogs.xrc:1060
 msgid "U&pload"
 msgstr "Від&вантажити"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2714
-#: ../src/interface/resources/xrc/settings.xrc:875
+#: ../src/interface/resources/xrc/dialogs.xrc:2364
 msgid "U&pload limit:"
 msgstr "Обмеження від&вантаження:"
 
-#: ../src/interface/resources/xrc/settings.xrc:1754
+#: ../src/interface/resources/xrc/settings.xrc:1323
 msgid "U&se filetype associations if available"
 msgstr "При наявності, ви&користовувати асоціації типів файлів"
 
-#: ../src/interface/resources/xrc/settings.xrc:1347
+#: ../src/interface/resources/xrc/settings.xrc:1033
 msgid "U&se system defaults for current language"
 msgstr "В&икористати типові параметри системи для даної мови"
 
@@ -8442,7 +8444,7 @@ msgstr "КОРИСТУВАЧ@&ХОСТ"
 msgid "Unassigned error code %d"
 msgstr "Неініціалізоаний код помилки %d"
 
-#: ../src/interface/update_dialog.cpp:170
+#: ../src/interface/update_dialog.cpp:175
 msgid "Unfortunately information about the new update could not be retrieved."
 msgstr "На жаль, інформацію про нове оновлення не вдалося отримати."
 
@@ -8454,8 +8456,8 @@ msgstr "Модуль:"
 #: ../src/interface/resources/xrc/dialogs.xrc:324
 #: ../src/interface/resources/xrc/dialogs.xrc:435
 #: ../src/interface/resources/xrc/dialogs.xrc:445
-#: ../src/interface/resources/xrc/dialogs.xrc:1527
-#: ../src/interface/resources/xrc/dialogs.xrc:1537
+#: ../src/interface/resources/xrc/dialogs.xrc:1177
+#: ../src/interface/resources/xrc/dialogs.xrc:1187
 #: ../src/engine/sizeformatting_base.cpp:61
 #: ../src/interface/edithandler.cpp:1232 ../src/interface/edithandler.cpp:1260
 msgid "Unknown"
@@ -8532,7 +8534,7 @@ msgstr ""
 msgid "Unsupported redirect"
 msgstr "Непідтримуване перескерування"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1416
+#: ../src/interface/resources/xrc/dialogs.xrc:1066
 msgid "Up&load and unedit"
 msgstr "Від&вантажити і не редагувати"
 
@@ -8541,9 +8543,13 @@ msgstr "Від&вантажити і не редагувати"
 msgid "Updates"
 msgstr "Оновлення"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1733
+#: ../src/interface/resources/xrc/dialogs.xrc:1383
 msgid "Upload"
 msgstr "Відвантаження"
+
+#: ../src/interface/settings/optionspage_transfer.cpp:59
+msgid "Upload &limit:"
+msgstr "&Обмеження відвантаження:"
 
 #: ../src/interface/edithandler.cpp:1223
 msgid "Upload failed"
@@ -8558,8 +8564,8 @@ msgstr "Обмеження відвантаження: %s/s"
 msgid "Upload limit: none"
 msgstr "Обмеження відвантаження: жодного"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2440
-#: ../src/interface/search.cpp:1330
+#: ../src/interface/resources/xrc/dialogs.xrc:2090
+#: ../src/interface/search.cpp:1331
 msgid "Upload search results"
 msgstr "Відвантажити результати пошуку"
 
@@ -8571,11 +8577,11 @@ msgstr "Відвантажити обрану директорію"
 msgid "Upload selected files and directories"
 msgstr "Відвантажити обрані файли і директорії"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1221
+#: ../src/interface/resources/xrc/dialogs.xrc:871
 msgid "Upload this file back to the server?"
 msgstr "Відвантажити даний файл назад на сервер?"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1216
+#: ../src/interface/resources/xrc/dialogs.xrc:866
 msgid "Upload this file to the server?"
 msgstr "Відвантажити даний файл на сервер?"
 
@@ -8592,19 +8598,19 @@ msgstr "Відвантаження та очікування видалення"
 msgid "Uploading and unediting"
 msgstr "Відвантаження і відсутність редагування"
 
-#: ../src/interface/sitemanager_controls.cpp:1079
+#: ../src/interface/sitemanager_controls.cpp:1081
 msgid "Use &custom charset"
 msgstr "Використати &настроюваний набір шрифтів"
 
-#: ../src/interface/resources/xrc/settings.xrc:1718
+#: ../src/interface/resources/xrc/settings.xrc:1287
 msgid "Use &custom editor:"
 msgstr "Використати &настроюваний редактор:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2263
+#: ../src/interface/resources/xrc/dialogs.xrc:1913
 msgid "Use &default editor for text files"
 msgstr "Використати &типовий редактор для текстових файлів"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2205
+#: ../src/interface/resources/xrc/dialogs.xrc:1855
 #: ../src/interface/sitemanager_dialog.cpp:303
 msgid "Use &synchronized browsing"
 msgstr "Використати &синхронізовану навігацію"
@@ -8613,8 +8619,8 @@ msgstr "Використати &синхронізовану навігацію"
 msgid "Use Regular Expressions"
 msgstr "Використати сталі вирази"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:873
-#: ../src/interface/resources/xrc/dialogs.xrc:896
+#: ../src/interface/resources/xrc/dialogs.xrc:523
+#: ../src/interface/resources/xrc/dialogs.xrc:546
 msgid "Use default action"
 msgstr "Використати типову дію"
 
@@ -8622,15 +8628,15 @@ msgstr "Використати типову дію"
 msgid "Use explicit FTP over TLS if available"
 msgstr "Використовувати явне FTP через TLS, якщо доступно"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1838
+#: ../src/interface/resources/xrc/dialogs.xrc:1488
 msgid "Use server currently connected to"
 msgstr "Використати сервер, що поточно під'єднаний до"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1844
+#: ../src/interface/resources/xrc/dialogs.xrc:1494
 msgid "Use server from site manager"
 msgstr "Використати сервер з Сайт Менеджера"
 
-#: ../src/interface/resources/xrc/settings.xrc:1298
+#: ../src/interface/resources/xrc/settings.xrc:984
 msgid "Use system &defaults for current language"
 msgstr "Використати &типові параметри системи для даної мови"
 
@@ -8674,7 +8680,7 @@ msgstr "Користувач:"
 msgid "Username cannot be a series of spaces"
 msgstr "Ім'я користувача не може складатися з серії пробілів"
 
-#: ../src/interface/sitemanager_controls.cpp:1075
+#: ../src/interface/sitemanager_controls.cpp:1077
 msgid "Uses UTF-8 if the server supports it, else uses local charset."
 msgstr ""
 "Використовує UTF-8, якщо сервер підтримує його, в іншому випадку "
@@ -8693,7 +8699,7 @@ msgstr "Використання звичайного %s є незахищени
 msgid "Using secure HTTPS"
 msgstr "Використовується захищений HTTP"
 
-#: ../src/interface/sitemanager_controls.cpp:1088
+#: ../src/interface/sitemanager_controls.cpp:1090
 msgid ""
 "Using the wrong charset can result in filenames not displaying properly."
 msgstr ""
@@ -8712,7 +8718,7 @@ msgstr "Дійсний до:"
 msgid "Verbose log messages from wxWidgets"
 msgstr "Багатошарові журнали повідомлень від wxWidgets"
 
-#: ../src/interface/resources/xrc/settings.xrc:909
+#: ../src/interface/settings/optionspage_transfer.cpp:71
 msgid "Very high"
 msgstr "Дуже високий"
 
@@ -8720,11 +8726,11 @@ msgstr "Дуже високий"
 msgid "View hidden option set, but unsupported by server"
 msgstr "Переглянути прихований набір опцій,проте не підтримуваних сервером"
 
-#: ../src/interface/resources/xrc/settings.xrc:1626
+#: ../src/interface/resources/xrc/settings.xrc:1195
 msgid "View/Edit"
 msgstr "Переглянути/Редагувати"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:1635
+#: ../src/interface/resources/xrc/dialogs.xrc:1285
 msgid "Visible columns"
 msgstr "Видимі стовпці"
 
@@ -8803,11 +8809,11 @@ msgstr "Ласкаво просимо до FileZilla"
 msgid "What's new"
 msgstr "Що нового"
 
-#: ../src/interface/update_dialog.cpp:152
+#: ../src/interface/update_dialog.cpp:155
 msgid "What's new:"
 msgstr "Що нового:"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2788
+#: ../src/interface/resources/xrc/dialogs.xrc:2438
 msgid ""
 "When allowing FileZilla to remember passwords, you can reconnect without "
 "having to re-enter a password after restarting FileZilla."
@@ -8816,7 +8822,7 @@ msgstr ""
 "запам'ятовування паролів, з'являється можливість перепід'єднання без потреби "
 "повторного введення паролю."
 
-#: ../src/interface/resources/xrc/settings.xrc:936
+#: ../src/interface/settings/optionspage_transfer.cpp:84
 msgid ""
 "When enabled, characters that are not supported by the local operating "
 "system in filenames are replaced if downloading such a file."
@@ -8832,7 +8838,7 @@ msgstr "При запуску нового з'єднання під-час уж�
 msgid "Widescreen"
 msgstr "Широкий екран"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2783
+#: ../src/interface/resources/xrc/dialogs.xrc:2433
 msgid "Would you like FileZilla to remember passwords?"
 msgstr "Бажаєте, щоб FileZilla запам'ятовувала паролі?"
 
@@ -8879,7 +8885,7 @@ msgstr ""
 "Схоже, що ви користуєтесь винятково хостом IPv6. Даний майстер не підтримує "
 "такого середовища."
 
-#: ../src/interface/update_dialog.cpp:196
+#: ../src/interface/update_dialog.cpp:201
 msgid "You are using the latest version of FileZilla."
 msgstr "Ви користуєтесь останньою версією FileZilla."
 
@@ -8887,8 +8893,8 @@ msgstr "Ви користуєтесь останньою версією FileZill
 msgid "You can always open this dialog again through the help menu."
 msgstr "Даний діалог завжди можна відкрити через меню допомоги."
 
-#: ../src/interface/update_dialog.cpp:137
-#: ../src/interface/update_dialog.cpp:181
+#: ../src/interface/update_dialog.cpp:140
+#: ../src/interface/update_dialog.cpp:186
 msgid "You can download the latest version from the FileZilla website:"
 msgstr "Ви можете завантажити останню версію з веб сайту FileZilla:"
 
@@ -8917,7 +8923,7 @@ msgstr ""
 msgid "You cannot import settings from FileZilla's own settings directory."
 msgstr "Ви не можете імпортувати власні налаштування каталогу FileZilla."
 
-#: ../src/interface/settings/optionspage_transfer.cpp:149
+#: ../src/interface/settings/optionspage_transfer.cpp:221
 msgid ""
 "You cannot replace an invalid character with another invalid character. "
 "Please enter a character that is allowed in filenames."
@@ -8938,18 +8944,18 @@ msgstr ""
 msgid "You do not have permission to list this directory"
 msgstr "Ви не маєте дозволу на список цього каталогу"
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2542
+#: ../src/interface/resources/xrc/dialogs.xrc:2192
 msgid "You have selected at least one symbolic link."
 msgstr "Ви обрали принаймні одне символічне посилання."
 
-#: ../src/interface/edithandler.cpp:1740 ../src/interface/search.cpp:1622
+#: ../src/interface/edithandler.cpp:1740 ../src/interface/search.cpp:1623
 msgid ""
 "You have selected more than 10 files for editing, do you really want to "
 "continue?"
 msgstr ""
 "Ви обрали більше, ніж 10 файлів для редагування. Дійсно бажаєте продовжити?"
 
-#: ../src/interface/LocalListView.cpp:1892 ../src/interface/search.cpp:1949
+#: ../src/interface/LocalListView.cpp:1892 ../src/interface/search.cpp:1950
 msgid ""
 "You have selected more than 10 files or directories to open, do you really "
 "want to continue?"
@@ -8966,11 +8972,11 @@ msgstr "Необхідно ввести ім'я хоста."
 msgid "You have to enter a key file path"
 msgstr "Необхідно ввести шлях файла ключа"
 
-#: ../src/interface/search.cpp:1316
+#: ../src/interface/search.cpp:1317
 msgid "You have to enter a local directory."
 msgstr "Необхідно ввести локальний каталог."
 
-#: ../src/interface/search.cpp:1330
+#: ../src/interface/search.cpp:1331
 msgid "You have to enter a remote directory."
 msgstr "Необхідно ввести віддалений каталог."
 
@@ -8983,7 +8989,7 @@ msgstr "Необхідно ввести дійсну IPv4 адресу."
 msgid "You have to enter a valid encryption key"
 msgstr "Необхідно ввести дійсний ключ шифрування"
 
-#: ../src/interface/search.cpp:1321
+#: ../src/interface/search.cpp:1322
 msgid "You have to enter a writable local directory."
 msgstr "Необхідно ввести локальний каталог, придатний для запису."
 
@@ -9049,7 +9055,7 @@ msgstr ""
 "Щоб увімкнути синхронізовану навігацію для цієї закладки, необхідно ввести "
 "як локальний, так і віддалений шляхи."
 
-#: ../src/interface/sitemanager_controls.cpp:1051
+#: ../src/interface/sitemanager_controls.cpp:1053
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this site."
@@ -9057,7 +9063,7 @@ msgstr ""
 "Щоб увімкнути синхронізовану навігацію для цього сайту, необхідно ввести як "
 "локальний, так і віддалений шляхи."
 
-#: ../src/interface/resources/xrc/dialogs.xrc:2945
+#: ../src/interface/resources/xrc/dialogs.xrc:2595
 msgid ""
 "You need to grant FileZilla access to the directories you want to download "
 "files into or to upload files from."
@@ -9093,24 +9099,24 @@ msgstr ""
 msgid "Your computer will suspend unless you click Cancel."
 msgstr "Ваш комп'ютер призупиниться, якщо не натиснути Скасувати."
 
-#: ../src/interface/filter_conditions_dialog.cpp:97
+#: ../src/interface/filter_conditions_dialog.cpp:96
 msgid "after"
 msgstr "після"
 
-#: ../src/interface/filter_conditions_dialog.cpp:94
+#: ../src/interface/filter_conditions_dialog.cpp:93
 msgid "before"
 msgstr "перед"
 
-#: ../src/interface/filter_conditions_dialog.cpp:64
+#: ../src/interface/filter_conditions_dialog.cpp:63
 msgid "begins with"
 msgstr "починається з"
 
-#: ../src/interface/filter_conditions_dialog.cpp:138
-#: ../src/interface/filter_conditions_dialog.cpp:288
+#: ../src/interface/filter_conditions_dialog.cpp:137
+#: ../src/interface/filter_conditions_dialog.cpp:287
 msgid "bytes"
 msgstr "байти"
 
-#: ../src/interface/filter_conditions_dialog.cpp:62
+#: ../src/interface/filter_conditions_dialog.cpp:61
 msgid "contains"
 msgstr "вміщує"
 
@@ -9118,21 +9124,21 @@ msgstr "вміщує"
 msgid "custom"
 msgstr "додатково"
 
-#: ../src/interface/filter_conditions_dialog.cpp:67
+#: ../src/interface/filter_conditions_dialog.cpp:66
 msgid "does not contain"
 msgstr "не містить"
 
-#: ../src/interface/filter_conditions_dialog.cpp:71
-#: ../src/interface/filter_conditions_dialog.cpp:96
+#: ../src/interface/filter_conditions_dialog.cpp:70
+#: ../src/interface/filter_conditions_dialog.cpp:95
 msgid "does not equal"
 msgstr "не дорівнює"
 
-#: ../src/interface/filter_conditions_dialog.cpp:65
+#: ../src/interface/filter_conditions_dialog.cpp:64
 msgid "ends with"
 msgstr "завершується з"
 
-#: ../src/interface/filter_conditions_dialog.cpp:70
-#: ../src/interface/filter_conditions_dialog.cpp:95
+#: ../src/interface/filter_conditions_dialog.cpp:69
+#: ../src/interface/filter_conditions_dialog.cpp:94
 msgid "equals"
 msgstr "дорівнює"
 
@@ -9179,43 +9185,43 @@ msgstr ""
 "Переконайтесь, що даний виконуваний файл знаходиться у тому ж каталозі, що і "
 "головний виконуваний файл FileZilla."
 
-#: ../src/interface/filter_conditions_dialog.cpp:69
+#: ../src/interface/filter_conditions_dialog.cpp:68
 msgid "greater than"
 msgstr "більше, ніж"
 
-#: ../src/interface/filter_conditions_dialog.cpp:89
+#: ../src/interface/filter_conditions_dialog.cpp:88
 msgid "group executable"
 msgstr "групове виконання"
 
-#: ../src/interface/filter_conditions_dialog.cpp:87
+#: ../src/interface/filter_conditions_dialog.cpp:86
 msgid "group readable"
 msgstr "групове читання"
 
-#: ../src/interface/filter_conditions_dialog.cpp:88
+#: ../src/interface/filter_conditions_dialog.cpp:87
 msgid "group writeable"
 msgstr "груповий запис"
 
-#: ../src/interface/resources/xrc/settings.xrc:1392
+#: ../src/interface/resources/xrc/settings.xrc:1078
 msgid "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 msgstr "https://wiki.filezilla-project.org/Date_and_Time_formatting"
 
-#: ../src/interface/filter_conditions_dialog.cpp:63
+#: ../src/interface/filter_conditions_dialog.cpp:62
 msgid "is equal to"
 msgstr "є рівним з"
 
-#: ../src/interface/filter_conditions_dialog.cpp:74
+#: ../src/interface/filter_conditions_dialog.cpp:73
 msgid "is set"
 msgstr "встановлено"
 
-#: ../src/interface/filter_conditions_dialog.cpp:75
+#: ../src/interface/filter_conditions_dialog.cpp:74
 msgid "is unset"
 msgstr "не встановлено"
 
-#: ../src/interface/filter_conditions_dialog.cpp:72
+#: ../src/interface/filter_conditions_dialog.cpp:71
 msgid "less than"
 msgstr "менше, ніж"
 
-#: ../src/interface/filter_conditions_dialog.cpp:66
+#: ../src/interface/filter_conditions_dialog.cpp:65
 msgid "matches regex"
 msgstr "співпадає з regex"
 
@@ -9223,15 +9229,15 @@ msgstr "співпадає з regex"
 msgid "new name"
 msgstr "нове ім'я"
 
-#: ../src/interface/filter_conditions_dialog.cpp:86
+#: ../src/interface/filter_conditions_dialog.cpp:85
 msgid "owner executable"
 msgstr "виконуване власником"
 
-#: ../src/interface/filter_conditions_dialog.cpp:84
+#: ../src/interface/filter_conditions_dialog.cpp:83
 msgid "owner readable"
 msgstr "читається власником"
 
-#: ../src/interface/filter_conditions_dialog.cpp:85
+#: ../src/interface/filter_conditions_dialog.cpp:84
 msgid "owner writeable"
 msgstr "записується власником"
 
@@ -9239,21 +9245,24 @@ msgstr "записується власником"
 msgid "unknown"
 msgstr "невідомо"
 
-#: ../src/interface/filter_conditions_dialog.cpp:92
+#: ../src/interface/filter_conditions_dialog.cpp:91
 msgid "world executable"
 msgstr "глобальне виконання"
 
-#: ../src/interface/filter_conditions_dialog.cpp:90
+#: ../src/interface/filter_conditions_dialog.cpp:89
 msgid "world readable"
 msgstr "глобальне читання"
 
-#: ../src/interface/filter_conditions_dialog.cpp:91
+#: ../src/interface/filter_conditions_dialog.cpp:90
 msgid "world writeable"
 msgstr "глобальний запис"
 
 #: ../src/interface/aboutdialog.cpp:75
 msgid "wxWidgets:"
 msgstr "wxВіджети:"
+
+#~ msgid "Enable invalid character &amp;filtering"
+#~ msgstr "Увімкнути &amp;фільтрування неприпустимих символів"
 
 #~ msgid "&Local search"
 #~ msgstr "&Локальний пошук"
