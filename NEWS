@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.47.1 (2020-02-24)
+
+- Fixed regression loading advanced site parameters
+
 3.47.0 (2020-02-24)
 
 - Fix visual glitched adding/removing filter rows
