@@ -28,13 +28,13 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 		inner->Add(new wxStaticText(box, -1, _("(1-10)")), lay.valign);
 		inner->Add(new wxStaticText(box, -1, _("Limit for concurrent &downloads:")), lay.valign);
 		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMDOWNLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(1, 10);
+		spin->SetRange(0, 10);
 		spin->SetMaxLength(2);
 		inner->Add(spin, lay.valign);
 		inner->Add(new wxStaticText(box, -1, _("(0 for no limit)")), lay.valign);
 		inner->Add(new wxStaticText(box, -1, _("Limit for concurrent &uploads:")), lay.valign);
 		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMUPLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(1, 10);
+		spin->SetRange(0, 10);
 		spin->SetMaxLength(2);
 		inner->Add(spin, lay.valign);
 		inner->Add(new wxStaticText(box, -1, _("(0 for no limit)")), lay.valign);
