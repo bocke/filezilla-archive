@@ -651,25 +651,25 @@ bool CSearchDialog::Load()
 
 	auto typesSizer = lay.createFlex(3);
 
-	typesSizer->Add(new wxRadioButton(this, XRCID("ID_LOCAL_SEARCH"), "&Local search", wxDefaultPosition, wxDefaultSize, wxRB_GROUP), 0, wxALIGN_CENTRE_VERTICAL);
-	typesSizer->Add(new wxRadioButton(this, XRCID("ID_REMOTE_SEARCH"), "&Remote search"), 0, wxALIGN_CENTRE_VERTICAL);
-	typesSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARATIVE_SEARCH"), "C&omparative search"), 0, wxALIGN_CENTRE_VERTICAL);
+	typesSizer->Add(new wxRadioButton(this, XRCID("ID_LOCAL_SEARCH"), _("&Local search"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), 0, wxALIGN_CENTRE_VERTICAL);
+	typesSizer->Add(new wxRadioButton(this, XRCID("ID_REMOTE_SEARCH"), _("&Remote search")), 0, wxALIGN_CENTRE_VERTICAL);
+	typesSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARATIVE_SEARCH"), _("C&omparative search")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(typesSizer, 0, wxALIGN_CENTRE_VERTICAL);
 
-	optionsSizer->Add(new wxButton(this, XRCID("ID_START"), "&Search"), 0, wxALIGN_CENTRE_VERTICAL);
-	optionsSizer->Add(new wxStaticText(this, XRCID("ID_PATH_LABEL"), "Search &directory:"), 0, wxALIGN_CENTRE_VERTICAL);
+	optionsSizer->Add(new wxButton(this, XRCID("ID_START"), _("&Search")), 0, wxALIGN_CENTRE_VERTICAL);
+	optionsSizer->Add(new wxStaticText(this, XRCID("ID_PATH_LABEL"), _("Search &directory:")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
-	optionsSizer->Add(new wxButton(this, XRCID("ID_STOP"), "S&top"), 0, wxALIGN_CENTRE_VERTICAL);
-	optionsSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_PATH_LABEL"), "Search &directory:"), 0, wxALIGN_CENTRE_VERTICAL);
+	optionsSizer->Add(new wxButton(this, XRCID("ID_STOP"), _("S&top")), 0, wxALIGN_CENTRE_VERTICAL);
+	optionsSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_PATH_LABEL"), _("Search &directory:")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_REMOTE_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
 	optionsSizer->AddSpacer(0);
-	optionsSizer->Add(new wxStaticText(this, wxID_ANY, "Search &conditions:"), 0, wxALIGN_CENTRE_VERTICAL);
+	optionsSizer->Add(new wxStaticText(this, wxID_ANY, _("Search &conditions:")), 0, wxALIGN_CENTRE_VERTICAL);
 
 	wxChoice* matchTypeChoice = new wxChoice(this, XRCID("ID_MATCHTYPE"));
-	matchTypeChoice->Append("Match all of the following");
-	matchTypeChoice->Append("Match any of the following");
-	matchTypeChoice->Append("Match none of the following");
-	matchTypeChoice->Append("Match not all of the following");
+	matchTypeChoice->Append(_("Match all of the following"));
+	matchTypeChoice->Append(_("Match any of the following"));
+	matchTypeChoice->Append(_("Match none of the following"));
+	matchTypeChoice->Append(_("Match not all of the following"));
 	matchTypeChoice->SetSelection(0);
 	optionsSizer->Add(matchTypeChoice, 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->AddSpacer(0);
@@ -681,20 +681,20 @@ bool CSearchDialog::Load()
 	conditionsSizer->Add(new wxCustomHeightListCtrl(this, XRCID("ID_CONDITIONS"), wxDefaultPosition, wxSize(350, 120), wxVSCROLL| wxSUNKEN_BORDER | wxTAB_TRAVERSAL), 0, wxGROW);
 
 	auto criteriaSizer = lay.createFlex(3, 1);
-	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_CASE"), "Conditions are c&ase sensitive"), 0, wxALIGN_CENTRE_VERTICAL);
-	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_FIND_FILES"), "Find &files"), 0, wxALIGN_CENTRE_VERTICAL);
-	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_FIND_DIRS"), "Find d&irectories"), 0, wxALIGN_CENTRE_VERTICAL);
+	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_CASE"), _("Conditions are c&ase sensitive")), 0, wxALIGN_CENTRE_VERTICAL);
+	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_FIND_FILES"), _("Find &files")), 0, wxALIGN_CENTRE_VERTICAL);
+	criteriaSizer->Add(new wxCheckBox(this, XRCID("ID_FIND_DIRS"), _("Find d&irectories")), 0, wxALIGN_CENTRE_VERTICAL);
 	conditionsSizer->Add(criteriaSizer, 0);
 
 	auto compareSizer = lay.createFlex(4, 1);
-	compareSizer->Add(new wxStaticText(this, XRCID("ID_COMPARE_LABEL"), "Compare:"), 0, wxALIGN_CENTRE_VERTICAL);
-	compareSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARE_SIZE"), "Fil&e sizes", wxDefaultPosition, wxDefaultSize, wxRB_GROUP), 0, wxALIGN_CENTRE_VERTICAL);
-	compareSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARE_DATE"), "Modification tim&e"), 0, wxALIGN_CENTRE_VERTICAL);
-	compareSizer->Add(new wxCheckBox(this, XRCID("ID_COMPARE_HIDEIDENTICAL"), "&Hide identical files"), 0, wxALIGN_CENTRE_VERTICAL);
+	compareSizer->Add(new wxStaticText(this, XRCID("ID_COMPARE_LABEL"), _("Compare:")), 0, wxALIGN_CENTRE_VERTICAL);
+	compareSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARE_SIZE"), _("Fil&e sizes"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP), 0, wxALIGN_CENTRE_VERTICAL);
+	compareSizer->Add(new wxRadioButton(this, XRCID("ID_COMPARE_DATE"), _("Modification tim&e")), 0, wxALIGN_CENTRE_VERTICAL);
+	compareSizer->Add(new wxCheckBox(this, XRCID("ID_COMPARE_HIDEIDENTICAL"), _("&Hide identical files")), 0, wxALIGN_CENTRE_VERTICAL);
 	conditionsSizer->Add(compareSizer, 0);
 
 	main->Add(new wxStaticLine(this), 0, wxALL|wxGROW, lay.border);
-	main->Add(new wxStaticText(this, XRCID("ID_RESULTS_LABEL"), "Results:"), 0, wxLEFT|wxRIGHT, lay.border);
+	main->Add(new wxStaticText(this, XRCID("ID_RESULTS_LABEL"), _("Results:")), 0, wxLEFT|wxRIGHT, lay.border);
 
 	auto resultSizer = lay.createFlex(2, 3);
 	resultSizer->AddGrowableCol(0);
@@ -702,8 +702,8 @@ bool CSearchDialog::Load()
 	resultSizer->AddGrowableRow(1);
 	main->Add(resultSizer, 1, wxALL|wxGROW, lay.border);
 
-	resultSizer->Add(new wxStaticText(this, XRCID("ID_LOCAL_RESULTS_LABEL"), "Local results:"));
-	resultSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_RESULTS_LABEL"), "Remote results:"));
+	resultSizer->Add(new wxStaticText(this, XRCID("ID_LOCAL_RESULTS_LABEL"), _("Local results:")));
+	resultSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_RESULTS_LABEL"), _("Remote results:")));
 	resultSizer->Add(new wxListCtrl(this, XRCID("ID_RESULTS"), wxDefaultPosition, wxDefaultSize, wxLC_REPORT), 0, wxGROW);
 	resultSizer->Add(new wxListCtrl(this, XRCID("ID_REMOTE_RESULTS"), wxDefaultPosition, wxDefaultSize, wxLC_REPORT), 0, wxGROW);
 
