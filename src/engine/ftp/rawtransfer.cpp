@@ -6,6 +6,8 @@
 
 #include <libfilezilla/iputils.hpp>
 
+#include <assert.h>
+
 int CFtpRawTransferOpData::Send()
 {
 	if (!controlSocket_.m_pTransferSocket) {

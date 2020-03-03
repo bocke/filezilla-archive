@@ -6,6 +6,8 @@
 
 #include <libfilezilla/tls_layer.hpp>
 
+#include <assert.h>
+
 CFtpLogonOpData::CFtpLogonOpData(CFtpControlSocket& controlSocket)
 	: COpData(Command::connect, L"CFtpLogonOpData")
 	, CFtpOpData(controlSocket)

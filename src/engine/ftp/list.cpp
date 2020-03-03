@@ -5,6 +5,8 @@
 #include "list.h"
 #include "transfersocket.h"
 
+#include <assert.h>
+
 namespace {
 // Some servers are broken. Instead of an empty listing, some MVS servers
 // for example they return "550 no members found"

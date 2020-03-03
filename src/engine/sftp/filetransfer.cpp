@@ -5,6 +5,8 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
+#include <assert.h>
+
 enum filetransferStates
 {
 	filetransfer_init = 0,

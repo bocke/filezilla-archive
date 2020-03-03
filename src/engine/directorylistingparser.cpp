@@ -8,6 +8,7 @@
 #include <vector>
 #include <limits>
 
+#include <assert.h>
 #include <string.h>
 
 std::map<std::wstring, int> CDirectoryListingParser::m_MonthNamesMap;

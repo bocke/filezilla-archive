@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+#include <assert.h>
 #include <string.h>
 
 enum handshake_state
