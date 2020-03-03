@@ -424,6 +424,20 @@ int CControlSocket::CheckOverwriteFile()
 	return FZ_REPLY_WOULDBLOCK;
 }
 
+SleepOpData::SleepOpData(CControlSocket & controlSocket, fz::duration const& delay)
+	: COpData(Command::sleep, L"SleepOpData")
+	, fz::event_handler(controlSocket.event_loop_)
+	, controlSocket_(controlSocket)
+{
+	add_timer(delay, true);
+	controlSocket_.SetWait(false);
+}
+
+void SleepOpData::operator()(fz::event_base const&)
+{
+	controlSocket_.ResetOperation(FZ_REPLY_OK);
+}
+
 CFileTransferOpData::CFileTransferOpData(wchar_t const* name, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
 	: COpData(Command::transfer, name)
 	, localFile_(local_file), remoteFile_(remote_file), remotePath_(remote_path)
@@ -1161,6 +1175,11 @@ void CControlSocket::CallSetAsyncRequestReply(CAsyncRequestNotification *pNotifi
 	SetAsyncRequestReply(pNotification);
 }
 
+void CControlSocket::Sleep(fz::duration const& delay)
+{
+	Push(std::make_unique<SleepOpData>(*this, delay));
+}
+
 int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::duration const& lastChunkDuration, int64_t minChunkSize, int64_t multiple, int64_t partCount, int64_t maxPartCount, int64_t maxChunkSize)
 {
 	if (remaining <= 0) {
@@ -1204,4 +1223,9 @@ int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::dur
 	}
 
 	return newChunkSize;
+}
+
+int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::monotonic_clock const& lastChunkStart, int64_t minChunkSize, int64_t multiple, int64_t partCount, int64_t maxPartCount, int64_t maxChunkSize)
+{
+	return CalculateNextChunkSize(remaining, lastChunkSize, fz::monotonic_clock::now() - lastChunkStart, minChunkSize, multiple, partCount, maxPartCount, maxChunkSize);
 }
