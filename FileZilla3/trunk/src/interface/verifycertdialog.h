@@ -4,6 +4,7 @@
 #include "dialogex.h"
 #include "xmlfunctions.h"
 
+#include <list>
 #include <set>
 
 class CertStore final

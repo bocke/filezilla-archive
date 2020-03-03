@@ -4,6 +4,8 @@
 #include "list.h"
 #include "rmd.h"
 
+#include <assert.h>
+
 enum mkdStates
 {
 	rmd_init = 0,

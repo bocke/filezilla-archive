@@ -5,9 +5,11 @@
 #include "richedit.h"
 #endif
 
+#include "option_change_event_handler.h"
+
 #include <wx/timer.h>
 
-#include "option_change_event_handler.h"
+#include <list>
 
 class CFastTextCtrl;
 class CStatusView final : public wxNavigationEnabled<wxWindow>, private COptionChangeEventHandler
