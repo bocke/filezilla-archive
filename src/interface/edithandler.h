@@ -6,6 +6,8 @@
 
 #include <wx/timer.h>
 
+#include <list>
+
 // Handles all aspects about remote file viewing/editing
 
 namespace edit_choices {

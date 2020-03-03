@@ -7,9 +7,10 @@
 
 #include <wx/timer.h>
 
-#include <functional>
-
 #include <libfilezilla/uri.hpp>
+
+#include <functional>
+#include <list>
 
 struct build
 {
@@ -127,10 +128,10 @@ protected:
 
 	UpdaterState state_;
 	std::wstring local_file_;
-	
+
 	CFileZillaEngineContext& engine_context_;
 	CFileZillaEngine* engine_{};
-	
+
 	bool m_use_internal_rootcert{};
 
 	std::wstring raw_version_information_;

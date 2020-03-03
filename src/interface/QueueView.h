@@ -7,13 +7,14 @@
 #include <libfilezilla_engine.h>
 #include <option_change_event_handler.h>
 
-#include <set>
-#include <wx/progdlg.h>
-
 #include "queue_storage.h"
 #include "local_recursive_operation.h"
 #include "notification.h"
 
+#include <wx/progdlg.h>
+
+#include <list>
+#include <set>
 
 namespace ActionAfterState {
 enum type {

@@ -5,6 +5,7 @@
 
 #include <wx/timer.h>
 
+#include <list>
 #include <memory>
 
 class CertStore;

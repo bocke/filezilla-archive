@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <array>
+#include <list>
 
 BEGIN_EVENT_TABLE(CSiteManagerDialog, wxDialogEx)
 EVT_BUTTON(XRCID("wxID_OK"), CSiteManagerDialog::OnOK)

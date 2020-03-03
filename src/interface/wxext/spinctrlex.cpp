@@ -27,6 +27,8 @@ void wxSpinCtrlEx::SetMaxLength(unsigned long len)
 {
 #ifdef __WXMSW__
 	::SendMessage(m_hwndBuddy, EM_LIMITTEXT, len, 0);
+#else
+	(void)len;
 #endif
 }
 
@@ -53,5 +55,7 @@ void wxSpinCtrlDoubleEx::SetMaxLength(unsigned long len)
 {
 #ifndef __WXGTK__
 	GetText()->SetMaxLength(len);
+#else
+	(void)len;
 #endif
 }

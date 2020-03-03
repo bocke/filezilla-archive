@@ -23,7 +23,8 @@
 #include <libfilezilla/thread_pool.hpp>
 
 #include <algorithm>
-#include <cwchar>
+
+#include <assert.h>
 
 CStorjControlSocket::CStorjControlSocket(CFileZillaEnginePrivate & engine)
 	: CControlSocket(engine)
