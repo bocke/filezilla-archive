@@ -26,6 +26,7 @@ enum class Command
 	httprequest, // Only used by HTTP protocol
 
 	// Only used internally
+	sleep,
 	lookup,
 	cwd,
 	common_private1, // Internal commands common to multiple protocols

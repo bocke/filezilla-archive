@@ -84,8 +84,8 @@ public:
 		, result_(result)
 	{}
 
-	virtual int Send() { return result_; }
-	virtual int ParseResponse() { return FZ_REPLY_INTERNALERROR; }
+	virtual int Send() override { return result_; }
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
 
 	int const result_{};
 };
@@ -97,8 +97,27 @@ public:
 		: COpData(Command::none, L"CNotSupportedOpData")
 	{}
 
-	virtual int Send() { return FZ_REPLY_NOTSUPPORTED; }
-	virtual int ParseResponse() { return FZ_REPLY_INTERNALERROR; }
+	virtual int Send() override { return FZ_REPLY_NOTSUPPORTED; }
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
+};
+
+class SleepOpData final : public COpData, public::fz::event_handler
+{
+public:
+	SleepOpData(CControlSocket & controlSocket, fz::duration const& delay);
+
+	virtual ~SleepOpData()
+	{
+		remove_handler();
+	}
+
+	virtual int Send() override { return FZ_REPLY_WOULDBLOCK; }
+	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
+
+private:
+	virtual void operator()(fz::event_base const&) override;
+
+	CControlSocket & controlSocket_;
 };
 
 class CFileTransferOpData : public COpData
@@ -200,6 +219,7 @@ public:
 	virtual void Mkdir(CServerPath const& path);
 	virtual void Rename(CRenameCommand const& command);
 	virtual void Chmod(CChmodCommand const& command);
+	void Sleep(fz::duration const& delay);
 
 	virtual bool Connected() const = 0;
 
@@ -253,6 +273,7 @@ protected:
 	virtual void Lookup(CServerPath const& path, std::wstring const& file, CDirentry * entry = nullptr);
 	virtual void Lookup(CServerPath const& path, std::vector<std::wstring> const& files);
 
+	friend class SleepOpData;
 	friend class LookupOpData;
 	friend class LookupManyOpData;
 	friend class CProtocolOpData<CControlSocket>;

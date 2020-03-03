@@ -69,6 +69,16 @@ int CHttpRequestOpData::Send()
 		auto & rr = *requests_[send_pos_];
 		auto & req = rr.request();
 
+		// Check backoff
+		fz::duration backoff = controlSocket_.throttler_.get_throttle(req.uri_.host_);
+		if (backoff) {
+			if (backoff >= fz::duration::from_seconds(30)) {
+				log(logmsg::status, _("Server instructed us to wait %d seconds before sending next request"), backoff.get_seconds());
+			}
+			controlSocket_.Sleep(backoff);
+			return FZ_REPLY_CONTINUE;
+		}
+
 		int res = req.reset();
 		if (res != FZ_REPLY_CONTINUE) {
 			return res;
@@ -571,6 +581,33 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 		return FZ_REPLY_ERROR;
 	}
 	
+	auto retry = response.get_header("Retry-After");
+	if (response.code_ >= 400 && !retry.empty()) {
+		// TODO: Retry-After for redirects
+		auto const now = fz::datetime::now();
+
+		fz::duration d;
+		int seconds = fz::to_integral<int>(retry, -1);
+		if (seconds > 0) {
+			d = fz::duration::from_seconds(seconds);
+		}
+		else {
+			fz::datetime t;
+			if (t.set_rfc822(retry)) {
+				if (t > now) {
+					d = t - now;
+				}
+			}
+		}
+
+		if (!d && response.code_ == 429) {
+			d = fz::duration::from_seconds(1);
+		}
+		if (d) {
+			log(logmsg::debug_verbose, "Got Retry-After with %d", d.get_seconds());
+			controlSocket_.throttler_.throttle(request.uri_.host_, now + d);
+		}
+	}
 
 	int64_t length{-1};
 	auto const cl = response.get_header("Content-Length");
