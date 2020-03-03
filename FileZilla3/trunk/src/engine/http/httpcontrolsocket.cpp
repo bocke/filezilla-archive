@@ -14,6 +14,7 @@
 #include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/uri.hpp>
 
+#include <assert.h>
 #include <string.h>
 
 int simple_body::data_request(unsigned char* data, unsigned int & len)

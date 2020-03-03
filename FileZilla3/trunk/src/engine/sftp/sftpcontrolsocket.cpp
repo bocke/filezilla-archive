@@ -23,7 +23,8 @@
 #include <libfilezilla/process.hpp>
 
 #include <algorithm>
-#include <cwchar>
+
+#include <assert.h>
 
 struct SftpRateAvailableEventType;
 typedef fz::simple_event<SftpRateAvailableEventType, fz::direction::type> SftpRateAvailableEvent;

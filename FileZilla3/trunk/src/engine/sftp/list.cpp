@@ -3,6 +3,8 @@
 #include "../directorycache.h"
 #include "list.h"
 
+#include <assert.h>
+
 enum listStates
 {
 	list_init = 0,

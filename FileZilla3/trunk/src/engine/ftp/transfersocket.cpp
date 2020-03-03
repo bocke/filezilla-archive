@@ -12,6 +12,8 @@
 #include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/util.hpp>
 
+#include <assert.h>
+
 CTransferSocket::CTransferSocket(CFileZillaEnginePrivate & engine, CFtpControlSocket & controlSocket, TransferMode transferMode)
 : fz::event_handler(controlSocket.event_loop_)
 , engine_(engine)

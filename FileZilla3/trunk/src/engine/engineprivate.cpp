@@ -15,6 +15,8 @@
 
 #include <algorithm>
 
+#include <assert.h>
+
 fz::mutex CFileZillaEnginePrivate::global_mutex_{false};
 std::vector<CFileZillaEnginePrivate*> CFileZillaEnginePrivate::m_engineList;
 std::atomic_int CFileZillaEnginePrivate::m_activeStatus[2] = {{0}, {0}};

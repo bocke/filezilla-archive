@@ -2,10 +2,10 @@
 
 #include "request.h"
 
-#include <string.h>
-
 #include <libfilezilla/encode.hpp>
 
+#include <assert.h>
+#include <string.h>
 
 CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::shared_ptr<HttpRequestResponseInterface> const& request)
 	: COpData(PrivCommand::http_request, L"CHttpRequestOpData")

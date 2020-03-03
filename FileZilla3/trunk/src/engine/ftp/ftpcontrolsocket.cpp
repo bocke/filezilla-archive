@@ -30,6 +30,8 @@
 
 #include <algorithm>
 
+#include <assert.h>
+
 CFtpControlSocket::CFtpControlSocket(CFileZillaEnginePrivate & engine)
 	: CRealControlSocket(engine)
 {

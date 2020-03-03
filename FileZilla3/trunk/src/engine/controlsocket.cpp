@@ -14,6 +14,7 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/rate_limited_layer.hpp>
 
+#include <assert.h>
 #include <string.h>
 
 #ifndef FZ_WINDOWS
