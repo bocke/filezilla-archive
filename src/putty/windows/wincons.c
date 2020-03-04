@@ -323,7 +323,7 @@ void old_keyfile_warning(void)
         "Once the key is loaded into PuTTYgen, you can perform\n"
         "this conversion simply by saving it again.\n";
 
-    fputs(message, stderr);
+    fzprintf(sftpStatus, message);
 }
 
 /*
