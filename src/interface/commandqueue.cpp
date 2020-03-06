@@ -154,24 +154,28 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 		return;
 	}
 
+	auto & commandInfo = m_CommandList.front();
+
 	if (commandId != Command::connect &&
 		commandId != Command::disconnect &&
 		(nReplyCode & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED)
 	{
-		if (nReplyCode == FZ_REPLY_NOTCONNECTED) {
-			// Try automatic reconnect
-			Site const& site = m_state.GetSite();
-			if (site) {
-				m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server, site.Handle(), site.credentials));
-				ProcessNextCommand();
-				return;
+		if (nReplyCode & FZ_REPLY_DISCONNECTED) {
+			auto& info = m_CommandList.front();
+			if (!commandInfo.didReconnect) {
+				// Try automatic reconnect
+				commandInfo.didReconnect = true;
+				Site const& site = m_state.GetSite();
+				if (site) {
+					m_CommandList.emplace_front(normal, std::make_unique<CConnectCommand>(site.server, site.Handle(), site.credentials));
+					ProcessNextCommand();
+					return;
+				}
 			}
 		}
 	}
 
 	++m_inside_commandqueue;
-
-	auto const& commandInfo = m_CommandList.front();
 
 	if (commandInfo.command->GetId() == Command::list && nReplyCode != FZ_REPLY_OK) {
 		if ((nReplyCode & FZ_REPLY_LINKNOTDIR) == FZ_REPLY_LINKNOTDIR) {
