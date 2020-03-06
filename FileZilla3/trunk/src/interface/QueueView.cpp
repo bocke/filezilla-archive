@@ -1248,16 +1248,6 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 				return;
 			}
 
-			if (res == FZ_REPLY_NOTCONNECTED) {
-				if (engineData.transient) {
-					ResetEngine(engineData, ResetReason::retry);
-					return;
-				}
-
-				engineData.state = t_EngineData::connect;
-				continue;
-			}
-
 			if (res == FZ_REPLY_OK) {
 				ResetEngine(engineData, ResetReason::success);
 				return;
@@ -1282,23 +1272,20 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 				return;
 			}
 
-			if (res == FZ_REPLY_NOTCONNECTED) {
-				if (engineData.transient) {
-					ResetEngine(engineData, ResetReason::retry);
-					return;
-				}
-
-				engineData.state = t_EngineData::connect;
-				continue;
-			}
-
 			if (res == FZ_REPLY_OK) {
 				ResetEngine(engineData, ResetReason::success);
 				return;
 			}
 
-			// Pointless to retry
-			ResetEngine(engineData, ResetReason::failure);
+			if (res & FZ_REPLY_DISCONNECTED) {
+				if (IncreaseErrorCount(engineData)) {
+					continue;
+				}
+			}
+			else {
+				// Pointless to retry
+				ResetEngine(engineData, ResetReason::failure);
+			}
 			return;
 		}
 	}
