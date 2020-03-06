@@ -20,6 +20,10 @@
 #include "storage.h"
 #include "tree234.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef PATH_MAX
 #define FNLEN PATH_MAX
 #else
@@ -95,14 +99,16 @@ static char *make_filename(int index, const char *subname)
             return dupstr(env);
 
         home = getenv("HOME");
+
+        pwd_home = NULL;
+        xdg_dir = NULL;
+
+#ifndef USE_MAC_SANDBOX
         pwd = getpwuid(getuid());
         if (pwd && pwd->pw_dir) {
             pwd_home = pwd->pw_dir;
-        } else {
-            pwd_home = NULL;
         }
 
-        xdg_dir = NULL;
         env = getenv("XDG_CONFIG_HOME");
         if (env && *env) {
             xdg_dir = dupprintf("%s/putty", env);
@@ -120,6 +126,7 @@ static char *make_filename(int index, const char *subname)
         if (xdg_dir && access(xdg_dir, F_OK) == 0) {
             return xdg_dir;
         }
+#endif
 
         old_dir = old_dir2 = old_dir3 = NULL;
         if (home) {
@@ -138,6 +145,7 @@ static char *make_filename(int index, const char *subname)
             ret = old_dir2;
             goto out;
         }
+#ifndef USE_MAC_SANDBOX
         if (access(old_dir3, F_OK) == 0) {
             ret = old_dir3;
             goto out;
@@ -147,6 +155,7 @@ static char *make_filename(int index, const char *subname)
             ret = xdg_dir;
             goto out;
         }
+#endif
 #endif
         ret = old_dir ? old_dir : (old_dir2 ? old_dir2 : old_dir3);
 
