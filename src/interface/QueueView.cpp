@@ -421,7 +421,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 	switch (pNotification->GetID())
 	{
 	case nId_logmsg:
-		m_pMainFrame->GetStatusView()->AddToLog(static_cast<CLogmsgNotification&>(*pNotification.get()));
+		m_pMainFrame->GetStatusView()->AddToLog(std::move(static_cast<CLogmsgNotification&>(*pNotification.get())));
 		if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
 			m_pQueue->Highlight(3);
 		}
