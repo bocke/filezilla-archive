@@ -973,7 +973,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 		{
 		case nId_logmsg:
 			if (m_pStatusView) {
-				m_pStatusView->AddToLog(static_cast<CLogmsgNotification&>(*pNotification.get()));
+				m_pStatusView->AddToLog(std::move(static_cast<CLogmsgNotification&>(*pNotification.get())));
 			}
 			if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2 && m_pQueuePane) {
 				m_pQueuePane->Highlight(3);
