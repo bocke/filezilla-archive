@@ -1267,7 +1267,7 @@ int sftp_cmd_chmod(struct sftp_command *cmd)
         return 0;
     }
 
-    int ret = sftp_action_chmod(ctx, cname);
+    sftp_action_chmod(ctx, cname);
     sfree(cname);
     return 0;
 }

@@ -161,7 +161,6 @@ void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)
 		(nReplyCode & FZ_REPLY_CANCELED) != FZ_REPLY_CANCELED)
 	{
 		if (nReplyCode & FZ_REPLY_DISCONNECTED) {
-			auto& info = m_CommandList.front();
 			if (!commandInfo.didReconnect) {
 				// Try automatic reconnect
 				commandInfo.didReconnect = true;
