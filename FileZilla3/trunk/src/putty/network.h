@@ -294,4 +294,6 @@ void psb_init(ProxyStderrBuf *psb);
 void log_proxy_stderr(
     Plug *plug, ProxyStderrBuf *psb, const void *vdata, size_t len);
 
+int recv_peek(Socket *sock, char* buf, int len);
+
 #endif
