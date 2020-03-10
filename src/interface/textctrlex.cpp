@@ -5,6 +5,9 @@
 wxTextCtrlEx::wxTextCtrlEx(wxWindow* parent, int id, wxString const& value, wxPoint const& pos, wxSize const& size, long style)
 	: wxTextCtrl(parent, id, value, pos, size, style)
 {
+#ifdef __WXGTK__
+	if (!(style & wxTE_MULTILINE))
+#endif
 	SetMaxLength(512 * 1024);
 }
 
@@ -12,6 +15,9 @@ bool wxTextCtrlEx::Create(wxWindow* parent, int id, wxString const& value, wxPoi
 {
 	bool ret = wxTextCtrl::Create(parent, id, value, pos, size, style);
 	if (ret) {
+#ifdef __WXGTK__
+		if (!(style & wxTE_MULTILINE))
+#endif
 		SetMaxLength(512 * 1024);
 	}
 	return ret;
