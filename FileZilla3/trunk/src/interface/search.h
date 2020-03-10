@@ -39,10 +39,11 @@ protected:
 	void SaveConditions();
 	void LoadConditions();
 
-	wxWindow* m_parent;
+	wxWindow* m_parent{};
 	CSearchDialogFileList *m_results{};
 	CSearchDialogFileList *m_remoteResults{};
-	CQueueView* m_pQueue;
+	CQueueView* m_pQueue{};
+	wxSize m_otherSize{-1, -1};
 
 	CFilelistStatusBar* m_remoteStatusBar{};
 

@@ -735,9 +735,6 @@ bool CSearchDialog::Load()
 
 	SetCtrlState();
 
-	m_pWindowStateManager = new CWindowStateManager(this);
-	m_pWindowStateManager->Restore(OPTION_SEARCH_SIZE, wxSize(750, 500));
-
 	const int mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
 	if (mode == 0) {
 		xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::SetValue, true);
@@ -762,7 +759,10 @@ bool CSearchDialog::Load()
 
 	Layout();
 
-	SetMinSize(GetSize());
+	SetMinClientSize(GetSizer()->GetMinSize());
+
+	m_pWindowStateManager = new CWindowStateManager(this);
+	m_pWindowStateManager->Restore(OPTION_SEARCH_SIZE, wxSize(1750, 500));
 
 	if (m_state.IsRemoteConnected()) {
 		CServerPath const path = m_state.GetRemotePath();
@@ -1819,6 +1819,7 @@ void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)
 
 	bool const local = xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::GetValue);
 	bool const remote = xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::GetValue);
+	bool const changeComparison = m_comparative != xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::GetValue);
 
 	if (local) {
 		if (strPath == remotePath.GetPath() && !localPath.empty()) {
@@ -1839,7 +1840,18 @@ void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)
 
 	SetCtrlState();
 
-	Fit();
+	if (changeComparison) {
+		wxSize s = m_otherSize;
+		m_otherSize = GetClientSize();
+
+		SetMinClientSize(GetSizer()->GetMinSize());
+		GetSizer()->Fit(this);
+		Layout();
+
+		if (s.IsFullySpecified()) {
+			SetClientSize(s);
+		}
+	}
 }
 
 void CSearchDialog::OnChangeCompareOption(wxCommandEvent&)
