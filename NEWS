@@ -10,6 +10,13 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.47.2 (2020-03-10)
+
+- macOS: Potential fix for clipped text labels on a few systems
+- SFTP: Backported selected fixes from developement versions of PuTTY
+- Fixed value range for directional transfer limits
+- Fixed layout issues if changing to/from comparative search
+
 3.47.1 (2020-02-24)
 
 - Fixed regression loading advanced site parameters
