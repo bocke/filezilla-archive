@@ -250,7 +250,7 @@ std::wstring CServerPath::GetLastSegment() const
 	}
 
 	CServerPathData const& data = *m_data;
-	if (data.m_segments.empty()) {
+	if (!data.m_segments.empty()) {
 		return data.m_segments.back();
 	}
 	else {
