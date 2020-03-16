@@ -273,8 +273,7 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 
 unsigned int CFileZillaEnginePrivate::GetNextAsyncRequestNumber()
 {
-	fz::scoped_lock lock(notification_mutex_);
-	return ++m_asyncRequestCounter;
+	return ++asyncRequestCounter_;
 }
 
 // Command handlers
@@ -722,12 +721,7 @@ bool CFileZillaEnginePrivate::CheckAsyncRequestReplyPreconditions(std::unique_pt
 		return false;
 	}
 
-	bool match;
-	{
-		fz::scoped_lock l(notification_mutex_);
-		match = reply->requestNumber == m_asyncRequestCounter;
-	}
-
+	bool const match = reply->requestNumber == asyncRequestCounter_;
 	return match && controlSocket_;
 }
 
@@ -797,8 +791,7 @@ bool CFileZillaEnginePrivate::IsPendingAsyncRequestReply(std::unique_ptr<CAsyncR
 		return false;
 	}
 
-	fz::scoped_lock lock(notification_mutex_);
-	return pNotification->requestNumber == m_asyncRequestCounter;
+	return pNotification->requestNumber == asyncRequestCounter_;
 }
 
 void CFileZillaEnginePrivate::SetActive(int direction)
