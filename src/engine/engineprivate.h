@@ -169,10 +169,14 @@ protected:
 
 	std::unique_ptr<CCommand> currentCommand_;
 
-	// Protect access to these three with notification_mutex_
+	// Protect access to these with notification_mutex_
 	std::deque<CNotification*> m_NotificationList;
 	bool m_maySendNotificationEvent{true};
-	unsigned int m_asyncRequestCounter{};
+	bool queue_logs_{true};
+	std::vector<CLogmsgNotification*> queued_logs_;
+
+
+	std::atomic<unsigned int> asyncRequestCounter_{};
 
 	COptionsBase& m_options;
 
@@ -201,10 +205,6 @@ protected:
 	CPathCache& path_cache_;
 
 	CFileZillaEngine& parent_;
-
-	bool queue_logs_{true};
-
-	std::vector<CLogmsgNotification*> queued_logs_;
 
 	fz::thread_pool & thread_pool_;
 
