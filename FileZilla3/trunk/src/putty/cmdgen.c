@@ -79,6 +79,7 @@ int main(int argc, char **argv)
 
         if (!strcmp(cmd, "file")) {
             char const* ret = NULL;
+            bool error = false;
             if (ssh2key) {
                 ssh_key_free(ssh2key->key);
                 sfree(ssh2key->comment);
@@ -121,17 +122,36 @@ int main(int argc, char **argv)
             case SSH_KEYTYPE_OPENSSH_NEW:
             case SSH_KEYTYPE_SSHCOM:
                 encrypted = import_encrypted(infilename, intype, &origcomment);
-                ret = encrypted ? "convertible" : "ok";
+                if (encrypted) {
+                   ret = "convertible";
+                }
+                else {
+                    ssh2key = import_ssh2(infilename, intype, "", &ret);
+                    if (!ssh2key) {
+                        error = true;
+                        if (!ret) {
+				ret = "error";
+                        }
+                    }
+                    else {
+                        ret = "ok";
+                    }
+                }
                 break;
             }
-            fzprintf(sftpReply, "%s", ret);
+            if (error) {
+                fzprintf(sftpError, "%s", ret);
+            }
+            else {
+                fzprintf(sftpReply, "%s", ret);
+            }
         }
         else if (!strcmp(cmd, "encrypted")) {
             if (intype == SSH_KEYTYPE_UNOPENABLE) {
                 fzprintf(sftpError, "No key file opened");
                 continue;
             }
-            
+
             fzprintf(sftpReply, "%d", encrypted ? 1 : 0);
         }
         else if (!strcmp(cmd, "comment")) {
