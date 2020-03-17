@@ -270,7 +270,7 @@ typedef enum {
     OP_DSA, OP_RSA, OP_ECDSA
 } openssh_pem_keytype;
 typedef enum {
-    OP_E_3DES, OP_E_AES
+    OP_E_3DES, OP_E_AES128, OP_E_AES256
 } openssh_pem_enc;
 
 struct openssh_pem_key {
@@ -392,7 +392,10 @@ static struct openssh_pem_key *load_openssh_pem_key(const Filename *filename,
                     ret->encryption = OP_E_3DES;
                     ivlen = 8;
                 } else if (!strncmp(p, "AES-128-CBC,", 12)) {
-                    ret->encryption = OP_E_AES;
+                    ret->encryption = OP_E_AES128;
+                    ivlen = 16;
+                } else if (!strncmp(p, "AES-256-CBC,", 12)) {
+                    ret->encryption = OP_E_AES256;
                     ivlen = 16;
                 } else {
                     errmsg = "unsupported cipher";
@@ -552,7 +555,7 @@ static ssh2_userkey *openssh_pem_read(
             des3_decrypt_pubkey_ossh(keybuf, key->iv,
                                      key->keyblob->u, key->keyblob->len);
         else {
-            ssh_cipher *cipher = ssh_cipher_new(&ssh_aes128_cbc);
+            ssh_cipher *cipher = ssh_cipher_new((key->encryption == OP_E_AES256) ? &ssh_aes256_cbc : &ssh_aes128_cbc);
             ssh_cipher_setkey(cipher, keybuf);
             ssh_cipher_setiv(cipher, key->iv);
             ssh_cipher_decrypt(cipher, key->keyblob->u, key->keyblob->len);
