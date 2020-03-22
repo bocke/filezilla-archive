@@ -66,17 +66,15 @@ bool COptionsPageEdit::SavePage()
 bool COptionsPageEdit::Validate()
 {
 	const bool custom = GetRCheck(XRCID("ID_DEFAULT_CUSTOM"));
-	wxString editor;
+	std::wstring editor;
 	if (custom) {
 		bool failure = false;
 
-		editor = GetText(XRCID("ID_EDITOR"));
-		editor.Trim(true);
-		editor.Trim(false);
+		editor = fz::trimmed(GetText(XRCID("ID_EDITOR")).ToStdWstring());
 		SetText(XRCID("EDITOR"), editor, failure);
 
 		if (!editor.empty()) {
-			wxString args;
+			std::wstring args;
 			if (!UnquoteCommand(editor, args))
 				return DisplayError(_T("ID_EDITOR"), _("Default editor not properly quoted."));
 

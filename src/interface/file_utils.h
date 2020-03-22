@@ -3,9 +3,9 @@
 
 #include <libfilezilla/recursive_remove.hpp>
 
-bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde = false);
+bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde = false);
 bool ProgramExists(const wxString& editor);
-bool PathExpand(wxString& cmd);
+bool PathExpand(std::wstring & cmd);
 
 wxString GetSystemOpenCommand(wxString file, bool &program_exists);
 
@@ -19,7 +19,7 @@ bool RenameFile(wxWindow* pWnd, wxString dir, wxString from, wxString to);
 
 CLocalPath GetDownloadDir();
 
-std::wstring GetExtension(std::wstring const& file);
+std::wstring GetExtension(std::wstring_view const& file);
 
 class gui_recursive_remove final : public fz::recursive_remove
 {

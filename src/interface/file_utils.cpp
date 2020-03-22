@@ -142,27 +142,27 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 
 		program_exists = false;
 
-		wxString editor;
+		std::wstring editor;
 		bool is_dde = false;
 #ifdef __WXMSW__
-		if (cmd.Left(7) == _T("WX_DDE#")) {
+		if (cmd.substr(0, 7) == L"WX_DDE#") {
 			// See wxWidget's wxExecute in src/msw/utilsexc.cpp
 			// WX_DDE#<command>#DDE_SERVER#DDE_TOPIC#DDE_COMMAND
-			editor = cmd.Mid(7);
-			int pos = editor.Find('#');
-			if (pos < 1) {
+			editor = cmd.substr(7);
+			size_t pos = editor.find('#');
+			if (!pos || pos == std::wstring::npos) {
 				return cmd;
 			}
-			editor = editor.Left(pos);
+			editor = editor.substr(0, pos);
 			is_dde = true;
 		}
 		else
 #endif
 		{
-			editor = cmd;
+			editor = cmd.ToStdWstring();
 		}
 
-		wxString args;
+		std::wstring args;
 		if (!UnquoteCommand(editor, args, is_dde) || editor.empty()) {
 			return cmd;
 		}
@@ -194,7 +194,7 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 	return wxString();
 }
 
-bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
+bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde)
 {
 	arguments.clear();
 
@@ -202,10 +202,10 @@ bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
 		return true;
 	}
 
-	wxChar inQuotes = 0;
-	wxString file;
-	for (unsigned int i = 0; i < command.Len(); i++) {
-		const wxChar& c = command[i];
+	wchar_t inQuotes = 0;
+	std::wstring file;
+	for (size_t i = 0; i < command.size(); i++) {
+		wchar_t const& c = command[i];
 		if (c == '"' || c == '\'') {
 			if (!inQuotes) {
 				inQuotes = c;
@@ -221,18 +221,16 @@ bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde)
 				inQuotes = false;
 			}
 		}
-		else if (command[i] == ' ' && !inQuotes) {
-			arguments = command.Mid(i + 1);
-			arguments.Trim(false);
+		else if (c == ' ' && !inQuotes) {
+			arguments = fz::ltrimmed(command.substr(i + 1));
 			break;
 		}
-		else if (is_dde && !inQuotes && (command[i] == ',' || command[i] == '#')) {
-			arguments = command.Mid(i + 1);
-			arguments.Trim(false);
+		else if (is_dde && !inQuotes && (c == ',' || c == '#')) {
+			arguments = fz::ltrimmed(command.substr(i + 1));
 			break;
 		}
 		else {
-			file += command[i];
+			file += c;
 		}
 	}
 	if (inQuotes) {
@@ -259,7 +257,7 @@ bool ProgramExists(const wxString& editor)
 	return false;
 }
 
-bool PathExpand(wxString& cmd)
+bool PathExpand(std::wstring & cmd)
 {
 #ifndef __WXMSW__
 	if (!cmd.empty() && cmd[0] == '/') {
@@ -270,7 +268,7 @@ bool PathExpand(wxString& cmd)
 		// UNC or root of current working dir, whatever that is
 		return true;
 	}
-	if (cmd.Len() > 2 && cmd[1] == ':') {
+	if (cmd.size() > 2 && cmd[1] == ':') {
 		// Absolute path
 		return true;
 	}
@@ -285,8 +283,8 @@ bool PathExpand(wxString& cmd)
 	wxString full_cmd;
 	bool found = wxFindFileInPath(&full_cmd, path, cmd);
 #ifdef __WXMSW__
-	if (!found && cmd.Right(4).Lower() != _T(".exe")) {
-		cmd += _T(".exe");
+	if (!found && !fz::equal_insensitive_ascii(cmd.substr(cmd.size() - 1), L".exe")) {
+		cmd += L".exe";
 		found = wxFindFileInPath(&full_cmd, path, cmd);
 	}
 #endif
@@ -435,7 +433,7 @@ CLocalPath GetDownloadDir()
 	return CLocalPath(wxStandardPaths::Get().GetDocumentsDir().ToStdWstring());
 }
 
-std::wstring GetExtension(std::wstring const& file)
+std::wstring GetExtension(std::wstring_view const& file)
 {
 #ifdef FZ_WINDOWS
 	size_t pos = file.find_last_of(L"./\\");
@@ -443,7 +441,7 @@ std::wstring GetExtension(std::wstring const& file)
 	size_t pos = file.find_last_of(L"./");
 #endif
 	if (pos != std::wstring::npos && pos != 0 && file[pos] == '.') {
-		return file.substr(pos + 1);
+		return std::wstring(file.substr(pos + 1));
 	}
 
 	return std::wstring();

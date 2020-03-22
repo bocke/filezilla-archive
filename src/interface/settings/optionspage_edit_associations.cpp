@@ -1,5 +1,6 @@
 #include <filezilla.h>
 
+#include "../file_utils.h"
 #include "../Options.h"
 #include "settingsdialog.h"
 #include "optionspage.h"
@@ -28,38 +29,31 @@ bool COptionsPageEditAssociations::SavePage()
 	return true;
 }
 
-// optionspage_edit.cpp
-extern bool UnquoteCommand(wxString& command, wxString& arguments, bool is_dde = false);
-extern bool ProgramExists(const wxString& editor);
-
 bool COptionsPageEditAssociations::Validate()
 {
-	wxString associations = GetText(XRCID("ID_ASSOCIATIONS")) + _T("\n");
-	associations.Replace(_T("\r"), wxString());
-	int pos;
-	while ((pos = associations.Find('\n')) != -1) {
-		wxString assoc = associations.Left(pos);
-		associations = associations.Mid(pos + 1);
+	std::wstring const raw_assocs = GetText(XRCID("ID_ASSOCIATIONS")).ToStdWstring();
+	auto assocs = fz::strtok(raw_assocs, L"\r\n", true);
 
-		if (assoc.empty())
-			continue;
-
-		wxString command;
-		if (!UnquoteCommand(assoc, command))
+	for (auto& assoc : assocs) {
+		std::wstring command;
+		if (!UnquoteCommand(assoc, command)) {
 			return DisplayError(_T("ID_ASSOCIATIONS"), _("Improperly quoted association."));
+		}
 
-		if (assoc.empty())
+		if (assoc.empty()) {
 			return DisplayError(_T("ID_ASSOCIATIONS"), _("Empty file extension."));
+		}
 
-		wxString args;
-		if (!UnquoteCommand(command, args))
+		std::wstring args;
+		if (!UnquoteCommand(command, args)) {
 			return DisplayError(_T("ID_ASSOCIATIONS"), _("Improperly quoted association."));
+		}
 
-		if (command.empty())
+		if (command.empty()) {
 			return DisplayError(_T("ID_ASSOCIATIONS"), _("Empty command."));
+		}
 
-		if (!ProgramExists(command))
-		{
+		if (!ProgramExists(command)) {
 			wxString error = _("Associated program not found:");
 			error += '\n';
 			error += command;
