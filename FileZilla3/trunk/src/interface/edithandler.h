@@ -130,7 +130,7 @@ protected:
 
 	bool StartEditing(fileType type, t_fileData &data);
 
-	wxString GetCustomOpenCommand(wxString const& file, bool& program_exists);
+	std::wstring GetCustomOpenCommand(std::wstring_view const& file, bool& program_exists);
 
 	void SetTimerState();
 
