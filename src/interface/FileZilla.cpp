@@ -255,7 +255,7 @@ bool CFileZillaApp::OnInit()
 
 #if USE_MAC_SANDBOX
 	// Set PUTTYDIR so that fzsftp uses the sandboxed home to put settings.
-	std::wstring home = GetEnv("Home");
+	std::wstring home = GetEnv("HOME");
 	if (!home.empty()) {
 		if (home.back() != '/') {
 			home += '/';
