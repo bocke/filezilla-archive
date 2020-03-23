@@ -888,9 +888,9 @@ wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& file
 		fn = wxFileName(fileName);
 	}
 
-	wxString name = fn.GetFullPath();
-	wxString tmp = command;
-	wxString args;
+	std::wstring name = fn.GetFullPath().ToStdWstring();
+	std::wstring tmp = command.ToStdWstring();
+	std::wstring args;
 	if (UnquoteCommand(tmp, args) && tmp == name) {
 		dangerous = true;
 	}
@@ -901,7 +901,7 @@ wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& file
 	return command;
 }
 
-wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists)
+wxString CEditHandler::GetOpenCommand(wxString const& file, bool& program_exists)
 {
 #ifdef __WXMSW__
 	if (file.find('"') != std::wstring::npos) {
@@ -913,13 +913,13 @@ wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists
 #endif
 
 	if (!COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
-		const wxString command = GetCustomOpenCommand(file, program_exists);
+		const wxString command = GetCustomOpenCommand(file.ToStdWstring(), program_exists);
 		if (!command.empty()) {
 			return command;
 		}
 
 		if (COptions::Get()->GetOptionVal(OPTION_EDIT_INHERITASSOCIATIONS)) {
-			const wxString sysCommand = GetSystemOpenCommand(file, program_exists);
+			const wxString sysCommand = GetSystemOpenCommand(file.ToStdWstring(), program_exists);
 			if (!sysCommand.empty()) {
 				return sysCommand;
 			}
@@ -949,8 +949,8 @@ wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists
 		return wxString();
 	}
 
-	wxString args;
-	wxString editor = command;
+	std::wstring args;
+	std::wstring editor = command.ToStdWstring();
 	if (!UnquoteCommand(editor, args)) {
 		return wxString();
 	}
@@ -971,41 +971,34 @@ wxString CEditHandler::GetOpenCommand(const wxString& file, bool& program_exists
 #endif
 }
 
-wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_exists)
+std::wstring CEditHandler::GetCustomOpenCommand(std::wstring_view const& file, bool& program_exists)
 {
 #ifdef __WXMSW__
 	if (file.find('"') != std::wstring::npos) {
 		// Windows doesn't allow double-quotes in filenames.
 		// On top if it, wxExecute does not properly deal with quotes preceeded by backslashes.
 		// This is the safe choice.
-		return wxString();
+		return std::wstring();
 	}
 #endif
 
-	wxFileName fn(file);
-
-	wxString ext = fn.GetExt();
+	std::wstring ext = GetExtension(file);
+	
 	if (ext.empty()) {
-		if (fn.GetFullName()[0] == '.') {
-			ext = _T(".");
+		if (!file.empty() && file[0] == '.') {
+			ext = L".";
 		}
 		else {
-			ext = _T("/");
+			ext = L"/";
 		}
 	}
 
-	wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS) + _T("\n");
-	associations.Replace(_T("\r"), _T(""));
-	int pos;
-	while ((pos = associations.Find('\n')) != -1) {
-		wxString assoc = associations.Left(pos);
-		associations = associations.Mid(pos + 1);
+	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+	auto assocs = fz::strtok(raw_assocs, L"\r\n", true);
 
-		if (assoc.empty()) {
-			continue;
-		}
+	for (auto & assoc : assocs) {
 
-		wxString command;
+		std::wstring command;
 		if (!UnquoteCommand(assoc, command)) {
 			continue;
 		}
@@ -1014,15 +1007,15 @@ wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_
 			continue;
 		}
 
-		wxString prog = command;
+		std::wstring prog = command;
 
-		wxString args;
+		std::wstring args;
 		if (!UnquoteCommand(prog, args)) {
-			return wxString();
+			return std::wstring();
 		}
 
 		if (prog.empty()) {
-			return wxString();
+			return std::wstring();
 		}
 
 		if (!ProgramExists(prog)) {
@@ -1032,15 +1025,15 @@ wxString CEditHandler::GetCustomOpenCommand(const wxString& file, bool& program_
 
 		program_exists = true;
 
-		wxString arg = fn.GetFullPath();
+		std::wstring arg(file);
 #ifndef __WXMSW__
-		arg.Replace(L"\\", L"\\\\");
-		arg.Replace(L"\"", L"\\\"");
+		fz::replace_substrings(arg, L"\\", L"\\\\");
+		fz::replace_substrings(arg, L"\"", L"\\\"");
 #endif
 		return command + L" \"" + arg + L"\"";
 	}
 
-	return wxString();
+	return std::wstring();
 }
 
 void CEditHandler::OnChangedFileEvent(wxCommandEvent&)
@@ -1542,12 +1535,12 @@ bool CNewAssociationDialog::Run(const wxString &file)
 	}
 
 	bool program_exists = false;
-	wxString cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
+	std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists).ToStdWstring();
 	if (!program_exists) {
 		cmd.clear();
 	}
 	if (!cmd.empty()) {
-		wxString args;
+		std::wstring args;
 		if (!UnquoteCommand(cmd, args)) {
 			cmd.clear();
 		}
@@ -1606,9 +1599,9 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 	const bool always = XRCCTRL(*this, "ID_ALWAYS", wxCheckBox)->GetValue();
 
 	if (custom) {
-		wxString cmd = XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->GetValue();
-		wxString editor = cmd;
-		wxString args;
+		std::wstring cmd = XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->GetValue().ToStdWstring();
+		std::wstring editor = cmd;
+		std::wstring args;
 		if (!UnquoteCommand(editor, args) || editor.empty()) {
 			wxMessageBoxEx(_("You need to enter a properly quoted command."), _("Cannot set file association"), wxICON_EXCLAMATION);
 			return;
@@ -1619,18 +1612,18 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 		}
 
 		if (always) {
-			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + cmd.ToStdWstring());
+			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + cmd);
 		}
 		else {
-			wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.Last() != '\n') {
+			std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+			if (!associations.empty() && associations.back() != '\n') {
 				associations += '\n';
 			}
 			if (m_ext.empty()) {
 				m_ext = _T("/");
 			}
-			associations += m_ext.ToStdWstring() + _T(" ") + cmd.ToStdWstring();
-			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations.ToStdWstring());
+			associations += m_ext.ToStdWstring() + L" " + cmd;
+			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
 		}
 	}
 	else {
@@ -1639,12 +1632,12 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 		}
 		else {
 			bool program_exists = false;
-			wxString cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
+			std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists).ToStdWstring();
 			if (!program_exists) {
 				cmd.clear();
 			}
 			if (!cmd.empty()) {
-				wxString args;
+				std::wstring args;
 				if (!UnquoteCommand(cmd, args)) {
 					cmd.clear();
 				}
@@ -1658,18 +1651,18 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 				wxMessageBoxEx(_("The default editor for text files could not be found."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
 				return;
 			}
-			if (cmd.Find(' ') != -1) {
-				cmd = _T("\"") + cmd + _T("\"");
+			if (cmd.find(' ') != std::wstring::npos) {
+				cmd = L"\"" + cmd + L"\"";
 			}
-			wxString associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.Last() != '\n') {
+			std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+			if (!associations.empty() && associations.back() != '\n') {
 				associations += '\n';
 			}
 			if (m_ext.empty()) {
-				m_ext = _T("/");
+				m_ext = L"/";
 			}
-			associations += m_ext + _T(" ") + cmd;
-			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations.ToStdWstring());
+			associations += m_ext + L" " + cmd;
+			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
 		}
 	}
 

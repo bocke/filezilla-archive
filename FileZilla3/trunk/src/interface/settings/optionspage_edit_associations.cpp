@@ -31,7 +31,7 @@ bool COptionsPageEditAssociations::SavePage()
 
 bool COptionsPageEditAssociations::Validate()
 {
-	std::wstring const raw_assocs = GetText(XRCID("ID_ASSOCIATIONS")).ToStdWstring();
+	std::wstring const raw_assocs = GetText(XRCID("ID_ASSOCIATIONS"));
 	auto assocs = fz::strtok(raw_assocs, L"\r\n", true);
 
 	for (auto& assoc : assocs) {
