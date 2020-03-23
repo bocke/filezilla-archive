@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <string>
 
+#include <stdlib.h>
+
 #ifdef FZ_WINDOWS
 	#include <shlobj.h>
 
@@ -204,6 +206,18 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Disable update check", number, L"0", default_only },
 	{ "Cache directory", string, L"", default_priority },
 };
+
+std::wstring GetEnv(char const* name)
+{
+	std::wstring ret;
+	if (name) {
+		auto* v = getenv(name);
+		if (v) {
+			ret = fz::to_wstring(v);
+		}
+	}
+	return ret;
+}
 
 BEGIN_EVENT_TABLE(COptions, wxEvtHandler)
 EVT_TIMER(wxID_ANY, COptions::OnTimer)
@@ -888,14 +902,6 @@ std::wstring TryDirectory(wxString path, wxString const& suffix, bool check_exis
 	return path.ToStdWstring();
 }
 
-wxString GetEnv(wxString const& env)
-{
-	wxString ret;
-	if (!wxGetEnv(env, &ret)) {
-		ret.clear();
-	}
-	return ret;
-}
 #endif
 }
 
@@ -923,7 +929,7 @@ CLocalPath COptions::GetUnadjustedSettingsDir()
 		}
 	}
 #else
-	std::wstring cfg = TryDirectory(GetEnv(L"XDG_CONFIG_HOME"), L"filezilla/", true);
+	std::wstring cfg = TryDirectory(GetEnv("XDG_CONFIG_HOME"), L"filezilla/", true);
 	if (cfg.empty()) {
 		cfg = TryDirectory(wxGetHomeDir(), L".config/filezilla/", true);
 	}
@@ -931,7 +937,7 @@ CLocalPath COptions::GetUnadjustedSettingsDir()
 		cfg = TryDirectory(wxGetHomeDir(), L".filezilla/", true);
 	}
 	if (cfg.empty()) {
-		cfg = TryDirectory(GetEnv(L"XDG_CONFIG_HOME"), L"filezilla/", false);
+		cfg = TryDirectory(GetEnv("XDG_CONFIG_HOME"), L"filezilla/", false);
 	}
 	if (cfg.empty()) {
 		cfg = TryDirectory(wxGetHomeDir(), L".config/filezilla/", false);
@@ -967,7 +973,7 @@ CLocalPath COptions::GetCacheDirectory()
 			}
 		}
 #else
-		std::wstring cfg = TryDirectory(GetEnv(L"XDG_CACHE_HOME"), L"filezilla/", false);
+		std::wstring cfg = TryDirectory(GetEnv("XDG_CACHE_HOME"), L"filezilla/", false);
 		if (cfg.empty()) {
 			cfg = TryDirectory(wxGetHomeDir(), L".cache/filezilla/", false);
 		}

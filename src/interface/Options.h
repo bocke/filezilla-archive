@@ -126,6 +126,8 @@ struct t_OptionsCache
 	std::unique_ptr<pugi::xml_document> xmlValue;
 };
 
+std::wstring GetEnv(char const* name);
+
 class CXmlFile;
 class COptions final : public wxEvtHandler, public COptionsBase
 {

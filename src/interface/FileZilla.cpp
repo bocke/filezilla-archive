@@ -44,18 +44,6 @@ IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
 #endif
 
 namespace {
-std::wstring GetEnv(std::string const& name)
-{
-	std::wstring ret;
-
-	char const* const p = getenv(name.c_str());
-	if (p && *p) {
-		ret = fz::to_wstring(std::string(p));
-	}
-
-	return ret;
-}
-
 #if FZ_WINDOWS
 std::wstring const PATH_SEP = L";";
 #else
@@ -616,7 +604,7 @@ void CFileZillaApp::CheckExistsFzstorj()
 }
 #endif
 
-void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, std::string const& env, int setting, std::wstring const& description)
+void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env, int setting, std::wstring const& description)
 {
 	// Get the correct path to the specified tool
 

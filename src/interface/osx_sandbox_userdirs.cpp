@@ -3,6 +3,7 @@
 
 #include "filezillaapp.h"
 #include "ipcmutex.h"
+#include "Options.h"
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
 
@@ -155,8 +156,7 @@ bool OSXSandboxUserdirs::Save()
 
 bool OSXSandboxUserdirs::Add()
 {
-	wxString home;
-	wxGetEnv(L"HOME", &home);
+	std::wstring home = GetEnv("HOME");
 	wxDirDialog dlg(0, (L"Select local data directory"), home, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 	if (dlg.ShowModal() != wxID_OK) {
 		return false;

@@ -11,6 +11,8 @@
 #include <wordexp.h>
 #endif
 
+#include "Options.h"
+
 std::wstring GetAsURL(std::wstring const& dir)
 {
 	// Cheap URL encode
@@ -275,8 +277,8 @@ bool PathExpand(std::wstring & cmd)
 #endif
 
 	// Need to search for program in $PATH
-	wxString path;
-	if (!wxGetEnv(_T("PATH"), &path)) {
+	std::wstring path = GetEnv("PATH");
+	if (path.empty()) {
 		return false;
 	}
 
