@@ -84,11 +84,7 @@ int CUpdateDialog::ShowModal()
 	auto buttons = new wxBoxSizer(wxHORIZONTAL);
 	main->Add(buttons, 0, wxALIGN_RIGHT);
 
-	bool debug = false;
-	wxString v;
-	if (wxGetEnv(_T("FZDEBUG"), &v) && v == _T("1")) {
-		debug = true;
-	}
+	bool const debug = GetEnv("FZDEBUG") == L"1";
 	buttons->Add(new wxButton(this, XRCID("ID_DEBUGLOG"), L"show log"))->Show(debug);
 	buttons->Add(new wxButton(this, wxID_CANCEL, _("&Close")));
 

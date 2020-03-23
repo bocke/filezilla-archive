@@ -252,8 +252,7 @@ fz::uri CUpdater::GetUrl()
 		qs["manual"] = "1";
 	}
 
-	wxString v;
-	if (wxGetEnv(_T("FZUPDATETEST"), &v) && v == _T("1")) {
+	if (GetEnv("FZUPDATETEST") == L"1") {
 		qs["test"] = "1";
 	}
 	uri.query_ = qs.to_string(true);
