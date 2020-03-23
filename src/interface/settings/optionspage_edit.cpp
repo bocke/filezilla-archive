@@ -17,29 +17,34 @@ bool COptionsPageEdit::LoadPage()
 
 	COptions* pOptions = COptions::Get();
 
-	wxString editor = pOptions->GetOption(OPTION_EDIT_DEFAULTEDITOR);
-	if (editor.empty() || editor[0] == '0')
+	std::wstring editor = pOptions->GetOption(OPTION_EDIT_DEFAULTEDITOR);
+	if (editor.empty() || editor[0] == '0') {
 		SetRCheck(XRCID("ID_DEFAULT_NONE"), true, failure);
-	else if (editor[0] == '1')
+	}
+	else if (editor[0] == '1') {
 		SetRCheck(XRCID("ID_DEFAULT_TEXT"), true, failure);
-	else
-	{
-		if (editor[0] == '2')
-			editor = editor.Mid(1);
+	}
+	else {
+		if (editor[0] == '2') {
+			editor = editor.substr(1);
+		}
 
 		SetRCheck(XRCID("ID_DEFAULT_CUSTOM"), true, failure);
 		SetText(XRCID("ID_EDITOR"), editor, failure);
 	}
 
-	if (pOptions->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT))
+	if (pOptions->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
 		SetRCheck(XRCID("ID_USEDEFAULT"), true, failure);
-	else
+	}
+	else {
 		SetRCheck(XRCID("ID_USEASSOCIATIONS"), true, failure);
+	}
 
 	SetCheckFromOption(XRCID("ID_EDIT_TRACK_LOCAL"), OPTION_EDIT_TRACK_LOCAL, failure);
 
-	if (!failure)
+	if (!failure) {
 		SetCtrlState();
+	}
 
 	return !failure;
 }
@@ -48,15 +53,19 @@ bool COptionsPageEdit::SavePage()
 {
 	COptions* pOptions = COptions::Get();
 
-	if (GetRCheck(XRCID("ID_DEFAULT_CUSTOM")))
-		pOptions->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + GetText(XRCID("ID_EDITOR")).ToStdWstring());
-	else
+	if (GetRCheck(XRCID("ID_DEFAULT_CUSTOM"))) {
+		pOptions->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + GetText(XRCID("ID_EDITOR")));
+	}
+	else {
 		pOptions->SetOption(OPTION_EDIT_DEFAULTEDITOR, GetRCheck(XRCID("ID_DEFAULT_TEXT")) ? _T("1") : _T("0"));
+	}
 
-	if (GetRCheck(XRCID("ID_USEDEFAULT")))
+	if (GetRCheck(XRCID("ID_USEDEFAULT"))) {
 		pOptions->SetOption(OPTION_EDIT_ALWAYSDEFAULT, 1);
-	else
+	}
+	else {
 		pOptions->SetOption(OPTION_EDIT_ALWAYSDEFAULT, 0);
+	}
 
 	SetOptionFromCheck(XRCID("ID_EDIT_TRACK_LOCAL"), OPTION_EDIT_TRACK_LOCAL);
 
@@ -70,19 +79,22 @@ bool COptionsPageEdit::Validate()
 	if (custom) {
 		bool failure = false;
 
-		editor = fz::trimmed(GetText(XRCID("ID_EDITOR")).ToStdWstring());
+		editor = fz::trimmed(GetText(XRCID("ID_EDITOR")));
 		SetText(XRCID("EDITOR"), editor, failure);
 
 		if (!editor.empty()) {
 			std::wstring args;
-			if (!UnquoteCommand(editor, args))
+			if (!UnquoteCommand(editor, args)) {
 				return DisplayError(_T("ID_EDITOR"), _("Default editor not properly quoted."));
+			}
 
-			if (editor.empty())
+			if (editor.empty()) {
 				return DisplayError(_T("ID_EDITOR"), _("Empty quoted string."));
+			}
 
-			if (!ProgramExists(editor))
+			if (!ProgramExists(editor)) {
 				return DisplayError(_T("ID_EDITOR"), _("The file selected as default editor does not exist."));
+			}
 		}
 	}
 
@@ -109,22 +121,24 @@ void COptionsPageEdit::OnBrowseEditor(wxCommandEvent&)
 #endif
 		wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if (dlg.ShowModal() != wxID_OK)
+	if (dlg.ShowModal() != wxID_OK) {
 		return;
+	}
 
-	wxString editor = dlg.GetPath();
-	if (editor.empty())
+	std::wstring editor = dlg.GetPath().ToStdWstring();
+	if (editor.empty()) {
 		return;
+	}
 
-	if (!ProgramExists(editor))
-	{
+	if (!ProgramExists(editor)) {
 		XRCCTRL(*this, "ID_EDITOR", wxWindow)->SetFocus();
 		wxMessageBoxEx(_("Selected editor does not exist."), _("File not found"), wxICON_EXCLAMATION, this);
 		return;
 	}
 
-	if (editor.Find(' ') != -1)
-		editor = _T("\"") + editor + _T("\"");
+	if (editor.find(' ') != std::wstring::npos) {
+		editor = L"\"" + editor + L"\"";
+	}
 
 	bool tmp;
 	SetText(XRCID("ID_EDITOR"), editor, tmp);
