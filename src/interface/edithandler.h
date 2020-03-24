@@ -49,8 +49,8 @@ public:
 	// If files are locked, they won't be removed though
 	void Release();
 
-	fileState GetFileState(wxString const& fileName) const; // Local files
-	fileState GetFileState(wxString const& fileName, CServerPath const& remotePath, Site const& site) const; // Remote files
+	fileState GetFileState(std::wstring const& fileName) const; // Local files
+	fileState GetFileState(std::wstring const& fileName, CServerPath const& remotePath, Site const& site) const; // Remote files
 
 	// Returns the number of files in given state
 	// pServer may be set only if state isn't unknown
@@ -138,10 +138,10 @@ protected:
 
 	std::list<t_fileData> m_fileDataList[2];
 
-	std::list<t_fileData>::iterator GetFile(wxString const& fileName);
-	std::list<t_fileData>::const_iterator GetFile(wxString const& fileName) const;
-	std::list<t_fileData>::iterator GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site);
-	std::list<t_fileData>::const_iterator GetFile(wxString const& fileName, CServerPath const& remotePath, Site const& site) const;
+	std::list<t_fileData>::iterator GetFile(std::wstring const& fileName);
+	std::list<t_fileData>::const_iterator GetFile(std::wstring const& fileName) const;
+	std::list<t_fileData>::iterator GetFile(std::wstring const& fileName, CServerPath const& remotePath, Site const& site);
+	std::list<t_fileData>::const_iterator GetFile(std::wstring const& fileName, CServerPath const& remotePath, Site const& site) const;
 
 	CQueueView* m_pQueue;
 
@@ -198,12 +198,12 @@ class CNewAssociationDialog final : protected wxDialogEx
 public:
 	CNewAssociationDialog(wxWindow* parent);
 
-	bool Run(const wxString& file);
+	bool Run(std::wstring const& file);
 
 protected:
 	void SetCtrlState();
-	wxWindow* m_pParent;
-	wxString m_ext;
+	wxWindow* parent_{};
+	std::wstring ext_;
 
 	DECLARE_EVENT_TABLE()
 	void OnRadioButton(wxCommandEvent& event);
