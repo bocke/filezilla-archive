@@ -76,13 +76,13 @@ public:
 	bool AddFile(fileType type, std::wstring& fileName, CServerPath const& remotePath, Site const& site);
 
 	// Tries to unedit and remove file
-	bool Remove(wxString const& fileName); // Local files
-	bool Remove(wxString const& fileName, CServerPath const& remotePath, Site const& site); // Remote files
+	bool Remove(std::wstring const& fileName); // Local files
+	bool Remove(std::wstring const& fileName, CServerPath const& remotePath, Site const& site); // Remote files
 	bool RemoveAll(bool force);
 	bool RemoveAll(fileState state, Site const& site = Site());
 
-	void FinishTransfer(bool successful, wxString const& fileName);
-	void FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, Site const& site);
+	void FinishTransfer(bool successful, std::wstring const& fileName);
+	void FinishTransfer(bool successful, std::wstring const& fileName, CServerPath const& remotePath, Site const& site);
 
 	void CheckForModifications(bool emitEvent = false);
 
@@ -96,9 +96,9 @@ public:
 	 * The dangerous argument will be set to true on some filetypes,
 	 * e.g. executables.
 	 */
-	wxString CanOpen(fileType type, wxString const& fileName, bool &dangerous, bool& program_exists);
-	bool StartEditing(wxString const& file);
-	bool StartEditing(wxString const& file, CServerPath const& remotePath, Site const& site);
+	std::wstring CanOpen(fileType type, std::wstring const& fileName, bool &dangerous, bool& program_exists);
+	bool StartEditing(std::wstring const& file);
+	bool StartEditing(std::wstring const& file, CServerPath const& remotePath, Site const& site);
 
 	struct t_fileData
 	{
@@ -112,12 +112,12 @@ public:
 
 	const std::list<t_fileData>& GetFiles(fileType type) const { wxASSERT(type != none); return m_fileDataList[(type == local) ? 0 : 1]; }
 
-	bool UploadFile(wxString const& file, bool unedit);
-	bool UploadFile(wxString const& file, CServerPath const& remotePath, Site const& site, bool unedit);
+	bool UploadFile(std::wstring const& file, bool unedit);
+	bool UploadFile(std::wstring const& file, CServerPath const& remotePath, Site const& site, bool unedit);
 
 	// Returns command to open the file. If association is set but
 	// program does not exist, program_exists is set to false.
-	wxString GetOpenCommand(wxString const& file, bool& program_exists);
+	std::wstring GetOpenCommand(std::wstring const& file, bool& program_exists);
 
 protected:
 	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
@@ -148,12 +148,12 @@ protected:
 	wxTimer m_timer;
 	wxTimer m_busyTimer;
 
-	void RemoveTemporaryFiles(wxString const& temp);
+	void RemoveTemporaryFiles(std::wstring const& temp);
 	void RemoveTemporaryFilesInSpecificDir(std::wstring const& temp);
 
 	std::wstring GetTemporaryFile(std::wstring name);
 	std::wstring TruncateFilename(std::wstring const& path, std::wstring const& name, size_t max);
-	bool FilenameExists(wxString const& file);
+	bool FilenameExists(std::wstring const& file);
 
 	int DisplayChangeNotification(fileType type, std::list<t_fileData>::const_iterator iter, bool& remove);
 

@@ -1917,7 +1917,7 @@ void CLocalListView::OnMenuOpen(wxCommandEvent&)
 		if (cmd.empty()) {
 			auto pos = data.name.find('.');
 			if (pos == std::wstring::npos || (pos == 0 && data.name.find('.', 1) == std::wstring::npos)) {
-				cmd = pEditHandler->GetOpenCommand(fn.GetFullPath(), program_exists);
+				cmd = pEditHandler->GetOpenCommand(fn.GetFullPath().ToStdWstring(), program_exists);
 			}
 		}
 		if (cmd.empty()) {
