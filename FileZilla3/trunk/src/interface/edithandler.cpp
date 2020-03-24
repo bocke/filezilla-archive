@@ -74,7 +74,7 @@ CEditHandler* CEditHandler::Get()
 	return m_pEditHandler;
 }
 
-void CEditHandler::RemoveTemporaryFiles(wxString const& temp)
+void CEditHandler::RemoveTemporaryFiles(std::wstring const& temp)
 {
 	wxDir dir(temp);
 	if (!dir.IsOpened()) {
@@ -183,7 +183,7 @@ std::wstring CEditHandler::GetLocalDirectory()
 	// working directory.
 	// This avoids some strange errors where freshly deleted directories
 	// cannot be instantly recreated.
-	RemoveTemporaryFiles(dir);
+	RemoveTemporaryFiles(dir.ToStdWstring());
 
 #ifdef __WXMSW__
 	m_lockfile_handle = ::CreateFile((m_localDir + L"fz3temp-lockfile").c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY, 0);
@@ -340,9 +340,9 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring& fileName, 
 	return true;
 }
 
-bool CEditHandler::Remove(const wxString& fileName)
+bool CEditHandler::Remove(std::wstring const& fileName)
 {
-	std::list<t_fileData>::iterator iter = GetFile(fileName.ToStdWstring());
+	std::list<t_fileData>::iterator iter = GetFile(fileName);
 	if (iter == m_fileDataList[local].end()) {
 		return true;
 	}
@@ -357,9 +357,9 @@ bool CEditHandler::Remove(const wxString& fileName)
 	return true;
 }
 
-bool CEditHandler::Remove(wxString const& fileName, CServerPath const& remotePath, Site const& site)
+bool CEditHandler::Remove(std::wstring const& fileName, CServerPath const& remotePath, Site const& site)
 {
-	std::list<t_fileData>::iterator iter = GetFile(fileName.ToStdWstring(), remotePath, site);
+	std::list<t_fileData>::iterator iter = GetFile(fileName, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return true;
 	}
@@ -519,9 +519,9 @@ std::list<CEditHandler::t_fileData>::const_iterator CEditHandler::GetFile(std::w
 	return iter;
 }
 
-void CEditHandler::FinishTransfer(bool, wxString const& fileName)
+void CEditHandler::FinishTransfer(bool, std::wstring const& fileName)
 {
-	auto iter = GetFile(fileName.ToStdWstring());
+	auto iter = GetFile(fileName);
 	if (iter == m_fileDataList[local].end()) {
 		return;
 	}
@@ -548,9 +548,9 @@ void CEditHandler::FinishTransfer(bool, wxString const& fileName)
 	SetTimerState();
 }
 
-void CEditHandler::FinishTransfer(bool successful, wxString const& fileName, CServerPath const& remotePath, Site const& site)
+void CEditHandler::FinishTransfer(bool successful, std::wstring const& fileName, CServerPath const& remotePath, Site const& site)
 {
-	auto iter = GetFile(fileName.ToStdWstring(), remotePath, site);
+	auto iter = GetFile(fileName, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return;
 	}
@@ -606,9 +606,9 @@ void CEditHandler::FinishTransfer(bool successful, wxString const& fileName, CSe
 	SetTimerState();
 }
 
-bool CEditHandler::StartEditing(wxString const& file)
+bool CEditHandler::StartEditing(std::wstring const& file)
 {
-	auto iter = GetFile(file.ToStdWstring());
+	auto iter = GetFile(file);
 	if (iter == m_fileDataList[local].end()) {
 		return false;
 	}
@@ -616,9 +616,9 @@ bool CEditHandler::StartEditing(wxString const& file)
 	return StartEditing(local, *iter);
 }
 
-bool CEditHandler::StartEditing(wxString const& file, CServerPath const& remotePath, Site const& site)
+bool CEditHandler::StartEditing(std::wstring const& file, CServerPath const& remotePath, Site const& site)
 {
-	auto iter = GetFile(file.ToStdWstring(), remotePath, site);
+	auto iter = GetFile(file, remotePath, site);
 	if (iter == m_fileDataList[remote].end()) {
 		return false;
 	}
@@ -637,7 +637,7 @@ bool CEditHandler::StartEditing(CEditHandler::fileType type, t_fileData& data)
 	}
 
 	bool program_exists = false;
-	wxString cmd = GetOpenCommand(data.file, program_exists);
+	std::wstring cmd = GetOpenCommand(data.file, program_exists);
 	if (cmd.empty() || !program_exists) {
 		return false;
 	}
@@ -652,8 +652,9 @@ bool CEditHandler::StartEditing(CEditHandler::fileType type, t_fileData& data)
 void CEditHandler::CheckForModifications(bool emitEvent)
 {
 	static bool insideCheckForModifications = false;
-	if (insideCheckForModifications)
+	if (insideCheckForModifications) {
 		return;
+	}
 
 	if (emitEvent) {
 		QueueEvent(new wxCommandEvent(fzEDIT_CHANGEDFILE));
@@ -787,15 +788,15 @@ int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::li
 	return res;
 }
 
-bool CEditHandler::UploadFile(wxString const& file, CServerPath const& remotePath, Site const& site, bool unedit)
+bool CEditHandler::UploadFile(std::wstring const& file, CServerPath const& remotePath, Site const& site, bool unedit)
 {
-	std::list<t_fileData>::iterator iter = GetFile(file.ToStdWstring(), remotePath, site);
+	std::list<t_fileData>::iterator iter = GetFile(file, remotePath, site);
 	return UploadFile(remote, iter, unedit);
 }
 
-bool CEditHandler::UploadFile(const wxString& file, bool unedit)
+bool CEditHandler::UploadFile(std::wstring const& file, bool unedit)
 {
-	std::list<t_fileData>::iterator iter = GetFile(file.ToStdWstring());
+	std::list<t_fileData>::iterator iter = GetFile(file);
 	return UploadFile(local, iter, unedit);
 }
 
@@ -871,13 +872,13 @@ void CEditHandler::SetTimerState()
 	}
 }
 
-wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& fileName, bool &dangerous, bool &program_exists)
+std::wstring CEditHandler::CanOpen(CEditHandler::fileType type, std::wstring const& fileName, bool &dangerous, bool &program_exists)
 {
 	wxASSERT(type != none);
 
 	wxString command = GetOpenCommand(fileName, program_exists);
 	if (command.empty() || !program_exists) {
-		return command;
+		return command.ToStdWstring();
 	}
 
 	wxFileName fn;
@@ -898,61 +899,60 @@ wxString CEditHandler::CanOpen(CEditHandler::fileType type, const wxString& file
 		dangerous = false;
 	}
 
-	return command;
+	return command.ToStdWstring();
 }
 
-wxString CEditHandler::GetOpenCommand(wxString const& file, bool& program_exists)
+std::wstring CEditHandler::GetOpenCommand(std::wstring const& file, bool& program_exists)
 {
 #ifdef __WXMSW__
 	if (file.find('"') != std::wstring::npos) {
 		// Windows doesn't allow double-quotes in filenames.
 		// On top if it, wxExecute does not properly deal with quotes preceeded by backslashes.
 		// This is the safe choice.
-		return wxString();
+		return std::wstring();
 	}
 #endif
 
 	if (!COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
-		const wxString command = GetCustomOpenCommand(file.ToStdWstring(), program_exists);
+		std::wstring const command = GetCustomOpenCommand(file, program_exists);
 		if (!command.empty()) {
 			return command;
 		}
 
 		if (COptions::Get()->GetOptionVal(OPTION_EDIT_INHERITASSOCIATIONS)) {
-			const wxString sysCommand = GetSystemOpenCommand(file.ToStdWstring(), program_exists);
+			std::wstring const sysCommand = GetSystemOpenCommand(file, program_exists).ToStdWstring();
 			if (!sysCommand.empty()) {
 				return sysCommand;
 			}
 		}
 	}
 
-	wxString command = COptions::Get()->GetOption(OPTION_EDIT_DEFAULTEDITOR);
+	std::wstring command = COptions::Get()->GetOption(OPTION_EDIT_DEFAULTEDITOR);
 	if (command.empty() || command[0] == '0') {
-		return wxString(); // None set
+		return std::wstring(); // None set
 	}
 	else if (command[0] == '1') {
 		// Text editor
-		const wxString random = _T("5AC2EE515D18406 space aB77C2C60F1F88952.txt"); // Chosen by fair dice roll. Guaranteed to be random.
-		wxString sysCommand = GetSystemOpenCommand(random, program_exists);
+		std::wstring const random = _T("5AC2EE515D18406 space aB77C2C60F1F88952.txt"); // Chosen by fair dice roll. Guaranteed to be random.
+		std::wstring sysCommand = GetSystemOpenCommand(random, program_exists).ToStdWstring();
 		if (sysCommand.empty() || !program_exists) {
 			return sysCommand;
 		}
 
-		sysCommand.Replace(random, file);
-		return sysCommand;
+		return fz::replaced_substrings(sysCommand, random, file);
 	}
 	else if (command[0] == '2') {
-		command = command.Mid(1);
+		command = command.substr(1);
 	}
 
 	if (command.empty()) {
-		return wxString();
+		return std::wstring();
 	}
 
 	std::wstring args;
-	std::wstring editor = command.ToStdWstring();
+	std::wstring editor = command;
 	if (!UnquoteCommand(editor, args)) {
-		return wxString();
+		return std::wstring();
 	}
 
 	if (!ProgramExists(editor)) {
@@ -962,12 +962,12 @@ wxString CEditHandler::GetOpenCommand(wxString const& file, bool& program_exists
 
 	program_exists = true;
 #ifndef __WXMSW__
-	wxString escaped = file;
-	escaped.Replace(L"\\", L"\\\\");
-	escaped.Replace(L"\"", L"\\\"");
-	return command + _T(" \"") + escaped + _T("\"");
+	std::wstring escaped = file;
+	fz::replace_substrings(escaped, L"\\", L"\\\\");
+	fz::replace_substrings(escaped, L"\"", L"\\\"");
+	return command + L" \"" + escaped + L"\"";
 #else
-	return command + _T(" \"") + file + _T("\"");
+	return command + L" \"" + file + L"\"";
 #endif
 }
 
@@ -1117,7 +1117,7 @@ std::wstring CEditHandler::TruncateFilename(std::wstring const& path, std::wstri
 	return name;
 }
 
-bool CEditHandler::FilenameExists(const wxString& file)
+bool CEditHandler::FilenameExists(std::wstring const& file)
 {
 	for (auto const& fileData : m_fileDataList[remote]) {
 		// Always ignore case, we don't know which type of filesystem the user profile
