@@ -54,4 +54,6 @@ private:
 	wxWindow* parent_;
 };
 
+bool IsInvalidChar(wchar_t c, bool includeQuotes = false);
+
 #endif

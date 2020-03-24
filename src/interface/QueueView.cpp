@@ -6,6 +6,7 @@
 #include "statuslinectrl.h"
 #include "xmlfunctions.h"
 #include "filezillaapp.h"
+#include "file_utils.h"
 #include "ipcmutex.h"
 #include "local_recursive_operation.h"
 #include "state.h"
@@ -2947,48 +2948,15 @@ std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename)
 		return filename;
 	}
 
-	const wxChar replace = COptions::Get()->GetOption(OPTION_INVALID_CHAR_REPLACE)[0];
+	wchar_t const replace = COptions::Get()->GetOption(OPTION_INVALID_CHAR_REPLACE)[0];
 
-	wxString result;
-	{
-		wxStringBuffer start(result, filename.size() + 1);
-		wxChar* buf = start;
-
-		const wxChar* p = filename.c_str();
-		while (*p) {
-			const wxChar c = *p;
-			switch (c)
-			{
-			case '/':
-	#ifdef __WXMSW__
-			case '\\':
-			case ':':
-			case '*':
-			case '?':
-			case '"':
-			case '<':
-			case '>':
-			case '|':
-	#endif
-				if (replace)
-					*buf++ = replace;
-				break;
-			default:
-	#ifdef __WXMSW__
-				if (c < 0x20)
-					*buf++ = replace;
-				else
-	#endif
-				{
-					*buf++ = c;
-				}
-			}
-			p++;
+	std::wstring ret = filename;
+	for (auto & c : ret) {
+		if (IsInvalidChar(c, false)) {
+			c = replace;
 		}
-		*buf = 0;
 	}
-
-	return result.ToStdWstring();
+	return ret;
 }
 
 wxFileOffset CQueueView::GetCurrentDownloadSpeed()

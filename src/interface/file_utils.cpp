@@ -448,3 +448,38 @@ std::wstring GetExtension(std::wstring_view const& file)
 
 	return std::wstring();
 }
+
+bool IsInvalidChar(wchar_t c, bool includeQuotes)
+{
+	switch (c)
+	{
+	case '/':
+#ifdef __WXMSW__
+	case '\\':
+	case ':':
+	case '*':
+	case '?':
+	case '"':
+	case '<':
+	case '>':
+	case '|':
+#endif
+		return true;
+
+
+	case '\'':
+#ifndef __WXMSW__
+	case '"':
+	case '\\':
+#endif
+		return includeQuotes;
+
+	default:
+#ifdef __WXMSW__
+		if (c < 0x20) {
+			return true;
+		}
+#endif
+		return false;
+	}
+}
