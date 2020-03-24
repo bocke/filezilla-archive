@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "Options.h"
 #include "filezillaapp.h"
+#include "file_utils.h"
 #include "ipcmutex.h"
 #include "locale_initializer.h"
 #include <option_change_event_handler.h>
@@ -658,7 +659,10 @@ int COptions::Validate(unsigned int nID, int value)
 std::wstring COptions::Validate(unsigned int nID, std::wstring_view const& value)
 {
 	if (nID == OPTION_INVALID_CHAR_REPLACE) {
-		if (value.size() > 1) {
+		if (value.size() != 1) {
+			return L"_";
+		}
+		if (IsInvalidChar(value[0], true)) {
 			return L"_";
 		}
 	}
