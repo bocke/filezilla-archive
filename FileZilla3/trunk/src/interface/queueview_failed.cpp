@@ -126,7 +126,7 @@ void CQueueViewFailed::OnRemoveSelected(wxCommandEvent&)
 			CFileItem* pFileItem = (CFileItem*)pItem;
 			if (pFileItem->m_edit == CEditHandler::remote && pEditHandler) {
 				if (pFileItem->m_edit == CEditHandler::local) {
-					wxString fullPath(pFileItem->GetLocalPath().GetPath() + pFileItem->GetLocalFile());
+					std::wstring fullPath(pFileItem->GetLocalPath().GetPath() + pFileItem->GetLocalFile());
 					CEditHandler::fileState state = pEditHandler->GetFileState(fullPath);
 					if (state == CEditHandler::upload_and_remove_failed) {
 						pEditHandler->Remove(fullPath);
