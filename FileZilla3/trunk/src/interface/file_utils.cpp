@@ -100,18 +100,18 @@ bool OpenInFileManager(std::wstring const& dir)
 	return ret;
 }
 
-wxString GetSystemOpenCommand(wxString file, bool &program_exists)
+std::wstring GetSystemOpenCommand(std::wstring file, bool &program_exists)
 {
 	// Disallowed on MSW. On other platforms wxWidgets doens't escape properly.
 	// For now don't support these files until we can replace wx with something sane.
 	if (file.find('"') != std::wstring::npos) {
-		return wxString();
+		return std::wstring();
 	}
 #ifndef __WXMSW__
 	// wxWidgets doens't escape backslashes properly.
 	// For now don't support these files until we can replace wx with something sane.
 	if (file.find('\\') != std::wstring::npos) {
-		return wxString();
+		return std::wstring();
 	}
 #endif
 
@@ -119,7 +119,7 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 
 	const wxString& ext = fn.GetExt();
 	if (ext.empty()) {
-		return wxString();
+		return std::wstring();
 	}
 
 #ifdef __WXGTK__
@@ -128,18 +128,13 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 	{
 		wxFileType* pType = wxTheMimeTypesManager->GetFileTypeFromExtension(ext);
 		if (!pType) {
-			return wxString();
+			return std::wstring();
 		}
 
-		wxString cmd;
-		if (!pType->GetOpenCommand(&cmd, wxFileType::MessageParameters(file))) {
-			delete pType;
-			return wxString();
-		}
+		std::wstring cmd = pType->GetOpenCommand(file).ToStdWstring();
 		delete pType;
-
 		if (cmd.empty()) {
-			return wxString();
+			return std::wstring();
 		}
 
 		program_exists = false;
@@ -161,7 +156,7 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 		else
 #endif
 		{
-			editor = cmd.ToStdWstring();
+			editor = cmd;
 		}
 
 		std::wstring args;
@@ -178,14 +173,14 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 		}
 
 #ifdef __WXGTK__
-		int pos = args.Find(file);
-		if (pos != -1 && file.Find(' ') != -1 && file[0] != '\'' && file[0] != '"') {
+		size_t pos = args.find(file);
+		if (pos != std::wstring::npos && file.find(' ') != std::wstring::npos && file[0] != '\'' && file[0] != '"') {
 			// Might need to quote filename, wxWidgets doesn't do it
 			if ((!pos || (args[pos - 1] != '\'' && args[pos - 1] != '"')) &&
-				(pos + file.Length() >= args.Length() || (args[pos + file.Length()] != '\'' && args[pos + file.Length()] != '"')))
+				(pos + file.size() >= args.size() || (args[pos + file.size()] != '\'' && args[pos + file.size()] != '"')))
 			{
 				// Filename in command arguments isn't quoted. Repeat with quoted filename
-				file = _T("\"") + file + _T("\"");
+				file = L"\"" + file + L"\"";
 				continue;
 			}
 		}
@@ -193,7 +188,7 @@ wxString GetSystemOpenCommand(wxString file, bool &program_exists)
 		return cmd;
 	}
 
-	return wxString();
+	return std::wstring();
 }
 
 bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde)
@@ -244,14 +239,14 @@ bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dd
 	return true;
 }
 
-bool ProgramExists(const wxString& editor)
+bool ProgramExists(std::wstring const& editor)
 {
 	if (wxFileName::FileExists(editor)) {
 		return true;
 	}
 
 #ifdef __WXMAC__
-	if (editor.Right(4) == _T(".app") && wxFileName::DirExists(editor)) {
+	if (editor.size() > 4 && editor.substr(editor.size() - 4) == L".app" && wxFileName::DirExists(editor)) {
 		return true;
 	}
 #endif

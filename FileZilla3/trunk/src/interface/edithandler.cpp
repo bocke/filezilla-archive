@@ -922,7 +922,7 @@ std::wstring CEditHandler::GetOpenCommand(std::wstring const& file, bool& progra
 		}
 
 		if (COptions::Get()->GetOptionVal(OPTION_EDIT_INHERITASSOCIATIONS)) {
-			std::wstring const sysCommand = GetSystemOpenCommand(file, program_exists).ToStdWstring();
+			std::wstring const sysCommand = GetSystemOpenCommand(file, program_exists);
 			if (!sysCommand.empty()) {
 				return sysCommand;
 			}
@@ -936,7 +936,7 @@ std::wstring CEditHandler::GetOpenCommand(std::wstring const& file, bool& progra
 	else if (command[0] == '1') {
 		// Text editor
 		std::wstring const random = _T("5AC2EE515D18406 space aB77C2C60F1F88952.txt"); // Chosen by fair dice roll. Guaranteed to be random.
-		std::wstring sysCommand = GetSystemOpenCommand(random, program_exists).ToStdWstring();
+		std::wstring sysCommand = GetSystemOpenCommand(random, program_exists);
 		if (sysCommand.empty() || !program_exists) {
 			return sysCommand;
 		}
@@ -1537,7 +1537,7 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 	}
 
 	bool program_exists = false;
-	std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists).ToStdWstring();
+	std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
 	if (!program_exists) {
 		cmd.clear();
 	}
@@ -1635,7 +1635,7 @@ void CNewAssociationDialog::OnOK(wxCommandEvent&)
 		}
 		else {
 			bool program_exists = false;
-			std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists).ToStdWstring();
+			std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
 			if (!program_exists) {
 				cmd.clear();
 			}
@@ -1688,7 +1688,7 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 		return;
 	}
 
-	wxString editor = dlg.GetPath();
+	std::wstring editor = dlg.GetPath().ToStdWstring();
 	if (editor.empty()) {
 		return;
 	}
@@ -1699,7 +1699,7 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 		return;
 	}
 
-	if (editor.Find(' ') != -1) {
+	if (editor.find(' ') != std::wstring::npos) {
 		editor = _T("\"") + editor + _T("\"");
 	}
 
