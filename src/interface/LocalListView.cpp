@@ -1913,7 +1913,7 @@ void CLocalListView::OnMenuOpen(wxCommandEvent&)
 			continue;
 		}
 		bool program_exists = false;
-		wxString cmd = GetSystemOpenCommand(fn.GetFullPath(), program_exists);
+		std::wstring cmd = GetSystemOpenCommand(fn.GetFullPath().ToStdWstring(), program_exists);
 		if (cmd.empty()) {
 			auto pos = data.name.find('.');
 			if (pos == std::wstring::npos || (pos == 0 && data.name.find('.', 1) == std::wstring::npos)) {

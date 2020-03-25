@@ -4,10 +4,10 @@
 #include <libfilezilla/recursive_remove.hpp>
 
 bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde = false);
-bool ProgramExists(const wxString& editor);
+bool ProgramExists(std::wstring const& editor);
 bool PathExpand(std::wstring & cmd);
 
-wxString GetSystemOpenCommand(wxString file, bool &program_exists);
+std::wstring GetSystemOpenCommand(std::wstring file, bool &program_exists);
 
 // Returns a file:// URL
 std::wstring GetAsURL(std::wstring const& dir);

@@ -394,24 +394,25 @@ void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 
 void CUpdateDialog::OnInstall(wxCommandEvent&)
 {
-	wxString f = updater_.DownloadedFile();
-	if( f.empty() ) {
+	std::wstring f = updater_.DownloadedFile();
+	if (f.empty()) {
 		return;
 	}
 	COptions::Get()->SetOption(OPTION_GREETINGRESOURCES, updater_.GetResources());
 #ifdef __WXMSW__
 	wxExecute(_T("\"") + f +  _T("\" /update /NCRC"));
 	wxWindow* p = parent_;
-	while( p->GetParent() ) {
+	while (p->GetParent()) {
 		p = p->GetParent();
 	}
 	p->Close();
 #else
 	bool program_exists = false;
-	wxString cmd = GetSystemOpenCommand(f, program_exists);
-	if( program_exists && !cmd.empty() ) {
-		if (wxExecute(cmd))
+	std::wstring cmd = GetSystemOpenCommand(f, program_exists);
+	if (program_exists && !cmd.empty()) {
+		if (wxExecute(cmd)) {
 			return;
+		}
 	}
 
 	wxFileName fn(f);
