@@ -72,8 +72,8 @@ public:
 	bool Edit(CEditHandler::fileType type, std::vector<FileData> const& data, CServerPath const& path, Site const& site, wxWindow* parent);
 
 	// Adds the file that doesn't exist yet. (Has to be in unknown state)
-	// The initial state will be download
-	bool AddFile(fileType type, std::wstring& fileName, CServerPath const& remotePath, Site const& site);
+	// The initial state will be download for remote files.
+	bool AddFile(CEditHandler::fileType type, std::wstring const& localFile, std::wstring const& remoteFile, CServerPath const& remotePath, Site const& site, int64_t size);
 
 	// Tries to unedit and remove file
 	bool Remove(std::wstring const& fileName); // Local files
@@ -88,22 +88,13 @@ public:
 
 	void SetQueue(CQueueView* pQueue) { m_pQueue = pQueue; }
 
-	/* Checks if file can be opened. One of these conditions has to be true:
-	 * - Filetype association of system has to exist
-	 * - Custom association for that filetype
-	 * - Default editor set
-	 *
-	 * The dangerous argument will be set to true on some filetypes,
-	 * e.g. executables.
-	 */
-	std::wstring CanOpen(fileType type, std::wstring const& fileName, bool &dangerous, bool& program_exists);
-	bool StartEditing(std::wstring const& file);
-	bool StartEditing(std::wstring const& file, CServerPath const& remotePath, Site const& site);
+	bool LaunchEditor(std::wstring const& file);
+	bool LaunchEditor(std::wstring const& file, CServerPath const& remotePath, Site const& site);
 
 	struct t_fileData
 	{
-		std::wstring name; // The name of the file
-		std::wstring file; // The actual local filename
+		std::wstring remoteFile; // The name of the remote file
+		std::wstring localFile; // The full path to the local file
 		fileState state;
 		fz::datetime modificationTime;
 		CServerPath remotePath;
@@ -120,6 +111,16 @@ public:
 	std::wstring GetOpenCommand(std::wstring const& file, bool& program_exists);
 
 protected:
+	/* Checks if file can be opened. One of these conditions has to be true:
+	 * - Filetype association of system has to exist
+	 * - Custom association for that filetype
+	 * - Default editor set
+	 *
+	 * The dangerous argument will be set to true on some filetypes,
+	 * e.g. executables.
+	 */
+	std::wstring CanOpen(std::wstring const& fileName, bool& dangerous, bool& program_exists);
+
 	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
 
 	CEditHandler();
@@ -128,7 +129,7 @@ protected:
 
 	std::wstring m_localDir;
 
-	bool StartEditing(fileType type, t_fileData &data);
+	bool LaunchEditor(fileType type, t_fileData &data);
 
 	std::wstring GetCustomOpenCommand(std::wstring_view const& file, bool& program_exists);
 
