@@ -1350,57 +1350,6 @@
       </object>
     </object>
   </object>
-  <object class="wxPanel" name="ID_SETTINGS_EDIT_ASSOCIATIONS">
-    <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
-      <object class="sizeritem">
-        <object class="wxStaticBoxSizer">
-          <object class="sizeritem">
-            <object class="wxFlexGridSizer">
-              <object class="sizeritem">
-                <object class="wxCheckBox" name="ID_INHERIT">
-                  <label>&amp;Inherit system's filetype associations</label>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>C&amp;ustom filetype associations:</label>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <object class="wxTextCtrl" name="ID_ASSOCIATIONS">
-                  <style>wxTE_MULTILINE</style>
-                </object>
-                <option>1</option>
-                <flag>wxGROW</flag>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Format: Extension followed by properly quoted command and arguments.</label>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Example: png "c:\program files\viewer\viewer.exe" -open</label>
-                </object>
-              </object>
-              <cols>1</cols>
-              <vgap>5</vgap>
-              <growablerows>2</growablerows>
-              <growablecols>0</growablecols>
-            </object>
-            <option>1</option>
-            <flag>wxALL|wxGROW</flag>
-            <border>5</border>
-          </object>
-          <label>Filetype associations</label>
-          <orient>wxVERTICAL</orient>
-        </object>
-        <option>1</option>
-        <flag>wxGROW</flag>
-      </object>
-    </object>
-  </object>
   <object class="wxPanel" name="ID_SETTINGS_UPDATECHECK">
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
