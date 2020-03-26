@@ -6,6 +6,7 @@
 #include "file_utils.h"
 #include "Options.h"
 #include "queue.h"
+#include "textctrlex.h"
 #include "window_state_manager.h"
 #include "xrc_helper.h"
 
@@ -920,13 +921,6 @@ std::wstring CEditHandler::GetOpenCommand(std::wstring const& file, bool& progra
 		if (!command.empty()) {
 			return command;
 		}
-
-		if (COptions::Get()->GetOptionVal(OPTION_EDIT_INHERITASSOCIATIONS)) {
-			std::wstring const sysCommand = GetSystemOpenCommand(file, program_exists);
-			if (!sysCommand.empty()) {
-				return sysCommand;
-			}
-		}
 	}
 
 	std::wstring command = COptions::Get()->GetOption(OPTION_EDIT_DEFAULTEDITOR);
@@ -985,14 +979,8 @@ std::wstring CEditHandler::GetCustomOpenCommand(std::wstring_view const& file, b
 #endif
 
 	std::wstring ext = GetExtension(file);
-	
 	if (ext.empty()) {
-		if (!file.empty() && file[0] == '.') {
-			ext = L".";
-		}
-		else {
-			ext = L"/";
-		}
+		ext = L"/";
 	}
 
 	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
@@ -1501,71 +1489,136 @@ CEditHandler::t_fileData* CEditHandlerStatusDialog::GetDataFromItem(int item, CE
 	return pData;
 }
 
-//----------
 
-BEGIN_EVENT_TABLE(CNewAssociationDialog, wxDialogEx)
-EVT_RADIOBUTTON(wxID_ANY, CNewAssociationDialog::OnRadioButton)
-EVT_BUTTON(wxID_OK, CNewAssociationDialog::OnOK)
-EVT_BUTTON(XRCID("ID_BROWSE"), CNewAssociationDialog::OnBrowseEditor)
-END_EVENT_TABLE()
+struct CNewAssociationDialog::impl
+{
+	wxRadioButton* rbSystem_{};
+	wxRadioButton* rbDefault_{};
+	wxRadioButton* rbCustom_{};
+
+	wxCheckBox* always_{};
+
+	wxTextCtrlEx* custom_{};
+	wxButton* browse_{};
+};
 
 CNewAssociationDialog::CNewAssociationDialog(wxWindow *parent)
 	: parent_(parent)
 {
 }
 
+CNewAssociationDialog::~CNewAssociationDialog()
+{
+}
+
 bool CNewAssociationDialog::Run(std::wstring const& file)
 {
-	if (!Load(parent_, _T("ID_EDIT_NOPROGRAM"))) {
-		return true;
-	}
+	file_ = file;
 
-	size_t pos = file.rfind('.');
-	if (!pos) {
-		ext_ = _T(".");
+	ext_ = GetExtension(file);
+
+	impl_ = std::make_unique<impl>();
+
+	Create(parent_, -1, _("No program associated with filetype"));
+
+	auto & lay = layout();
+
+	auto * main = lay.createMain(this, 1);
+
+	if (ext_.empty()) {
+		main->Add(new wxStaticText(this, -1, _("No program has been associated to edit extensionless files.")));
 	}
-	else if (pos != std::wstring::npos) {
-		ext_ = file.substr(pos + 1);
+	else if (ext_ == L".") {
+		main->Add(new wxStaticText(this, -1, _("No program has been associated to edit dotfiles.")));
 	}
 	else {
-		ext_.clear();
+		main->Add(new wxStaticText(this, -1, wxString::Format(_("No program has been associated to edit files with the extension '%s'."), LabelEscape(ext_))));
 	}
 
-	wxStaticText *const pDesc = XRCCTRL(*this, "ID_DESC", wxStaticText);
-	if (pDesc) {
-		pDesc->SetLabel(wxString::Format(pDesc->GetLabel(), LabelEscape(ext_)));
-	}
+	main->Add(new wxStaticText(this, -1, _("Select how these files should be opened.")));
+	int const leftIndent = lay.dlgUnits(10);
 
-	bool program_exists = false;
-	std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
-	if (!program_exists) {
-		cmd.clear();
-	}
-	if (!cmd.empty()) {
-		std::wstring args;
-		if (!UnquoteCommand(cmd, args)) {
+	{
+		bool program_exists = false;
+		std::wstring cmd = GetSystemOpenCommand(file, program_exists);
+		if (!program_exists) {
 			cmd.clear();
 		}
-	}
+		if (!cmd.empty()) {
+			std::wstring args;
+			if (!UnquoteCommand(cmd, args)) {
+				cmd.clear();
+			}
+		}
 
-	if (!PathExpand(cmd)) {
-		cmd.clear();
-	}
+		if (!PathExpand(cmd)) {
+			cmd.clear();
+		}
 
-	if (cmd.empty()) {
-		xrc_call(*this, "ID_USE_CUSTOM", &wxRadioButton::SetValue, true);
-		xrc_call(*this, "ID_USE_EDITOR", &wxRadioButton::Enable, false);
-		xrc_call(*this, "ID_EDITOR_DESC", &wxStaticText::Hide);
-	}
-	else {
-		xrc_call(*this, "ID_EDITOR_DESC_NONE", &wxStaticText::Hide);
-		wxStaticText* const pEditorDesc = XRCCTRL(*this, "ID_EDITOR_DESC", wxStaticText);
-		if (pEditorDesc) {
-			pEditorDesc->SetLabel(wxString::Format(pEditorDesc->GetLabel(), cmd));
+		if (!cmd.empty()) {
+			impl_->rbSystem_ = new wxRadioButton(this, -1, _("Use system association"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+			impl_->rbSystem_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+			main->Add(impl_->rbSystem_);
+			main->Add(new wxStaticText(this, -1, wxString::Format(_("The associated program is '%s'."), LabelEscape(cmd))), 0, wxLEFT, leftIndent);
 		}
 	}
 
+	{
+		bool program_exists = false;
+		std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
+		if (!program_exists) {
+			cmd.clear();
+		}
+		if (!cmd.empty()) {
+			std::wstring args;
+			if (!UnquoteCommand(cmd, args)) {
+				cmd.clear();
+			}
+		}
+
+		if (!PathExpand(cmd)) {
+			cmd.clear();
+		}
+
+		if (!cmd.empty()) {
+			impl_->rbDefault_ = new wxRadioButton(this, -1, _("Use &default editor for text files"), wxDefaultPosition, wxDefaultSize, impl_->rbSystem_ ? 0 : wxRB_GROUP);
+			impl_->rbDefault_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+			main->Add(impl_->rbDefault_);
+			main->Add(new wxStaticText(this, -1, wxString::Format(_("The default editor for text files is '%s'."), LabelEscape(cmd))), 0, wxLEFT, leftIndent);
+			impl_->always_ = new wxCheckBox(this, -1, _("&Always use selection for all unassociated files"));
+			main->Add(impl_->always_, 0, wxLEFT, leftIndent);
+		}
+	}
+
+	impl_->rbCustom_ = new wxRadioButton(this, -1, _("&Use custom program"), wxDefaultPosition, wxDefaultSize, (impl_->rbSystem_ || impl_->rbDefault_) ? 0 : wxRB_GROUP);
+	impl_->rbCustom_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+	main->Add(impl_->rbCustom_);
+	auto row = lay.createFlex(2);
+	row->AddGrowableCol(0);
+	main->Add(row, 0, wxLEFT|wxGROW, leftIndent);
+
+	impl_->custom_ = new wxTextCtrlEx(this, -1, wxString());
+	row->Add(impl_->custom_, lay.valigng);
+	impl_->browse_ = new wxButton(this, -1, _("&Browse..."));
+	impl_->browse_->Bind(wxEVT_BUTTON, [this](wxEvent const&) { OnBrowseEditor(); });
+	row->Add(impl_->browse_, lay.valign);
+
+	auto buttons = lay.createButtonSizer(this, main, true);
+	auto ok = new wxButton(this, wxID_OK, _("OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+	buttons->Realize();
+
+	ok->Bind(wxEVT_BUTTON, [this](wxEvent const&) { OnOK(); });
+
+	Layout();
+	GetSizer()->Fit(this);
+
 	SetCtrlState();
+
+	return ShowModal() == wxID_OK;
 
 	GetSizer()->Fit(this);
 
@@ -1578,101 +1631,99 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 
 void CNewAssociationDialog::SetCtrlState()
 {
-	wxRadioButton* pCustom = dynamic_cast<wxRadioButton*>(FindWindow(XRCID("ID_USE_CUSTOM")));
-	if (!pCustom) {
-		// Return since it can get called before dialog got fully loaded
+	if (impl_->custom_) {
+		impl_->custom_->Enable(impl_->rbCustom_->GetValue());
+	}
+	if (impl_->browse_) {
+		impl_->browse_->Enable(impl_->rbCustom_->GetValue());
+	}
+	if (impl_->always_) {
+		impl_->always_->Enable(impl_->rbDefault_->GetValue());
+	}
+}
+
+void CNewAssociationDialog::OnOK()
+{
+	const bool custom = impl_->rbCustom_->GetValue();
+	const bool def = impl_->rbDefault_->GetValue();
+	const bool always = impl_->always_->GetValue();
+
+	if (def && always) {
+		COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
+		EndModal(wxID_OK);
+
 		return;
 	}
 
-	bool const custom = pCustom->GetValue();
-
-	xrc_call(*this, "ID_CUSTOM", &wxTextCtrl::Enable, custom);
-	xrc_call(*this, "ID_BROWSE", &wxButton::Enable, custom);
-}
-
-void CNewAssociationDialog::OnRadioButton(wxCommandEvent&)
-{
-	SetCtrlState();
-}
-
-void CNewAssociationDialog::OnOK(wxCommandEvent&)
-{
-	const bool custom = XRCCTRL(*this, "ID_USE_CUSTOM", wxRadioButton)->GetValue();
-	const bool always = XRCCTRL(*this, "ID_ALWAYS", wxCheckBox)->GetValue();
-
+	std::wstring cmd;
 	if (custom) {
-		std::wstring cmd = XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->GetValue().ToStdWstring();
+		bool unused;
+		std::wstring cmd = custom ? impl_->custom_->GetValue().ToStdWstring() : GetSystemOpenCommand(file_, unused);
 		std::wstring editor = cmd;
 		std::wstring args;
 		if (!UnquoteCommand(editor, args) || editor.empty()) {
+			impl_->custom_->SetFocus();
 			wxMessageBoxEx(_("You need to enter a properly quoted command."), _("Cannot set file association"), wxICON_EXCLAMATION);
 			return;
 		}
 		if (!ProgramExists(editor)) {
+			impl_->custom_->SetFocus();
 			wxMessageBoxEx(_("Selected editor does not exist."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
 			return;
 		}
-
-		if (always) {
-			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("2") + cmd);
-		}
-		else {
-			std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.back() != '\n') {
-				associations += '\n';
-			}
-			if (ext_.empty()) {
-				ext_ = L"/";
-			}
-			associations += ext_;
-			associations += L" " + cmd;
-			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
-		}
 	}
 	else {
-		if (always) {
-			COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
+		bool program_exists = false;
+		if (def) {
+			cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
 		}
 		else {
-			bool program_exists = false;
-			std::wstring cmd = GetSystemOpenCommand(_T("foo.txt"), program_exists);
-			if (!program_exists) {
+			cmd = GetSystemOpenCommand(file_, program_exists);
+		}
+		if (!program_exists) {
+			cmd.clear();
+		}
+		if (!cmd.empty()) {
+			std::wstring args;
+			if (!UnquoteCommand(cmd, args)) {
 				cmd.clear();
 			}
-			if (!cmd.empty()) {
-				std::wstring args;
-				if (!UnquoteCommand(cmd, args)) {
-					cmd.clear();
-				}
-			}
-			if (cmd.empty()
+		}
+		if (cmd.empty()
 #ifdef __WXGTK__
-				|| !PathExpand(cmd)
+			|| !PathExpand(cmd)
 #endif
-				)
-			{
-				wxMessageBoxEx(_("The default editor for text files could not be found."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
-				return;
-			}
-			if (cmd.find(' ') != std::wstring::npos) {
-				cmd = L"\"" + cmd + L"\"";
-			}
-			std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-			if (!associations.empty() && associations.back() != '\n') {
-				associations += '\n';
-			}
-			if (ext_.empty()) {
-				ext_ = L"/";
-			}
-			associations += ext_ + L" " + cmd;
-			COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
+			)
+		{
+			wxMessageBoxEx(_("The associated program could not be found."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
+			return;
+		}
+
+		if (cmd.find_first_of(L" '\"") != std::wstring::npos) {
+			fz::replace_substrings(cmd, L"\"", L"\"\"");
+			cmd = L"\"" + cmd + L"\"";
 		}
 	}
+
+	std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+	if (!associations.empty() && associations.back() != '\n') {
+		associations += '\n';
+	}
+	if (ext_.empty()) {
+		ext_ = L"/";
+	}
+	if (ext_.find_first_of(L" '\"") != std::wstring::npos) {
+		fz::replace_substrings(ext_, L"\"", L"\"\"");
+		ext_ = L"\"" + ext_ + L"\"";
+	}
+	associations += ext_;
+	associations += L" " + cmd;
+	COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
 
 	EndModal(wxID_OK);
 }
 
-void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
+void CNewAssociationDialog::OnBrowseEditor()
 {
 	wxFileDialog dlg(this, _("Select default editor"), _T(""), _T(""),
 #ifdef __WXMSW__
@@ -1694,7 +1745,7 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 	}
 
 	if (!ProgramExists(editor)) {
-		XRCCTRL(*this, "ID_EDITOR", wxWindow)->SetFocus();
+		impl_->custom_->SetFocus();
 		wxMessageBoxEx(_("Selected editor does not exist."), _("File not found"), wxICON_EXCLAMATION, this);
 		return;
 	}
@@ -1703,8 +1754,9 @@ void CNewAssociationDialog::OnBrowseEditor(wxCommandEvent&)
 		editor = _T("\"") + editor + _T("\"");
 	}
 
-	XRCCTRL(*this, "ID_CUSTOM", wxTextCtrl)->ChangeValue(editor);
+	impl_->custom_->ChangeValue(editor);
 }
+
 
 bool CEditHandler::Edit(CEditHandler::fileType type, std::wstring const& fileName, CServerPath const& path, Site const& site, int64_t size, wxWindow * parent)
 {

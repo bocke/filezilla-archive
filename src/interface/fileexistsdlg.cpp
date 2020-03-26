@@ -193,7 +193,7 @@ void CFileExistsDlg::LoadIcon(int id, const wxString &file)
 #endif //__WXMSW__
 
 	std::wstring ext = GetExtension(file.ToStdWstring());
-	if (ext.empty()) {
+	if (ext.empty() || ext == L".") {
 		return;
 	}
 

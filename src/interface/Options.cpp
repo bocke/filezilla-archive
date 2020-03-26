@@ -155,7 +155,6 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Show queue", number, L"1", normal },
 	{ "Default editor", string, L"", normal },
 	{ "Always use default editor", number, L"0", normal },
-	{ "Inherit system associations", number, L"1", normal },
 	{ "Custom file associations", string, L"", normal },
 	{ "Comparison mode", number, L"1", normal },
 	{ "Comparison threshold", number, L"1", normal },
