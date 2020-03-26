@@ -115,10 +115,8 @@ std::wstring GetSystemOpenCommand(std::wstring file, bool &program_exists)
 	}
 #endif
 
-	wxFileName fn(file);
-
-	const wxString& ext = fn.GetExt();
-	if (ext.empty()) {
+	auto const ext = GetExtension(file);
+	if (ext.empty() || ext == L".") {
 		return std::wstring();
 	}
 
