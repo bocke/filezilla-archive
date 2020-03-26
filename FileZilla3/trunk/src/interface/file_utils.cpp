@@ -256,6 +256,9 @@ bool ProgramExists(std::wstring const& editor)
 
 bool PathExpand(std::wstring & cmd)
 {
+	if (cmd.empty()) {
+		return false;
+	}
 #ifndef __WXMSW__
 	if (!cmd.empty() && cmd[0] == '/') {
 		return true;
@@ -430,14 +433,24 @@ CLocalPath GetDownloadDir()
 	return CLocalPath(wxStandardPaths::Get().GetDocumentsDir().ToStdWstring());
 }
 
-std::wstring GetExtension(std::wstring_view const& file)
+std::wstring GetExtension(std::wstring_view file)
 {
+	// Strip path if any
 #ifdef FZ_WINDOWS
-	size_t pos = file.find_last_of(L"./\\");
+	size_t pos = file.find_last_of(L"/\\");
 #else
-	size_t pos = file.find_last_of(L"./");
+	size_t pos = file.find_last_of(L"/");
 #endif
-	if (pos != std::wstring::npos && pos != 0 && file[pos] == '.') {
+	if (pos != std::wstring::npos) {
+		file = file.substr(pos + 1);
+	}
+
+	// Find extension
+	pos = file.find_last_of('.');
+	if (!pos) {
+		return std::wstring(L".");
+	}
+	else if (pos != std::wstring::npos) {
 		return std::wstring(file.substr(pos + 1));
 	}
 

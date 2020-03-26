@@ -198,18 +198,21 @@ class CNewAssociationDialog final : protected wxDialogEx
 {
 public:
 	CNewAssociationDialog(wxWindow* parent);
+	virtual ~CNewAssociationDialog();
 
 	bool Run(std::wstring const& file);
 
 protected:
+	struct impl;
+	std::unique_ptr<impl> impl_;
+
 	void SetCtrlState();
 	wxWindow* parent_{};
+	std::wstring file_;
 	std::wstring ext_;
 
-	DECLARE_EVENT_TABLE()
-	void OnRadioButton(wxCommandEvent& event);
-	void OnOK(wxCommandEvent& event);
-	void OnBrowseEditor(wxCommandEvent& event);
+	void OnOK();
+	void OnBrowseEditor();
 };
 
 #endif

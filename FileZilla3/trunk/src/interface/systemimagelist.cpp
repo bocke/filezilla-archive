@@ -166,7 +166,7 @@ int CSystemImageList::GetIconIndex(iconType type, std::wstring const& fileName, 
 	}
 
 	std::wstring ext = GetExtension(fileName);
-	if (ext.empty()) {
+	if (ext.empty() || ext == L".") {
 		return icon;
 	}
 

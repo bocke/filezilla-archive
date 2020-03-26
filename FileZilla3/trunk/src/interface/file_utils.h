@@ -19,7 +19,7 @@ bool RenameFile(wxWindow* pWnd, wxString dir, wxString from, wxString to);
 
 CLocalPath GetDownloadDir();
 
-std::wstring GetExtension(std::wstring_view const& file);
+std::wstring GetExtension(std::wstring_view file);
 
 class gui_recursive_remove final : public fz::recursive_remove
 {
