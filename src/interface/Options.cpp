@@ -32,10 +32,11 @@ enum Type
 
 enum Flags
 {
-	normal,
-	internal,
-	default_only,
-	default_priority // If that option is given in fzdefaults.xml, it overrides any user option
+	normal = 0,
+	internal = 1,
+	default_only = 2,
+	default_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
+	platform = 8 // A non-portable platform specific option, nodes have platform attribute
 };
 
 struct t_Option
@@ -53,6 +54,16 @@ struct t_Option
 //case sensitive
 #define DEFAULT_FILENAME_SORT   L"1"
 #endif
+
+namespace {
+#ifdef FZ_WINDOWS
+	auto const platform_name = "win";
+#elif defined(FZ_MAC)
+	auto const platform_name = "mac";
+#else
+	auto const platform_name = "unix";
+#endif
+}
 
 static_assert(OPTIONS_NUM <= changed_options_t().size());
 
@@ -97,14 +108,14 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "FTP Proxy user", string, L"", normal },
 	{ "FTP Proxy password", string, L"", normal },
 	{ "FTP Proxy login sequence", string, L"", normal },
-	{ "SFTP keyfiles", string, L"", normal },
+	{ "SFTP keyfiles", string, L"", platform },
 	{ "SFTP compression", number, L"", normal },
 	{ "Proxy type", number, L"0", normal },
 	{ "Proxy host", string, L"", normal },
 	{ "Proxy port", number, L"0", normal },
 	{ "Proxy user", string, L"", normal },
 	{ "Proxy password", string, L"", normal },
-	{ "Logging file", string, L"", normal },
+	{ "Logging file", string, L"", platform },
 	{ "Logging filesize limit", number, L"10", normal },
 	{ "Logging show detailed logs", number, L"0", internal },
 	{ "Size format", number, L"0", normal },
@@ -126,7 +137,7 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Update Check Interval", number, L"7", normal },
 	{ "Last automatic update check", string, L"", normal },
 	{ "Last automatic update version", string, L"", normal },
-	{ "Update Check New Version", string, L"", normal },
+	{ "Update Check New Version", string, L"", platform },
 	{ "Update Check Check Beta", number, L"0", normal },
 	{ "Show debug menu", number, L"0", normal },
 	{ "File exists action download", number, L"0", normal },
@@ -153,9 +164,9 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Date Format", string, L"", normal },
 	{ "Show message log", number, L"1", normal },
 	{ "Show queue", number, L"1", normal },
-	{ "Default editor", string, L"", normal },
+	{ "Default editor", string, L"", platform },
 	{ "Always use default editor", number, L"0", normal },
-	{ "Custom file associations", string, L"", normal },
+	{ "File associations", string, L"", platform },
 	{ "Comparison mode", number, L"1", normal },
 	{ "Comparison threshold", number, L"1", normal },
 	{ "Site Manager position", string, L"", normal },
@@ -201,10 +212,10 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Tab data", xml, std::wstring(), normal },
 
 	// Default/internal options
-	{ "Config Location", string, L"", default_only },
+	{ "Config Location", string, L"", static_cast<Flags>(default_only|platform) },
 	{ "Kiosk mode", number, L"0", default_priority },
 	{ "Disable update check", number, L"0", default_only },
-	{ "Cache directory", string, L"", default_priority },
+	{ "Cache directory", string, L"", static_cast<Flags>(default_priority|platform) },
 };
 
 std::wstring GetEnv(char const* name)
@@ -285,7 +296,7 @@ std::map<std::string, unsigned int> COptions::GetNameOptionMap() const
 {
 	std::map<std::string, unsigned int> ret;
 	for (unsigned int i = 0; i < OPTIONS_NUM; ++i) {
-		if (options[i].flags != internal) {
+		if (!(options[i].flags & internal)) {
 			ret.insert(std::make_pair(std::string(options[i].name), i));
 		}
 	}
@@ -407,7 +418,7 @@ void COptions::ContinueSetOption(unsigned int nID, T const& value)
 		return;
 	}
 
-	if (options[nID].flags == normal || options[nID].flags == default_priority) {
+	if (!(options[nID].flags & (internal | default_only))) {
 		SetXmlValue(nID, validated);
 
 		if (!m_save_timer.IsRunning()) {
@@ -488,18 +499,38 @@ void COptions::SetXmlValue(unsigned int nID, std::wstring_view const& value)
 	auto settings = CreateSettingsXmlElement();
 	if (settings) {
 		pugi::xml_node setting;
-		for (setting = settings.child("Setting"); setting; setting = setting.next_sibling("Setting")) {
-			const char *attribute = setting.attribute("name").value();
-			if (!attribute) {
+		for (pugi::xml_node it = settings.child("Setting"); it;) {
+			auto cur = it;
+			it = it.next_sibling("Setting");
+
+			char const *attribute = cur.attribute("name").value();
+			if (strcmp(attribute, options[nID].name)) {
 				continue;
 			}
-			if (!strcmp(attribute, options[nID].name)) {
-				break;
+
+			if (options[nID].flags & platform) {
+				// Ignore items from the wrong platform
+				char const* p = cur.attribute("platform").value();
+				if (*p && strcmp(p, platform_name)) {
+					continue;
+				}
 			}
+
+			if (setting) {
+				// Remove duplicates
+				settings.remove_child(cur);
+			}
+			else {
+				setting = cur;
+			}
+			break;
 		}
 		if (!setting) {
 			setting = settings.append_child("Setting");
 			SetTextAttribute(setting, "name", options[nID].name);
+		}
+		if (options[nID].flags & platform) {
+			SetTextAttribute(setting, "platform", platform_name);
 		}
 		setting.text() = utf8.c_str();
 	}
@@ -514,14 +545,22 @@ void COptions::SetXmlValue(unsigned int nID, std::unique_ptr<pugi::xml_document>
 	auto settings = CreateSettingsXmlElement();
 	if (settings) {
 		pugi::xml_node setting;
-		for (setting = settings.child("Setting"); setting; setting = setting.next_sibling("Setting")) {
-			const char *attribute = setting.attribute("name").value();
-			if (!attribute) {
+		for (pugi::xml_node it = settings.child("Setting"); it;) {
+			auto cur = it;
+			it = it.next_sibling("Setting");
+
+			const char *attribute = cur.attribute("name").value();
+			if (strcmp(attribute, options[nID].name)) {
 				continue;
 			}
-			if (!strcmp(attribute, options[nID].name)) {
-				break;
+			if (options[nID].flags & platform) {
+				// Ignore items from the wrong platform
+				char const* p = cur.attribute("platform").value();
+				if (*p && strcmp(p, platform_name)) {
+					continue;
+				}
 			}
+			break;
 		}
 		if (setting) {
 			settings.remove_child(setting);
@@ -529,6 +568,9 @@ void COptions::SetXmlValue(unsigned int nID, std::unique_ptr<pugi::xml_document>
 		if (value && value->first_child()) {
 			setting = settings.append_child("Setting");
 			SetTextAttribute(setting, "name", options[nID].name);
+			if (options[nID].flags & platform) {
+				SetTextAttribute(setting, "platform", platform_name);
+			}
 
 			for (auto c = value->first_child(); c; c = c.next_sibling()) {
 				setting.append_copy(c);
@@ -733,11 +775,19 @@ void COptions::LoadOptionFromElement(pugi::xml_node option, std::map<std::string
 
 	auto const iter = nameOptionMap.find(name);
 	if (iter != nameOptionMap.end()) {
-		if (!allowDefault && options[iter->second].flags == default_only) {
+		if (!allowDefault && options[iter->second].flags & default_only) {
 			return;
 		}
+
+		if (options[iter->second].flags & platform) {
+			char const* p = option.attribute("platform").value();
+			if (*p && strcmp(p, platform_name)) {
+				return;
+			}
+		}
+
 		std::wstring value = GetTextElement(option);
-		if (options[iter->second].flags == default_priority) {
+		if (options[iter->second].flags & default_priority) {
 			if (allowDefault) {
 				fz::scoped_lock l(m_sync_);
 				m_optionsCache[iter->second].from_default = true;
