@@ -47,28 +47,19 @@ bool COptionsPageEditAssociations::Validate()
 	auto assocs = fz::strtok(raw_assocs, L"\r\n", true);
 
 	for (auto& assoc : assocs) {
-		std::wstring command;
-		if (!UnquoteCommand(assoc, command)) {
-			return DisplayError(assocs_, _("Improperly quoted association."));
-		}
-
 		if (assoc.empty()) {
 			return DisplayError(assocs_, _("Empty file extension."));
 		}
 
-		std::wstring args;
-		if (!UnquoteCommand(command, args)) {
+		auto cmd_with_args = UnquoteCommand(assoc);
+		if (cmd_with_args.size() < 2 || cmd_with_args[0].empty() || cmd_with_args[1].empty()) {
 			return DisplayError(assocs_, _("Improperly quoted association."));
 		}
 
-		if (command.empty()) {
-			return DisplayError(assocs_, _("Empty command."));
-		}
-
-		if (!ProgramExists(command)) {
+		if (!ProgramExists(cmd_with_args[1])) {
 			wxString error = _("Associated program not found:");
 			error += '\n';
-			error += command;
+			error += cmd_with_args[1];
 			return DisplayError(assocs_, error);
 		}
 	}

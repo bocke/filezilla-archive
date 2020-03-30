@@ -106,9 +106,8 @@ public:
 	bool UploadFile(std::wstring const& file, bool unedit);
 	bool UploadFile(std::wstring const& file, CServerPath const& remotePath, Site const& site, bool unedit);
 
-	// Returns command to open the file. If association is set but
-	// program does not exist, program_exists is set to false.
-	std::wstring GetOpenCommand(std::wstring const& file, bool& program_exists);
+	// Returns command to open the file.
+	std::vector<std::wstring> GetAssociation(std::wstring const& file);
 
 protected:
 	/* Checks if file can be opened. One of these conditions has to be true:
@@ -119,7 +118,7 @@ protected:
 	 * The dangerous argument will be set to true on some filetypes,
 	 * e.g. executables.
 	 */
-	std::wstring CanOpen(std::wstring const& fileName, bool& dangerous, bool& program_exists);
+	std::vector<std::wstring> CanOpen(std::wstring const& fileName, bool& dangerous, bool& program_exists);
 
 	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
 
@@ -131,7 +130,7 @@ protected:
 
 	bool LaunchEditor(fileType type, t_fileData &data);
 
-	std::wstring GetCustomOpenCommand(std::wstring_view const& file, bool& program_exists);
+	std::vector<std::wstring> GetCustomAssociation(std::wstring_view const& file);
 
 	void SetTimerState();
 

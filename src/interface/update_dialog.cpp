@@ -11,6 +11,8 @@
 #include "xrc_helper.h"
 #include "Options.h"
 
+#include <libfilezilla/process.hpp>
+
 #include <wx/animate.h>
 #include <wx/hyperlink.h>
 #include <wx/statline.h>
@@ -407,10 +409,10 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 	}
 	p->Close();
 #else
-	bool program_exists = false;
-	std::wstring cmd = GetSystemOpenCommand(f, program_exists);
-	if (program_exists && !cmd.empty()) {
-		if (wxExecute(cmd)) {
+	auto cmd_with_args = GetSystemAssociation(f);
+	if (!cmd_with_args.empty()) {
+		AssociationToCommand(cmd_with_args, f);
+		if (fz::spawn_detached_process(cmd_with_args)) {
 			return;
 		}
 	}

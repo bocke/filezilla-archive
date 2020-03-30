@@ -17,6 +17,7 @@
 #include "xrc_helper.h"
 #include "customheightlistctrl.h"
 
+#include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
 #include <libfilezilla/translate.hpp>
 
@@ -1983,28 +1984,23 @@ void CSearchDialog::OnOpen(wxCommandEvent & event)
 		if (wxLaunchDefaultApplication(fn, 0)) {
 			continue;
 		}
-		bool program_exists = false;
-		std::wstring cmd = GetSystemOpenCommand(fn, program_exists);
-		if (cmd.empty()) {
-			auto pos = data.name.find('.');
-			if (pos == std::wstring::npos || (pos == 0 && data.name.find('.', 1) == std::wstring::npos)) {
-				cmd = pEditHandler->GetOpenCommand(fn, program_exists);
-			}
+		auto cmd_with_args = GetSystemAssociation(fn);
+		if (cmd_with_args.empty()) {
+			cmd_with_args = pEditHandler->GetAssociation(fn);
 		}
-		if (cmd.empty()) {
+		if (cmd_with_args.empty()) {
 			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nNo program has been associated on your system with this file type."), fn), _("Opening failed"), wxICON_EXCLAMATION);
 			continue;
 		}
-		if (!program_exists) {
-			wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), fn, cmd);
+		if (!ProgramExists(cmd_with_args.front())) {
+			wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), fn, cmd_with_args.front());
 			wxMessageBoxEx(msg, _("Cannot edit file"), wxICON_EXCLAMATION);
 			continue;
 		}
-
-		if (wxExecute(cmd)) {
+		AssociationToCommand(cmd_with_args, fn);
+		if (fz::spawn_detached_process(cmd_with_args)) {
 			continue;
 		}
-
 		wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), fn), _("Opening failed"), wxICON_EXCLAMATION);
 	}
 }

@@ -3,11 +3,21 @@
 
 #include <libfilezilla/recursive_remove.hpp>
 
-bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde = false);
-bool ProgramExists(std::wstring const& editor);
-bool PathExpand(std::wstring & cmd);
+// Quotation rules:
+// - Args containing spaces double-quotes need to be quotes by enclosing in double-quotes.
+// - If an arg is quoted, contained double-quotes are doubled
+//
+// - Example: "foo""bar" is the quoted representation of foo"bar
+std::wstring QuoteCommand(std::vector<std::wstring> const& cmd_with_args);
+std::vector<std::wstring> UnquoteCommand(std::wstring_view const& command);
 
-std::wstring GetSystemOpenCommand(std::wstring file, bool &program_exists);
+// Returns the association for a file based on its extension
+std::vector<std::wstring> GetSystemAssociation(std::wstring const& file);
+
+void AssociationToCommand(std::vector<std::wstring> & association, std::wstring_view const& file);
+
+bool ProgramExists(std::wstring const& editor); // TODO: Still needed?
+bool PathExpand(std::wstring & cmd); // TODO: Still needed?
 
 // Returns a file:// URL
 std::wstring GetAsURL(std::wstring const& dir);
