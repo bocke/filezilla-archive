@@ -311,7 +311,7 @@ filezilla_CPPFLAGS += $(LIBSQLITE3_CFLAGS)
 filezilla_LDFLAGS += $(LIBSQLITE3_LIBS)
 
 if MINGW
-filezilla_LDFLAGS += -lnormaliz -lole32 -luuid -lnetapi32 -lmpr -lpowrprof -lws2_32
+filezilla_LDFLAGS += -lnormaliz -lole32 -luuid -lnetapi32 -lmpr -lpowrprof -lws2_32 -lshlwapi
 endif
 
 # GTK+ libs, empty if not using wxGTK
