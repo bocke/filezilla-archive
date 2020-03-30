@@ -83,18 +83,16 @@ bool COptionsPageEdit::Validate()
 		SetText(XRCID("EDITOR"), editor, failure);
 
 		if (!editor.empty()) {
-			std::wstring args;
-			if (!UnquoteCommand(editor, args)) {
+			auto cmd_with_args = UnquoteCommand(editor);
+			if (cmd_with_args.empty()) {
 				return DisplayError(_T("ID_EDITOR"), _("Default editor not properly quoted."));
 			}
 
-			if (editor.empty()) {
-				return DisplayError(_T("ID_EDITOR"), _("Empty quoted string."));
-			}
-
-			if (!ProgramExists(editor)) {
+			if (!ProgramExists(cmd_with_args[0])) {
 				return DisplayError(_T("ID_EDITOR"), _("The file selected as default editor does not exist."));
 			}
+
+			SetText(XRCID("EDITOR"), QuoteCommand(cmd_with_args), failure);
 		}
 	}
 

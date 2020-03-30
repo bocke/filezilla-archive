@@ -6,6 +6,7 @@
 #ifdef FZ_WINDOWS
 #include <knownfolders.h>
 #include <shlobj.h>
+#include <shlwapi.h>
 #else
 #include <wx/textfile.h>
 #include <wordexp.h>
@@ -100,141 +101,150 @@ bool OpenInFileManager(std::wstring const& dir)
 	return ret;
 }
 
-std::wstring GetSystemOpenCommand(std::wstring file, bool &program_exists)
+std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 {
-	// Disallowed on MSW. On other platforms wxWidgets doens't escape properly.
-	// For now don't support these files until we can replace wx with something sane.
-	if (file.find('"') != std::wstring::npos) {
-		return std::wstring();
-	}
-#ifndef __WXMSW__
-	// wxWidgets doens't escape backslashes properly.
-	// For now don't support these files until we can replace wx with something sane.
-	if (file.find('\\') != std::wstring::npos) {
-		return std::wstring();
-	}
-#endif
+	std::vector<std::wstring> ret;
 
 	auto const ext = GetExtension(file);
 	if (ext.empty() || ext == L".") {
-		return std::wstring();
+		return ret;
 	}
 
-#ifdef __WXGTK__
-	for (;;)
-#endif
-	{
-		wxFileType* pType = wxTheMimeTypesManager->GetFileTypeFromExtension(ext);
-		if (!pType) {
-			return std::wstring();
-		}
+	auto query = [&](wchar_t const* verb) {
+		DWORD len{};
+		int res = AssocQueryString(0, ASSOCSTR_COMMAND, (L"." + ext).c_str(), verb, nullptr, &len);
+		if (res == S_FALSE && len > 1) {
+			std::wstring raw;
 
-		std::wstring cmd = pType->GetOpenCommand(file).ToStdWstring();
-		delete pType;
-		if (cmd.empty()) {
-			return std::wstring();
-		}
+			// len as returned by AssocQueryString includes terminating null
+			raw.resize(static_cast<size_t>(len - 1));
 
-		program_exists = false;
-
-		std::wstring editor;
-		bool is_dde = false;
-#ifdef __WXMSW__
-		if (cmd.substr(0, 7) == L"WX_DDE#") {
-			// See wxWidget's wxExecute in src/msw/utilsexc.cpp
-			// WX_DDE#<command>#DDE_SERVER#DDE_TOPIC#DDE_COMMAND
-			editor = cmd.substr(7);
-			size_t pos = editor.find('#');
-			if (!pos || pos == std::wstring::npos) {
-				return cmd;
-			}
-			editor = editor.substr(0, pos);
-			is_dde = true;
-		}
-		else
-#endif
-		{
-			editor = cmd;
-		}
-
-		std::wstring args;
-		if (!UnquoteCommand(editor, args, is_dde) || editor.empty()) {
-			return cmd;
-		}
-
-		if (!PathExpand(editor)) {
-			return cmd;
-		}
-
-		if (ProgramExists(editor)) {
-			program_exists = true;
-		}
-
-#ifdef __WXGTK__
-		size_t pos = args.find(file);
-		if (pos != std::wstring::npos && file.find(' ') != std::wstring::npos && file[0] != '\'' && file[0] != '"') {
-			// Might need to quote filename, wxWidgets doesn't do it
-			if ((!pos || (args[pos - 1] != '\'' && args[pos - 1] != '"')) &&
-				(pos + file.size() >= args.size() || (args[pos + file.size()] != '\'' && args[pos + file.size()] != '"')))
-			{
-				// Filename in command arguments isn't quoted. Repeat with quoted filename
-				file = L"\"" + file + L"\"";
-				continue;
+			res = AssocQueryString(0, ASSOCSTR_COMMAND, (L"." + ext).c_str(), verb, raw.data(), &len);
+			if (res == S_OK && len > 1) {
+				raw.resize(len - 1);
+				return UnquoteCommand(raw);
 			}
 		}
-#endif
-		return cmd;
+
+		return std::vector<std::wstring>();
+	};
+
+	ret = query(L"edit");
+	if (ret.empty()) {
+		ret = query(nullptr);
 	}
 
-	return std::wstring();
+	return ret;
 }
 
-bool UnquoteCommand(std::wstring & command, std::wstring & arguments, bool is_dde)
+void AssociationToCommand(std::vector<std::wstring>& association, std::wstring_view const& file)
 {
-	arguments.clear();
+	bool replaced{};
 
-	if (command.empty()) {
-		return true;
-	}
-
-	wchar_t inQuotes = 0;
-	std::wstring file;
-	for (size_t i = 0; i < command.size(); i++) {
-		wchar_t const& c = command[i];
-		if (c == '"' || c == '\'') {
-			if (!inQuotes) {
-				inQuotes = c;
+	for (size_t i = 1; i < association.size(); ++i) {
+		bool percent{};
+		std::wstring & arg = association[i];
+		
+		std::wstring out;
+		out.reserve(arg.size());
+		for (auto const& c : arg) {
+			if (percent) {
+				percent = false;
+				if (c == 'f') {
+					replaced = true;
+					out += file;
+				}
+				else {
+					out += c;
+				}
 			}
-			else if (c != inQuotes) {
-				file += c;
-			}
-			else if (command[i + 1] == c) {
-				file += c;
-				i++;
+			else if (c == '%') {
+				percent = true;
 			}
 			else {
-				inQuotes = false;
+				out += c;
 			}
 		}
-		else if (c == ' ' && !inQuotes) {
-			arguments = fz::ltrimmed(command.substr(i + 1));
-			break;
+		std::swap(arg, out);
+	}
+
+	if (!replaced) {
+		association.emplace_back(file);
+	}
+}
+
+std::wstring QuoteCommand(std::vector<std::wstring> const& cmd_with_args)
+{
+	std::wstring ret;
+
+	for (auto const& arg : cmd_with_args) {
+		if (!ret.empty()) {
+			ret += ' ';
 		}
-		else if (is_dde && !inQuotes && (c == ',' || c == '#')) {
-			arguments = fz::ltrimmed(command.substr(i + 1));
-			break;
+		size_t pos = arg.find_first_of(L" \t\"'");
+		if (pos != std::wstring::npos || arg.empty()) {
+			ret += '"';
+			ret += fz::replaced_substrings(arg, L"\"", L"\"\"");
+			ret += '"';
 		}
 		else {
-			file += c;
+			ret += arg;
 		}
 	}
-	if (inQuotes) {
-		return false;
+
+	return ret;
+}
+
+std::vector<std::wstring> UnquoteCommand(std::wstring_view const& command)
+{
+	std::vector<std::wstring> ret;
+
+	std::wstring part;
+	bool quoted{};
+	bool add{};
+	for (size_t i = 0; i < command.size(); i++) {
+		wchar_t const& c = command[i];
+
+		if ((c == ' ' || c == '\t') && !quoted) {
+			if (add) {
+				add = false;
+				ret.emplace_back(std::move(part));
+				part.clear();
+			}
+		}
+		else {
+			add = true;
+			if (c == '"') {
+				if (!quoted) {
+					quoted = true;
+				}
+				else if (i + 1 != command.size() && command[i + 1] == '"') {
+					part += '"';
+					++i;
+				}
+				else {
+					quoted = false;
+				}
+			}
+			else {
+				part.push_back(c);
+			}
+		}
+	}
+	if (quoted) {
+		ret.clear();
 	}
 
-	command = file;
+	if (add) {
+		ret.emplace_back(std::move(part));
+	}
 
-	return true;
+	if (!ret.empty() && ret.front().empty()) {
+		// Commands may have empty arguments, but themselves cannot be empty
+		ret.clear();
+	}
+
+	return ret;
 }
 
 bool ProgramExists(std::wstring const& editor)

@@ -28,6 +28,7 @@
 #include "timeformatting.h"
 
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/process.hpp>
 #include <libfilezilla/recursive_remove.hpp>
 
 class CLocalListViewDropTarget final : public CFileDropTarget<wxListCtrlEx>
@@ -1908,33 +1909,31 @@ void CLocalListView::OnMenuOpen(wxCommandEvent&)
 			continue;
 		}
 
+
 		wxFileName fn(m_dir.GetPath(), data.name);
 		if (wxLaunchDefaultApplication(fn.GetFullPath(), 0)) {
 			continue;
 		}
-		bool program_exists = false;
-		std::wstring cmd = GetSystemOpenCommand(fn.GetFullPath().ToStdWstring(), program_exists);
-		if (cmd.empty()) {
-			auto pos = data.name.find('.');
-			if (pos == std::wstring::npos || (pos == 0 && data.name.find('.', 1) == std::wstring::npos)) {
-				cmd = pEditHandler->GetOpenCommand(fn.GetFullPath().ToStdWstring(), program_exists);
-			}
+		auto cmd_with_args = GetSystemAssociation(fn.GetFullPath().ToStdWstring());
+		if (cmd_with_args.empty()) {
+			cmd_with_args = pEditHandler->GetAssociation(fn.GetFullPath().ToStdWstring());
 		}
-		if (cmd.empty()) {
+		if (cmd_with_args.empty()) {
 			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nNo program has been associated on your system with this file type."), fn.GetFullPath()), _("Opening failed"), wxICON_EXCLAMATION);
 			continue;
 		}
-		if (!program_exists) {
-			wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), fn.GetFullPath(), cmd);
+		if (!ProgramExists(cmd_with_args.front())) {
+			wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), fn.GetFullPath(), cmd_with_args.front());
 			wxMessageBoxEx(msg, _("Cannot edit file"), wxICON_EXCLAMATION);
 			continue;
 		}
 
-		if (wxExecute(cmd)) {
+		AssociationToCommand(cmd_with_args, fn.GetFullPath().ToStdWstring());
+		if (fz::spawn_detached_process(cmd_with_args)) {
 			continue;
 		}
-
 		wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), fn.GetFullPath()), _("Opening failed"), wxICON_EXCLAMATION);
+
 	}
 }
 
