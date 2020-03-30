@@ -133,6 +133,91 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 	if (ret.empty()) {
 		ret = query(nullptr);
 	}
+	
+	std::vector<std::wstring> raw;
+	std::swap(ret, raw);
+	if (!raw.empty()) {
+		ret.emplace_back(std::move(raw.front()));
+	}
+
+	// Process placeholders.
+
+	// Phase 1: Look for %1
+	bool got_first{};
+	for (size_t i = 1; i < raw.size(); ++i) {
+		auto const& arg = raw[i];
+
+		std::wstring out;
+		out.reserve(arg.size());
+		bool percent{};
+		for (auto const& c : arg) {
+			if (percent) {
+				if (!got_first) {
+					if (c == '1') {
+						out += L"%f";
+						got_first = true;
+					}
+					else if (c == '*') {
+						out += '%';
+						out += c;
+					}
+					// Ignore others.
+				}
+
+				percent = false;
+			}
+			else if (c == '%') {
+				percent = true;
+			}
+			else {
+				out += c;
+			}
+		}
+
+		if (!out.empty() || arg.empty()) {
+			ret.emplace_back(std::move(out));
+		}
+	}
+
+	std::swap(ret, raw);
+	ret.clear();
+	if (!raw.empty()) {
+		ret.emplace_back(std::move(raw.front()));
+	}
+
+	// Phase 2: Filter %*
+	for (size_t i = 1; i < raw.size(); ++i) {
+		auto& arg = raw[i];
+
+		std::wstring out;
+		out.reserve(arg.size());
+		bool percent{};
+		for (auto const& c : arg) {
+			if (percent) {
+				if (c == '*') {
+					if (!got_first) {
+						out += L"%f";
+					}
+				}
+				else if (c == 'f') {
+					out += L"%f";
+				}
+				// Ignore others.
+
+				percent = false;
+			}
+			else if (c == '%') {
+				percent = true;
+			}
+			else {
+				out += c;
+			}
+		}
+
+		if (!out.empty() || arg.empty()) {
+			ret.emplace_back(std::move(out));
+		}
+	}
 
 	return ret;
 }
