@@ -7,6 +7,8 @@
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/translate.hpp>
 
+#include <wx/filedlg.h>
+
 CFZPuttyGenInterface::CFZPuttyGenInterface(wxWindow* parent)
 	: m_parent(parent)
 {

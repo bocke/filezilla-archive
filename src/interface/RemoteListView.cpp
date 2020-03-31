@@ -22,6 +22,7 @@
 #include "timeformatting.h"
 
 #include <wx/clipbrd.h>
+#include <wx/menu.h>
 
 #include <algorithm>
 

@@ -22,6 +22,8 @@
 #include <libfilezilla/translate.hpp>
 
 #include <wx/clipbrd.h>
+#include <wx/dirdlg.h>
+#include <wx/menu.h>
 #include <wx/statline.h>
 
 class CRemoteSearchFileData final : public CDirentry

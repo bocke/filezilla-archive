@@ -16,6 +16,8 @@
 
 #include <libfilezilla/translate.hpp>
 
+#include <wx/dirdlg.h>
+#include <wx/filedlg.h>
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
 #include <wx/statline.h>

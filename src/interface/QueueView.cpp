@@ -12,26 +12,29 @@
 #include "state.h"
 #include "asyncrequestqueue.h"
 #include "defaultfileexistsdlg.h"
-#include <wx/dnd.h>
 #include "dndobjects.h"
 #include "loginmanager.h"
 #include "aui_notebook_ex.h"
 #include "queueview_failed.h"
 #include "queueview_successful.h"
 #include "commandqueue.h"
-#include <wx/utils.h>
-#include <wx/progdlg.h>
-#include <wx/sound.h>
 #include "statusbar.h"
 #include "remote_recursive_operation.h"
 #include "auto_ascii_files.h"
 #include "dragdropmanager.h"
 #include "drop_target_ex.h"
+
 #if WITH_LIBDBUS
 #include "../dbus/desktop_notification.h"
 #elif defined(__WXGTK__) || defined(__WXMSW__)
 #include <wx/notifmsg.h>
 #endif
+
+#include <wx/dnd.h>
+#include <wx/menu.h>
+#include <wx/progdlg.h>
+#include <wx/sound.h>
+#include <wx/utils.h>
 
 #ifdef __WXMSW__
 #include <powrprof.h>

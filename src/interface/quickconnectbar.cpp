@@ -12,6 +12,7 @@
 #include "themeprovider.h"
 
 #include <wx/bmpbuttn.h>
+#include <wx/menu.h>
 #include <wx/statline.h>
 
 BEGIN_EVENT_TABLE(CQuickconnectBar, wxPanel)

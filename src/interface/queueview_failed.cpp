@@ -3,6 +3,8 @@
 #include "queueview_failed.h"
 #include "edithandler.h"
 
+#include <wx/menu.h>
+
 BEGIN_EVENT_TABLE(CQueueViewFailed, CQueueViewBase)
 EVT_CONTEXT_MENU(CQueueViewFailed::OnContextMenu)
 EVT_MENU(XRCID("ID_REMOVEALL"), CQueueViewFailed::OnRemoveAll)

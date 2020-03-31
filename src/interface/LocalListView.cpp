@@ -31,6 +31,8 @@
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/recursive_remove.hpp>
 
+#include <wx/menu.h>
+
 class CLocalListViewDropTarget final : public CFileDropTarget<wxListCtrlEx>
 {
 public:

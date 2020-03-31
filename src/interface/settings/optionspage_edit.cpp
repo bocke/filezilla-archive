@@ -6,6 +6,8 @@
 #include "optionspage.h"
 #include "optionspage_edit.h"
 
+#include <wx/filedlg.h>
+
 BEGIN_EVENT_TABLE(COptionsPageEdit, COptionsPage)
 EVT_BUTTON(XRCID("ID_BROWSE"), COptionsPageEdit::OnBrowseEditor)
 EVT_RADIOBUTTON(wxID_ANY, COptionsPageEdit::OnRadioButton)

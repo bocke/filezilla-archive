@@ -18,8 +18,10 @@
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
 
+#include <wx/dirdlg.h>
 #include <wx/dnd.h>
-#include <wx/file.h>
+#include <wx/filedlg.h>
+#include <wx/menu.h>
 #include <wx/statline.h>
 
 #include <algorithm>
