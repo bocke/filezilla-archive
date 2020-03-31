@@ -20,13 +20,13 @@ public:
 protected:
 	bool SetupControls();
 
-	void DisplayFile(bool left, std::wstring const& name, int64_t size, fz::datetime const& time, wxString const& iconFile);
+	void DisplayFile(bool left, std::wstring const& name, int64_t size, fz::datetime const& time, std::wstring const& iconFile);
 
 	void OnOK(wxCommandEvent& event);
 	void OnCancel(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
 
-	void LoadIcon(int id, const wxString &file);
+	void LoadIcon(int id, std::wstring const& file);
 	std::wstring GetPathEllipsis(std::wstring const& path, wxWindow *window);
 
 	CFileExistsNotification *m_pNotification;
