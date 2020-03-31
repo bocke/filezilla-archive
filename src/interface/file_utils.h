@@ -14,7 +14,7 @@ std::vector<std::wstring> UnquoteCommand(std::wstring_view const& command);
 // Returns the association for a file based on its extension
 std::vector<std::wstring> GetSystemAssociation(std::wstring const& file);
 
-void AssociationToCommand(std::vector<std::wstring> & association, std::wstring_view const& file);
+std::vector<fz::native_string> AssociationToCommand(std::vector<std::wstring> const& association, std::wstring_view const& file);
 
 bool ProgramExists(std::wstring const& editor); // TODO: Still needed?
 bool PathExpand(std::wstring & cmd); // TODO: Still needed?
