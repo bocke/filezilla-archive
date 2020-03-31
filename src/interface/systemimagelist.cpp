@@ -6,6 +6,7 @@
 #ifdef __WXMSW__
 #include "shlobj.h"
 #else
+#include <wx/mimetype.h>
 #include "graphics.h"
 #endif
 

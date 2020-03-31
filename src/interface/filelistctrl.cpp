@@ -9,6 +9,11 @@
 #include <algorithm>
 #include "filelist_statusbar.h"
 #include "themeprovider.h"
+
+#ifndef __WXMSW__
+#include <wx/mimetype.h>
+#endif
+
 #if defined(__WXGTK__) && !defined(__WXGTK3__)
 #include <gtk/gtk.h>
 #endif

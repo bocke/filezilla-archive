@@ -10,6 +10,10 @@
 #include <wx/display.h>
 #include <wx/statbox.h>
 
+#ifndef __WXMSW__
+#include <wx/mimetype.h>
+#endif
+
 BEGIN_EVENT_TABLE(CFileExistsDlg, wxDialogEx)
 EVT_BUTTON(XRCID("wxID_OK"), CFileExistsDlg::OnOK)
 EVT_BUTTON(XRCID("wxID_CANCEL"), CFileExistsDlg::OnCancel)

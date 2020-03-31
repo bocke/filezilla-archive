@@ -8,6 +8,7 @@
 #include <shlobj.h>
 #include <shlwapi.h>
 #else
+#include <wx/mimetype.h>
 #include <wx/textfile.h>
 #include <wordexp.h>
 #endif
