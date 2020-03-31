@@ -9,6 +9,7 @@
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
 
+#include <wx/dirdlg.h>
 #include <wx/statline.h>
 
 BEGIN_EVENT_TABLE(CNewBookmarkDialog, wxDialogEx)

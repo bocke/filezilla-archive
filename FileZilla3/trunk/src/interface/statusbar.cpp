@@ -8,6 +8,7 @@
 #include "verifycertdialog.h"
 
 #include <wx/dcclient.h>
+#include <wx/menu.h>
 
 #include <algorithm>
 

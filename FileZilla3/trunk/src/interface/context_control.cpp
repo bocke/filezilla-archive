@@ -25,6 +25,7 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 
+#include <wx/menu.h>
 #include <wx/wupdlock.h>
 
 #include <array>

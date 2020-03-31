@@ -4,6 +4,8 @@
 #include "optionspage.h"
 #include "optionspage_logging.h"
 
+#include <wx/filedlg.h>
+
 BEGIN_EVENT_TABLE(COptionsPageLogging, COptionsPage)
 EVT_BUTTON(XRCID("ID_BROWSE"), COptionsPageLogging::OnBrowse)
 EVT_CHECKBOX(XRCID("ID_LOGFILE"), COptionsPageLogging::OnCheck)

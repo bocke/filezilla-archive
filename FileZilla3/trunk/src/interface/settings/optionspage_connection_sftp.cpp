@@ -10,6 +10,8 @@
 #include "../osx_sandbox_userdirs.h"
 #endif
 
+#include <wx/filedlg.h>
+
 BEGIN_EVENT_TABLE(COptionsPageConnectionSFTP, COptionsPage)
 EVT_BUTTON(XRCID("ID_ADDKEY"), COptionsPageConnectionSFTP::OnAdd)
 EVT_BUTTON(XRCID("ID_REMOVEKEY"), COptionsPageConnectionSFTP::OnRemove)

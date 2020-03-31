@@ -10,6 +10,8 @@
 
 #include <libfilezilla/translate.hpp>
 
+#include <wx/menu.h>
+
 namespace {
 struct background_color {
 	wxColour const color;

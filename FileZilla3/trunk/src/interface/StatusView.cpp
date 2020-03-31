@@ -6,6 +6,7 @@
 #include <libfilezilla/util.hpp>
 
 #include <wx/dcclient.h>
+#include <wx/menu.h>
 
 #define MAX_LINECOUNT 1000
 #define LINECOUNT_REMOVAL 10

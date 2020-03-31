@@ -15,6 +15,8 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
+#include <wx/menu.h>
+
 #ifdef __WXMSW__
 #include <wx/msw/registry.h>
 #include <shlobj.h>

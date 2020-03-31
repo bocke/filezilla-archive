@@ -9,6 +9,7 @@
 
 #include <wx/bmpbuttn.h>
 #include <wx/dcclient.h>
+#include <wx/menu.h>
 
 wxWindowID const ID_SEARCH_TEXT = wxWindow::NewControlId();
 wxWindowID const ID_OPTIONS_MENU_BUTTON = wxWindow::NewControlId();

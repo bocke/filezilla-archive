@@ -14,6 +14,8 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>
 
+#include <wx/filedlg.h>
+
 class CChangedFileDialog : public wxDialogEx
 {
 	DECLARE_EVENT_TABLE()
