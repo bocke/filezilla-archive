@@ -110,6 +110,7 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 		return ret;
 	}
 
+#if FZ_WINDOWS
 	auto query = [&](wchar_t const* verb) {
 		DWORD len{};
 		int res = AssocQueryString(0, ASSOCSTR_COMMAND, (L"." + ext).c_str(), verb, nullptr, &len);
@@ -218,6 +219,45 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 			ret.emplace_back(std::move(out));
 		}
 	}
+#else
+	// wxWidgets doens't escape properly.
+	// For now don't support these files until we can replace wx with something sane.
+	if (ext.find_first_of(L"\"\\") != std::wstring::npos) {
+		return ret;
+	}
+
+	std::unique_ptr<wxFileType> pType(wxTheMimeTypesManager->GetFileTypeFromExtension(ext));
+	if (!pType) {
+		return ret;
+	}
+
+	std::wstring const placeholder = L"placeholderJkpZ0eet6lWsI8glm3uSJYZyvn7WZn5S";
+	ret = UnquoteCommand(pType->GetOpenCommand(placeholder).ToStdWstring());
+
+	bool replaced{};
+	for (size_t i = 0; i < ret.size(); ++i) {
+		auto& arg = ret[i];
+
+		fz::replace_substrings(arg, L"%", L"%%");
+		if (fz::replace_substrings(arg, placeholder, L"%f")) {
+			if (!i) {
+				// Placeholder found in the command itself? Something went wrong.
+				ret.clear();
+				return ret;
+			}
+			replaced = true;
+		}
+	}
+
+	if (!replaced) {
+		ret.clear();
+	}
+
+	if (!ret.empty()) {
+		PathExpand(ret[0]);
+	}
+
+#endif
 
 	return ret;
 }
