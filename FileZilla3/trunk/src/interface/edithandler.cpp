@@ -655,8 +655,7 @@ bool CEditHandler::LaunchEditor(CEditHandler::fileType type, t_fileData& data)
 		return false;
 	}
 	
-	AssociationToCommand(cmd_with_args, data.localFile);
-	return fz::spawn_detached_process(cmd_with_args);
+	return fz::spawn_detached_process(AssociationToCommand(cmd_with_args, data.localFile));
 }
 
 void CEditHandler::CheckForModifications(bool emitEvent)

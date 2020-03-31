@@ -1999,8 +1999,7 @@ void CSearchDialog::OnOpen(wxCommandEvent & event)
 			wxMessageBoxEx(msg, _("Cannot edit file"), wxICON_EXCLAMATION);
 			continue;
 		}
-		AssociationToCommand(cmd_with_args, fn);
-		if (fz::spawn_detached_process(cmd_with_args)) {
+		if (fz::spawn_detached_process(AssociationToCommand(cmd_with_args, fn))) {
 			continue;
 		}
 		wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), fn), _("Opening failed"), wxICON_EXCLAMATION);

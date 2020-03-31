@@ -1930,8 +1930,7 @@ void CLocalListView::OnMenuOpen(wxCommandEvent&)
 			continue;
 		}
 
-		AssociationToCommand(cmd_with_args, fn.GetFullPath().ToStdWstring());
-		if (fz::spawn_detached_process(cmd_with_args)) {
+		if (fz::spawn_detached_process(AssociationToCommand(cmd_with_args, fn.GetFullPath().ToStdWstring()))) {
 			continue;
 		}
 		wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), fn.GetFullPath()), _("Opening failed"), wxICON_EXCLAMATION);

@@ -263,13 +263,16 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 	return ret;
 }
 
-void AssociationToCommand(std::vector<std::wstring>& association, std::wstring_view const& file)
+std::vector<fz::native_string> AssociationToCommand(std::vector<std::wstring> const& association, std::wstring_view const& file)
 {
+	std::vector<fz::native_string> ret;
+	ret.reserve(association.size());
+
 	bool replaced{};
 
 	for (size_t i = 1; i < association.size(); ++i) {
 		bool percent{};
-		std::wstring & arg = association[i];
+		std::wstring const& arg = association[i];
 		
 		std::wstring out;
 		out.reserve(arg.size());
@@ -291,12 +294,14 @@ void AssociationToCommand(std::vector<std::wstring>& association, std::wstring_v
 				out += c;
 			}
 		}
-		std::swap(arg, out);
+		ret.emplace_back(fz::to_native(out));
 	}
 
 	if (!replaced) {
-		association.emplace_back(file);
+		ret.emplace_back(fz::to_native(file));
 	}
+
+	return ret;
 }
 
 std::wstring QuoteCommand(std::vector<std::wstring> const& cmd_with_args)
