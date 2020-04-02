@@ -102,6 +102,51 @@ bool OpenInFileManager(std::wstring const& dir)
 	return ret;
 }
 
+namespace {
+bool PathExpand(std::wstring& cmd)
+{
+	if (cmd.empty()) {
+		return false;
+	}
+#ifndef __WXMSW__
+	if (!cmd.empty() && cmd[0] == '/') {
+		return true;
+	}
+#else
+	if (!cmd.empty() && cmd[0] == '\\') {
+		// UNC or root of current working dir, whatever that is
+		return true;
+	}
+	if (cmd.size() > 2 && cmd[1] == ':') {
+		// Absolute path
+		return true;
+	}
+#endif
+
+	// Need to search for program in $PATH
+	std::wstring path = GetEnv("PATH");
+	if (path.empty()) {
+		return false;
+	}
+
+	wxString full_cmd;
+	bool found = wxFindFileInPath(&full_cmd, path, cmd);
+#ifdef __WXMSW__
+	if (!found && !fz::equal_insensitive_ascii(cmd.substr(cmd.size() - 1), L".exe")) {
+		cmd += L".exe";
+		found = wxFindFileInPath(&full_cmd, path, cmd);
+	}
+#endif
+
+	if (!found) {
+		return false;
+	}
+
+	cmd = full_cmd;
+	return true;
+}
+}
+
 std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 {
 	std::vector<std::wstring> ret;
@@ -269,7 +314,7 @@ std::vector<fz::native_string> AssociationToCommand(std::vector<std::wstring> co
 	ret.reserve(association.size());
 
 	if (!association.empty()) {
-		ret.push_back(association.front());
+		ret.push_back(fz::to_native(association.front()));
 	}
 
 	bool replaced{};
@@ -277,7 +322,7 @@ std::vector<fz::native_string> AssociationToCommand(std::vector<std::wstring> co
 	for (size_t i = 1; i < association.size(); ++i) {
 		bool percent{};
 		std::wstring const& arg = association[i];
-		
+
 		std::wstring out;
 		out.reserve(arg.size());
 		for (auto const& c : arg) {
@@ -420,51 +465,6 @@ bool ProgramExists(std::wstring const& editor)
 #endif
 
 	return false;
-}
-
-namespace {
-bool PathExpand(std::wstring& cmd)
-{
-	if (cmd.empty()) {
-		return false;
-	}
-#ifndef __WXMSW__
-	if (!cmd.empty() && cmd[0] == '/') {
-		return true;
-	}
-#else
-	if (!cmd.empty() && cmd[0] == '\\') {
-		// UNC or root of current working dir, whatever that is
-		return true;
-	}
-	if (cmd.size() > 2 && cmd[1] == ':') {
-		// Absolute path
-		return true;
-	}
-#endif
-
-	// Need to search for program in $PATH
-	std::wstring path = GetEnv("PATH");
-	if (path.empty()) {
-		return false;
-	}
-
-	wxString full_cmd;
-	bool found = wxFindFileInPath(&full_cmd, path, cmd);
-#ifdef __WXMSW__
-	if (!found && !fz::equal_insensitive_ascii(cmd.substr(cmd.size() - 1), L".exe")) {
-		cmd += L".exe";
-		found = wxFindFileInPath(&full_cmd, path, cmd);
-	}
-#endif
-
-	if (!found) {
-		return false;
-	}
-
-	cmd = full_cmd;
-	return true;
-}
 }
 
 bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)
