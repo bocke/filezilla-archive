@@ -1583,7 +1583,7 @@ void CNewAssociationDialog::OnOK()
 	if (ext_.empty()) {
 		ext_ = L"/";
 	}
-	if (ext_.find_first_of(L" '\"") != std::wstring::npos) {
+	else if (ext_.find_first_of(L" \t'\"") != std::wstring::npos) {
 		fz::replace_substrings(ext_, L"\"", L"\"\"");
 		ext_ = L"\"" + ext_ + L"\"";
 	}
