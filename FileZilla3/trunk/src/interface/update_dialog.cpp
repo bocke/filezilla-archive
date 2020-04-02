@@ -402,7 +402,12 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 	}
 	COptions::Get()->SetOption(OPTION_GREETINGRESOURCES, updater_.GetResources());
 #ifdef __WXMSW__
-	wxExecute(_T("\"") + f +  _T("\" /update /NCRC"));
+	std::vector<std::wstring> cmd_with_args;
+	cmd_with_args.push_back(f);
+	cmd_with_args.push_back(L"/update");
+	cmd_with_args.push_back(L"/NCRC");
+	fz::spawn_detached_process(cmd_with_args);
+
 	wxWindow* p = parent_;
 	while (p->GetParent()) {
 		p = p->GetParent();
