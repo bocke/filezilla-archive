@@ -268,6 +268,10 @@ std::vector<fz::native_string> AssociationToCommand(std::vector<std::wstring> co
 	std::vector<fz::native_string> ret;
 	ret.reserve(association.size());
 
+	if (!association.empty()) {
+		ret.push_back(association.front());
+	}
+
 	bool replaced{};
 
 	for (size_t i = 1; i < association.size(); ++i) {
@@ -326,31 +330,30 @@ std::wstring QuoteCommand(std::vector<std::wstring> const& cmd_with_args)
 	return ret;
 }
 
-std::vector<std::wstring> UnquoteCommand(std::wstring_view const& command)
+std::optional<std::wstring> UnquoteFirst(std::wstring_view & command)
 {
-	std::vector<std::wstring> ret;
+	std::optional<std::wstring> ret;
 
-	std::wstring part;
 	bool quoted{};
-	bool add{};
-	for (size_t i = 0; i < command.size(); i++) {
+	size_t i = 0;
+	for (; i < command.size(); ++i) {
 		wchar_t const& c = command[i];
 
-		if ((c == ' ' || c == '\t') && !quoted) {
-			if (add) {
-				add = false;
-				ret.emplace_back(std::move(part));
-				part.clear();
+		if ((c == ' ' || c == '\t' || c == '\r' || c == '\n') && !quoted) {
+			if (ret) {
+				break;
 			}
 		}
 		else {
-			add = true;
+			if (!ret) {
+				ret = std::wstring();
+			}
 			if (c == '"') {
 				if (!quoted) {
 					quoted = true;
 				}
 				else if (i + 1 != command.size() && command[i + 1] == '"') {
-					part += '"';
+					*ret += '"';
 					++i;
 				}
 				else {
@@ -358,16 +361,42 @@ std::vector<std::wstring> UnquoteCommand(std::wstring_view const& command)
 				}
 			}
 			else {
-				part.push_back(c);
+				ret->push_back(c);
 			}
 		}
 	}
 	if (quoted) {
-		ret.clear();
+		ret.reset();
 	}
 
-	if (add) {
-		ret.emplace_back(std::move(part));
+	if (ret) {
+		for (; i < command.size(); ++i) {
+			wchar_t const& c = command[i];
+			if (!(c == ' ' || c == '\t' || c == '\r' || c == '\n')) {
+				break;
+			}
+		}
+		command = command.substr(i);
+	}
+
+	return ret;
+}
+
+std::vector<std::wstring> UnquoteCommand(std::wstring_view command)
+{
+	std::vector<std::wstring> ret;
+
+	while (!command.empty()) {
+		auto part = UnquoteFirst(command);
+		if (!part) {
+			break;
+		}
+
+		ret.emplace_back(std::move(*part));
+	}
+
+	if (!command.empty()) {
+		ret.clear();
 	}
 
 	if (!ret.empty() && ret.front().empty()) {
@@ -393,7 +422,8 @@ bool ProgramExists(std::wstring const& editor)
 	return false;
 }
 
-bool PathExpand(std::wstring & cmd)
+namespace {
+bool PathExpand(std::wstring& cmd)
 {
 	if (cmd.empty()) {
 		return false;
@@ -434,6 +464,7 @@ bool PathExpand(std::wstring & cmd)
 
 	cmd = full_cmd;
 	return true;
+}
 }
 
 bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)

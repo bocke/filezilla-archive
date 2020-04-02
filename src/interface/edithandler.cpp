@@ -931,20 +931,17 @@ std::vector<std::wstring> CEditHandler::GetCustomAssociation(std::wstring_view c
 	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
 	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
 
-	for (auto & assoc : assocs) {
-		// TODO: Decode space
-		auto pos = assoc.find(' ');
-		if (pos == std::wstring::npos) {
-			continue;
-		}
-		if (ext != assoc.substr(0, pos)) {
+	for (std::wstring_view assoc : assocs) {
+		std::optional<std::wstring> aext = UnquoteFirst(assoc);
+		if (!aext || *aext != ext) {
 			continue;
 		}
 
-		ret = UnquoteCommand(assoc.substr(pos + 1));
-		if (!ret.empty()) {
+		ret = UnquoteCommand(assoc);
+		if (!ret.empty() && !ret[0].empty()) {
 			break;
 		}
+		ret.clear();
 	}
 
 	return ret;
@@ -1468,7 +1465,7 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 			impl_->rbSystem_ = new wxRadioButton(this, -1, _("Use system association"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 			impl_->rbSystem_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
 			main->Add(impl_->rbSystem_);
-			main->Add(new wxStaticText(this, -1, _("The default editor for text files is:") + L" " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
+			main->Add(new wxStaticText(this, -1, _("The default editor for this file type is:") + L" " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
 		}
 	}
 
