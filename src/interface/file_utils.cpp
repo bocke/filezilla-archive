@@ -300,7 +300,9 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 	}
 
 	if (!ret.empty()) {
-		PathExpand(ret[0]);
+		if (!PathExpand(ret[0])) {
+			ret.clear();
+		}
 	}
 
 #endif
