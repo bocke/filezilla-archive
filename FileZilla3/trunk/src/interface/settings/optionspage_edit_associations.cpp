@@ -44,22 +44,24 @@ bool COptionsPageEditAssociations::SavePage()
 bool COptionsPageEditAssociations::Validate()
 {
 	std::wstring const raw_assocs = assocs_->GetValue().ToStdWstring();
-	auto assocs = fz::strtok(raw_assocs, L"\r\n", true);
+	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
 
-	for (auto& assoc : assocs) {
-		if (assoc.empty()) {
-			return DisplayError(assocs_, _("Empty file extension."));
-		}
-
-		auto cmd_with_args = UnquoteCommand(assoc);
-		if (cmd_with_args.size() < 2 || cmd_with_args[0].empty() || cmd_with_args[1].empty()) {
+	for (std::wstring_view assoc : assocs) {
+		std::optional<std::wstring> aext = UnquoteFirst(assoc);
+		if (!aext || aext->empty()) {
 			return DisplayError(assocs_, _("Improperly quoted association."));
 		}
 
-		if (!ProgramExists(cmd_with_args[1])) {
+		auto cmd_with_args = UnquoteCommand(assoc);
+
+		if (cmd_with_args.empty() || cmd_with_args[0].empty()) {
+			return DisplayError(assocs_, _("Improperly quoted association."));
+		}
+
+		if (!ProgramExists(cmd_with_args[0])) {
 			wxString error = _("Associated program not found:");
 			error += '\n';
-			error += cmd_with_args[1];
+			error += cmd_with_args[0];
 			return DisplayError(assocs_, error);
 		}
 	}
