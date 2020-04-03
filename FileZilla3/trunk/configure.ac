@@ -187,6 +187,9 @@ if test "$buildmain" = "yes"; then
   if echo "$WX_CPPFLAGS" | grep __WXUNIVERSAL__ > /dev/null; then
     AC_MSG_ERROR([wxUniversal is not acceptable as flavour of wxWidgets. Please recompile wxWidgets with --disable-universal])
   fi
+  if echo "$WX_CPPFLAGS" | grep __WXMOTIF__ > /dev/null; then
+    AC_MSG_ERROR([wxMotif is not acceptable as flavour of wxWidgets. Please recompile wxWidgets with the GTK flavour])
+  fi
 
   AC_LANG_PUSH(C++)
   CPPFLAGS_OLD="$CPPFLAGS"
