@@ -461,7 +461,11 @@ bool ProgramExists(std::wstring const& editor)
 	}
 
 #ifdef __WXMAC__
-	if (editor.size() > 4 && editor.substr(editor.size() - 4) == L".app" && wxFileName::DirExists(editor)) {
+	std::wstring_view e;
+	if (!e.empty() && e.back() == '/') {
+		e = e.substr(0, e.size() - 1);
+	}
+	if (fz::ends_with(e, std::wstring_view(L".app")) && wxFileName::DirExists(editor)) {
 		return true;
 	}
 #endif
