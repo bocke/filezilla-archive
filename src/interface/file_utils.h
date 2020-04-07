@@ -67,6 +67,6 @@ private:
 	wxWindow* parent_;
 };
 
-bool IsInvalidChar(wchar_t c, bool includeQuotes = false);
+bool IsInvalidChar(wchar_t c, bool includeQuotesAndBreaks = false);
 
 #endif

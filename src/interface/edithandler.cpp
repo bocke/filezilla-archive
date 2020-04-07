@@ -954,7 +954,7 @@ void CEditHandler::OnChangedFileEvent(wxCommandEvent&)
 
 std::wstring CEditHandler::GetTemporaryFile(std::wstring name)
 {
-	name = CQueueView::ReplaceInvalidCharacters(name);
+	name = CQueueView::ReplaceInvalidCharacters(name, true);
 #ifdef __WXMSW__
 	// MAX_PATH - 1 is theoretical limit, we subtract another 4 to allow
 	// editors which create temporary files
