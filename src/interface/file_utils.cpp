@@ -663,7 +663,7 @@ bool IsInvalidChar(wchar_t c, bool includeQuotesAndBreaks)
 #ifdef __WXMSW__
 			return true;
 #else
-			return includeQuotesAndBreaks
+			return includeQuotesAndBreaks;
 #endif
 		}
 		return false;
