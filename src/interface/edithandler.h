@@ -155,7 +155,7 @@ protected:
 	std::wstring TruncateFilename(std::wstring const& path, std::wstring const& name, size_t max);
 	bool FilenameExists(std::wstring const& file);
 
-	int DisplayChangeNotification(fileType type, std::list<t_fileData>::const_iterator iter, bool& remove);
+	int DisplayChangeNotification(fileType type, t_fileData const& data, bool& remove);
 
 #ifdef __WXMSW__
 	HANDLE m_lockfile_handle;
