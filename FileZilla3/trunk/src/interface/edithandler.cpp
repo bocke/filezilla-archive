@@ -15,28 +15,7 @@
 #include <libfilezilla/process.hpp>
 
 #include <wx/filedlg.h>
-
-class CChangedFileDialog : public wxDialogEx
-{
-	DECLARE_EVENT_TABLE()
-	void OnYes(wxCommandEvent& event);
-	void OnNo(wxCommandEvent& event);
-};
-
-BEGIN_EVENT_TABLE(CChangedFileDialog, wxDialogEx)
-EVT_BUTTON(wxID_YES, CChangedFileDialog::OnYes)
-EVT_BUTTON(wxID_NO, CChangedFileDialog::OnNo)
-END_EVENT_TABLE()
-
-void CChangedFileDialog::OnYes(wxCommandEvent&)
-{
-	EndDialog(wxID_YES);
-}
-
-void CChangedFileDialog::OnNo(wxCommandEvent&)
-{
-	EndDialog(wxID_NO);
-}
+#include <wx/statline.h>
 
 //-------------
 
@@ -347,7 +326,10 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring const& loca
 	else {
 		std::wstring localFileName;
 		CLocalPath localPath(localFile, &localFileName);
-		m_pQueue->QueueFile(false, true, localFileName, remoteFile, localPath, remotePath, site, size, type, QueuePriority::high);
+		if (localFileName == remoteFile) {
+			localFileName.clear();
+		}
+		m_pQueue->QueueFile(false, true, remoteFile, localFileName, localPath, remotePath, site, size, type, QueuePriority::high);
 		m_pQueue->QueueFile_Finish(true);
 	}
 
@@ -712,7 +694,7 @@ checkmodifications_loopbegin:
 			}
 
 			bool remove;
-			int res = DisplayChangeNotification(CEditHandler::fileType(i), iter, remove);
+			int res = DisplayChangeNotification(CEditHandler::fileType(i), *iter, remove);
 			if (res == -1) {
 				continue;
 			}
@@ -749,50 +731,76 @@ checkmodifications_loopbegin:
 	insideCheckForModifications = false;
 }
 
-int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, std::list<CEditHandler::t_fileData>::const_iterator iter, bool& remove)
+int CEditHandler::DisplayChangeNotification(CEditHandler::fileType type, CEditHandler::t_fileData const& data, bool& remove)
 {
-	CChangedFileDialog dlg;
-	if (!dlg.Load(wxTheApp->GetTopWindow(), _T("ID_CHANGEDFILE"))) {
+	wxDialogEx dlg;
+
+	if (!dlg.Create(wxTheApp->GetTopWindow(), -1, _("File has changed"))) {
 		return -1;
 	}
+
+	auto& lay = dlg.layout();
+
+	auto main = lay.createMain(&dlg, 1);
+	main->AddGrowableCol(0);
+
+	main->Add(new wxStaticText(&dlg, -1, _("A file previously opened has been changed.")));
+
+	auto inner = lay.createFlex(2);
+	main->Add(inner);
+
+	inner->Add(new wxStaticText(&dlg, -1, _("Filename:")));
+	inner->Add(new wxStaticText(&dlg, -1, LabelEscape((type == local) ? data.localFile : data.remoteFile)));
+
 	if (type == remote) {
-		XRCCTRL(dlg, "ID_DESC_UPLOAD_LOCAL", wxStaticText)->Hide();
-	}
-	else {
-		XRCCTRL(dlg, "ID_DESC_UPLOAD_REMOTE", wxStaticText)->Hide();
+		std::wstring file = data.localFile;
+		size_t pos = file.rfind(wxFileName::GetPathSeparator());
+		if (pos != std::wstring::npos) {
+			file = file.substr(pos + 1);
+		}
+		if (file != data.remoteFile) {
+			inner->Add(new wxStaticText(&dlg, -1, _("Opened as:")));
+			inner->Add(new wxStaticText(&dlg, -1, LabelEscape(file)));
+		}
 	}
 
-	dlg.SetChildLabel(XRCID("ID_FILENAME"), iter->localFile);
+	inner->Add(new wxStaticText(&dlg, -1, _("Server:")));
+	inner->Add(new wxStaticText(&dlg, -1, LabelEscape(data.site.Format(ServerFormat::with_user_and_optional_port))));
+	
+	inner->Add(new wxStaticText(&dlg, -1, _("Remote path:")));
+	inner->Add(new wxStaticText(&dlg, -1, LabelEscape(data.remotePath.GetPath())));
 
+	main->Add(new wxStaticLine(&dlg), lay.grow);
+
+	wxCheckBox* cb{};
 	if (type == local) {
-		XRCCTRL(dlg, "ID_DESC_OPENEDAS", wxStaticText)->Hide();
-		XRCCTRL(dlg, "ID_OPENEDAS", wxStaticText)->Hide();
-
-		dlg.SetChildLabel("ID_DELETE", _T("&Finish editing"));
+		main->Add(new wxStaticText(&dlg, -1, _("Upload this file to the server?")));
+		cb = new wxCheckBox(&dlg, -1, _("&Finish editing"));
 	}
 	else {
-		wxString file = iter->localFile;
-		int pos = file.Find(wxFileName::GetPathSeparator(), true);
-		wxASSERT(pos != -1);
-		file = file.Mid(pos + 1);
+		main->Add(new wxStaticText(&dlg, -1, _("Upload this file back to the server?")));
+		cb = new wxCheckBox(&dlg, -1, _("&Finish editing and delete local file"));
 
-		if (file == iter->localFile) {
-			XRCCTRL(dlg, "ID_DESC_OPENEDAS", wxStaticText)->Hide();
-			XRCCTRL(dlg, "ID_OPENEDAS", wxStaticText)->Hide();
-		}
-		else {
-			dlg.SetChildLabel(XRCID("ID_OPENEDAS"), file);
-		}
 	}
+	main->Add(cb);
 
-	dlg.SetChildLabel(XRCID("ID_SERVER"), iter->site.Format(ServerFormat::with_user_and_optional_port));
-	dlg.SetChildLabel(XRCID("ID_REMOTEPATH"), iter->remotePath.GetPath());
+	auto buttons = lay.createButtonSizer(&dlg, main, false);
+	auto yes = new wxButton(&dlg, wxID_YES, _("&Yes"));
+	yes->SetDefault();
+	buttons->AddButton(yes);
+	auto no = new wxButton(&dlg, wxID_NO, _("&No"));
+	buttons->AddButton(no);
+	buttons->Realize();
 
+	yes->Bind(wxEVT_BUTTON, [&dlg](wxEvent const&) { dlg.EndDialog(wxID_YES); });
+	no->Bind(wxEVT_BUTTON, [&dlg](wxEvent const&) { dlg.EndDialog(wxID_NO); });
+
+	dlg.Layout();
 	dlg.GetSizer()->Fit(&dlg);
 
 	int res = dlg.ShowModal();
 
-	remove = XRCCTRL(dlg, "ID_DELETE", wxCheckBox)->IsChecked();
+	remove = cb->IsChecked();
 
 	return res;
 }
@@ -848,7 +856,7 @@ bool CEditHandler::UploadFile(fileType type, std::list<t_fileData>::iterator ite
 		return false;
 	}
 
-	m_pQueue->QueueFile(false, false, file, iter->remoteFile, localPath, iter->remotePath, iter->site, size, type, QueuePriority::high);
+	m_pQueue->QueueFile(false, false, file, (file == iter->remoteFile) ? std::wstring() : iter->remoteFile, localPath, iter->remotePath, iter->site, size, type, QueuePriority::high);
 	m_pQueue->QueueFile_Finish(true);
 
 	return true;
@@ -1510,14 +1518,6 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 	SetCtrlState();
 
 	return ShowModal() == wxID_OK;
-
-	GetSizer()->Fit(this);
-
-	if (ShowModal() != wxID_OK) {
-		return false;
-	}
-
-	return true;
 }
 
 void CNewAssociationDialog::SetCtrlState()

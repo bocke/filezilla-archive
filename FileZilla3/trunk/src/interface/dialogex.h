@@ -56,6 +56,10 @@ public:
 
 	DialogLayout const& layout();
 
+	void EndDialog(int rc) {
+		wxDialog::EndDialog(rc);
+	}
+
 protected:
 	virtual void InitDialog();
 

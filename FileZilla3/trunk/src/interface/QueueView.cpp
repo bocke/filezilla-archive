@@ -254,9 +254,9 @@ CQueueView::~CQueueView()
 	m_resize_timer.Stop();
 }
 
-bool CQueueView::QueueFile(const bool queueOnly, const bool download,
+bool CQueueView::QueueFile(bool const queueOnly, bool const download,
 						   std::wstring const& sourceFile, std::wstring const& targetFile,
-						   const CLocalPath& localPath, const CServerPath& remotePath,
+						   CLocalPath const& localPath, CServerPath const& remotePath,
 						   Site const& site, int64_t size, CEditHandler::fileType edit,
 						   QueuePriority priority)
 {

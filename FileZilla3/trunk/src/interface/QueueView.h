@@ -117,9 +117,9 @@ public:
 	CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue* pAsyncRequestQueue);
 	virtual ~CQueueView();
 
-	bool QueueFile(const bool queueOnly, const bool download,
-		std::wstring const& localFile, std::wstring const& remoteFile,
-		const CLocalPath& localPath, const CServerPath& remotePath,
+	bool QueueFile(bool const queueOnly, bool const download,
+		std::wstring const& sourceFile, std::wstring const& targetFile,
+		CLocalPath const& localPath, CServerPath const& remotePath,
 		Site const& site, int64_t size, CEditHandler::fileType edit = CEditHandler::none,
 		QueuePriority priority = QueuePriority::normal);
 
