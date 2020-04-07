@@ -632,7 +632,7 @@ bool CEditHandler::LaunchEditor(CEditHandler::fileType type, t_fileData& data)
 		return false;
 	}
 
-	auto cmd_with_args = GetAssociation(data.localFile);
+	auto cmd_with_args = GetAssociation((type == local) ? data.localFile : data.remoteFile);
 	if (cmd_with_args.empty() || !ProgramExists(cmd_with_args.front())) {
 		return false;
 	}
@@ -1710,26 +1710,70 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 			int action = already_editing_action;
 			if (!action) {
 				wxDialogEx dlg;
-				if (!dlg.Load(parent, type == CEditHandler::local ? _T("ID_EDITEXISTING_LOCAL") : _T("ID_EDITEXISTING_REMOTE"))) {
+				if (!dlg.Create(parent, -1, _("Selected file already being edited"))) {
 					wxBell();
 					return false;
 				}
-				dlg.SetChildLabel(XRCID("ID_FILENAME"), file.name);
+
+				auto& lay = dlg.layout();
+				auto main = lay.createMain(&dlg, 1);
+				main->AddGrowableCol(0);
+
+				main->Add(new wxStaticText(&dlg, -1, _("The selected file is already being edited:")));
+				main->Add(new wxStaticText(&dlg, -1, LabelEscape(file.name)));
+
+				main->AddSpacer(0);
 
 				int choices = COptions::Get()->GetOptionVal(OPTION_PERSISTENT_CHOICES);
 
-				if (fileCount < 2) {
-					xrc_call(dlg, "ID_ALWAYS", &wxCheckBox::Hide);
+				wxRadioButton* reopen{};
+				if (type == local) {
+					main->Add(new wxStaticText(&dlg, -1, _("Do you want to reopen this file?")));
 				}
 				else {
-					if (choices & edit_choices::edit_existing_always) {
-						xrc_call(dlg, "ID_ALWAYS", &wxCheckBox::SetValue, true);
+					main->Add(new wxStaticText(&dlg, -1, _("Action to perform:")));
+
+					reopen = new wxRadioButton(&dlg, -1, _("&Reopen local file"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+					main->Add(reopen);
+					wxRadioButton* retransfer = new wxRadioButton(&dlg, -1, _("&Discard local file then download and edit file anew"));
+					main->Add(retransfer);
+
+					if (choices & edit_choices::edit_existing_action) {
+						retransfer->SetValue(true);
+					}
+					else {
+						reopen->SetValue(true);
 					}
 				}
 
-				if (type == CEditHandler::remote && (choices & edit_choices::edit_existing_action)) {
-					xrc_call(dlg, "ID_RETRANSFER", &wxRadioButton::SetValue, true);
+				wxCheckBox *always{};
+				if (fileCount > 1) {
+					always = new wxCheckBox(&dlg, -1, _("Do the same with &all selected files already being edited"));
+					main->Add(always);
+					if (choices & edit_choices::edit_existing_always) {
+						always->SetValue(true);
+					}
 				}
+
+				auto buttons = lay.createButtonSizer(&dlg, main, false);
+
+				if (type == remote) {
+					auto ok = new wxButton(&dlg, wxID_OK, _("OK"));
+					ok->SetDefault();
+					buttons->AddButton(ok);
+					auto cancel = new wxButton(&dlg, wxID_CANCEL, _("Cancel"));
+					buttons->AddButton(cancel);
+				}
+				else {
+					auto yes = new wxButton(&dlg, wxID_YES, _("&Yes"));
+					yes->SetDefault();
+					buttons->AddButton(yes);
+					auto no = new wxButton(&dlg, wxID_NO, _("&No"));
+					buttons->AddButton(no);
+					yes->Bind(wxEVT_BUTTON, [&dlg](wxEvent const&) { dlg.EndDialog(wxID_YES); });
+					no->Bind(wxEVT_BUTTON, [&dlg](wxEvent const&) { dlg.EndDialog(wxID_NO); });
+				}
+				buttons->Realize();
 
 				dlg.GetSizer()->Fit(&dlg);
 				int res = dlg.ShowModal();
@@ -1737,7 +1781,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 					wxBell();
 					action = -1;
 				}
-				else if (type == CEditHandler::local || xrc_call(dlg, "ID_REOPEN", &wxRadioButton::GetValue)) {
+				else if (type == CEditHandler::local || (reopen && reopen->GetValue())) {
 					action = 1;
 					if (type == CEditHandler::remote) {
 						choices &= ~edit_choices::edit_existing_action;
@@ -1748,15 +1792,16 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 					choices |= edit_choices::edit_existing_action;
 				}
 
-				bool always = xrc_call(dlg, "ID_ALWAYS", &wxCheckBox::GetValue);
-				if (always) {
-					already_editing_action = action;
-					choices |= edit_choices::edit_existing_always;
+				if (fileCount > 1) {
+					if (always && always->GetValue()) {
+						already_editing_action = action;
+						choices |= edit_choices::edit_existing_always;
+					}
+					else {
+						choices &= ~edit_choices::edit_existing_always;
+					}
+					COptions::Get()->SetOption(OPTION_PERSISTENT_CHOICES, choices);
 				}
-				else {
-					choices &= ~edit_choices::edit_existing_always;
-				}
-				COptions::Get()->SetOption(OPTION_PERSISTENT_CHOICES, choices);
 			}
 
 			if (action == -1) {
@@ -1808,20 +1853,20 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	// Find associated program
 	bool dangerous = false;
 	bool program_exists = false;
-	auto cmd_with_args = CanOpen(localFile, dangerous, program_exists);
+	auto cmd_with_args = CanOpen(file.name, dangerous, program_exists);
 	if (cmd_with_args.empty()) {
 		CNewAssociationDialog dlg(parent);
 		if (!dlg.Run(file.name)) {
 			return false;
 		}
-		cmd_with_args = CanOpen(localFile, dangerous, program_exists);
+		cmd_with_args = CanOpen(file.name, dangerous, program_exists);
 		if (cmd_with_args.empty()) {
-			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nNo program has been associated on your system with this file type."), localFile), _("Opening failed"), wxICON_EXCLAMATION);
+			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nNo program has been associated on your system with this file type."), file.name), _("Opening failed"), wxICON_EXCLAMATION);
 			return false;
 		}
 	}
 	if (!program_exists) {
-		wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), localFile, QuoteCommand(cmd_with_args));
+		wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), file.name, QuoteCommand(cmd_with_args));
 		wxMessageBoxEx(msg, _("Cannot edit file"), wxICON_EXCLAMATION);
 		return false;
 	}
