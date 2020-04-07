@@ -151,7 +151,7 @@ public:
 
 	void RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString& newName, bool local);
 
-	static std::wstring ReplaceInvalidCharacters(std::wstring const& filename);
+	static std::wstring ReplaceInvalidCharacters(std::wstring const& filename, bool includeQuotesAndBreaks = false);
 
 	// Get the current download speed as the sum of all active downloads.
 	// Unit is byte/s.

@@ -629,7 +629,7 @@ std::wstring GetExtension(std::wstring_view file)
 	return std::wstring();
 }
 
-bool IsInvalidChar(wchar_t c, bool includeQuotes)
+bool IsInvalidChar(wchar_t c, bool includeQuotesAndBreaks)
 {
 	switch (c)
 	{
@@ -652,14 +652,16 @@ bool IsInvalidChar(wchar_t c, bool includeQuotes)
 	case '"':
 	case '\\':
 #endif
-		return includeQuotes;
+		return includeQuotesAndBreaks;
 
 	default:
-#ifdef __WXMSW__
 		if (c < 0x20) {
+#ifdef __WXMSW__
 			return true;
-		}
+#else
+			return includeQuotesAndBreaks
 #endif
+		}
 		return false;
 	}
 }

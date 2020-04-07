@@ -2945,7 +2945,7 @@ void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString&
 	RefreshItem(pFile);
 }
 
-std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename)
+std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename, bool includeQuotesAndBreaks)
 {
 	if (!COptions::Get()->GetOptionVal(OPTION_INVALID_CHAR_REPLACE_ENABLE)) {
 		return filename;
@@ -2955,7 +2955,7 @@ std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename)
 
 	std::wstring ret = filename;
 	for (auto & c : ret) {
-		if (IsInvalidChar(c, false)) {
+		if (IsInvalidChar(c, includeQuotesAndBreaks)) {
 			c = replace;
 		}
 	}
