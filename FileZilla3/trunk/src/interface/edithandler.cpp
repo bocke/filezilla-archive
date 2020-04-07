@@ -1472,6 +1472,7 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 		if (!cmd_with_args.empty()) {
 			impl_->rbSystem_ = new wxRadioButton(this, -1, _("Use system association"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 			impl_->rbSystem_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+			impl_->rbSystem_->SetValue(true);
 			main->Add(impl_->rbSystem_);
 			main->Add(new wxStaticText(this, -1, _("The default editor for this file type is:") + L" " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
 		}
@@ -1482,6 +1483,9 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 		if (!cmd_with_args.empty()) {
 			impl_->rbDefault_ = new wxRadioButton(this, -1, _("Use &default editor for text files"), wxDefaultPosition, wxDefaultSize, impl_->rbSystem_ ? 0 : wxRB_GROUP);
 			impl_->rbDefault_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+			if (!impl_->rbSystem_) {
+				impl_->rbDefault_->SetValue(true);
+			}
 			main->Add(impl_->rbDefault_);
 			main->Add(new wxStaticText(this, -1, _("The default editor for text files is:") + " " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
 			impl_->always_ = new wxCheckBox(this, -1, _("&Always use selection for all unassociated files"));
@@ -1491,6 +1495,9 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 
 	impl_->rbCustom_ = new wxRadioButton(this, -1, _("&Use custom program"), wxDefaultPosition, wxDefaultSize, (impl_->rbSystem_ || impl_->rbDefault_) ? 0 : wxRB_GROUP);
 	impl_->rbCustom_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
+	if (!impl_->rbSystem_ && !impl_->rbDefault_) {
+		impl_->rbCustom_->SetValue(true);
+	}
 	main->Add(impl_->rbCustom_);
 	auto row = lay.createFlex(2);
 	row->AddGrowableCol(0);
