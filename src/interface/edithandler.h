@@ -182,15 +182,12 @@ protected:
 
 	CEditHandler::t_fileData* GetDataFromItem(int item, CEditHandler::fileType &type);
 
-	wxWindow* m_pParent;
+	struct impl;
+	std::unique_ptr<impl> impl_;
 
-	CWindowStateManager* m_pWindowStateManager;
-
-	DECLARE_EVENT_TABLE()
-	void OnSelectionChanged(wxListEvent& event);
-	void OnUnedit(wxCommandEvent& event);
-	void OnUpload(wxCommandEvent& event);
-	void OnEdit(wxCommandEvent& event);
+	void OnUnedit();
+	void OnUpload(bool uneditAfter);
+	void OnEdit();
 };
 
 class CNewAssociationDialog final : protected wxDialogEx
