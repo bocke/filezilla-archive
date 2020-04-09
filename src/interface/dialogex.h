@@ -69,6 +69,8 @@ protected:
 
 #ifdef __WXMAC__
 	virtual bool ProcessEvent(wxEvent& event);
+
+	static std::vector<void*> shown_dialogs_creation_events_;
 #endif
 
 	static std::vector<wxDialogEx*> shown_dialogs_;
