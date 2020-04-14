@@ -1226,41 +1226,6 @@
       </object>
     </object>
   </object>
-  <object class="wxPanel" name="ID_SETTINGS_LANGUAGE">
-    <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
-      <object class="sizeritem">
-        <object class="wxStaticBoxSizer">
-          <label>Language</label>
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>&amp;Select language:</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxListBox" name="ID_LANGUAGES">
-              <style>wxLB_SINGLE|wxLB_NEEDED_SB</style>
-            </object>
-            <option>1</option>
-            <flag>wxLEFT|wxRIGHT</flag>
-            <border>5</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxStaticText">
-              <label>If you change the language, you need to restart FileZilla.</label>
-            </object>
-            <flag>wxALL</flag>
-            <border>5</border>
-          </object>
-        </object>
-        <option>1</option>
-        <flag>wxGROW</flag>
-      </object>
-    </object>
-  </object>
   <object class="wxPanel" name="ID_SETTINGS_UPDATECHECK">
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
