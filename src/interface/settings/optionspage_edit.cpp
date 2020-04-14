@@ -9,6 +9,7 @@
 #include "optionspage_edit.h"
 
 #include <wx/filedlg.h>
+#include <wx/hyperlink.h>
 #include <wx/statline.h>
 
 struct COptionsPageEdit::impl final
@@ -34,6 +35,11 @@ COptionsPageEdit::COptionsPageEdit()
 COptionsPageEdit::~COptionsPageEdit()
 {
 }
+
+void ShowQuotingRules(wxWindow * parent)
+{
+	wxMessageBoxEx(wxString::Format(_("- The command and each argument are separated by spaces\n- A command or argument containing whitespace or a double-quote character need to be enclosed in double-quotes\n- Double-quotes inside of a command or argument need to be doubled up\n- In arguments, %%f is a placeholder for the file to be opened. Use %%%% for literal percents")), _("Quoting rules"), wxICON_INFORMATION, parent);
+};
 
 bool COptionsPageEdit::CreateControls(wxWindow* parent)
 {
@@ -67,7 +73,12 @@ bool COptionsPageEdit::CreateControls(wxWindow* parent)
 	main->Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
 	impl_->browse_->Bind(wxEVT_BUTTON, [this](wxCommandEvent const&) { OnBrowseEditor(); });
 
-	main->Add(new wxStaticText(this, -1, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT, lay.dlgUnits(10));
+	row = lay.createFlex(2);
+	row->Add(new wxStaticText(this, -1, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, lay.dlgUnits(10));
+	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
+	row->Add(rules, lay.valign);
+	main->Add(row, lay.grow);
+	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
 
 	main->Add(new wxStaticLine(this), lay.grow);
 
