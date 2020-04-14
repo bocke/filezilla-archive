@@ -17,9 +17,9 @@ class CSearchDialog final : protected CFilterConditionsDialog, public CStateEven
 public:
 	enum class search_mode
 	{
-		none,
 		local,
-		remote
+		remote,
+		comparison
 	};
 
 	CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue);
@@ -53,14 +53,17 @@ protected:
 
 	CFilter m_search_filter;
 
-	search_mode m_searching{};
-	bool m_comparative{};
+	search_mode mode_{};
+	bool searching_{};
 
 	CServerPath m_original_dir;
 
+	bool searched_remote_{};
+
+	void Stop();
+
 	DECLARE_EVENT_TABLE()
 	void OnSearch(wxCommandEvent& event);
-	void OnStop(wxCommandEvent& event);
 	void OnContextMenu(wxContextMenuEvent& event);
 	void OnDownload(wxCommandEvent&);
 	void OnUpload(wxCommandEvent&);
