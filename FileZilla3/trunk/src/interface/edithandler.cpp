@@ -14,6 +14,7 @@
 #include <libfilezilla/process.hpp>
 
 #include <wx/filedlg.h>
+#include <wx/hyperlink.h>
 #include <wx/statline.h>
 
 //-------------
@@ -1696,6 +1697,8 @@ CNewAssociationDialog::~CNewAssociationDialog()
 {
 }
 
+void ShowQuotingRules(wxWindow* parent);
+
 bool CNewAssociationDialog::Run(std::wstring const& file)
 {
 	file_ = file;
@@ -1758,6 +1761,11 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 	auto row = lay.createFlex(2);
 	row->AddGrowableCol(0);
 	main->Add(row, 0, wxLEFT|wxGROW, leftIndent);
+	
+	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
+	main->Add(rules, 0, wxLEFT, leftIndent);
+	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
+
 
 	impl_->custom_ = new wxTextCtrlEx(this, -1, wxString());
 	row->Add(impl_->custom_, lay.valigng);
@@ -1884,8 +1892,9 @@ void CNewAssociationDialog::OnBrowseEditor()
 		return;
 	}
 
-	if (editor.find(' ') != std::wstring::npos) {
-		editor = _T("\"") + editor + _T("\"");
+	if (editor.find_first_of(L" \t'\"") != std::wstring::npos) {
+		fz::replace_substrings(editor, L"\"", L"\"\"");
+		editor = L"\"" + editor + L"\"";
 	}
 
 	impl_->custom_->ChangeValue(editor);

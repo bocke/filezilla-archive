@@ -7,6 +7,10 @@
 #include "optionspage.h"
 #include "optionspage_edit_associations.h"
 
+#include <wx/hyperlink.h>
+
+void ShowQuotingRules(wxWindow* parent);
+
 bool COptionsPageEditAssociations::CreateControls(wxWindow* parent)
 {
 	auto const& lay = m_pOwner->layout();
@@ -25,6 +29,10 @@ bool COptionsPageEditAssociations::CreateControls(wxWindow* parent)
 	main->Add(new wxStaticText(this, -1, _("Format: Extension followed by properly quoted command and arguments.")));
 
 	main->Add(new wxStaticText(this, -1, _("Example: png \"c:\\program files\\viewer\\viewer.exe\" -open")));
+
+	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
+	main->Add(rules);
+	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
 
 	return true;
 }
