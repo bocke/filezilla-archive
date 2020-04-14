@@ -591,7 +591,6 @@ void CSearchDialogFileList::OnColumnClicked(wxListEvent &event)
 
 BEGIN_EVENT_TABLE(CSearchDialog, CFilterConditionsDialog)
 EVT_BUTTON(XRCID("ID_START"), CSearchDialog::OnSearch)
-EVT_BUTTON(XRCID("ID_STOP"), CSearchDialog::OnStop)
 EVT_CONTEXT_MENU(CSearchDialog::OnContextMenu)
 EVT_MENU(XRCID("ID_MENU_SEARCH_DOWNLOAD"), CSearchDialog::OnDownload)
 EVT_MENU(XRCID("ID_MENU_SEARCH_UPLOAD"), CSearchDialog::OnUpload)
@@ -622,16 +621,13 @@ CSearchDialog::CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue
 CSearchDialog::~CSearchDialog()
 {
 	if (m_pWindowStateManager) {
-		if (!m_comparative) {
+		if (mode_ != search_mode::comparison) {
 			m_pWindowStateManager->Remember(OPTION_SEARCH_SIZE);
 		}
 		delete m_pWindowStateManager;
 	}
 
-	if (m_comparative) {
-		m_pComparisonManager->ExitComparisonMode();
-	}
-
+	Stop();
 	delete m_pComparisonManager;
 }
 
@@ -648,7 +644,7 @@ bool CSearchDialog::Load()
 
 	auto optionsSizer = new wxFlexGridSizer(3, 7, 5);
 	optionsSizer->AddGrowableCol(1);
-	main->Add(optionsSizer, 0, wxALL|wxGROW, lay.border);
+	main->Add(optionsSizer, 0, wxALL | wxGROW, lay.border);
 
 	optionsSizer->Add(new wxStaticText(this, wxID_ANY, _("Search type:")), 0, wxALIGN_CENTRE_VERTICAL);
 
@@ -662,7 +658,9 @@ bool CSearchDialog::Load()
 	optionsSizer->Add(new wxButton(this, XRCID("ID_START"), _("&Search")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxStaticText(this, XRCID("ID_PATH_LABEL"), _("Search &directory:")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
-	optionsSizer->Add(new wxButton(this, XRCID("ID_STOP"), _("S&top")), 0, wxALIGN_CENTRE_VERTICAL);
+	auto stop = new wxButton(this, XRCID("ID_STOP"), _("S&top"));
+	stop->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { Stop(); });
+	optionsSizer->Add(stop, 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxStaticText(this, XRCID("ID_REMOTE_PATH_LABEL"), _("Search &directory:")), 0, wxALIGN_CENTRE_VERTICAL);
 	optionsSizer->Add(new wxTextCtrlEx(this, XRCID("ID_REMOTE_PATH")), 0, wxALIGN_CENTRE_VERTICAL | wxGROW);
 	optionsSizer->AddSpacer(0);
@@ -736,6 +734,10 @@ bool CSearchDialog::Load()
 	m_remoteResults->Show(false);
 	m_remoteStatusBar->Show(false);
 
+	if (m_state.IsRemoteConnected()) {
+		mode_ = search_mode::remote;
+	}
+
 	SetCtrlState();
 
 	const int mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
@@ -767,17 +769,19 @@ bool CSearchDialog::Load()
 	m_pWindowStateManager = new CWindowStateManager(this);
 	m_pWindowStateManager->Restore(OPTION_SEARCH_SIZE, wxSize(1750, 500));
 
-	if (m_state.IsRemoteConnected()) {
+	if (mode_ == search_mode::remote) {
+		xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::SetValue, true);
+
 		CServerPath const path = m_state.GetRemotePath();
-		if (!path.empty())
+		if (!path.empty()) {
 			xrc_call(*this, "ID_PATH", &wxTextCtrl::ChangeValue, path.GetPath());
+		}
 	}
 	else {
+		xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::SetValue, true);
+
 		CLocalPath const path = m_state.GetLocalDir();
 		xrc_call(*this, "ID_PATH", &wxTextCtrl::ChangeValue, path.GetPath());
-		xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::SetValue, true);
-		xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::Disable);
-		xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::Disable);
 	}
 
 	return true;
@@ -801,7 +805,7 @@ void CSearchDialog::Run()
 	m_state.UnregisterHandler(this, STATECHANGE_REMOTE_IDLE);
 	m_state.UnregisterHandler(this, STATECHANGE_REMOTE_DIR_OTHER);
 
-	if (m_searching == search_mode::remote || m_comparative) {
+	if (searched_remote_) {
 		if (!m_state.IsRemoteIdle()) {
 			m_state.m_pCommandQueue->Cancel();
 			m_state.GetRemoteRecursiveOperation()->StopRecursiveOperation();
@@ -810,17 +814,16 @@ void CSearchDialog::Run()
 			m_state.ChangeRemoteDir(m_original_dir);
 		}
 	}
-	else {
-		if (m_state.IsRemoteIdle() && !m_original_dir.empty()) {
-			m_state.ChangeRemoteDir(m_original_dir);
-		}
-	}
 }
 
 void CSearchDialog::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
+	if (!searching_) {
+		return;
+	}
+
 	if (notification == STATECHANGE_REMOTE_DIR_OTHER && data2) {
-		if (m_searching == search_mode::remote || m_comparative) {
+		if (searching_ && mode_ != search_mode::local) {
 			auto recursiveOperation = m_state.GetRemoteRecursiveOperation();
 			if (recursiveOperation && recursiveOperation->GetOperationMode() == CRecursiveOperation::recursive_list) {
 				std::shared_ptr<CDirectoryListing> const& listing = *reinterpret_cast<std::shared_ptr<CDirectoryListing> const*>(data2);
@@ -830,40 +833,45 @@ void CSearchDialog::OnStateChange(t_statechange_notifications notification, std:
 		}
 	}
 	else if (notification == STATECHANGE_REMOTE_IDLE) {
-		if (m_searching == search_mode::remote || m_comparative) {
-			if (m_state.IsRemoteIdle()) {
-				m_searching = search_mode::none;
+		if (mode_ != search_mode::local) {
+			if (!m_state.IsRemoteIdle()) {
+				return;
+			}
 
-				if (m_comparative) {
-					m_remoteResults->m_canStartComparison = true;
-					m_remoteResults->m_originalIndexMapping.clear();
-
-					m_pComparisonManager->CompareListings();
+			if (mode_ == search_mode::comparison) {
+				m_remoteResults->m_canStartComparison = true;
+				m_remoteResults->m_originalIndexMapping.clear();
+				if (!m_state.IsLocalIdle()) {
+					return;
 				}
 			}
 		}
-		if (m_searching != search_mode::local) {
-			SetCtrlState();
-		}
+		searching_ = false;
+		SetCtrlState();
 	}
 	else if (notification == STATECHANGE_LOCAL_RECURSION_LISTING) {
-		if ((m_searching == search_mode::local || m_comparative) && data2) {
+		if (mode_ != search_mode::remote) {
 			auto listing = reinterpret_cast<CLocalRecursiveOperation::listing const*>(data2);
 
 			ProcessDirectoryListing(*listing);
 		}
 	}
 	else if (notification == STATECHANGE_LOCAL_RECURSION_STATUS) {
-		if ((m_searching == search_mode::local || m_comparative)&& m_state.IsLocalIdle()) {
-			if (m_comparative) {
+		if (mode_ != search_mode::remote) {
+			if (!m_state.IsLocalIdle()) {
+				return;
+			}
+
+			if (mode_ == search_mode::comparison) {
 				m_results->m_canStartComparison = true;
 				m_results->m_originalIndexMapping.clear();
-
+				if (!m_state.IsRemoteIdle()) {
+					return;
+				}
 				m_pComparisonManager->CompareListings();
 			}
-			else {
-				m_searching = search_mode::none;
-			}
+
+			searching_ = false;
 			SetCtrlState();
 		}
 	}
@@ -871,6 +879,10 @@ void CSearchDialog::OnStateChange(t_statechange_notifications notification, std:
 
 void CSearchDialog::ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> const& listing)
 {
+	if (!searching_ || mode_ == search_mode::local) {
+		return;
+	}
+
 	if (!listing || listing->failed()) {
 		return;
 	}
@@ -881,7 +893,7 @@ void CSearchDialog::ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> c
 	}
 
 	CSearchDialogFileList *results = m_results;
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		results = m_remoteResults;
 	}
 
@@ -944,6 +956,10 @@ void CSearchDialog::ProcessDirectoryListing(std::shared_ptr<CDirectoryListing> c
 
 void CSearchDialog::ProcessDirectoryListing(CLocalRecursiveOperation::listing const& listing)
 {
+	if (!searching_ || mode_ == search_mode::remote) {
+		return;
+	}
+
 	int old_count = m_results->m_fileData.size();
 	int added_count = 0;
 
@@ -1010,11 +1026,18 @@ void CSearchDialog::ProcessDirectoryListing(CLocalRecursiveOperation::listing co
 
 void CSearchDialog::OnSearch(wxCommandEvent&)
 {
-	bool const localSearch = xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::GetValue);
+	if (searching_) {
+		return;
+	}
 
-	m_searching = (localSearch || m_comparative) ? search_mode::local : search_mode::remote;
+	// Prepare filter
+	wxString error;
+	if (!ValidateFilter(error, true)) {
+		wxMessageBoxEx(wxString::Format(_("Invalid search conditions: %s"), error), _("File search"), wxICON_EXCLAMATION);
+		return;
+	}
 
-	if (localSearch || m_comparative) {
+	if (mode_ != search_mode::remote) {
 		if (!m_state.IsLocalIdle()) {
 			wxBell();
 			return;
@@ -1035,7 +1058,7 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		m_local_search_root = path;
 	}
 
-	if (!localSearch || m_comparative) {
+	if (mode_ != search_mode::local) {
 		if (!m_state.IsRemoteIdle()) {
 			wxBell();
 			return;
@@ -1049,40 +1072,36 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 
 		CServerPath path;
 		path.SetType(site.server.GetType());
-		if (!path.SetPath(xrc_call(*this, m_comparative ? "ID_REMOTE_PATH" : "ID_PATH", &wxTextCtrl::GetValue).ToStdWstring()) || path.empty()) {
+		if (!path.SetPath(xrc_call(*this, (mode_ == search_mode::comparison) ? "ID_REMOTE_PATH" : "ID_PATH", &wxTextCtrl::GetValue).ToStdWstring()) || path.empty()) {
 			wxMessageBoxEx(_("Need to enter valid remote path"), _("Remote file search"), wxICON_EXCLAMATION);
 			return;
 		}
 
 		m_remote_search_root = path;
+
+		searched_remote_ = true;
 	}
 
-	// Prepare filter
-	wxString error;
-	if (!ValidateFilter(error, true)) {
-		wxMessageBoxEx(wxString::Format(_("Invalid search conditions: %s"), error), _("File search"), wxICON_EXCLAMATION);
-		return;
-	}
+	searching_ = true;
+
 	bool const matchCase = xrc_call(*this, "ID_CASE", &wxCheckBox::GetValue);
 	m_search_filter = GetFilter(matchCase);
 	m_search_filter.matchCase = matchCase;
 	m_search_filter.filterFiles = xrc_call(*this, "ID_FIND_FILES", &wxCheckBox::GetValue);
 	m_search_filter.filterDirs = xrc_call(*this, "ID_FIND_DIRS", &wxCheckBox::GetValue);
 
-	if (m_comparative) {
-		m_pComparisonManager->ExitComparisonMode();
-	}
+	m_pComparisonManager->ExitComparisonMode();
 
 	// Delete old results
 	m_results->clear();
-	if (localSearch || m_comparative) {
-		m_results->set_mode(search_mode::local);
-	}
-	else {
+	if (mode_ == search_mode::remote) {
 		m_results->set_mode(search_mode::remote);
 	}
+	else {
+		m_results->set_mode(search_mode::local);
+	}
 
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		if (m_results->m_sortColumn != 0) {
 			m_results->SortList(0);
 		}
@@ -1097,14 +1116,14 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 	m_visited.clear();
 
 	// Start
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		m_pComparisonManager->SetListings(m_results, m_remoteResults);
 
 		m_pComparisonManager->SetComparisonMode(xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::GetValue) ? 0 : 1);
 		m_pComparisonManager->SetHideIdentical(xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::GetValue) != 0);
 	}
 
-	if (localSearch || m_comparative) {
+	if (mode_ != search_mode::remote) {
 		local_recursion_root root;
 		root.add_dir_to_visit(m_local_search_root);
 		m_state.GetLocalRecursiveOperation()->AddRecursionRoot(std::move(root));
@@ -1112,7 +1131,7 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		m_state.GetLocalRecursiveOperation()->StartRecursiveOperation(CRecursiveOperation::recursive_list, filters, true, false);
 	}
 
-	if (!localSearch || m_comparative) {
+	if (mode_ != search_mode::local) {
 		recursion_root root(m_remote_search_root, true);
 		root.add_dir_to_visit_restricted(m_remote_search_root, std::wstring(), true);
 		m_state.GetRemoteRecursiveOperation()->AddRecursionRoot(std::move(root));
@@ -1123,90 +1142,83 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 	SetCtrlState();
 }
 
-void CSearchDialog::OnStop(wxCommandEvent&)
+void CSearchDialog::Stop()
 {
-	if (m_searching == search_mode::remote || m_comparative) {
+	if (!searching_) {
+		return;
+	}
+
+	if (mode_ != search_mode::local) {
 		if (!m_state.IsRemoteIdle()) {
 			m_state.m_pCommandQueue->Cancel();
 			m_state.GetRemoteRecursiveOperation()->StopRecursiveOperation();
 		}
 	}
 
-	if (m_searching == search_mode::local || m_comparative) {
+	if (mode_ != search_mode::remote) {
 		if (!m_state.IsLocalIdle()) {
 			m_state.GetLocalRecursiveOperation()->StopRecursiveOperation();
 		}
 	}
 
-	if (m_comparative) {
-		m_pComparisonManager->ExitComparisonMode();
-	}
+	m_pComparisonManager->ExitComparisonMode();
+
+	searching_ = false;
 }
 
 void CSearchDialog::SetCtrlState()
 {
 	bool const localSearch = xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::GetValue);
 
-	bool idle = m_searching == search_mode::none;
-	if (idle) {
-		if (!localSearch) {
-			if (!m_state.IsRemoteIdle()) {
-				idle = false;
-			}
-		}
-		else {
-			if (!m_state.IsLocalIdle()) {
-				idle = false;
-			}
-		}
-	}
+	xrc_call(*this, "ID_START", &wxButton::Enable, !searching_);
+	xrc_call(*this, "ID_STOP", &wxButton::Enable, searching_);
+	xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::Enable, !searching_);
+	xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::Enable, !searching_ && m_state.IsRemoteConnected());
+	xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::Enable, !searching_ && m_state.IsRemoteConnected());
+	xrc_call(*this, "ID_PATH", &wxTextCtrl::Enable, !searching_);
+	xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::Enable, !searching_);
 
-	xrc_call(*this, "ID_START", &wxButton::Enable, idle);
-	xrc_call(*this, "ID_STOP", &wxButton::Enable, !idle);
-
-	auto comparative = xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::GetValue);
-	if (m_comparative && !comparative) {
-		m_pComparisonManager->ExitComparisonMode();
-		m_results->clear();
-		m_remoteResults->clear();
-	}
-	m_comparative = comparative;
-
-	xrc_call(*this, "ID_REMOTE_PATH_LABEL", &wxStaticText::Show, m_comparative);
-	xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::Show, m_comparative);
-	xrc_call(*this, "ID_RESULTS_LABEL", &wxStaticText::Show, !m_comparative);
-	xrc_call(*this, "ID_LOCAL_RESULTS_LABEL", &wxStaticText::Show, m_comparative);
-	xrc_call(*this, "ID_REMOTE_RESULTS_LABEL", &wxStaticText::Show, m_comparative);
-	if (m_comparative) {
+	bool const comparison = mode_ == search_mode::comparison;
+	xrc_call(*this, "ID_REMOTE_PATH_LABEL", &wxStaticText::Show, comparison);
+	xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::Show, comparison);
+	xrc_call(*this, "ID_RESULTS_LABEL", &wxStaticText::Show, !comparison);
+	xrc_call(*this, "ID_LOCAL_RESULTS_LABEL", &wxStaticText::Show, comparison);
+	xrc_call(*this, "ID_REMOTE_RESULTS_LABEL", &wxStaticText::Show, comparison);
+	if (comparison) {
 		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _T("Local &directory:"));
 	}
 	else {
 		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _T("Search &directory:"));
 	}
-	xrc_call(*this, "ID_COMPARE_LABEL", &wxStaticText::Show, m_comparative);
-	xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::Show, m_comparative);
-	xrc_call(*this, "ID_COMPARE_DATE", &wxRadioButton::Show, m_comparative);
-	xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::Show, m_comparative);
+	xrc_call(*this, "ID_COMPARE_LABEL", &wxStaticText::Show, comparison);
+	xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::Show, comparison);
+	xrc_call(*this, "ID_COMPARE_DATE", &wxRadioButton::Show, comparison);
+	xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::Show, comparison);
 
-	m_remoteResults->Show(m_comparative);
-	m_remoteStatusBar->Show(m_comparative);
+	m_remoteResults->Show(comparison);
+	m_remoteStatusBar->Show(comparison);
 }
 
 void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 {
 	auto const evObj = event.GetEventObject();
 	if (!((evObj == m_results || evObj == m_results->GetMainWindow()) ||
-		(m_comparative && (evObj == m_remoteResults || evObj == m_remoteResults->GetMainWindow())))) {
+		(mode_ == search_mode::comparison && (evObj == m_remoteResults || evObj == m_remoteResults->GetMainWindow())))) {
 		event.Skip();
 		return;
 	}
 
-	bool const localResults = (m_comparative && (evObj == m_results || evObj == m_results->GetMainWindow()))
-			|| (!m_comparative && m_results->mode_ == search_mode::local);
+	bool local_results{};
+	if (mode_ == search_mode::comparison) {
+		local_results = (evObj == m_results || evObj == m_results->GetMainWindow());
+	}
+	else {
+		local_results = mode_ == search_mode::local;
+	}
 	bool const connected = m_state.IsRemoteIdle() && m_state.IsRemoteConnected();
 
 	wxMenu menu;
-	if (localResults) {
+	if (local_results) {
 		menu.Append(XRCID("ID_MENU_SEARCH_UPLOAD"), _("&Upload..."));
 		menu.Append(XRCID("ID_MENU_SEARCH_OPEN"), _("O&pen"));
 		menu.Append(XRCID("ID_MENU_SEARCH_FILEMANAGER"), _("Show in file &manager"));
@@ -1236,13 +1248,14 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 
 bool CSearchDialog::IsIdle()
 {
-	if (m_comparative) {
-		return m_state.IsRemoteIdle() && m_state.IsLocalIdle();
+	bool idle = true;
+	if (mode_ != search_mode::local) {
+		idle &= m_state.IsRemoteIdle();
 	}
-	if (m_searching == search_mode::remote) {
-		return m_state.IsRemoteIdle();
+	if (mode_ != search_mode::remote) {
+		idle &= m_state.IsLocalIdle();
 	}
-	return m_state.IsLocalIdle();
+	return idle;
 }
 
 class CSearchTransferDialog final : public wxDialogEx
@@ -1414,7 +1427,7 @@ void CSearchDialog::OnDownload(wxCommandEvent&)
 	}
 
 	CSearchDialogFileList *results = m_results;
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		results = m_remoteResults;
 	}
 
@@ -1579,7 +1592,7 @@ void CSearchDialog::OnEdit(wxCommandEvent&)
 	}
 
 	CSearchDialogFileList *results = m_results;
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		results = m_remoteResults;
 	}
 
@@ -1644,7 +1657,7 @@ void CSearchDialog::OnDeleteRemote(wxCommandEvent&)
 	}
 
 	CSearchDialogFileList *results = m_results;
-	if (m_comparative) {
+	if (mode_ == search_mode::comparison) {
 		results = m_remoteResults;
 	}
 
@@ -1813,37 +1826,45 @@ void CSearchDialog::SaveConditions()
 	file.Save(true);
 }
 
-void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)
+void CSearchDialog::OnChangeSearchMode(wxCommandEvent& ev)
 {
 	wxString const strPath = xrc_call(*this, "ID_PATH", &wxTextCtrl::GetValue);
 
 	CLocalPath const localPath = m_state.GetLocalDir();
 	CServerPath const remotePath = m_state.GetRemotePath();
 
-	bool const local = xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::GetValue);
-	bool const remote = xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::GetValue);
-	bool const changeComparison = m_comparative != xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::GetValue);
+	search_mode new_mode = search_mode::local;
+	if (xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::GetValue)) {
+		new_mode = search_mode::remote;
+	}
+	else if (xrc_call(*this, "ID_COMPARATIVE_SEARCH", &wxRadioButton::GetValue)) {
+		new_mode = search_mode::comparison;
+	}
 
-	if (local) {
+	if (new_mode == search_mode::local) {
 		if (strPath == remotePath.GetPath() && !localPath.empty()) {
 			xrc_call(*this, "ID_PATH", &wxTextCtrl::ChangeValue, localPath.GetPath());
 		}
 		xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::Clear);
 	}
-	else if (remote) {
+	else if (new_mode == search_mode::remote) {
 		if (strPath == localPath.GetPath() && !remotePath.empty()) {
 			xrc_call(*this, "ID_PATH", &wxTextCtrl::ChangeValue, remotePath.GetPath());
 		}
 		xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::Clear);
 	}
-	else {		// comparative search
+	else {
+		// comparative search
 		xrc_call(*this, "ID_PATH", &wxTextCtrl::ChangeValue, localPath.GetPath());
 		xrc_call(*this, "ID_REMOTE_PATH", &wxTextCtrl::ChangeValue, remotePath.GetPath());
 	}
 
+	bool comparison_toggle = (new_mode == search_mode::comparison) != (mode_ == search_mode::comparison);
+	mode_ = new_mode;
+
 	SetCtrlState();
 
-	if (changeComparison) {
+	if (comparison_toggle) {
 		wxSize s = m_otherSize;
 		m_otherSize = GetClientSize();
 
@@ -1859,7 +1880,7 @@ void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)
 
 void CSearchDialog::OnChangeCompareOption(wxCommandEvent&)
 {
-	if (!m_comparative) {
+	if (mode_ != search_mode::comparison) {
 		return;
 	}
 
