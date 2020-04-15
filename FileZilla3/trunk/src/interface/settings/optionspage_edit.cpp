@@ -70,11 +70,11 @@ bool COptionsPageEdit::CreateControls(wxWindow* parent)
 	row->Add(impl_->custom_, lay.valigng);
 	impl_->browse_ = new wxButton(this, -1, _("&Browse..."));
 	row->Add(impl_->browse_, lay.valign);
-	main->Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
+	main->Add(row, 0, wxLEFT|wxGROW, lay.indent);
 	impl_->browse_->Bind(wxEVT_BUTTON, [this](wxCommandEvent const&) { OnBrowseEditor(); });
 
 	row = lay.createFlex(2);
-	row->Add(new wxStaticText(this, -1, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, lay.dlgUnits(10));
+	row->Add(new wxStaticText(this, -1, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, lay.indent);
 	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
 	row->Add(rules, lay.valign);
 	main->Add(row, lay.grow);

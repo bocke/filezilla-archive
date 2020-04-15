@@ -72,7 +72,7 @@ bool CFileExistsDlg::Create(wxWindow* parent)
 	targetDetails->Add(new wxStaticText(this, XRCID("ID_FILE1_SIZE"), wxString()));
 	targetDetails->Add(new wxStaticText(this, XRCID("ID_FILE1_TIME"), wxString()));
 
-	inner->AddSpacer(lay.dlgUnits(10));
+	inner->AddSpacer(lay.indent);
 
 	auto* right = lay.createFlex(1);
 	inner->Add(right);
@@ -91,8 +91,8 @@ bool CFileExistsDlg::Create(wxWindow* parent)
 
 
 	right->Add(new wxCheckBox(this, XRCID("ID_ALWAYS"), _("&Always use this action")));
-	right->Add(new wxCheckBox(this, XRCID("ID_QUEUEONLY"), _("Apply to &current queue only")), 0, wxLEFT, lay.dlgUnits(10));
-	right->Add(new wxCheckBox(this, XRCID("ID_UPDOWNONLY"), wxString()), 0, wxLEFT, lay.dlgUnits(10));
+	right->Add(new wxCheckBox(this, XRCID("ID_QUEUEONLY"), _("Apply to &current queue only")), 0, wxLEFT, lay.indent);
+	right->Add(new wxCheckBox(this, XRCID("ID_UPDOWNONLY"), wxString()), 0, wxLEFT, lay.indent);
 
 	auto* buttons = lay.createButtonSizer(this, main, true);
 

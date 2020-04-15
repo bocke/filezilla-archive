@@ -1283,7 +1283,7 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 
 	auto * row = lay.createFlex(2);
 	row->AddGrowableCol(1);
-	sizer.Add(row, 0, wxLEFT|wxGROW, lay.dlgUnits(10));
+	sizer.Add(row, 0, wxLEFT|wxGROW, lay.indent);
 	row->Add(new wxStaticText(&parent, -1, _("&Select a key:")), lay.valign);
 	auto * choice = new wxChoice(&parent, XRCID("ID_S3_KMSKEY"));
 	choice->Append(_("Default (AWS/S3)"));
@@ -1296,7 +1296,7 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 	sizer.Add(customer);
 	row = lay.createFlex(2);
 	row->AddGrowableCol(1);
-	sizer.Add(row, 0, wxLEFT | wxGROW, lay.dlgUnits(10));
+	sizer.Add(row, 0, wxLEFT | wxGROW, lay.indent);
 	row->Add(new wxStaticText(&parent, -1, _("Cus&tomer Key:")), lay.valign);
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
 

@@ -132,7 +132,7 @@ bool COptionsPagePasswords::SavePage()
 		state->SetLastSite(site, path);
 	}
 
-	COptions::Get()->RequireCleanup();
+	m_pOptions->RequireCleanup();
 
 	CSiteManager::Rewrite(loginManager, true);
 

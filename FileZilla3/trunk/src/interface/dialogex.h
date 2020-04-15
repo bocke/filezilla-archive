@@ -9,6 +9,7 @@ struct DialogLayout final
 public:
 	int gap{};
 	int border{};
+	int indent{};
 
 	int dlgUnits(int num) const;
 

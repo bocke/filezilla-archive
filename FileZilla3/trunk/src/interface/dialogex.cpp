@@ -238,6 +238,7 @@ DialogLayout::DialogLayout(wxTopLevelWindow * parent)
 {
 	gap = dlgUnits(3);
 	border = dlgUnits(3);
+	indent = dlgUnits(10);
 }
 
 int DialogLayout::dlgUnits(int num) const

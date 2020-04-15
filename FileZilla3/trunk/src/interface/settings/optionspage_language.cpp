@@ -20,7 +20,6 @@ bool COptionsPageLanguage::CreateControls(wxWindow* parent)
 	SetSizer(main);
 
 	auto [box, inner] = lay.createStatBox(main, _("&Select language:"), 1);
-	//inner->AddGrowableCol(0);
 	inner->AddGrowableRow(0);
 	lb_ = new wxListBox(box, -1, wxDefaultPosition, wxDefaultSize, wxArrayString(), wxLB_SINGLE | wxLB_NEEDED_SB);
 	inner->Add(lb_, lay.grow);
