@@ -1724,7 +1724,6 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 	}
 
 	main->Add(new wxStaticText(this, -1, _("Select how these files should be opened.")));
-	int const leftIndent = lay.dlgUnits(10);
 
 	{
 		auto const cmd_with_args = GetSystemAssociation(file);
@@ -1733,7 +1732,7 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 			impl_->rbSystem_->Bind(wxEVT_RADIOBUTTON, [this](wxEvent const&) { SetCtrlState(); });
 			impl_->rbSystem_->SetValue(true);
 			main->Add(impl_->rbSystem_);
-			main->Add(new wxStaticText(this, -1, _("The default editor for this file type is:") + L" " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
+			main->Add(new wxStaticText(this, -1, _("The default editor for this file type is:") + L" " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, lay.indent);
 		}
 	}
 
@@ -1746,9 +1745,9 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 				impl_->rbDefault_->SetValue(true);
 			}
 			main->Add(impl_->rbDefault_);
-			main->Add(new wxStaticText(this, -1, _("The default editor for text files is:") + " " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, leftIndent);
+			main->Add(new wxStaticText(this, -1, _("The default editor for text files is:") + " " + LabelEscape(QuoteCommand(cmd_with_args))), 0, wxLEFT, lay.indent);
 			impl_->always_ = new wxCheckBox(this, -1, _("&Always use selection for all unassociated files"));
-			main->Add(impl_->always_, 0, wxLEFT, leftIndent);
+			main->Add(impl_->always_, 0, wxLEFT, lay.indent);
 		}
 	}
 
@@ -1760,10 +1759,10 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 	main->Add(impl_->rbCustom_);
 	auto row = lay.createFlex(2);
 	row->AddGrowableCol(0);
-	main->Add(row, 0, wxLEFT|wxGROW, leftIndent);
+	main->Add(row, 0, wxLEFT|wxGROW, lay.indent);
 	
 	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
-	main->Add(rules, 0, wxLEFT, leftIndent);
+	main->Add(rules, 0, wxLEFT, lay.indent);
 	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
 
 

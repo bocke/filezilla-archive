@@ -75,7 +75,7 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 	left->Add(new wxButton(this, wxID_CANCEL, _("&Cancel")), lay.grow);
 
 	pagePanel_ = new wxPanel(this);
-	main->Add(pagePanel_);
+	main->Add(pagePanel_, lay.grow);
 
 	if (!LoadPages()) {
 		return false;
@@ -135,7 +135,7 @@ bool CSettingsDialog::LoadPages()
 	AddPage(_("File editing"), new COptionsPageEdit, 0);
 	AddPage(_("Filetype associations"), new COptionsPageEditAssociations, 1);
 #if FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
-	if (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK)) {
+	if (!m_pOptions->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK)) {
 		AddPage(_("Updates"), new COptionsPageUpdateCheck, 0);
 	}
 #endif //FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK

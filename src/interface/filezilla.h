@@ -47,7 +47,6 @@
 #include <wx/dialog.h>
 #include <wx/dir.h>
 #include <wx/frame.h>
-#include <wx/listctrl.h>
 #include <wx/image.h>
 #include <wx/imaglist.h>
 #include <wx/log.h>

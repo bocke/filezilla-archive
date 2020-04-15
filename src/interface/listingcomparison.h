@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_INTERFACE_LISTINGCOMPARISON_HEADER
 #define FILEZILLA_INTERFACE_LISTINGCOMPARISON_HEADER
 
+#include <wx/listctrl.h>
+
 class CComparisonManager;
 class CComparableListing
 {
