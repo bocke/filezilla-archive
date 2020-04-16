@@ -45,7 +45,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxBitmapButtonXmlHandler);
 	res.AddHandler(new wxStaticBitmapXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);
-	res.AddHandler(new wxCheckListBoxXmlHandler);
 	res.AddHandler(new wxListBoxXmlHandler);
 	res.AddHandler(new wxScrolledWindowXmlHandler);
 }
