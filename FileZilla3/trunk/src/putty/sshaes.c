@@ -8,6 +8,10 @@
 #include "ssh.h"
 #include "mpint_i.h"               /* we reuse the BignumInt system */
 
+#include <nettle/aes.h>
+#include <nettle/gcm.h>
+#include <nettle/memxor.h>
+
 /*
  * Start by deciding whether we can support hardware AES at all.
  */
@@ -149,12 +153,324 @@ static const ssh_cipheralg ssh_rijndael_lysator = {
     "AES-256 CBC (dummy selector vtable)", NULL, &extra_aes256_cbc
 };
 
+
+// FZ GCM
+static void increment_iv_step32(uint8_t *iv, int i)
+{
+    uint32_t tmp;
+    for (--i; i >= 0; i--) {
+    tmp = GET_32BIT_MSB_FIRST(iv + 4 * i);
+    tmp = (tmp + 1) & 0xffffffff;
+    PUT_32BIT_MSB_FIRST(iv + 4 * i, tmp);
+    if (tmp != 0)
+        break;
+    }
+}
+
+struct AES128GCMContext {
+    struct gcm_aes128_ctx ctx;
+    uint8_t iv[12];
+    bool encrypt;
+    int skip;
+
+    BinarySink_IMPLEMENTATION;
+    ssh_cipher ciph;
+    ssh2_mac mac_if;
+};
+
+
+static void aes128_gcm_BinarySink_write(BinarySink *bs, const void *blkv, size_t len)
+{
+    struct AES128GCMContext *ctx = BinarySink_DOWNCAST(bs, struct AES128GCMContext);
+
+    if (!ctx->encrypt) {
+        unsigned char *blk = (unsigned char *)blkv;
+
+        /* First 4 bytes are the IV */
+        while (ctx->skip && len) {
+            --ctx->skip;
+            --len;
+        }
+
+        if (!ctx->skip && len) {
+            unsigned char adata[4];
+            PUT_32BIT_MSB_FIRST(adata, (unsigned int)(len - 4));
+            nettle_gcm_aes128_set_iv(&ctx->ctx, 12, ctx->iv);
+            nettle_gcm_aes128_update(&ctx->ctx, 4, adata);
+            nettle_gcm_aes128_decrypt(&ctx->ctx, len - 4, blk + 4, blk + 4);
+        }
+    }
+}
+
+
+static ssh_cipher* aes128_gcm_make_context(const ssh_cipheralg *alg)
+{
+    struct AES128GCMContext *ctx = snew(struct AES128GCMContext);
+    BinarySink_INIT(ctx, aes128_gcm_BinarySink_write);
+    ctx->ciph.vt = alg;
+    ctx->encrypt = false;
+
+    return &ctx->ciph;
+}
+
+
+static void aes128_gcm_free_context(ssh_cipher *cipher)
+{
+    struct AES128GCMContext *ctx = container_of(cipher, struct AES128GCMContext, ciph);
+    smemclr(&ctx->ctx, sizeof(ctx->ctx));
+    sfree(ctx);
+}
+
+void aes128_gcm_key(ssh_cipher *cipher, const void *vkey)
+{
+    struct AES128GCMContext *ctx = container_of(cipher, struct AES128GCMContext, ciph);
+    nettle_gcm_aes128_set_key(&ctx->ctx, vkey);
+}
+
+
+void aes128_gcm_iv(ssh_cipher *cipher, const void *iv)
+{
+    struct AES128GCMContext *ctx = container_of(cipher, struct AES128GCMContext, ciph);
+    memcpy(ctx->iv, iv, 12);
+}
+
+void aes128_gcm_encrypt(ssh_cipher *cipher, void *blk, int len)
+{
+    struct AES128GCMContext *ctx = container_of(cipher, struct AES128GCMContext, ciph);
+    unsigned char adata[4];
+    PUT_32BIT_MSB_FIRST(adata, (unsigned int)len);
+    nettle_gcm_aes128_set_iv(&ctx->ctx, 12, ctx->iv);
+    nettle_gcm_aes128_update(&ctx->ctx, 4, adata);
+    nettle_gcm_aes128_encrypt(&ctx->ctx, len, blk, blk);
+    ctx->encrypt = true;
+}
+
+void aes128_gcm_decrypt(ssh_cipher *cipher, void *blk, int len)
+{
+    (void)cipher;
+    (void)blk;
+    (void)len;
+    // Decryption was already done at MAC verification.
+}
+
+static ssh2_mac *aes128_gcm_mac_new(const ssh2_macalg *alg, ssh_cipher *cipher)
+{
+    struct AES128GCMContext *ctx = container_of(cipher, struct AES128GCMContext, ciph);
+    ctx->mac_if.vt = alg;
+    BinarySink_DELEGATE_INIT(&ctx->mac_if, ctx);
+    return &ctx->mac_if;
+}
+
+static void aes128_gcm_mac_free(ssh2_mac *mac)
+{
+    /* Not allocated, just forwarded, no need to free */
+    (void)mac;
+}
+
+static void aes128_gcm_mac_setkey(ssh2_mac *mac, ptrlen key)
+{
+    /* Uses the same context as AES128, so ignore */
+    (void)mac;
+    (void)key;
+}
+
+static void aes128_gcm_mac_start(ssh2_mac *mac)
+{
+    struct AES128GCMContext *ctx = container_of(mac, struct AES128GCMContext, mac_if);
+    ctx->skip = 4;
+}
+
+static void aes128_gcm_mac_genresult(ssh2_mac *mac, unsigned char *blk)
+{
+    struct AES128GCMContext *ctx = container_of(mac, struct AES128GCMContext, mac_if);
+
+    nettle_gcm_aes128_digest(&ctx->ctx, 16, blk);
+    increment_iv_step32(ctx->iv + 4, 2);
+}
+
+static const char *aes128_gcm_mac_textname(ssh2_mac *mac)
+{
+    (void)mac;
+    return "AES128 GCM";
+}
+
+static const ssh2_macalg ssh2_aes128_gcm_mac = {
+    aes128_gcm_mac_new, aes128_gcm_mac_free,
+    aes128_gcm_mac_setkey, aes128_gcm_mac_start,
+
+    /* whole-packet operations */
+    aes128_gcm_mac_genresult, aes128_gcm_mac_textname,
+
+    "", "", /* Not selectable individually, just part of aes128-gcm@openssh.com */
+    16, 0,
+
+    NULL
+};
+
+
+
+struct AES256GCMContext {
+    struct gcm_aes256_ctx ctx;
+    uint8_t iv[12];
+    bool encrypt;
+    int skip;
+
+    BinarySink_IMPLEMENTATION;
+    ssh_cipher ciph;
+    ssh2_mac mac_if;
+};
+
+
+static void aes256_gcm_BinarySink_write(BinarySink *bs, const void *blkv, size_t len)
+{
+    struct AES256GCMContext *ctx = BinarySink_DOWNCAST(bs, struct AES256GCMContext);
+
+    if (!ctx->encrypt) {
+        unsigned char *blk = (unsigned char *)blkv;
+
+        /* First 4 bytes are the IV */
+        while (ctx->skip && len) {
+            --ctx->skip;
+            --len;
+        }
+
+        if (!ctx->skip && len) {
+            unsigned char adata[4];
+            PUT_32BIT_MSB_FIRST(adata, (unsigned int)(len - 4));
+            nettle_gcm_aes256_set_iv(&ctx->ctx, 12, ctx->iv);
+            nettle_gcm_aes256_update(&ctx->ctx, 4, adata);
+            nettle_gcm_aes256_decrypt(&ctx->ctx, len - 4, blk + 4, blk + 4);
+        }
+    }
+}
+
+
+static ssh_cipher* aes256_gcm_make_context(const ssh_cipheralg *alg)
+{
+    struct AES256GCMContext *ctx = snew(struct AES256GCMContext);
+    BinarySink_INIT(ctx, aes256_gcm_BinarySink_write);
+    ctx->ciph.vt = alg;
+    ctx->encrypt = false;
+
+    return &ctx->ciph;
+}
+
+
+static void aes256_gcm_free_context(ssh_cipher *cipher)
+{
+    struct AES256GCMContext *ctx = container_of(cipher, struct AES256GCMContext, ciph);
+    smemclr(&ctx->ctx, sizeof(ctx->ctx));
+    sfree(ctx);
+}
+
+void aes256_gcm_key(ssh_cipher *cipher, const void *vkey)
+{
+    struct AES256GCMContext *ctx = container_of(cipher, struct AES256GCMContext, ciph);
+    nettle_gcm_aes256_set_key(&ctx->ctx, vkey);
+}
+
+
+void aes256_gcm_iv(ssh_cipher *cipher, const void *iv)
+{
+    struct AES256GCMContext *ctx = container_of(cipher, struct AES256GCMContext, ciph);
+    memcpy(ctx->iv, iv, 12);
+}
+
+void aes256_gcm_encrypt(ssh_cipher *cipher, void *blk, int len)
+{
+    struct AES256GCMContext *ctx = container_of(cipher, struct AES256GCMContext, ciph);
+    unsigned char adata[4];
+    PUT_32BIT_MSB_FIRST(adata, (unsigned int)len);
+    nettle_gcm_aes256_set_iv(&ctx->ctx, 12, ctx->iv);
+    nettle_gcm_aes256_update(&ctx->ctx, 4, adata);
+    nettle_gcm_aes256_encrypt(&ctx->ctx, len, blk, blk);
+    ctx->encrypt = true;
+}
+
+void aes256_gcm_decrypt(ssh_cipher *cipher, void *blk, int len)
+{
+    (void)cipher;
+    (void)blk;
+    (void)len;
+    // Decryption was already done at MAC verification.
+}
+
+static ssh2_mac *aes256_gcm_mac_new(const ssh2_macalg *alg, ssh_cipher *cipher)
+{
+    struct AES256GCMContext *ctx = container_of(cipher, struct AES256GCMContext, ciph);
+    ctx->mac_if.vt = alg;
+    BinarySink_DELEGATE_INIT(&ctx->mac_if, ctx);
+    return &ctx->mac_if;
+}
+
+static void aes256_gcm_mac_free(ssh2_mac *mac)
+{
+    /* Not allocated, just forwarded, no need to free */
+    (void)mac;
+}
+
+static void aes256_gcm_mac_setkey(ssh2_mac *mac, ptrlen key)
+{
+    /* Uses the same context as AES256, so ignore */
+    (void)mac;
+    (void)key;
+}
+
+static void aes256_gcm_mac_start(ssh2_mac *mac)
+{
+    struct AES256GCMContext *ctx = container_of(mac, struct AES256GCMContext, mac_if);
+    ctx->skip = 4;
+}
+
+static void aes256_gcm_mac_genresult(ssh2_mac *mac, unsigned char *blk)
+{
+    struct AES256GCMContext *ctx = container_of(mac, struct AES256GCMContext, mac_if);
+
+    nettle_gcm_aes256_digest(&ctx->ctx, 16, blk);
+    increment_iv_step32(ctx->iv + 4, 2);
+}
+
+static const char *aes256_gcm_mac_textname(ssh2_mac *mac)
+{
+    (void)mac;
+    return "AES256 GCM";
+}
+
+static const ssh2_macalg ssh2_aes256_gcm_mac = {
+    aes256_gcm_mac_new, aes256_gcm_mac_free,
+    aes256_gcm_mac_setkey, aes256_gcm_mac_start,
+
+    /* whole-packet operations */
+    aes256_gcm_mac_genresult, aes256_gcm_mac_textname,
+
+    "", "", /* Not selectable individually, just part of aes256-gcm@openssh.com */
+    16, 0,
+
+    NULL
+};
+
+static const ssh_cipheralg ssh_aes128_gcm = {
+    aes128_gcm_make_context, aes128_gcm_free_context, aes128_gcm_iv, aes128_gcm_key,
+    aes128_gcm_encrypt, aes128_gcm_decrypt, NULL, NULL,
+    "aes128-gcm@openssh.com", 16, 128, 16, 0, "AES-128 GCM", &ssh2_aes128_gcm_mac, NULL
+};
+
+static const ssh_cipheralg ssh_aes256_gcm = {
+    aes256_gcm_make_context, aes256_gcm_free_context, aes256_gcm_iv, aes256_gcm_key,
+    aes256_gcm_encrypt, aes256_gcm_decrypt, NULL, NULL,
+    "aes256-gcm@openssh.com", 16, 256, 32, 0, "AES-256 GCM", &ssh2_aes256_gcm_mac, NULL
+};
+
+// END FZ GCM
+
 static const ssh_cipheralg *const aes_list[] = {
+    &ssh_aes256_gcm,
     &ssh_aes256_sdctr,
     &ssh_aes256_cbc,
     &ssh_rijndael_lysator,
     &ssh_aes192_sdctr,
     &ssh_aes192_cbc,
+    &ssh_aes128_gcm,
     &ssh_aes128_sdctr,
     &ssh_aes128_cbc,
 };
