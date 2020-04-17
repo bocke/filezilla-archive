@@ -130,7 +130,7 @@ void CStatusView::OnSize(wxSizeEvent &)
 
 void CStatusView::AddToLog(CLogmsgNotification && notification)
 {
-	AddToLog(notification.msgType, std::move(notification.msg), fz::datetime::now());
+	AddToLog(notification.msgType, std::move(notification.msg), std::move(notification.time_));
 }
 
 void CStatusView::AddToLog(logmsg::type messagetype, std::wstring && message, fz::datetime const& time)

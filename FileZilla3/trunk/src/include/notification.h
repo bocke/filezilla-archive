@@ -99,13 +99,15 @@ public:
 	{}
 
 	template<typename String>
-	CLogmsgNotification(logmsg::type t, String && m)
+	CLogmsgNotification(logmsg::type t, String && m, fz::datetime const& time)
 		: msg(std::forward<String>(m))
+		, time_(time)
 		, msgType(t)
 	{
 	}
 
 	std::wstring msg;
+	fz::datetime time_;
 	logmsg::type msgType{logmsg::status}; // Type of message, see logging.h for details
 };
 
