@@ -1110,7 +1110,14 @@ bool CEditHandler::Edit(CEditHandler::fileType type, std::vector<FileData> const
 
 bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int& already_editing_action)
 {
-	// First check whether this file is already being edited	
+	for (auto const& c : GetExtension(file.name)) {
+		if (c < 32 && c != '\t') {
+			wxMessageBoxEx(_("Forbidden character in file extension."), _("Cannot view/edit selected file"), wxICON_EXCLAMATION);
+			return false;
+		}
+	}
+
+	// First check whether this file is already being edited
 	fileState state;
 	if (type == local) {
 		state = GetFileState(file.name);
