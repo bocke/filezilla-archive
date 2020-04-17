@@ -114,11 +114,8 @@ protected:
 	 * - Filetype association of system has to exist
 	 * - Custom association for that filetype
 	 * - Default editor set
-	 *
-	 * The dangerous argument will be set to true on some filetypes,
-	 * e.g. executables.
 	 */
-	std::vector<std::wstring> CanOpen(std::wstring const& fileName, bool& dangerous, bool& program_exists);
+	std::vector<std::wstring> CanOpen(std::wstring const& fileName, bool& program_exists);
 
 	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
 

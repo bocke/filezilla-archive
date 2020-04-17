@@ -889,7 +889,7 @@ void CEditHandler::SetTimerState()
 	}
 }
 
-std::vector<std::wstring> CEditHandler::CanOpen(std::wstring const& fileName, bool &dangerous, bool &program_exists)
+std::vector<std::wstring> CEditHandler::CanOpen(std::wstring const& fileName, bool &program_exists)
 {
 	auto cmd_with_args = GetAssociation(fileName);
 	if (cmd_with_args.empty()) {
@@ -897,8 +897,6 @@ std::vector<std::wstring> CEditHandler::CanOpen(std::wstring const& fileName, bo
 	}
 
 	program_exists = ProgramExists(cmd_with_args.front());
-	// TODO: dangerous flag
-	dangerous = false;
 
 	return cmd_with_args;
 }
@@ -1285,15 +1283,14 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 
 
 	// Find associated program
-	bool dangerous = false;
 	bool program_exists = false;
-	auto cmd_with_args = CanOpen(file.name, dangerous, program_exists);
+	auto cmd_with_args = CanOpen(file.name, program_exists);
 	if (cmd_with_args.empty()) {
 		CNewAssociationDialog dlg(parent);
 		if (!dlg.Run(file.name)) {
 			return false;
 		}
-		cmd_with_args = CanOpen(file.name, dangerous, program_exists);
+		cmd_with_args = CanOpen(file.name, program_exists);
 		if (cmd_with_args.empty()) {
 			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nNo program has been associated on your system with this file type."), file.name), _("Opening failed"), wxICON_EXCLAMATION);
 			return false;
@@ -1303,13 +1300,6 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 		wxString msg = wxString::Format(_("The file '%s' cannot be opened:\nThe associated program (%s) could not be found.\nPlease check your filetype associations."), file.name, QuoteCommand(cmd_with_args));
 		wxMessageBoxEx(msg, _("Cannot edit file"), wxICON_EXCLAMATION);
 		return false;
-	}
-	if (dangerous) {
-		int res = wxMessageBoxEx(_("The selected file would be executed directly.\nThis can be dangerous and might damage your system.\nDo you really want to continue?"), _("Dangerous filetype"), wxICON_EXCLAMATION | wxYES_NO);
-		if (res != wxYES) {
-			wxBell();
-			return false;
-		}
 	}
 
 	// We can proceed with adding the item and either open it or transfer it.
