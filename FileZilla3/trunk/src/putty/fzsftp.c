@@ -92,6 +92,20 @@ static int ReadQuotas(int i)
 
 int RequestQuota(int i, int bytes)
 {
+#ifndef _WINDOWS
+    static int tty = -1;
+    if (tty == -1) {
+        char* debug = getenv("FZDEBUG");
+        tty = isatty(0) && isatty(1) && isatty(2) && debug && !strcmp(debug, "1");
+        if (tty) {
+            return bytes;
+        }
+    }
+    else if (tty) {
+        return bytes;
+    }
+#endif
+
     if (bytesAvailable[i] < -100)
         bytesAvailable[i] = 0;
     else if (bytesAvailable[i] < 0)
