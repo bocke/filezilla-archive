@@ -307,6 +307,10 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 
 #endif
 
+	if (!ret.empty() && !ProgramExists(ret[0])) {
+		ret.clear();
+	}
+
 	return ret;
 }
 
