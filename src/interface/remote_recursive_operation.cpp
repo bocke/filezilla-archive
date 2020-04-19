@@ -265,16 +265,16 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 
 			bool isLink{};
 			fz::native_string name;
-			bool isDir{};
+			fz::local_filesys::type t{};
 			int64_t size{};
 			fz::datetime time;
 			int attributes{};
-			while (fs.get_next_file(name, isLink, isDir, &size, &time, &attributes)) {
+			while (fs.get_next_file(name, isLink, t, &size, &time, &attributes)) {
 				if (isLink) {
 					continue;
 				}
 				auto const wname = fz::to_wstring(name);
-				if (filter.FilenameFiltered(m_filters.first, wname, dir.localDir.GetPath(), isDir, size, attributes, time)) {
+				if (filter.FilenameFiltered(m_filters.first, wname, dir.localDir.GetPath(), t == fz::local_filesys::dir, size, attributes, time)) {
 					continue;
 				}
 
@@ -286,7 +286,7 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 					if (!filter.FilenameFiltered(m_filters.second, entry.name, remotePath, entry.is_dir(), entry.size, 0, entry.time)) {
 						// Both local and remote items exist
 
-						if (isDir == entry.is_dir() || entry.is_link()) {
+						if ((t == fz::local_filesys::dir) == entry.is_dir() || entry.is_link()) {
 							// Normal item, nothing we should do
 							continue;
 						}

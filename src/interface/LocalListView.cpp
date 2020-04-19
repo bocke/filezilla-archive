@@ -418,10 +418,12 @@ regular_dir:
 
 		int num = m_fileData.size();
 		CLocalFileData data;
-		bool wasLink;
+		bool wasLink{};
+		fz::local_filesys::type t{};
 		fz::native_string name;
-		while (local_filesys.get_next_file(name, wasLink, data.dir, &data.size, &data.time, &data.attributes)) {
+		while (local_filesys.get_next_file(name, wasLink, t, &data.size, &data.time, &data.attributes)) {
 			data.name = fz::to_wstring(name);
+			data.dir = t == fz::local_filesys::dir;
 			if (name.empty() || data.name.empty()) {
 				wxGetApp().DisplayEncodingWarning();
 				continue;

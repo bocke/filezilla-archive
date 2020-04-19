@@ -963,15 +963,16 @@ bool CState::RecursiveCopy(CLocalPath source, const CLocalPath& target)
 			continue;
 		}
 
-		bool is_dir, is_link;
+		bool is_link{};
+		fz::local_filesys::type t{};
 		fz::native_string file;
-		while (fs.get_next_file(file, is_link, is_dir, 0, 0, 0)) {
+		while (fs.get_next_file(file, is_link, t, 0, 0, 0)) {
 			if (file.empty()) {
 				wxGetApp().DisplayEncodingWarning();
 				continue;
 			}
 
-			if (is_dir) {
+			if (t == fz::local_filesys::dir) {
 				if (is_link) {
 					continue;
 				}
