@@ -197,15 +197,15 @@ void CLocalRecursiveOperation::entry()
 				listing::entry entry;
 				bool isLink{};
 				fz::native_string name;
-				bool isDir{};
-				while (fs.get_next_file(name, isLink, isDir, &entry.size, &entry.time, &entry.attributes)) {
+				fz::local_filesys::type t{};
+				while (fs.get_next_file(name, isLink, t, &entry.size, &entry.time, &entry.attributes)) {
 					if (isLink && m_ignoreLinks) {
 						continue;
 					}
 					entry.name = fz::to_wstring(name);
 
-					if (!filterManager.FilenameFiltered(filters, entry.name, d.localPath.GetPath(), isDir, entry.size, entry.attributes, entry.time)) {
-						if (isDir) {
+					if (!filterManager.FilenameFiltered(filters, entry.name, d.localPath.GetPath(), t == fz::local_filesys::dir, entry.size, entry.attributes, entry.time)) {
+						if (t == fz::local_filesys::dir) {
 							d.dirs.emplace_back(std::move(entry));
 						}
 						else {

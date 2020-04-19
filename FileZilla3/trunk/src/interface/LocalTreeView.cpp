@@ -494,15 +494,14 @@ void CLocalTreeView::DisplayDir(wxTreeItemId parent, std::wstring const& dirname
 	bool matchedKnown = false;
 
 	fz::native_string file;
-	bool wasLink;
-	int attributes;
-	bool is_dir;
+	bool wasLink{};
+	int attributes{};
+	fz::local_filesys::type t{};
 	static int64_t const size(-1);
 	fz::datetime date;
 
 	wxTreeItemId last;
-	while (local_filesys.get_next_file(file, wasLink, is_dir, 0, &date, &attributes)) {
-		wxASSERT(is_dir);
+	while (local_filesys.get_next_file(file, wasLink, t, 0, &date, &attributes)) {
 		std::wstring wfile = fz::to_wstring(file);
 		if (file.empty() || wfile.empty()) {
 			wxGetApp().DisplayEncodingWarning();
@@ -563,13 +562,13 @@ std::wstring CLocalTreeView::HasSubdir(std::wstring const& dirname)
 	}
 
 	fz::native_string file;
-	bool wasLink;
-	int attributes;
-	bool is_dir;
+	bool wasLink{};
+	int attributes{};
+	fz::local_filesys::type t{};
 	static int64_t const size(-1);
 	fz::datetime date;
-	while (local_filesys.get_next_file(file, wasLink, is_dir, 0, &date, &attributes)) {
-		wxASSERT(is_dir);
+	while (local_filesys.get_next_file(file, wasLink, t, 0, &date, &attributes)) {
+
 		std::wstring wfile = fz::to_wstring(file);
 		if (file.empty() || wfile.empty()) {
 			wxGetApp().DisplayEncodingWarning();
@@ -786,11 +785,11 @@ void CLocalTreeView::RefreshListing()
 
 		fz::native_string file;
 		static int64_t const size(-1);
-		bool was_link;
-		bool is_dir;
-		int attributes;
+		bool was_link{};
+		fz::local_filesys::type t{};
+		int attributes{};
 		fz::datetime date;
-		while (local_filesys.get_next_file(file, was_link, is_dir, 0, &date, &attributes)) {
+		while (local_filesys.get_next_file(file, was_link, t, 0, &date, &attributes)) {
 			std::wstring wfile = fz::to_wstring(file);
 			if (file.empty() || wfile.empty()) {
 				wxGetApp().DisplayEncodingWarning();
