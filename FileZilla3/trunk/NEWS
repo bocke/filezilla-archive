@@ -10,6 +10,13 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.48.0-rc1 (2002-04-20)
+
++ Overhaul of file associations for editing files. The setting to inherit system associations has been removed. When first editing a type of file with no default editor set, a dialog is shown asking which editor to use. The system associatio, if it exists, is a choice in this dialog.
+- SFTP: Re-added support for AES-GCM which was accidentally removed in 3.46.1
+- Fixes for comparative search leaving the program in an inconsistent state when closing the dialog during an ongoing search
+- Building and running FileZilla now depends on libfilezilla >= 0.20.0 (https://lib.filezilla-project.org/)
+
 3.47.2 (2020-03-10)
 
 - macOS: Potential fix for clipped text labels on a few systems
