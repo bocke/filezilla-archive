@@ -27,6 +27,51 @@ EVT_TIMER(wxID_ANY, CEditHandler::OnTimerEvent)
 EVT_COMMAND(wxID_ANY, fzEDIT_CHANGEDFILE, CEditHandler::OnChangedFileEvent)
 END_EVENT_TABLE()
 
+Associations LoadAssociations()
+{
+	Associations ret;
+
+	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
+
+	for (std::wstring_view assoc : assocs) {
+		std::optional<std::wstring> ext = UnquoteFirst(assoc);
+		if (!ext || ext->empty()) {
+			continue;
+		}
+
+		auto unquoted = UnquoteCommand(assoc);
+		if (!unquoted.empty() && !unquoted[0].empty()) {
+			ret.emplace(std::move(*ext), std::move(unquoted));
+		}
+	}
+
+	return ret;
+
+}
+
+void SaveAssociations(Associations const& assocs)
+{
+	std::wstring quoted;
+	for (auto const& assoc : assocs) {
+		if (quoted.empty()) {
+			quoted += '\n';
+		}
+
+		if (assoc.first.find_first_of(L" \t'\"") != std::wstring::npos) {
+			quoted += '"';
+			quoted += fz::replaced_substrings(assoc.first, L"\"", L"\"\"");
+			quoted += '"';
+		}
+		else {
+			quoted += assoc.first;
+		}
+		quoted += ' ';
+		quoted += QuoteCommand(assoc.second);
+	}
+	COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, quoted);
+}
+
 CEditHandler* CEditHandler::m_pEditHandler = 0;
 
 CEditHandler::CEditHandler()
@@ -934,22 +979,11 @@ std::vector<std::wstring> CEditHandler::GetCustomAssociation(std::wstring_view c
 		ext = L"/";
 	}
 
-	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
-
-	for (std::wstring_view assoc : assocs) {
-		std::optional<std::wstring> aext = UnquoteFirst(assoc);
-		if (!aext || *aext != ext) {
-			continue;
-		}
-
-		ret = UnquoteCommand(assoc);
-		if (!ret.empty() && !ret[0].empty()) {
-			break;
-		}
-		ret.clear();
+	auto assocs = LoadAssociations();
+	auto it = assocs.find(ext);
+	if (it != assocs.end()) {
+		ret = it->second;
 	}
-
 	return ret;
 }
 
@@ -1284,7 +1318,10 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 
 	// Find associated program
 	bool program_exists = false;
-	auto cmd_with_args = CanOpen(file.name, program_exists);
+	std::vector<std::wstring> cmd_with_args;
+	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
+		cmd_with_args = CanOpen(file.name, program_exists);
+	}
 	if (cmd_with_args.empty()) {
 		CNewAssociationDialog dlg(parent);
 		if (!dlg.Run(file.name)) {
@@ -1813,10 +1850,10 @@ void CNewAssociationDialog::OnOK()
 		return;
 	}
 
-	std::wstring cmd;
+	std::vector<std::wstring> cmd_with_args;
 	if (custom) {
-		cmd = impl_->custom_->GetValue().ToStdWstring();
-		auto cmd_with_args = UnquoteCommand(cmd);
+		std::wstring cmd = impl_->custom_->GetValue().ToStdWstring();
+		cmd_with_args = UnquoteCommand(cmd);
 		if (cmd_with_args.empty()) {
 			impl_->custom_->SetFocus();
 			wxMessageBoxEx(_("You need to enter a properly quoted command."), _("Cannot set file association"), wxICON_EXCLAMATION);
@@ -1832,31 +1869,23 @@ void CNewAssociationDialog::OnOK()
 	}
 	else {
 		if (def) {
-			cmd = QuoteCommand(GetSystemAssociation(_T("foo.txt")));
+			cmd_with_args = GetSystemAssociation(L"foo.txt");
 		}
 		else {
-			cmd = QuoteCommand(GetSystemAssociation(file_));
+			cmd_with_args = GetSystemAssociation(file_);
 		}
-		if (cmd.empty()) {
+		if (cmd_with_args.empty()) {
 			wxMessageBoxEx(_("The associated program could not be found."), _("Cannot set file association"), wxICON_EXCLAMATION, this);
 			return;
 		}
 	}
 
-	std::wstring associations = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
-	if (!associations.empty() && associations.back() != '\n') {
-		associations += '\n';
-	}
 	if (ext_.empty()) {
 		ext_ = L"/";
 	}
-	else if (ext_.find_first_of(L" \t'\"") != std::wstring::npos) {
-		fz::replace_substrings(ext_, L"\"", L"\"\"");
-		ext_ = L"\"" + ext_ + L"\"";
-	}
-	associations += ext_;
-	associations += L" " + cmd;
-	COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, associations);
+	auto associations = LoadAssociations();
+	associations[ext_] = cmd_with_args;
+	SaveAssociations(associations);
 
 	EndModal(wxID_OK);
 }

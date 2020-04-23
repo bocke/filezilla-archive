@@ -7,8 +7,15 @@
 #include <wx/timer.h>
 
 #include <list>
+#include <map>
 
 // Handles all aspects about remote file viewing/editing
+
+typedef std::map<std::wstring, std::vector<std::wstring>, std::less<>> Associations;
+
+Associations LoadAssociations();
+void SaveAssociations(Associations const& assocs);
+
 
 namespace edit_choices {
 enum type
