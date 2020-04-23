@@ -58,10 +58,10 @@ bool COptionsPageConnectionSFTP::CreateControls(wxWindow* parent)
 
 		auto row = lay.createGrid(2);
 		inner->Add(row, lay.halign);
-		impl_->add_ = new wxButton(this, -1, _("&Add key file..."));
+		impl_->add_ = new wxButton(box, -1, _("&Add key file..."));
 		impl_->add_->Bind(wxEVT_BUTTON, &COptionsPageConnectionSFTP::OnAdd, this);
 		row->Add(impl_->add_, lay.valign);
-		impl_->remove_ = new wxButton(this, -1, _("&Remove key"));
+		impl_->remove_ = new wxButton(box, -1, _("&Remove key"));
 		impl_->remove_->Bind(wxEVT_BUTTON, &COptionsPageConnectionSFTP::OnRemove, this);
 		row->Add(impl_->remove_, lay.valign);
 
