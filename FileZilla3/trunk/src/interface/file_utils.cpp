@@ -465,7 +465,7 @@ bool ProgramExists(std::wstring const& editor)
 	}
 
 #ifdef __WXMAC__
-	std::wstring_view e;
+	std::wstring_view e = editor;
 	if (!e.empty() && e.back() == '/') {
 		e = e.substr(0, e.size() - 1);
 	}
