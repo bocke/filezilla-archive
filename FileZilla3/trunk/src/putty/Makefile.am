@@ -48,7 +48,8 @@ libfzputtycommon_a_SOURCES += \
 			unix/uxmisc.c \
 			unix/uxnoise.c \
 			unix/uxpoll.c \
-			unix/uxstore.c
+			unix/uxstore.c \
+			unix/uxutils.c
 endif
 
 bin_PROGRAMS = fzsftp fzputtygen
