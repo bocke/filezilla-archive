@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2020-04-20 13:54+0200\n"
+"POT-Creation-Date: 2020-04-27 13:40+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Pgase <pgase.filezilla@free.fr>\n"
 "Language-Team: Pgase, William GATHOYE <pgase.filezilla@free.fr, "
@@ -262,7 +262,7 @@ msgstr "Toujours f&aire confiance à cet hôte, ajouter cette clé au cache"
 msgid "&Always use default editor"
 msgstr "Toujours utiliser l'éditeur p&ar défaut"
 
-#: ../src/interface/edithandler.cpp:1746
+#: ../src/interface/edithandler.cpp:1783
 msgid "&Always use selection for all unassociated files"
 msgstr "Toujours utiliser l&a sélection pour tous les fichiers non associés"
 
@@ -307,7 +307,7 @@ msgstr "Fa&voris"
 #: ../src/interface/resources/xrc/dialogs.xrc:1432
 #: ../src/interface/resources/xrc/dialogs.xrc:1526
 #: ../src/interface/resources/xrc/settings.xrc:1133
-#: ../src/interface/edithandler.cpp:1768
+#: ../src/interface/edithandler.cpp:1805
 #: ../src/interface/settings/optionspage_edit.cpp:71
 #: ../src/interface/sitemanager_controls.cpp:933
 #: ../src/interface/sitemanager_dialog.cpp:301
@@ -431,7 +431,7 @@ msgstr ""
 "&Désactiver la navigation synchronisée et continuer le changement de dossier "
 "distant"
 
-#: ../src/interface/edithandler.cpp:1170
+#: ../src/interface/edithandler.cpp:1204
 msgid "&Discard local file then download and edit file anew"
 msgstr ""
 "Supprimer le fichier local puis télécharger et é&diter le fichier à nouveau"
@@ -569,11 +569,11 @@ msgstr "&Filtres"
 msgid "&Filters:"
 msgstr "&Filtres :"
 
-#: ../src/interface/edithandler.cpp:778
+#: ../src/interface/edithandler.cpp:823
 msgid "&Finish editing"
 msgstr "&Terminer l'édition"
 
-#: ../src/interface/edithandler.cpp:782
+#: ../src/interface/edithandler.cpp:827
 msgid "&Finish editing and delete local file"
 msgstr "&Terminer l'édition et supprimer le fichier local"
 
@@ -762,7 +762,7 @@ msgstr "&Nouvelle version disponible !"
 msgid "&Next >"
 msgstr "&Suivant >"
 
-#: ../src/interface/edithandler.cpp:791 ../src/interface/edithandler.cpp:1203
+#: ../src/interface/edithandler.cpp:836 ../src/interface/edithandler.cpp:1237
 msgid "&No"
 msgstr "&Non"
 
@@ -902,7 +902,7 @@ msgstr "&Renommer"
 msgid "&Rename..."
 msgstr "&Renommer..."
 
-#: ../src/interface/edithandler.cpp:1168
+#: ../src/interface/edithandler.cpp:1202
 msgid "&Reopen local file"
 msgstr "Ouvri&r à nouveau le fichier local"
 
@@ -1068,7 +1068,7 @@ msgid "&Trust this certificate on the listed alternative hostnames."
 msgstr ""
 "&Faire confiance à ce certificat sur les noms d'hôte alternatifs répertoriés."
 
-#: ../src/interface/edithandler.cpp:1452
+#: ../src/interface/edithandler.cpp:1489
 msgid "&Unedit"
 msgstr "Ann&uler l'édition"
 
@@ -1094,7 +1094,7 @@ msgstr "&Envoyer..."
 msgid "&Uploads:"
 msgstr "&Envois :"
 
-#: ../src/interface/edithandler.cpp:1751
+#: ../src/interface/edithandler.cpp:1788
 msgid "&Use custom program"
 msgstr "&Utiliser un programme personnalisé"
 
@@ -1157,7 +1157,7 @@ msgstr "Lors de la recherche des mises à jour, vérifier les :"
 msgid "&Write"
 msgstr "É&crire"
 
-#: ../src/interface/edithandler.cpp:788 ../src/interface/edithandler.cpp:1200
+#: ../src/interface/edithandler.cpp:833 ../src/interface/edithandler.cpp:1234
 msgid "&Yes"
 msgstr "&Oui"
 
@@ -1279,6 +1279,13 @@ msgid ""
 "- In arguments, %%f is a placeholder for the file to be opened. Use %%%% for "
 "literal percents"
 msgstr ""
+"- La commande et chaque argument doivent être séparés par des espaces\n"
+"- Une commande ou un argument contenant des espaces ou des guillemets doit "
+"être placé entre des guillemets doublés\n"
+"- Les guillemets à l'intérieur d'une commande ou d'un argument doivent être "
+"placés entre des guillemets doublés\n"
+"- Dans les arguments, %%f est un espace réservé pour le fichier à ouvrir. "
+"Utilisez %%%% pour les pourcentages"
 
 #: ../src/interface/statuslinectrl.cpp:229
 msgid "--:--:-- left"
@@ -1356,15 +1363,15 @@ msgstr ""
 "configurés. Dans pareils cas, vous devrez utiliser le mode actif. En mode "
 "actif, FileZilla ouvre un port et demande au serveur de s'y connecter."
 
-#: ../src/interface/edithandler.cpp:747
+#: ../src/interface/edithandler.cpp:792
 msgid "A file previously opened has been changed."
 msgstr "Un fichier précédemment ouvert a été modifié."
 
-#: ../src/interface/edithandler.cpp:1132
+#: ../src/interface/edithandler.cpp:1166
 msgid "A file with that name is already being transferred."
 msgstr "Un fichier portant ce nom est déjà en cours de transfert."
 
-#: ../src/interface/edithandler.cpp:1136
+#: ../src/interface/edithandler.cpp:1170
 msgid ""
 "A file with that name is still being edited. Please close it and try again."
 msgstr ""
@@ -1492,11 +1499,11 @@ msgstr "Compte"
 msgid "Action after queue &completion"
 msgstr "A&ction après &traitement de la file d'attente"
 
-#: ../src/interface/edithandler.cpp:1447
+#: ../src/interface/edithandler.cpp:1484
 msgid "Action on selected file:"
 msgstr "Action sur le fichier sélectionné :"
 
-#: ../src/interface/edithandler.cpp:1166
+#: ../src/interface/edithandler.cpp:1200
 msgid "Action to perform:"
 msgstr "Action à exécuter :"
 
@@ -1820,7 +1827,7 @@ msgstr "Instructions pour une première utilisation"
 msgid "Behaviour"
 msgstr "Comportement"
 
-#: ../src/interface/edithandler.cpp:1399 ../src/interface/edithandler.cpp:1426
+#: ../src/interface/edithandler.cpp:1436 ../src/interface/edithandler.cpp:1463
 msgid "Being edited"
 msgstr "En cours d'édition"
 
@@ -1955,7 +1962,7 @@ msgstr "Impossible d'écrire les données dans un fichier : %s"
 #: ../src/interface/resources/xrc/dialogs.xrc:2086
 #: ../src/interface/resources/xrc/dialogs.xrc:2157
 #: ../src/interface/bookmarks_dialog.cpp:284
-#: ../src/interface/edithandler.cpp:1196 ../src/interface/edithandler.cpp:1776
+#: ../src/interface/edithandler.cpp:1230 ../src/interface/edithandler.cpp:1813
 #: ../src/interface/fileexistsdlg.cpp:103 ../src/interface/filter.cpp:201
 #: ../src/interface/filteredit.cpp:143 ../src/interface/listctrlex.cpp:737
 #: ../src/interface/loginmanager.cpp:124 ../src/interface/loginmanager.cpp:266
@@ -2012,7 +2019,7 @@ msgstr ""
 msgid "Cannot create new filter"
 msgstr "Impossible de créer un nouveau filtre"
 
-#: ../src/interface/edithandler.cpp:1078 ../src/interface/edithandler.cpp:1301
+#: ../src/interface/edithandler.cpp:1112 ../src/interface/edithandler.cpp:1338
 #: ../src/interface/LocalListView.cpp:1931 ../src/interface/search.cpp:1625
 #: ../src/interface/search.cpp:2020
 msgid "Cannot edit file"
@@ -2064,17 +2071,17 @@ msgstr "Impossible de sauvegarder le jeu de filtres"
 msgid "Cannot select filter"
 msgstr "Impossible de sélectionner le filtre"
 
-#: ../src/interface/edithandler.cpp:1822 ../src/interface/edithandler.cpp:1827
-#: ../src/interface/edithandler.cpp:1841
+#: ../src/interface/edithandler.cpp:1859 ../src/interface/edithandler.cpp:1864
+#: ../src/interface/edithandler.cpp:1878
 msgid "Cannot set file association"
 msgstr "Impossible de définir l'association de fichier"
 
-#: ../src/interface/edithandler.cpp:1351
+#: ../src/interface/edithandler.cpp:1388
 msgid "Cannot show dialog"
 msgstr "Impossible d'afficher le dialogue"
 
-#: ../src/interface/edithandler.cpp:1113 ../src/interface/edithandler.cpp:1132
-#: ../src/interface/edithandler.cpp:1278
+#: ../src/interface/edithandler.cpp:1147 ../src/interface/edithandler.cpp:1166
+#: ../src/interface/edithandler.cpp:1312
 msgid "Cannot view/edit selected file"
 msgstr "Impossible d'afficher/éditer le fichier sélectionné"
 
@@ -2405,7 +2412,7 @@ msgstr "Configuration de FileZilla et de votre réseau"
 msgid "Confirm deletion"
 msgstr "Confirmer la suppression"
 
-#: ../src/interface/edithandler.cpp:1090 ../src/interface/file_utils.h:60
+#: ../src/interface/edithandler.cpp:1124 ../src/interface/file_utils.h:60
 #: ../src/interface/LocalListView.cpp:1896
 #: ../src/interface/RemoteListView.cpp:1436
 #: ../src/interface/RemoteTreeView.cpp:1129 ../src/interface/search.cpp:1637
@@ -2668,7 +2675,7 @@ msgstr "Impossible de créer le journal mutex : %s"
 msgid "Could not create security-scoped bookmark from URL:"
 msgstr "Impossible de créer un favori sécurisé à partir de l'URL :"
 
-#: ../src/interface/edithandler.cpp:1278
+#: ../src/interface/edithandler.cpp:1312
 msgid "Could not create temporary file name."
 msgstr "Impossible de créer un nom de fichier temporaire."
 
@@ -2725,7 +2732,7 @@ msgstr "Impossible d'accéder à l'URL"
 msgid "Could not get reply from fzputtygen."
 msgstr "Impossible d'obtenir une réponse de fzputtygen."
 
-#: ../src/interface/edithandler.cpp:1078 ../src/interface/search.cpp:1625
+#: ../src/interface/edithandler.cpp:1112 ../src/interface/search.cpp:1625
 msgid "Could not get temporary directory to download file into."
 msgstr ""
 "Impossible d'obtenir un dossier temporaire pour y télécharger le fichier."
@@ -3407,7 +3414,7 @@ msgstr "Affiche le dialogue À propos de FileZilla"
 msgid "Do &not use default editor"
 msgstr "&Ne pas utiliser l'éditeur par défaut"
 
-#: ../src/interface/edithandler.cpp:1183
+#: ../src/interface/edithandler.cpp:1217
 msgid "Do the same with &all selected files already being edited"
 msgstr ""
 "Faire de même avec tous les fichiers sélectionnés déjà en cours d'édition"
@@ -3442,7 +3449,7 @@ msgstr "Souhaitez-vous vraiment supprimer la file d'attente ?"
 msgid "Do you really want to send '%s' to the server?"
 msgstr "Souhaitez-vous vraiment envoyer '%s' au serveur ?"
 
-#: ../src/interface/edithandler.cpp:1163
+#: ../src/interface/edithandler.cpp:1197
 msgid "Do you want to reopen this file?"
 msgstr "Souhaitez-vous rouvrir ce fichier ?"
 
@@ -3505,7 +3512,7 @@ msgstr ""
 "Téléchargement : %s/s\n"
 "Envoi : %s/s"
 
-#: ../src/interface/edithandler.cpp:1384
+#: ../src/interface/edithandler.cpp:1421
 msgid "Downloading"
 msgstr "En cours de téléchargement"
 
@@ -4140,7 +4147,7 @@ msgstr "Le fichier existe"
 msgid "File exists action"
 msgstr "Action lorsque le fichier existe"
 
-#: ../src/interface/edithandler.cpp:738
+#: ../src/interface/edithandler.cpp:783
 msgid "File has changed"
 msgstr "Le fichier a été modifié"
 
@@ -4149,7 +4156,7 @@ msgid "File lists"
 msgstr "Listes des fichiers"
 
 #: ../src/engine/storj/resolve.cpp:111 ../src/engine/storj/resolve.cpp:174
-#: ../src/interface/edithandler.cpp:1887 ../src/interface/FileZilla.cpp:689
+#: ../src/interface/edithandler.cpp:1916 ../src/interface/FileZilla.cpp:689
 #: ../src/interface/settings/optionspage_edit.cpp:194
 msgid "File not found"
 msgstr "Fichier introuvable"
@@ -4233,7 +4240,7 @@ msgstr "Mises à jour de FileZilla"
 msgid "Filelist status &bars"
 msgstr "Barre d'état des ar&borescences"
 
-#: ../src/interface/edithandler.cpp:1370
+#: ../src/interface/edithandler.cpp:1407
 #: ../src/interface/filter_conditions_dialog.cpp:100
 #: ../src/interface/LocalListView.cpp:288
 #: ../src/interface/RemoteListView.cpp:337 ../src/interface/search.cpp:176
@@ -4257,7 +4264,7 @@ msgid "Filename unchanged"
 msgstr "Nom de fichier inchangé"
 
 #: ../src/interface/resources/xrc/settings.xrc:1121
-#: ../src/interface/edithandler.cpp:752
+#: ../src/interface/edithandler.cpp:797
 msgid "Filename:"
 msgstr "Nom de fichier :"
 
@@ -4275,7 +4282,7 @@ msgstr ""
 "Les noms de fichier ne peuvent pas contenir les caractères suivants : / \\ : "
 "* ? \" < > |"
 
-#: ../src/interface/edithandler.cpp:1355
+#: ../src/interface/edithandler.cpp:1392
 msgid "Files currently being edited"
 msgstr "Fichiers en cours d'édition"
 
@@ -4399,9 +4406,9 @@ msgstr ""
 "Les paramètres par défaut seront utilisés pour cette session. Toute "
 "modification apportée à ces paramètres ne sera pas sauvegardée."
 
-#: ../src/interface/edithandler.cpp:1113
+#: ../src/interface/edithandler.cpp:1147
 msgid "Forbidden character in file extension."
-msgstr ""
+msgstr "Caractère interdit dans l'extension de fichier."
 
 #: ../src/interface/sitemanager_controls.cpp:1083
 msgid "Force &UTF-8"
@@ -5140,7 +5147,7 @@ msgstr "Contenu :"
 msgid "Lo&west available port:"
 msgstr "P&ort le plus bas disponible :"
 
-#: ../src/interface/edithandler.cpp:1416 ../src/interface/edithandler.cpp:1664
+#: ../src/interface/edithandler.cpp:1453 ../src/interface/edithandler.cpp:1701
 msgid "Local"
 msgstr "Local"
 
@@ -5567,7 +5574,7 @@ msgid "No external IP address set, trying default."
 msgstr ""
 "Aucune adresse IP externe spécifiée, utilisation des paramètres par défaut."
 
-#: ../src/interface/edithandler.cpp:1351
+#: ../src/interface/edithandler.cpp:1388
 msgid "No files are currently being edited."
 msgstr "Aucun fichier en cours d'édition."
 
@@ -5588,22 +5595,22 @@ msgstr "Aucune image disponible"
 msgid "No name for the filterset given."
 msgstr "Le jeu de filtres spécifié n'a aucun nom."
 
-#: ../src/interface/edithandler.cpp:1707
+#: ../src/interface/edithandler.cpp:1744
 msgid "No program associated with filetype"
 msgstr "Aucun programme associé à ce type de fichier"
 
-#: ../src/interface/edithandler.cpp:1717
+#: ../src/interface/edithandler.cpp:1754
 msgid "No program has been associated to edit dotfiles."
 msgstr ""
 "Aucun programme n'a été associé pour modifier les fichiers dont le nom "
 "commence par un point."
 
-#: ../src/interface/edithandler.cpp:1714
+#: ../src/interface/edithandler.cpp:1751
 msgid "No program has been associated to edit extensionless files."
 msgstr ""
 "Aucun programme n'a été associé pour modifier les fichiers sans extension."
 
-#: ../src/interface/edithandler.cpp:1720
+#: ../src/interface/edithandler.cpp:1757
 #, c-format
 msgid "No program has been associated to edit files with the extension '%s'."
 msgstr ""
@@ -5737,8 +5744,8 @@ msgstr "O&uvrir"
 #: ../src/interface/resources/xrc/dialogs.xrc:2018
 #: ../src/interface/resources/xrc/dialogs.xrc:2151
 #: ../src/interface/resources/xrc/storj.xrc:37
-#: ../src/interface/aboutdialog.cpp:134 ../src/interface/edithandler.cpp:1193
-#: ../src/interface/edithandler.cpp:1467 ../src/interface/edithandler.cpp:1773
+#: ../src/interface/aboutdialog.cpp:134 ../src/interface/edithandler.cpp:1227
+#: ../src/interface/edithandler.cpp:1504 ../src/interface/edithandler.cpp:1810
 #: ../src/interface/filter.cpp:198 ../src/interface/filteredit.cpp:140
 #: ../src/interface/listctrlex.cpp:734
 #: ../src/interface/settings/settingsdialog.cpp:72
@@ -5779,7 +5786,7 @@ msgstr "Une fois par semaine"
 msgid "Only use plain FTP (insecure)"
 msgstr "Connexion FTP simple (non sécurisé)"
 
-#: ../src/interface/edithandler.cpp:1461
+#: ../src/interface/edithandler.cpp:1498
 msgid "Op&en file"
 msgstr "Ou&vrir le fichier"
 
@@ -5816,11 +5823,11 @@ msgstr "Ouvrir le fichier."
 msgid "Open the settings dialog of FileZilla"
 msgstr "Ouvrir le dialogue des paramètres de FileZilla"
 
-#: ../src/interface/edithandler.cpp:762
+#: ../src/interface/edithandler.cpp:807
 msgid "Opened as:"
 msgstr "Ouvert comme :"
 
-#: ../src/interface/edithandler.cpp:322 ../src/interface/edithandler.cpp:1295
+#: ../src/interface/edithandler.cpp:367 ../src/interface/edithandler.cpp:1332
 #: ../src/interface/LocalListView.cpp:1926
 #: ../src/interface/LocalListView.cpp:1938 ../src/interface/search.cpp:2015
 #: ../src/interface/search.cpp:2026
@@ -6035,8 +6042,8 @@ msgstr "Chemin du service d'identification"
 msgid "Paths"
 msgstr "Chemins"
 
-#: ../src/interface/edithandler.cpp:1396 ../src/interface/edithandler.cpp:1550
-#: ../src/interface/edithandler.cpp:1634 ../src/interface/edithandler.cpp:1645
+#: ../src/interface/edithandler.cpp:1433 ../src/interface/edithandler.cpp:1587
+#: ../src/interface/edithandler.cpp:1671 ../src/interface/edithandler.cpp:1682
 msgid "Pending removal"
 msgstr "En attente de retrait"
 
@@ -6614,12 +6621,12 @@ msgid "Quick search cannot be opened if comparing directories."
 msgstr ""
 "La recherche rapide ne peut pas être ouverte si vous comparez des dossiers."
 
-#: ../src/interface/edithandler.cpp:1761
+#: ../src/interface/edithandler.cpp:1798
 #: ../src/interface/settings/optionspage_edit.cpp:41
 #: ../src/interface/settings/optionspage_edit.cpp:78
 #: ../src/interface/settings/optionspage_edit_associations.cpp:33
 msgid "Quoting rules"
-msgstr ""
+msgstr "Règles de cotation"
 
 #: ../src/interface/QueueView.cpp:1810
 msgid "R&eboot system once"
@@ -6804,7 +6811,7 @@ msgstr "Actualiser la liste des dossiers et des fichiers"
 msgid "Remember passwords?"
 msgstr "Se souvenir des mots de passe?"
 
-#: ../src/interface/edithandler.cpp:1380
+#: ../src/interface/edithandler.cpp:1417
 msgid "Remote"
 msgstr "Distant"
 
@@ -6821,7 +6828,7 @@ msgstr "Recherche de fichiers distants"
 msgid "Remote filters:"
 msgstr "Filtres distants :"
 
-#: ../src/interface/edithandler.cpp:1372
+#: ../src/interface/edithandler.cpp:1409
 msgid "Remote path"
 msgstr "Chemin distant"
 
@@ -6860,7 +6867,7 @@ msgstr "Le chemin d'accès à distance n'a pas pu être analysé."
 msgid "Remote path handling:"
 msgstr "Traitement du chemin distant :"
 
-#: ../src/interface/edithandler.cpp:770
+#: ../src/interface/edithandler.cpp:815
 msgid "Remote path:"
 msgstr "Chemin distant :"
 
@@ -7155,7 +7162,7 @@ msgstr ""
 "Sélectionnez une action par défaut à effectuer si le fichier cible d'un "
 "transfert existe déjà."
 
-#: ../src/interface/edithandler.cpp:1866
+#: ../src/interface/edithandler.cpp:1895
 #: ../src/interface/settings/optionspage_edit.cpp:173
 msgid "Select default editor"
 msgstr "Sélection de l'éditeur par défaut"
@@ -7212,7 +7219,7 @@ msgstr "Sélection du fichier à envoyer"
 msgid "Select filename for converted key file"
 msgstr "Sélection du nom pour le fichier de clé convertie"
 
-#: ../src/interface/edithandler.cpp:1723
+#: ../src/interface/edithandler.cpp:1760
 msgid "Select how these files should be opened."
 msgstr "Sélectionnez la façon dont ces fichiers doivent être ouverts."
 
@@ -7282,12 +7289,12 @@ msgstr "Sélection de %s et %s. Taille totale : %s"
 msgid "Selected %s and %s. Total size: At least %s"
 msgstr "Sélection de %s et %s. Taille totale : Au moins %s"
 
-#: ../src/interface/edithandler.cpp:1827 ../src/interface/edithandler.cpp:1887
+#: ../src/interface/edithandler.cpp:1864 ../src/interface/edithandler.cpp:1916
 #: ../src/interface/settings/optionspage_edit.cpp:194
 msgid "Selected editor does not exist."
 msgstr "L'éditeur sélectionné n'existe pas."
 
-#: ../src/interface/edithandler.cpp:1145
+#: ../src/interface/edithandler.cpp:1179
 msgid "Selected file already being edited"
 msgstr "Le fichier sélectionné est déjà en cours d'édition"
 
@@ -7295,11 +7302,11 @@ msgstr "Le fichier sélectionné est déjà en cours d'édition"
 msgid "Selected file is already loaded"
 msgstr "Le fichier sélectionné est déjà chargé"
 
-#: ../src/interface/edithandler.cpp:1136
+#: ../src/interface/edithandler.cpp:1170
 msgid "Selected file is already opened"
 msgstr "Le fichier sélectionné est déjà ouvert"
 
-#: ../src/interface/edithandler.cpp:1253
+#: ../src/interface/edithandler.cpp:1287
 msgid "Selected file is still being edited"
 msgstr "Le fichier sélectionné est encore en cours d'édition"
 
@@ -7489,7 +7496,7 @@ msgid "Server/Local file"
 msgstr "Serveur / Fichier local"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1110
-#: ../src/interface/edithandler.cpp:767
+#: ../src/interface/edithandler.cpp:812
 msgid "Server:"
 msgstr "Serveur :"
 
@@ -7807,7 +7814,7 @@ msgstr "Démarre le site local dans le chemin déterminé"
 msgid "State or province:"
 msgstr "État ou province :"
 
-#: ../src/interface/edithandler.cpp:1373 ../src/interface/queue.cpp:1277
+#: ../src/interface/edithandler.cpp:1410 ../src/interface/queue.cpp:1277
 msgid "Status"
 msgstr "Statut"
 
@@ -7968,7 +7975,7 @@ msgstr "Résultats du test"
 msgid "Testing resume capabilities of server"
 msgstr "Test de la capacité du serveur à reprendre les transferts"
 
-#: ../src/interface/edithandler.cpp:1362
+#: ../src/interface/edithandler.cpp:1399
 msgid "The &following files are currently being edited:"
 msgstr "Les &fichiers suivants sont en cours d'édition :"
 
@@ -8009,7 +8016,7 @@ msgstr "Le membre de l'ai_family n'est pas pas supporté"
 msgid "The ai_socktype member is not supported"
 msgstr "Le membre ai_socktype n'est pas supporté"
 
-#: ../src/interface/edithandler.cpp:1841
+#: ../src/interface/edithandler.cpp:1878
 msgid "The associated program could not be found."
 msgstr "Le programme associé est introuvable."
 
@@ -8049,11 +8056,11 @@ msgstr ""
 msgid "The data connection could not be established: %s"
 msgstr "La connexion des données ne peut pas être établie : %s"
 
-#: ../src/interface/edithandler.cpp:1745
+#: ../src/interface/edithandler.cpp:1782
 msgid "The default editor for text files is:"
 msgstr "L'éditeur par défaut pour les fichiers texte est :"
 
-#: ../src/interface/edithandler.cpp:1732
+#: ../src/interface/edithandler.cpp:1769
 msgid "The default editor for this file type is:"
 msgstr "L'éditeur par défaut pour ce type de fichier est :"
 
@@ -8083,7 +8090,7 @@ msgstr ""
 "Le fichier %s existe déjà.\n"
 "Saisissez un nouveau nom :"
 
-#: ../src/interface/edithandler.cpp:1300
+#: ../src/interface/edithandler.cpp:1337
 #: ../src/interface/LocalListView.cpp:1930 ../src/interface/search.cpp:2019
 #, c-format
 msgid ""
@@ -8115,7 +8122,7 @@ msgstr ""
 msgid "The file '%s' could not be loaded."
 msgstr "Le fichier '%s' ne peut pas être chargé."
 
-#: ../src/interface/edithandler.cpp:1295
+#: ../src/interface/edithandler.cpp:1332
 #: ../src/interface/LocalListView.cpp:1926 ../src/interface/search.cpp:2015
 #, c-format
 msgid ""
@@ -8125,7 +8132,7 @@ msgstr ""
 "Le fichier '%s' n'a pas pu être ouvert :\n"
 "Aucun programme n'est associé à ce type de fichier sur votre système."
 
-#: ../src/interface/edithandler.cpp:322 ../src/interface/LocalListView.cpp:1938
+#: ../src/interface/edithandler.cpp:367 ../src/interface/LocalListView.cpp:1938
 #: ../src/interface/search.cpp:2026
 #, c-format
 msgid ""
@@ -8276,11 +8283,11 @@ msgstr ""
 "Le fichier sélectionné contient des données importables pour les catégories "
 "suivantes :"
 
-#: ../src/interface/edithandler.cpp:1154
+#: ../src/interface/edithandler.cpp:1188
 msgid "The selected file is already being edited:"
 msgstr "Le fichier sélectionné est déjà en cours d'édition :"
 
-#: ../src/interface/edithandler.cpp:1253
+#: ../src/interface/edithandler.cpp:1287
 msgid ""
 "The selected file is still opened in some other program, please close it."
 msgstr ""
@@ -8607,7 +8614,7 @@ msgid "Try again"
 msgstr "Essayer à nouveau"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1354
-#: ../src/interface/edithandler.cpp:1371
+#: ../src/interface/edithandler.cpp:1408
 msgid "Type"
 msgstr "Type"
 
@@ -8619,7 +8626,7 @@ msgstr "Type de Proxy FTP :"
 msgid "Type of generic proxy:"
 msgstr "Type de Proxy générique :"
 
-#: ../src/interface/edithandler.cpp:1455
+#: ../src/interface/edithandler.cpp:1492
 msgid "U&pload"
 msgstr "E&nvoyer"
 
@@ -8661,7 +8668,7 @@ msgstr "Unité :"
 #: ../src/interface/resources/xrc/dialogs.xrc:865
 #: ../src/interface/resources/xrc/dialogs.xrc:875
 #: ../src/engine/sizeformatting_base.cpp:61
-#: ../src/interface/edithandler.cpp:1402 ../src/interface/edithandler.cpp:1429
+#: ../src/interface/edithandler.cpp:1439 ../src/interface/edithandler.cpp:1466
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -8739,7 +8746,7 @@ msgstr ""
 msgid "Unsupported redirect"
 msgstr "Redirection non supportée"
 
-#: ../src/interface/edithandler.cpp:1458
+#: ../src/interface/edithandler.cpp:1495
 msgid "Up&load and unedit"
 msgstr "Envoyer et terminer &l'édition"
 
@@ -8756,7 +8763,7 @@ msgstr "Envoyer"
 msgid "Upload &limit:"
 msgstr "Limite de &l'envoi :"
 
-#: ../src/interface/edithandler.cpp:1393
+#: ../src/interface/edithandler.cpp:1430
 msgid "Upload failed"
 msgstr "Échec de l'envoi"
 
@@ -8782,24 +8789,24 @@ msgstr "Envoyer le dossier sélectionné"
 msgid "Upload selected files and directories"
 msgstr "Envoyer les fichiers et les dossiers sélectionnés"
 
-#: ../src/interface/edithandler.cpp:781
+#: ../src/interface/edithandler.cpp:826
 msgid "Upload this file back to the server?"
 msgstr "Envoyer à nouveau ce fichier vers le serveur ?"
 
-#: ../src/interface/edithandler.cpp:777
+#: ../src/interface/edithandler.cpp:822
 msgid "Upload this file to the server?"
 msgstr "Envoyer ce fichier vers le serveur ?"
 
-#: ../src/interface/edithandler.cpp:1387 ../src/interface/edithandler.cpp:1420
-#: ../src/interface/edithandler.cpp:1591
+#: ../src/interface/edithandler.cpp:1424 ../src/interface/edithandler.cpp:1457
+#: ../src/interface/edithandler.cpp:1628
 msgid "Uploading"
 msgstr "Envoi en cours"
 
-#: ../src/interface/edithandler.cpp:1390 ../src/interface/edithandler.cpp:1594
+#: ../src/interface/edithandler.cpp:1427 ../src/interface/edithandler.cpp:1631
 msgid "Uploading and pending removal"
 msgstr "Envoi et attente de retrait"
 
-#: ../src/interface/edithandler.cpp:1423 ../src/interface/edithandler.cpp:1597
+#: ../src/interface/edithandler.cpp:1460 ../src/interface/edithandler.cpp:1634
 msgid "Uploading and unediting"
 msgstr "Envoi et fin de l'édition"
 
@@ -8811,7 +8818,7 @@ msgstr "Utiliser un jeu de &caractères personnalisé"
 msgid "Use &custom editor:"
 msgstr "Utiliser l'éditeur pers&onnalisé :"
 
-#: ../src/interface/edithandler.cpp:1739
+#: ../src/interface/edithandler.cpp:1776
 msgid "Use &default editor for text files"
 msgstr "Utiliser l'éditeur par &défaut pour les fichiers texte"
 
@@ -8845,7 +8852,7 @@ msgstr "Utiliser le serveur défini dans le Gestionnaire de Sites"
 msgid "Use system &defaults for current language"
 msgstr "Utiliser la langue du système par &défaut"
 
-#: ../src/interface/edithandler.cpp:1728
+#: ../src/interface/edithandler.cpp:1765
 msgid "Use system association"
 msgstr "Utiliser l'association des fichiers du système"
 
@@ -9169,7 +9176,7 @@ msgstr "Vous n'êtes pas autorisé à répertorier ce dossier"
 msgid "You have selected at least one symbolic link."
 msgstr "Vous avez sélectionné au moins un lien symbolique."
 
-#: ../src/interface/edithandler.cpp:1091 ../src/interface/search.cpp:1638
+#: ../src/interface/edithandler.cpp:1125 ../src/interface/search.cpp:1638
 msgid ""
 "You have selected more than 10 files for editing, do you really want to "
 "continue?"
@@ -9245,7 +9252,7 @@ msgstr "Vous devez saisir un nom pour le favori."
 msgid "You need to enter a name for the log file."
 msgstr "Vous devez saisir un nom pour le fichier journal."
 
-#: ../src/interface/edithandler.cpp:1822
+#: ../src/interface/edithandler.cpp:1859
 msgid "You need to enter a properly quoted command."
 msgstr "Vous devez saisir une commande correcte et placée entre guillemets."
 
