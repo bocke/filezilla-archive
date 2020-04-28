@@ -567,6 +567,7 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		break;
 	case ProtocolFeature::PreserveTimestamp:
 	case ProtocolFeature::ServerType:
+	case ProtocolFeature::UnixChmod:
 		if (protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP ||
 			protocol == SFTP) {
 			return true;
@@ -873,6 +874,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 			return ret;
 		}
 	case GOOGLE_DRIVE:
+	case ONEDRIVE:
 	{
 		static std::vector<ParameterTraits> ret = []() {
 			std::vector<ParameterTraits> ret;
@@ -883,30 +885,10 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		return ret;
 	}
 	case DROPBOX:
-	{
-		static std::vector<ParameterTraits> ret = []() {
-			std::vector<ParameterTraits> ret;
-			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
-			return ret;
-		}();
-		return ret;
-	}
-	case ONEDRIVE:
-	{
-		static std::vector<ParameterTraits> ret = []() {
-			std::vector<ParameterTraits> ret;
-			ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
-			ret.emplace_back(ParameterTraits{"nowebview", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
-			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
-			return ret;
-		}();
-		return ret;
-	}
 	case BOX:
 	{
 		static std::vector<ParameterTraits> ret = []() {
 			std::vector<ParameterTraits> ret;
-			ret.emplace_back(ParameterTraits{"nowebview", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			return ret;
 		}();

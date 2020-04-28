@@ -100,7 +100,8 @@ enum class ProtocolFeature
 	ServerAssignedHome,
 	TemporaryUrl,
 	S3Sse,
-	Security // Encryption, integrity protection and authentication
+	Security, // Encryption, integrity protection and authentication
+	UnixChmod
 };
 
 enum class CaseSensitivity
