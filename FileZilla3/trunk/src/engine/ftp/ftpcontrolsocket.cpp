@@ -177,6 +177,7 @@ void CFtpControlSocket::OnConnect()
 {
 	m_lastTypeBinary = -1;
 	m_sentRestartOffset = false;
+	m_protectDataChannel = false;
 
 	SetAlive();
 
@@ -791,6 +792,7 @@ void CFtpControlSocket::ResetSocket()
 	receiveBuffer_.clear();
 	tls_layer_.reset();
 	m_pendingReplies = 0;
+	m_repliesToSkip = 0;
 	CRealControlSocket::ResetSocket();
 }
 
