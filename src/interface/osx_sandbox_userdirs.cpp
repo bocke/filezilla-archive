@@ -7,6 +7,7 @@
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
 
+#include <wx/dirdlg.h>
 #include <wx/osx/core/cfstring.h>
 
 OSXSandboxUserdirs::OSXSandboxUserdirs()
