@@ -356,19 +356,21 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring const& loca
 	data.remotePath = remotePath;
 	data.site = site;
 	
-	m_fileDataList[type].push_back(data);
-
+	
 	if (type == local) {
-		auto it = GetFile(localFile);
-		bool launched = LaunchEditor(local, *it);
+		bool const launched = LaunchEditor(local, data);
 
-		if (!launched || !COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
-			m_fileDataList[local].erase(it);
+		if (launched && COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
+			m_fileDataList[type].emplace_back(std::move(data));
+		}
+		if (!launched) {
 			wxMessageBoxEx(wxString::Format(_("The file '%s' could not be opened:\nThe associated command failed"), localFile), _("Opening failed"), wxICON_EXCLAMATION);
 		}
 		return launched;
 	}
 	else {
+		m_fileDataList[type].emplace_back(std::move(data));
+
 		std::wstring localFileName;
 		CLocalPath localPath(localFile, &localFileName);
 		if (localFileName == remoteFile) {
