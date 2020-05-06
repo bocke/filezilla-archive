@@ -364,14 +364,12 @@ struct CVerifyCertDialog::impl final
 	wxStaticText* validity_{};
 	wxStaticText* serial_{};
 	wxStaticText* pubkey_algo_{};
+	wxStaticText* signature_algo_{};
 	wxStaticText* fingerprint_sha1_{};
 	wxStaticText* fingerprint_sha256_{};
 
-	wxStaticBox* subject_{};
-	wxStaticBox* issuer_{};
-
-	wxScrolledWindow* subjectPanel_{};
-	wxScrolledWindow* issuerPanel_{};
+	wxScrolledWindow* certPanel_{};
+	wxSizer* certSizer_{};
 
 	wxFlexGridSizer* subjectSizer_{};
 	wxFlexGridSizer* issuerSizer_{};
@@ -388,6 +386,10 @@ CVerifyCertDialog::~CVerifyCertDialog()
 
 bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 {
+	std::wstring const sha256 = fz::to_wstring_from_utf8(cert.get_fingerprint_sha256());
+	impl_->fingerprint_sha256_->SetLabel(sha256.substr(0, sha256.size() / 2 + 1) + L"\n" + sha256.substr(sha256.size() / 2 + 1));
+	impl_->fingerprint_sha1_->SetLabel(fz::to_wstring_from_utf8(cert.get_fingerprint_sha1()));
+
 	bool valid_date{};
 	wxString label;
 	if (!cert.get_activation_time() || !cert.get_expiration_time()) {
@@ -421,18 +423,14 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 	}
 
 
-	// @translator: Example: RSA with 2048 bits and RSA-SHA256 signatures
-	impl_->pubkey_algo_->SetLabel(wxString::Format(_("%s with %d bits and %s signatures"), fz::to_wstring_from_utf8(cert.get_pubkey_algorithm()), cert.get_pubkey_bits(), fz::to_wstring_from_utf8(cert.get_signature_algorithm())));
-	
-	std::wstring const sha256 = fz::to_wstring_from_utf8(cert.get_fingerprint_sha256());
-	impl_->fingerprint_sha256_->SetLabel(sha256.substr(0, sha256.size() / 2 + 1) + L"\n" + sha256.substr(sha256.size() / 2 + 1));
-	impl_->fingerprint_sha1_->SetLabel(fz::to_wstring_from_utf8(cert.get_fingerprint_sha1()));
-
+	// @translator: Example: RSA with 2048 bits
+	impl_->pubkey_algo_->SetLabel(wxString::Format(_("%s with %d bits"), fz::to_wstring_from_utf8(cert.get_pubkey_algorithm()), cert.get_pubkey_bits()));
+	impl_->signature_algo_->SetLabel(fz::to_wstring_from_utf8(cert.get_signature_algorithm()));
 
 	auto recalc = [this](wxWindow* panel, wxSizer* sizer) {
 		sizer->Fit(panel);
 		wxSize min = sizer->CalcMin();
-		int const maxHeight = (line_height_ + layout().dlgUnits(1)) * 14;
+		int const maxHeight = (line_height_ + layout().dlgUnits(1)) * 20;
 		if (min.y >= maxHeight) {
 			min.y = maxHeight;
 			min.x += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X);
@@ -444,16 +442,9 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 		panel->SetMinSize(min);
 	};
 
-	impl_->issuerPanel_->Freeze();
-	ParseDN(impl_->issuerPanel_, fz::to_wstring_from_utf8(cert.get_issuer()), impl_->issuerSizer_);
-	recalc(impl_->issuerPanel_, impl_->subjectSizer_);
-	impl_->issuerPanel_->Thaw();
-
+	impl_->certPanel_->Freeze();
+	ParseDN(impl_->certPanel_, fz::to_wstring_from_utf8(cert.get_subject()), impl_->subjectSizer_);
 	
-	impl_->subjectPanel_->Freeze();
-
-	ParseDN(impl_->subjectPanel_, fz::to_wstring_from_utf8(cert.get_subject()), impl_->subjectSizer_);
-
 	auto const& altNames = cert.get_alt_subject_names();
 	if (!altNames.empty()) {
 		wxString str;
@@ -461,11 +452,20 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 			str += LabelEscape(fz::to_wstring_from_utf8(altName.name)) + L"\n";
 		}
 		str.RemoveLast();
-		impl_->subjectSizer_->Add(new wxStaticText(impl_->subjectPanel_, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
-		impl_->subjectSizer_->Add(new wxStaticText(impl_->subjectPanel_, wxID_ANY, str));
+		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
+		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, wxID_ANY, str));
 	}
-	recalc(impl_->subjectPanel_, impl_->subjectSizer_);
-	impl_->subjectPanel_->Thaw();
+
+	if (cert.self_signed()) {
+		impl_->issuerSizer_->Clear();
+		impl_->issuerSizer_->Add(new wxStaticText(impl_->certPanel_, -1, _("Same as subject, certificate is self-signed")));
+	}
+	else {
+		ParseDN(impl_->certPanel_, fz::to_wstring_from_utf8(cert.get_issuer()), impl_->issuerSizer_);
+	}
+
+	recalc(impl_->certPanel_, impl_->certSizer_);
+	impl_->certPanel_->Thaw();
 
 	return valid_date;
 }
@@ -540,10 +540,13 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 	outer->Add(main, lay.grow);
 
 	if (!displayOnly) {
-		main->Add(new wxStaticText(this, -1, _("The server's certificate is unknown. Please carefully examine the certificate to make sure the server can be trusted.")));
-		main->Add(new wxStaticText(this, -1, _("Compare the displayed fingerprint with the certificate fingerprint you have received from your server adminstrator or server hosting provider.")));
-
-		// TODO: Wrap 420
+		auto label1 = _("The server's certificate is unknown. Please carefully examine the certificate to make sure the server can be trusted.");
+		WrapText(this, label1, 600);
+		main->Add(new wxStaticText(this, -1, label1));
+		
+		auto label2 =_("Compare the displayed fingerprint with the certificate fingerprint you have received from your server adminstrator or server hosting provider.");
+		WrapText(this, label2, 600);
+		main->Add(new wxStaticText(this, -1, label2));
 	}
 
 	impl_->certificates_ = info.get_certificates();
@@ -575,51 +578,81 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 	}
 
 	{
-		auto [box, inner] = lay.createStatBox(main, _("Details"), 2);
-
-		// @translator: Period as in a span of time with a start and end date
-		inner->Add(new wxStaticText(box, -1, _("Validity period:")), lay.valign);
-		impl_->validity_ = new wxStaticText(box, -1, wxString());
-		inner->Add(impl_->validity_, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Serial:")), lay.valign);
-		impl_->serial_ = new wxStaticText(box, -1, wxString());
-		inner->Add(impl_->serial_, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Public key algorithm:")), lay.valign);
-		impl_->pubkey_algo_ = new wxStaticText(box, -1, wxString());
-		inner->Add(impl_->pubkey_algo_, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Fingerprint (SHA-256):")), lay.valign);
-		impl_->fingerprint_sha256_ = new wxStaticText(box, -1, wxString());
-		inner->Add(impl_->fingerprint_sha256_, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Fingerprint (SHA-1):")), lay.valign);
-		impl_->fingerprint_sha1_ = new wxStaticText(box, -1, wxString());
-		inner->Add(impl_->fingerprint_sha1_, lay.valign);
-	}
-
-	{
 		main->AddGrowableRow(main->GetEffectiveRowsCount());
-		auto row = lay.createGrid(2);
+		auto row = lay.createGrid(1);
 		main->Add(row, lay.grow);
 
-		wxFlexGridSizer* s;
-		std::tie(impl_->subject_, s) = lay.createStatBox(row, _("Subject of certificate"), 1);
-		s->AddGrowableCol(0);
-		s->AddGrowableRow(0);
-		impl_->subjectPanel_ = new wxScrolledWindow(impl_->subject_, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
-		impl_->subjectPanel_->SetScrollRate(0, lay.dlgUnits(8));
-		s->Add(impl_->subjectPanel_, lay.grow);
-		impl_->subjectSizer_ = lay.createFlex(2);
-		impl_->subjectPanel_->SetSizer(impl_->subjectSizer_);
-		impl_->subjectSizer_->SetVGap(lay.dlgUnits(1));
+		auto [box, boxsizer] = lay.createStatBox(row, _("Certificate"), 1);
+		boxsizer->AddGrowableCol(0);
+		boxsizer->AddGrowableRow(0);
+		impl_->certPanel_ = new wxScrolledWindow(box, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
+		impl_->certPanel_->SetScrollRate(0, lay.dlgUnits(8));
+		boxsizer->Add(impl_->certPanel_, lay.grow);
+		impl_->certSizer_ = lay.createFlex(1);
+		impl_->certPanel_->SetSizer(impl_->certSizer_);
 
-		std::tie(impl_->issuer_, s) = lay.createStatBox(row, _("Issuer of certificate"), 1);
-		s->AddGrowableCol(0);
-		s->AddGrowableRow(0);
-		impl_->issuerPanel_ = new wxScrolledWindow(impl_->issuer_, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
-		s->Add(impl_->issuerPanel_, lay.grow);
-		impl_->issuerSizer_ = lay.createFlex(2);
-		impl_->issuerPanel_->SetSizer(impl_->issuerSizer_);
-		impl_->issuerSizer_->SetVGap(lay.dlgUnits(1));
+		{
+			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Overview"));
+			heading->SetFont(heading->GetFont().Bold());
+			impl_->certSizer_->Add(heading);
+			auto inner = lay.createFlex(2);
+			inner->SetVGap(lay.dlgUnits(1));
+			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
 
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Fingerprint (SHA-256):")));
+			impl_->fingerprint_sha256_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->fingerprint_sha256_);
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Fingerprint (SHA-1):")), lay.valign);
+			impl_->fingerprint_sha1_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->fingerprint_sha1_, lay.valign);
+			// @translator: Period as in a span of time with a start and end date
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Validity period:")), lay.valign);
+			impl_->validity_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->validity_, lay.valign);
+		}
+		impl_->certSizer_->AddSpacer(0);
+		{
+			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Subject"));
+			heading->SetFont(heading->GetFont().Bold());
+			impl_->certSizer_->Add(heading);
+			auto inner = lay.createFlex(2);
+			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
+
+			impl_->subjectSizer_ = lay.createFlex(2);
+			impl_->subjectSizer_->SetVGap(lay.dlgUnits(1));
+			impl_->certSizer_->Add(impl_->subjectSizer_, 0, wxLEFT, lay.indent);
+		}
+		impl_->certSizer_->AddSpacer(0);
+		{
+			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Issuer"));
+			heading->SetFont(heading->GetFont().Bold());
+			impl_->certSizer_->Add(heading);
+			auto inner = lay.createFlex(2);
+			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
+
+			impl_->issuerSizer_ = lay.createFlex(2);
+			impl_->issuerSizer_->SetVGap(lay.dlgUnits(1));
+			impl_->certSizer_->Add(impl_->issuerSizer_, 0, wxLEFT, lay.indent);
+		}
+		impl_->certSizer_->AddSpacer(0);
+		{
+			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Details"));
+			heading->SetFont(heading->GetFont().Bold());
+			impl_->certSizer_->Add(heading);
+			auto inner = lay.createFlex(2);
+			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
+
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Serial:")), lay.valign);
+			impl_->serial_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->serial_, lay.valign);
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Public key algorithm:")), lay.valign);
+			impl_->pubkey_algo_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->pubkey_algo_, lay.valign);
+			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Signature algorithm:")), lay.valign);
+			impl_->signature_algo_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(impl_->signature_algo_, lay.valign);
+
+		}
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Session details"), 1);
@@ -655,20 +688,24 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 
 
 	if (!displayOnly) {
-		main->Add(new wxStaticText(this, -1, _("Trust this certificate and carry on connecting?")));
+		main->Add(new wxStaticText(this, -1, _("Trust the server certificate and carry on connecting?")));
 		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
-			impl_->always_ = new wxCheckBox(this, -1, _("&Always trust server certificate in future sessions."));
+			impl_->always_ = new wxCheckBox(this, -1, _("&Always trust this certificate in future sessions."));
 			main->Add(impl_->always_);
 		}
-		impl_->san_trust_ = new wxCheckBox(this, -1, _("&Trust server certificate on the listed alternative hostnames."));
+		impl_->san_trust_ = new wxCheckBox(this, -1, _("&Trust this certificate on the listed alternative hostnames."));
 		main->Add(impl_->san_trust_);
 	}
 
 	auto buttons = lay.createButtonSizer(this, main, false);
 	auto ok = new wxButton(this, wxID_OK, _("OK"));
+	ok->SetDefault();
 	buttons->AddButton(ok);
+	if (!displayOnly) {
+		auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+		buttons->AddButton(cancel);
+	}
 	buttons->Realize();
-
 
 	line_height_ = impl_->validity_->GetSize().y;
 
