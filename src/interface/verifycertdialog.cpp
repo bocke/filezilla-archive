@@ -369,7 +369,7 @@ struct CVerifyCertDialog::impl final
 	wxStaticText* fingerprint_sha256_{};
 
 	wxScrolledWindow* certPanel_{};
-	wxSizer* certSizer_{};
+	wxFlexGridSizer* certSizer_{};
 
 	wxFlexGridSizer* subjectSizer_{};
 	wxFlexGridSizer* issuerSizer_{};
@@ -589,6 +589,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		impl_->certPanel_->SetScrollRate(0, lay.dlgUnits(8));
 		boxsizer->Add(impl_->certPanel_, lay.grow);
 		impl_->certSizer_ = lay.createFlex(1);
+		impl_->certSizer_->SetVGap(lay.dlgUnits(2));
 		impl_->certPanel_->SetSizer(impl_->certSizer_);
 
 		{
@@ -709,12 +710,12 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 
 	line_height_ = impl_->validity_->GetSize().y;
 
-	bool warning{};
+	warning_ = false;
 
 	wxSize minSize(0, 0);
 	for (unsigned int i = 0; i < impl_->certificates_.size(); ++i) {
 		if (!DisplayCert(impl_->certificates_[i])) {
-			warning = true;
+			warning_ = true;
 		}
 		Layout();
 		GetSizer()->Fit(this);
