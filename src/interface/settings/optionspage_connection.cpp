@@ -82,7 +82,7 @@ bool COptionsPageConnection::SavePage()
 
 bool COptionsPageConnection::Validate()
 {
-	auto const timeout = fz::to_integral<int>(impl_->tries_->GetValue().ToStdWstring(), -1);
+	auto const timeout = fz::to_integral<int>(impl_->timeout_->GetValue().ToStdWstring(), -1);
 	if (timeout != 0 && (timeout < 10 || timeout > 9999)) {
 		return DisplayError(impl_->timeout_, _("Please enter a timeout between 10 and 9999 seconds or 0 to disable timeouts."));
 	}

@@ -10,6 +10,7 @@ class COptionsPageConnection final : public COptionsPage
 public:
 	COptionsPageConnection();
 	~COptionsPageConnection();
+
 	virtual bool CreateControls(wxWindow* parent) override;
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
