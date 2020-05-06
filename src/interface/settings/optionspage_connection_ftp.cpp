@@ -3,6 +3,11 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_connection_ftp.h"
+#include "../netconfwizard.h"
+
+BEGIN_EVENT_TABLE(COptionsPageConnectionFTP, COptionsPage)
+EVT_BUTTON(XRCID("ID_RUNWIZARD"), COptionsPageConnectionFTP::OnWizard)
+END_EVENT_TABLE()
 
 bool COptionsPageConnectionFTP::LoadPage()
 {
@@ -22,4 +27,15 @@ bool COptionsPageConnectionFTP::SavePage()
 	SetOptionFromCheck(XRCID("ID_FALLBACK"), OPTION_ALLOW_TRANSFERMODEFALLBACK);
 	SetOptionFromCheck(XRCID("ID_USEKEEPALIVE"), OPTION_FTP_SENDKEEPALIVE);
 	return true;
+}
+
+void COptionsPageConnectionFTP::OnWizard(wxCommandEvent&)
+{
+	CNetConfWizard wizard(GetParent(), m_pOptions, m_pOwner->GetEngineContext());
+	if (!wizard.Load()) {
+		return;
+	}
+	if (wizard.Run()) {
+		ReloadSettings();
+	}
 }
