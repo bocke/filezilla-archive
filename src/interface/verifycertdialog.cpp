@@ -457,7 +457,7 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 	}
 
 	if (cert.self_signed()) {
-		impl_->issuerSizer_->Clear();
+		impl_->issuerSizer_->Clear(true);
 		impl_->issuerSizer_->Add(new wxStaticText(impl_->certPanel_, -1, _("Same as subject, certificate is self-signed")));
 	}
 	else {
