@@ -54,7 +54,7 @@ void SaveAssociations(Associations const& assocs)
 {
 	std::wstring quoted;
 	for (auto const& assoc : assocs) {
-		if (quoted.empty()) {
+		if (!quoted.empty()) {
 			quoted += '\n';
 		}
 
