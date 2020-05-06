@@ -7,6 +7,9 @@ public:
 	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_CONNECTION_FTP"); }
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
+
+	DECLARE_EVENT_TABLE()
+	void OnWizard(wxCommandEvent& event);
 };
 
 #endif
