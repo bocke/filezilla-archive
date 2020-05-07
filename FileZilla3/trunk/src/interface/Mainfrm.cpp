@@ -2771,7 +2771,7 @@ void CMainFrame::PostInitialize()
 
 	if (m_pContextControl && startupReconnect) {
 		auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
-		pugi::xml_node tabs = xml ? xml->child("Tabs") : pugi::xml_node();
+		pugi::xml_node tabs = xml.child("Tabs");
 		int i = 0;
 		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
 			if (tab.attribute("connected").as_int()) {

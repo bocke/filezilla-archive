@@ -700,7 +700,7 @@ void CContextControl::RestoreTabs()
 		selectedOnly = true;
 	}
 
-	pugi::xml_node tabs = xml ? xml->child("Tabs") : pugi::xml_node();
+	pugi::xml_node tabs = xml.child("Tabs");
 	if (tabs) {
 		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
 
