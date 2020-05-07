@@ -71,7 +71,7 @@ bool COptionsPageConnectionFTP::LoadPage()
 {
 	const bool use_pasv = m_pOptions->GetOptionVal(OPTION_USEPASV) != 0;
 	impl_->passive_->SetValue(use_pasv);
-	impl_->active_->SetValue(use_pasv);
+	impl_->active_->SetValue(!use_pasv);
 	impl_->fallback_->SetValue(m_pOptions->GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK) != 0);
 	impl_->keepalive_->SetValue(m_pOptions->GetOptionVal(OPTION_FTP_SENDKEEPALIVE) != 0);
 	return true;
