@@ -339,10 +339,12 @@ std::tuple<wxStaticBox*, wxFlexGridSizer*> DialogLayout::createStatBox(wxSizer* 
 	auto* flex = createFlex(cols, rows);
 #ifdef __WXMSW__
 	int style = wxGROW | wxLEFT | wxBOTTOM | wxRIGHT;
+	int const b = dlgUnits(2);
 #else
 	int style = wxGROW | wxALL;
+	int const b = border;
 #endif
-	boxSizer->Add(flex, 1, style, border);
+	boxSizer->Add(flex, 1, style, b);
 
 	return std::make_tuple(box, flex);
 }
