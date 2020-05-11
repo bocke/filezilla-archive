@@ -163,9 +163,9 @@ protected:
 	pugi::xml_document Validate(unsigned int nID, pugi::xml_document const& value);
 
 	template<typename T> void ContinueSetOption(unsigned int nID, T const& value);
-	void SetXmlValue(unsigned int nID, int value);
-	void SetXmlValue(unsigned int nID, std::wstring_view const& value);
-	void SetXmlValue(unsigned int nID, pugi::xml_document const& value);
+	void SetXmlValue(unsigned int nID, pugi::xml_node settings, int value);
+	void SetXmlValue(unsigned int nID, pugi::xml_node settings, std::wstring_view const& value);
+	void SetXmlValue(unsigned int nID, pugi::xml_node settings, pugi::xml_document const& value);
 
 	pugi::xml_node CreateSettingsXmlElement();
 
@@ -175,6 +175,7 @@ protected:
 	void LoadOptionFromElement(pugi::xml_node option, std::map<std::string, unsigned int> const& nameOptionMap, bool allowDefault);
 	CLocalPath InitSettingsDir();
 	void SetDefaultValues();
+	void WriteCacheToXml(pugi::xml_node settings);
 
 	bool Cleanup(); // Removes all unknown elements from the XML
 	void Save();
