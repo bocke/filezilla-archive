@@ -338,6 +338,7 @@ pugi::xml_document COptions::GetOptionXml(unsigned int nID)
 {
 	pugi::xml_document ret;
 	if (nID < OPTIONS_NUM) {
+		fz::scoped_lock l(m_sync_);
 		for (auto c = m_optionsCache[nID].xmlValue.first_child(); c; c = c.next_sibling()) {
 			ret.append_copy(c);
 		}
@@ -415,6 +416,11 @@ void COptions::ContinueSetOption(unsigned int nID, T const& value)
 			return;
 		}
 		m_optionsCache[nID] = validated;
+
+		if (changedOptions_.none()) {
+			CallAfter(&COptions::NotifyChangedOptions);
+		}
+		changedOptions_.set(nID);
 	}
 
 	// Fixme: Setting options from other threads
@@ -429,18 +435,16 @@ void COptions::ContinueSetOption(unsigned int nID, T const& value)
 			m_save_timer.Start(15000, true);
 		}
 	}
-
-	if (changedOptions_.none()) {
-		CallAfter(&COptions::NotifyChangedOptions);
-	}
-	changedOptions_.set(nID);
 }
 
 void COptions::NotifyChangedOptions()
 {
 	// Reset prior to notifying to correctly handle the case of an option being set while notifying
-	auto changedOptions = changedOptions_;
-	changedOptions_.reset();
+	changed_options_t changedOptions;
+	{
+		fz::scoped_lock l(m_sync_);
+		std::swap(changedOptions, changedOptions_);
+	}
 	COptionChangeEventHandler::DoNotify(changedOptions);
 }
 
