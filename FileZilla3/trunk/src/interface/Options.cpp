@@ -7,6 +7,8 @@
 #include <option_change_event_handler.h>
 #include "sizeformatting.h"
 
+#include <libfilezilla/local_filesys.hpp>
+
 #include <algorithm>
 #include <string>
 
@@ -1066,7 +1068,7 @@ CLocalPath COptions::InitSettingsDir()
 	}
 
 	if (!p.empty() && !p.Exists()) {
-		wxFileName::Mkdir(p.GetPath(), 0700, wxPATH_MKDIR_FULL);
+		fz::mkdir(fz::to_native(p.GetPath()), true, true);
 	}
 
 	SetOption(OPTION_DEFAULT_SETTINGSDIR, p.GetPath());
