@@ -168,7 +168,7 @@ static const t_Option options[OPTIONS_NUM] =
 	{ "Show queue", number, L"1", normal },
 	{ "Default editor", string, L"", platform },
 	{ "Always use default editor", number, L"0", normal },
-	{ "File associations", string, L"", platform },
+	{ "File associations (v2)", string, L"", platform },
 	{ "Comparison mode", number, L"1", normal },
 	{ "Comparison threshold", number, L"1", normal },
 	{ "Site Manager position", string, L"", normal },
