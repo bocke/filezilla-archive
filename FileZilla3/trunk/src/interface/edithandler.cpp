@@ -1223,7 +1223,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 				}
 			}
 
-			auto buttons = lay.createButtonSizer(&dlg, main, false);
+			auto buttons = lay.createButtonSizer(&dlg, main, true);
 
 			if (type == remote) {
 				auto ok = new wxButton(&dlg, wxID_OK, _("OK"));
@@ -1268,8 +1268,8 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 				else {
 					choices &= ~edit_choices::edit_existing_always;
 				}
-				COptions::Get()->SetOption(OPTION_PERSISTENT_CHOICES, choices);
 			}
+			COptions::Get()->SetOption(OPTION_PERSISTENT_CHOICES, choices);
 		}
 
 		if (action == -1) {
