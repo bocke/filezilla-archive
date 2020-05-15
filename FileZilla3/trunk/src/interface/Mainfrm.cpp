@@ -2483,9 +2483,11 @@ void CMainFrame::OnDropdownComparisonMode(wxCommandEvent& event)
 	COptions::Get()->SetOption(OPTION_COMPARISONMODE, new_mode);
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
-	if (old_mode != new_mode && pComparisonManager && pComparisonManager->IsComparing()) {
+	if (old_mode != new_mode && pComparisonManager) {
 		pComparisonManager->SetComparisonMode(new_mode);
-		pComparisonManager->CompareListings();
+		if (pComparisonManager->IsComparing()) {
+			pComparisonManager->CompareListings();
+		}
 	}
 }
 
@@ -2500,9 +2502,11 @@ void CMainFrame::OnDropdownComparisonHide(wxCommandEvent&)
 	COptions::Get()->SetOption(OPTION_COMPARE_HIDEIDENTICAL, old_mode ? 0 : 1);
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
-	if (pComparisonManager && pComparisonManager->IsComparing()) {
+	if (pComparisonManager) {
 		pComparisonManager->SetHideIdentical(old_mode ? 0 : 1);
-		pComparisonManager->CompareListings();
+		if (pComparisonManager->IsComparing()) {
+			pComparisonManager->CompareListings();
+		}
 	}
 }
 
