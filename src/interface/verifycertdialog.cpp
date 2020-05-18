@@ -954,7 +954,7 @@ void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecure
 	}
 	buttons->AddButton(ok);
 
-	auto cancel = new wxButton(&dlg, wxID_CANCEL, _("&Cancel"));
+	auto cancel = new wxButton(&dlg, wxID_CANCEL, _("Cancel"));
 	if (warning) {
 		cancel->SetFocus();
 		cancel->SetDefault();
