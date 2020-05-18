@@ -108,7 +108,7 @@ bool COptionsPageDateFormatting::LoadPage()
 	}
 	else if (!timeFormat.empty() && timeFormat[0] == '2') {
 		impl_->time_custom_->SetValue(true);
-		impl_->time_format_->ChangeValue(dateFormat.substr(1));
+		impl_->time_format_->ChangeValue(timeFormat.substr(1));
 	}
 	else {
 		impl_->time_system_->SetValue(true);
