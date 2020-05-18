@@ -10,7 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.48.1 (2020-05-18)
+
+- If FileZilla is configured to restore open tabs on startup, the directory trees no longer shrink in size
+
 3.48.1-rc1 (2020-05-12)
+
 
 ! MSW: The settings directory is now initially created with tight permissions restricted to the user's account. Previously the directory could have had inherited too wide permissions if a custom location outside the user's profile directory had been preconfigured.
 + Redesigned certificate dialog
