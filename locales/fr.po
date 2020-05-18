@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2020-05-12 11:53+0200\n"
+"POT-Creation-Date: 2020-05-18 14:48+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Pgase <pgase.filezilla@free.fr>\n"
 "Language-Team: Pgase, William GATHOYE <pgase.filezilla@free.fr, "
@@ -312,9 +312,6 @@ msgstr "&Tolérance de dépassement :"
 #: ../src/interface/resources/xrc/dialogs.xrc:486
 #: ../src/interface/resources/xrc/dialogs.xrc:1922
 #: ../src/interface/resources/xrc/dialogs.xrc:2024
-#: ../src/interface/inputdialog.cpp:31
-#: ../src/interface/settings/settingsdialog.cpp:75
-#: ../src/interface/verifycertdialog.cpp:957
 msgid "&Cancel"
 msgstr "Ann&uler"
 
@@ -365,7 +362,7 @@ msgstr "&Copier dans le presse-papier"
 msgid "&Create directory"
 msgstr "&Créer un dossier"
 
-#: ../src/interface/context_control.cpp:472
+#: ../src/interface/context_control.cpp:480
 msgid "&Create new tab"
 msgstr "Ouvrir un nouvel ongle&t"
 
@@ -485,7 +482,7 @@ msgstr "&Édition"
 msgid "&Edit filter rules..."
 msgstr "Éditer l&es règles de filtrage..."
 
-#: ../src/interface/Mainfrm.cpp:2421 ../src/interface/menu_bar.cpp:89
+#: ../src/interface/Mainfrm.cpp:2441 ../src/interface/menu_bar.cpp:89
 #: ../src/interface/menu_bar.cpp:128 ../src/interface/statusbar.cpp:553
 msgid "&Enable"
 msgstr "Activ&er"
@@ -612,7 +609,7 @@ msgstr "&HTTP/1.1 utilisant la méthode CONNECT"
 msgid "&Help"
 msgstr "&?"
 
-#: ../src/interface/Mainfrm.cpp:2428 ../src/interface/menu_bar.cpp:94
+#: ../src/interface/Mainfrm.cpp:2448 ../src/interface/menu_bar.cpp:94
 #: ../src/interface/search.cpp:694
 msgid "&Hide identical files"
 msgstr "Masquer les fic&hiers identiques"
@@ -846,7 +843,7 @@ msgstr "&Reconnexion"
 msgid "&Reconnect information"
 msgstr "Informations de &reconnexion"
 
-#: ../src/interface/context_control.cpp:479 ../src/interface/menu_bar.cpp:80
+#: ../src/interface/context_control.cpp:487 ../src/interface/menu_bar.cpp:80
 msgid "&Refresh"
 msgstr "Actualise&r"
 
@@ -1955,10 +1952,13 @@ msgstr "Impossible d'écrire les données dans un fichier : %s"
 #: ../src/interface/bookmarks_dialog.cpp:284
 #: ../src/interface/edithandler.cpp:1232 ../src/interface/edithandler.cpp:1815
 #: ../src/interface/fileexistsdlg.cpp:103 ../src/interface/filter.cpp:201
-#: ../src/interface/filteredit.cpp:143 ../src/interface/listctrlex.cpp:737
-#: ../src/interface/loginmanager.cpp:124 ../src/interface/loginmanager.cpp:266
+#: ../src/interface/filteredit.cpp:143 ../src/interface/inputdialog.cpp:31
+#: ../src/interface/listctrlex.cpp:737 ../src/interface/loginmanager.cpp:124
+#: ../src/interface/loginmanager.cpp:266
+#: ../src/interface/settings/settingsdialog.cpp:75
 #: ../src/interface/sitemanager_dialog.cpp:373
 #: ../src/interface/verifycertdialog.cpp:706
+#: ../src/interface/verifycertdialog.cpp:957
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -1991,7 +1991,7 @@ msgstr ""
 "Impossible de modifier le dossier, il existe déjà une opération de "
 "navigation synchronisée en cours."
 
-#: ../src/interface/context_control.cpp:402
+#: ../src/interface/context_control.cpp:410
 msgid ""
 "Cannot close tab while busy.\n"
 "Cancel current operation and close tab?"
@@ -2209,7 +2209,7 @@ msgstr "Sélectionnez le dossier local par défaut"
 msgid "Choose the local directory"
 msgstr "Sélectionnez le dossier local"
 
-#: ../src/engine/http/request.cpp:705
+#: ../src/engine/http/request.cpp:711
 msgid "Chunk data improperly terminated"
 msgstr "Paquet de données interrompu incorrectement"
 
@@ -2217,7 +2217,7 @@ msgstr "Paquet de données interrompu incorrectement"
 msgid "Cipher:"
 msgstr "Chiffrement :"
 
-#: ../src/interface/context_control.cpp:475 ../src/interface/menu_bar.cpp:55
+#: ../src/interface/context_control.cpp:483 ../src/interface/menu_bar.cpp:55
 msgid "Cl&ose tab"
 msgstr "Fermer l'&onglet"
 
@@ -2266,7 +2266,7 @@ msgstr "Client vers serveur de chiffrement :"
 msgid "Close"
 msgstr "Fermer"
 
-#: ../src/interface/context_control.cpp:476
+#: ../src/interface/context_control.cpp:484
 msgid "Close &all other tabs"
 msgstr "Fermer tous les &autres onglets"
 
@@ -2279,7 +2279,7 @@ msgstr "Quitter FileZilla"
 msgid "Close all running instances of FileZilla"
 msgstr "Fermer tous les processus en cours de FileZilla"
 
-#: ../src/interface/Mainfrm.cpp:2374
+#: ../src/interface/Mainfrm.cpp:2394
 msgid "Close quick search and continue comparing?"
 msgstr "Fermer la recherche rapide et continuer à comparer ?"
 
@@ -2336,11 +2336,11 @@ msgstr "Nom commun :"
 msgid "Communication tainted by router or firewall"
 msgstr "La communication est corrompue par un routeur ou un pare-feu"
 
-#: ../src/interface/Mainfrm.cpp:2425 ../src/interface/menu_bar.cpp:92
+#: ../src/interface/Mainfrm.cpp:2445 ../src/interface/menu_bar.cpp:92
 msgid "Compare &modification time"
 msgstr "Co&mparer l'horodatage"
 
-#: ../src/interface/Mainfrm.cpp:2424 ../src/interface/menu_bar.cpp:91
+#: ../src/interface/Mainfrm.cpp:2444 ../src/interface/menu_bar.cpp:91
 msgid "Compare file&size"
 msgstr "Comparer la taille de&s fichiers"
 
@@ -2390,7 +2390,7 @@ msgstr "Transferts simultanés"
 
 #: ../src/interface/filteredit.cpp:132 ../src/interface/search.cpp:685
 msgid "Conditions are c&ase sensitive"
-msgstr "Les conditions respectent la c&asse"
+msgstr "Conditions sensiblent à la c&asse"
 
 #: ../src/interface/resources/xrc/netconfwizard.xrc:341
 msgid "Configuration test"
@@ -2501,9 +2501,9 @@ msgstr "Tentative de connexion expirée"
 msgid "Connection closed"
 msgstr "Connexion interrompue"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:71 ../src/engine/http/request.cpp:313
-#: ../src/engine/http/request.cpp:326 ../src/engine/http/request.cpp:337
-#: ../src/engine/http/request.cpp:348
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:71 ../src/engine/http/request.cpp:317
+#: ../src/engine/http/request.cpp:330 ../src/engine/http/request.cpp:341
+#: ../src/engine/http/request.cpp:352
 msgid "Connection closed by server"
 msgstr "Connexion interrompue par le serveur"
 
@@ -2840,7 +2840,7 @@ msgstr "Impossible de lire depuis '%s'"
 msgid "Could not read from data socket."
 msgstr "Impossible de lire depuis le socket."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:60 ../src/engine/http/request.cpp:385
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:60 ../src/engine/http/request.cpp:389
 #, c-format
 msgid "Could not read from socket: %s"
 msgstr "Impossible de lire depuis le socket : %s"
@@ -2950,7 +2950,7 @@ msgid "Could not write to log file: %s"
 msgstr "Impossible d'écrire dans le fichier journal : %s"
 
 #: ../src/engine/controlsocket.cpp:718 ../src/engine/controlsocket.cpp:816
-#: ../src/engine/http/request.cpp:249
+#: ../src/engine/http/request.cpp:253
 #, c-format
 msgid "Could not write to socket: %s"
 msgstr "Impossible d'écrire vers le socket : %s"
@@ -3319,8 +3319,8 @@ msgid "Directory access permissions"
 msgstr "Droits d'accès au dossier"
 
 #: ../src/interface/resources/xrc/settings.xrc:620
-#: ../src/interface/filelistctrl.cpp:482 ../src/interface/Mainfrm.cpp:2372
-#: ../src/interface/Mainfrm.cpp:2392
+#: ../src/interface/filelistctrl.cpp:482 ../src/interface/Mainfrm.cpp:2392
+#: ../src/interface/Mainfrm.cpp:2412
 #: ../src/interface/sitemanager_controls.cpp:948
 #: ../src/interface/sitemanager_dialog.cpp:307 ../src/interface/toolbar.cpp:51
 #: ../src/interface/view.cpp:109
@@ -3387,13 +3387,13 @@ msgstr "Déconnecter du serveur actuel"
 
 #: ../src/engine/controlsocket.cpp:51 ../src/engine/controlsocket.cpp:719
 #: ../src/engine/controlsocket.cpp:818
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:62 ../src/engine/http/request.cpp:250
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:62 ../src/engine/http/request.cpp:254
 #: ../src/interface/queue.cpp:354
 msgid "Disconnected from server"
 msgstr "Déconnecté du serveur"
 
 #: ../src/engine/controlsocket.cpp:843
-#: ../src/engine/http/httpcontrolsocket.cpp:358
+#: ../src/engine/http/httpcontrolsocket.cpp:363
 #, c-format
 msgid "Disconnected from server: %s"
 msgstr "Déconnecté du serveur : %s"
@@ -3789,7 +3789,7 @@ msgstr "Erreur lors du chargement de la file d'attente"
 #: ../src/interface/bookmarks_dialog.cpp:795
 #: ../src/interface/bookmarks_dialog.cpp:835
 #: ../src/interface/bookmarks_dialog.cpp:888 ../src/interface/filter.cpp:943
-#: ../src/interface/filter.cpp:1034 ../src/interface/Options.cpp:291
+#: ../src/interface/filter.cpp:1034 ../src/interface/Options.cpp:293
 #: ../src/interface/osx_sandbox_userdirs.cpp:67
 #: ../src/interface/osx_sandbox_userdirs.cpp:138
 #: ../src/interface/QueueView.cpp:1551 ../src/interface/search.cpp:1771
@@ -4402,7 +4402,7 @@ msgid "For reliability you should specify a range of at least 10 ports."
 msgstr ""
 "Pour plus de fiabilité, vous devez spécifier une plage d'au moins 10 ports."
 
-#: ../src/interface/Options.cpp:290
+#: ../src/interface/Options.cpp:292
 msgid ""
 "For this session the default settings will be used. Any changes to the "
 "settings will not be saved."
@@ -4906,11 +4906,11 @@ msgstr "Interrompu par le signal"
 msgid "Interrupted by user"
 msgstr "Interrompu par l'utilisateur"
 
-#: ../src/engine/http/request.cpp:167 ../src/engine/http/request.cpp:617
+#: ../src/engine/http/request.cpp:171 ../src/engine/http/request.cpp:621
 msgid "Invalid Content-Length"
 msgstr "Longueur du contenu invalide"
 
-#: ../src/engine/http/request.cpp:496
+#: ../src/engine/http/request.cpp:500
 msgid "Invalid HTTP Response"
 msgstr "Réponse HTTP invalide"
 
@@ -4931,7 +4931,7 @@ msgstr ""
 msgid "Invalid characters in hostname"
 msgstr "Caractères non valides dans le nom d'hôte"
 
-#: ../src/engine/http/request.cpp:740
+#: ../src/engine/http/request.cpp:746
 msgid "Invalid chunk size"
 msgstr "Taille du paquet invalide"
 
@@ -4973,7 +4973,7 @@ msgstr "Nom d'hôte invalide : %s"
 msgid "Invalid input"
 msgstr "Entrée invalide"
 
-#: ../src/engine/http/request.cpp:524
+#: ../src/engine/http/request.cpp:528
 msgid "Invalid line"
 msgstr "Ligne invalide"
 
@@ -5010,7 +5010,7 @@ msgstr ""
 msgid "Invalid regular expression"
 msgstr "Expression régulière invalide"
 
-#: ../src/engine/http/request.cpp:505
+#: ../src/engine/http/request.cpp:509
 msgid "Invalid response code"
 msgstr "Code de réponse invalide"
 
@@ -5143,7 +5143,7 @@ msgstr "Taille limite du fichier journal"
 msgid "Limit:"
 msgstr "Limite :"
 
-#: ../src/engine/http/request.cpp:694
+#: ../src/engine/http/request.cpp:700
 msgid "Line length exceeded"
 msgstr "Longueur de ligne dépassée"
 
@@ -5311,27 +5311,27 @@ msgstr ""
 "Assurez-vous que le fichier est accessible et qu'il est bien un document XML "
 "correctement mis en forme."
 
-#: ../src/engine/http/request.cpp:681 ../src/engine/http/request.cpp:687
-#: ../src/engine/http/request.cpp:694 ../src/engine/http/request.cpp:705
-#: ../src/engine/http/request.cpp:740
+#: ../src/engine/http/request.cpp:687 ../src/engine/http/request.cpp:693
+#: ../src/engine/http/request.cpp:700 ../src/engine/http/request.cpp:711
+#: ../src/engine/http/request.cpp:746
 #, c-format
 msgid "Malformed chunk data: %s"
 msgstr "Paquet de données non conforme : %s"
 
-#: ../src/engine/http/request.cpp:167
+#: ../src/engine/http/request.cpp:171
 #, c-format
 msgid "Malformed request header: %s"
 msgstr "En-tête de la requête non conforme : %s"
 
-#: ../src/engine/http/request.cpp:465 ../src/engine/http/request.cpp:471
-#: ../src/engine/http/request.cpp:524 ../src/engine/http/request.cpp:580
-#: ../src/engine/http/request.cpp:617
+#: ../src/engine/http/request.cpp:469 ../src/engine/http/request.cpp:475
+#: ../src/engine/http/request.cpp:528 ../src/engine/http/request.cpp:584
+#: ../src/engine/http/request.cpp:621
 #, c-format
 msgid "Malformed response header: %s"
 msgstr "En-tête de réponse non conforme : %s"
 
-#: ../src/engine/http/request.cpp:412 ../src/engine/http/request.cpp:426
-#: ../src/engine/http/request.cpp:444
+#: ../src/engine/http/request.cpp:416 ../src/engine/http/request.cpp:430
+#: ../src/engine/http/request.cpp:448
 #, c-format
 msgid "Malformed response: %s"
 msgstr "Réponse non conforme : %s"
@@ -5729,7 +5729,7 @@ msgstr ""
 "Note : L'utilisation d'un Proxy générique force les connexions FTP en mode "
 "Passif."
 
-#: ../src/engine/http/request.cpp:471 ../src/engine/http/request.cpp:687
+#: ../src/engine/http/request.cpp:475 ../src/engine/http/request.cpp:693
 msgid "Null character in line"
 msgstr "Caractère nul en ligne"
 
@@ -5995,7 +5995,7 @@ msgstr "La commande PORT a été corrompue par le routeur ou le pare-feu."
 msgid "Pa&ssive (recommended)"
 msgstr "Pa&ssif (recommandé)"
 
-#: ../src/interface/Mainfrm.cpp:2562
+#: ../src/interface/Mainfrm.cpp:2586
 msgid "Parameter not a valid URL"
 msgstr "Le paramètre n'est pas une URL invalide"
 
@@ -6051,7 +6051,7 @@ msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr ""
 "Le chemin ne peut pas être créé pour le dossier %s et le sous-dossier %s"
 
-#: ../src/interface/Mainfrm.cpp:2520
+#: ../src/interface/Mainfrm.cpp:2544
 msgid "Path not found:"
 msgstr "Chemin introuvable :"
 
@@ -7453,7 +7453,7 @@ msgstr ""
 "Le serveur requiert un compte. Essayez de spécifier un compte en utilisant "
 "le Gestionnaire de Sites"
 
-#: ../src/engine/http/request.cpp:465
+#: ../src/engine/http/request.cpp:469
 msgid "Server not sending proper line endings"
 msgstr "Le serveur n'envoie pas des fins de ligne correctes"
 
@@ -7482,7 +7482,7 @@ msgstr ""
 "Le serveur a envoyé une requête d'identification additionnelle. Vous devez "
 "utiliser un type d'identification interactif."
 
-#: ../src/engine/http/request.cpp:317
+#: ../src/engine/http/request.cpp:321
 msgid "Server sent data even before request headers were sent"
 msgstr ""
 "Le serveur a envoyé des données avant même que les en-têtes de requête aient "
@@ -7502,8 +7502,8 @@ msgstr ""
 "Le serveur a envoyé une réponse passive avec une adresse non routable. "
 "Adresse remplacée par celle du serveur."
 
-#: ../src/engine/http/request.cpp:412 ../src/engine/http/request.cpp:426
-#: ../src/engine/http/request.cpp:444
+#: ../src/engine/http/request.cpp:416 ../src/engine/http/request.cpp:430
+#: ../src/engine/http/request.cpp:448
 msgid "Server sent too much data."
 msgstr "Le serveur a envoyé trop de données."
 
@@ -7573,7 +7573,7 @@ msgstr "Afficher le contenu b&rut du dossier"
 msgid "Show &welcome dialog..."
 msgstr "Afficher le dialogue de &bienvenue..."
 
-#: ../src/interface/Mainfrm.cpp:2395
+#: ../src/interface/Mainfrm.cpp:2415
 msgid "Show both directory trees and continue comparing?"
 msgstr "Afficher les arborescences des 2 côtés et continuer la comparaison ?"
 
@@ -7938,8 +7938,8 @@ msgstr "Erreur de syntaxe"
 
 #: ../src/interface/cmdline.cpp:83 ../src/interface/cmdline.cpp:88
 #: ../src/interface/cmdline.cpp:93 ../src/interface/cmdline.cpp:100
-#: ../src/interface/cmdline.cpp:105 ../src/interface/Mainfrm.cpp:2522
-#: ../src/interface/Mainfrm.cpp:2564
+#: ../src/interface/cmdline.cpp:105 ../src/interface/Mainfrm.cpp:2546
+#: ../src/interface/Mainfrm.cpp:2588
 msgid "Syntax error in command line"
 msgstr "Erreur de syntaxe dans la ligne de commande"
 
@@ -8490,17 +8490,17 @@ msgstr "Délai d'attente"
 msgid "Title:"
 msgstr "Titre :"
 
-#: ../src/interface/Mainfrm.cpp:2373
+#: ../src/interface/Mainfrm.cpp:2393
 msgid "To compare directories quick search must be closed."
 msgstr "Pour comparer des dossiers, la recherche rapide doit être fermée."
 
-#: ../src/interface/Mainfrm.cpp:2393
+#: ../src/interface/Mainfrm.cpp:2413
 msgid "To compare directories, both file lists have to be aligned."
 msgstr ""
 "Pour comparer des dossiers, les listes de fichiers doivent être alignées des "
 "deux côtés."
 
-#: ../src/interface/Mainfrm.cpp:2394
+#: ../src/interface/Mainfrm.cpp:2414
 msgid "To do this, the directory trees need to be both shown or both hidden."
 msgstr ""
 "Pour ce faire, les arborescences doivent être toutes deux visibles ou "
@@ -8561,7 +8561,7 @@ msgstr "Afficher ou masquer l'arborescence des dossiers distants"
 msgid "Toggles the display of the transfer queue"
 msgstr "Afficher ou masquer la file d'attente"
 
-#: ../src/engine/http/request.cpp:478
+#: ../src/engine/http/request.cpp:482
 msgid "Too long header line"
 msgstr "Ligne d'en-tête trop longue"
 
@@ -8753,7 +8753,7 @@ msgstr ""
 "Élément inconnu à la racine, il semblerait que ce fichier n'ait pas été "
 "généré par FileZilla."
 
-#: ../src/engine/http/request.cpp:580
+#: ../src/engine/http/request.cpp:584
 msgid "Unknown transfer encoding"
 msgstr "Encodage de transfert inconnu"
 
@@ -8848,7 +8848,7 @@ msgstr "Envoi et fin de l'édition"
 
 #: ../src/interface/settings/optionspage_dateformatting.cpp:62
 msgid "Us&e system &defaults for current language"
-msgstr "Utilis&er les valeurs par &défaut du système pour la langue actuelle"
+msgstr "Utilis&er le format du système par &défaut"
 
 #: ../src/interface/sitemanager_controls.cpp:1085
 msgid "Use &custom charset"
@@ -8890,7 +8890,7 @@ msgstr "Utiliser le serveur défini dans le Gestionnaire de Sites"
 
 #: ../src/interface/settings/optionspage_dateformatting.cpp:47
 msgid "Use system &defaults for current language"
-msgstr "Utiliser la langue du système par &défaut"
+msgstr "Utiliser le format du système par &défaut"
 
 #: ../src/interface/edithandler.cpp:1767
 msgid "Use system association"
@@ -9112,7 +9112,7 @@ msgstr "Écr&ire"
 msgid "Wrong external IP address"
 msgstr "Adresse IP externe incorrecte"
 
-#: ../src/engine/http/request.cpp:681
+#: ../src/engine/http/request.cpp:687
 msgid "Wrong line endings"
 msgstr "Fins de ligne incorrectes"
 
