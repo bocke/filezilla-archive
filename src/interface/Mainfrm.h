@@ -16,6 +16,8 @@
 #include "updater.h"
 #endif
 
+#include <list>
+
 class CAsyncRequestQueue;
 class CContextControl;
 class CLed;
