@@ -655,12 +655,12 @@ void CControlSocket::InvalidateCurrentWorkingDir(const CServerPath& path)
 	}
 }
 
-fz::duration CControlSocket::GetTimezoneOffset() const
+fz::duration CControlSocket::GetInferredTimezoneOffset() const
 {
 	fz::duration ret;
 	if (currentServer_) {
 		int seconds = 0;
-		if (CServerCapabilities::GetCapability(currentServer_, timezone_offset, &seconds) == yes) {
+		if (CServerCapabilities::GetCapability(currentServer_, inferred_timezone_offset, &seconds) == yes) {
 			ret = fz::duration::from_seconds(seconds);
 		}
 	}

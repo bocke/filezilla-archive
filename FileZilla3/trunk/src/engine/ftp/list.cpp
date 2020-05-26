@@ -95,7 +95,7 @@ int CFtpListOpData::Send()
 
 		listing_parser_ = std::make_unique<CDirectoryListingParser>(&controlSocket_, currentServer_, encoding);
 
-		listing_parser_->SetTimezoneOffset(controlSocket_.GetTimezoneOffset());
+		listing_parser_->SetTimezoneOffset(controlSocket_.GetInferredTimezoneOffset());
 		controlSocket_.m_pTransferSocket->m_pDirectoryListingParser = listing_parser_.get();
 
 		engine_.transfer_status_.Init(-1, 0, true);
@@ -148,7 +148,7 @@ int CFtpListOpData::ParseResponse()
 	std::wstring const& response = controlSocket_.m_Response;
 
 	// First condition prevents problems with concurrent MDTM
-	if (CServerCapabilities::GetCapability(currentServer_, timezone_offset) == unknown &&
+	if (CServerCapabilities::GetCapability(currentServer_, inferred_timezone_offset) == unknown &&
 	    response.substr(0, 4) == L"213 " && response.size() > 16)
 	{
 		fz::datetime date(response.substr(4), fz::datetime::utc);
@@ -177,15 +177,15 @@ int CFtpListOpData::ParseResponse()
 
 			// TODO: Correct cached listings
 
-			CServerCapabilities::SetCapability(currentServer_, timezone_offset, yes, serveroffset);
+			CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, yes, serveroffset);
 		}
 		else {
 			CServerCapabilities::SetCapability(currentServer_, mdtm_command, no);
-			CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
+			CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, no);
 		}
 	}
 	else {
-		CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
+		CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, no);
 	}
 
 	engine_.GetDirectoryCache().Store(directoryListing_, currentServer_);
@@ -355,9 +355,9 @@ int CFtpListOpData::SubcommandResult(int prevResult, COpData const&)
 
 int CFtpListOpData::CheckTimezoneDetection(CDirectoryListing& listing)
 {
-	if (CServerCapabilities::GetCapability(currentServer_, timezone_offset) == unknown) {
+	if (CServerCapabilities::GetCapability(currentServer_, inferred_timezone_offset) == unknown) {
 		if (CServerCapabilities::GetCapability(currentServer_, mdtm_command) != yes) {
-			CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
+			CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, no);
 		}
 		else {
 			size_t const count = listing.size();

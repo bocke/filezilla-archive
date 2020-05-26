@@ -41,7 +41,7 @@ enum capabilityNames
 	// Note that the user can invoke an additional timezone offset on top of
 	// this for server not supporting auto-detection or to compensate
 	// unsynchronized clocks.
-	timezone_offset,
+	inferred_timezone_offset,
 
 	auth_tls_command,
 	auth_ssl_command

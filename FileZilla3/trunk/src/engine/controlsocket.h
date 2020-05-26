@@ -281,7 +281,7 @@ protected:
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) = 0;
 	void SendDirectoryListingNotification(CServerPath const& path, bool failed);
 
-	fz::duration GetTimezoneOffset() const;
+	fz::duration GetInferredTimezoneOffset() const;
 
 	virtual int DoClose(int nErrorCode = FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR);
 

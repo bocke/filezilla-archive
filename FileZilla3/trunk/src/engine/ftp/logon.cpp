@@ -808,7 +808,7 @@ void CFtpLogonOpData::ParseFeat(std::wstring line)
 		CServerCapabilities::SetCapability(currentServer_, mlsd_command, yes, facts);
 
 		// MLST/MLSD specs require use of UTC
-		CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
+		CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, no);
 	}
 	else if (HasFeature(up, L"MLST")) {
 		std::wstring facts;
@@ -824,7 +824,7 @@ void CFtpLogonOpData::ParseFeat(std::wstring line)
 		CServerCapabilities::SetCapability(currentServer_, mlsd_command, yes, facts);
 
 		// MLST/MLSD specs require use of UTC
-		CServerCapabilities::SetCapability(currentServer_, timezone_offset, no);
+		CServerCapabilities::SetCapability(currentServer_, inferred_timezone_offset, no);
 	}
 	else if (HasFeature(up, L"MODE Z")) {
 		CServerCapabilities::SetCapability(currentServer_, mode_z_support, yes);
