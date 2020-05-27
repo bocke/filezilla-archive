@@ -1,6 +1,7 @@
 #include <filezilla.h>
 #include "filelist_statusbar.h"
 #include "sizeformatting.h"
+#include "Options.h"
 
 BEGIN_EVENT_TABLE(CFilelistStatusBar, wxStatusBar)
 EVT_TIMER(wxID_ANY, CFilelistStatusBar::OnTimer)

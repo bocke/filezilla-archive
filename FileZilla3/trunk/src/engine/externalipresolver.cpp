@@ -1,6 +1,7 @@
-#include <filezilla.h>
-#include "externalipresolver.h"
-#include "misc.h"
+#include "filezilla.h"
+
+#include "../include/externalipresolver.h"
+#include "../include/misc.h"
 
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/iputils.hpp>

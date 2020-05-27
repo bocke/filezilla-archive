@@ -3,7 +3,7 @@
 
 #include "ftpcontrolsocket.h"
 
-#include "iothread.h"
+#include "../iothread.h"
 
 enum filetransferStates
 {

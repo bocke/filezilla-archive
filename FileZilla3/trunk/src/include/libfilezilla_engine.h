@@ -2,7 +2,7 @@
 #define LIBFILEZILLA_ENGINE_HEADER
 
 #ifdef HAVE_CONFIG_H
-  #include <config.h>
+#include "config.h"
 #endif
 
 #ifndef PACKAGE_STRING
@@ -26,7 +26,6 @@
 #include <windows.h>
 #endif
 
-#include "optionsbase.h"
 #include "logging.h"
 #include "server.h"
 #include "serverpath.h"

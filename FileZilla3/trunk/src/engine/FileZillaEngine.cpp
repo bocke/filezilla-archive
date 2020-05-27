@@ -1,7 +1,7 @@
-#include <filezilla.h>
 #include "controlsocket.h"
 #include "directorycache.h"
 #include "engineprivate.h"
+#include "filezilla.h"
 
 CFileZillaEngine::CFileZillaEngine(CFileZillaEngineContext& engine_context, EngineNotificationHandler& notificationHandler)
 	: impl_(new CFileZillaEnginePrivate(engine_context, *this, notificationHandler))

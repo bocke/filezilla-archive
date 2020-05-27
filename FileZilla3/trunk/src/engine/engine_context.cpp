@@ -1,10 +1,12 @@
-#include <filezilla.h>
-#include "engine_context.h"
+#include "filezilla.h"
+
+#include "../include/engine_context.h"
+#include "../include/optionsbase.h"
+#include "../include/option_change_event_handler.h"
 
 #include "directorycache.h"
 #include "logging_private.h"
 #include "oplock_manager.h"
-#include "option_change_event_handler.h"
 #include "pathcache.h"
 
 #include <libfilezilla/event_loop.hpp>

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "rename.h"
 #include "../directorycache.h"

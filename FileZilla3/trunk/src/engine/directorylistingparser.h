@@ -32,8 +32,8 @@
  * get concatenated to be parsed again (and discarded if not recognized).
  */
 
-#include <directorylisting.h>
-#include <server.h>
+#include "../include/directorylisting.h"
+#include "../include/server.h"
 
 #include <deque>
 #include <vector>

@@ -1,11 +1,13 @@
-#include <filezilla.h>
-#include "sizeformatting_base.h"
-#include "optionsbase.h"
+#include "filezilla.h"
+
+#include "../include/optionsbase.h"
+#include "../include/sizeformatting_base.h"
+
+#include <libfilezilla/format.hpp>
+
 #ifndef FZ_WINDOWS
 #include <langinfo.h>
 #endif
-
-#include <libfilezilla/format.hpp>
 
 #include <math.h>
 #include <assert.h>

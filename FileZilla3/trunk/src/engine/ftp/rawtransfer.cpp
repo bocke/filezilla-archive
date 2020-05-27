@@ -1,8 +1,9 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "rawtransfer.h"
-#include "servercapabilities.h"
+#include "../servercapabilities.h"
 #include "transfersocket.h"
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/iputils.hpp>
 

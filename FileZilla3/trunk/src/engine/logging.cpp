@@ -1,6 +1,8 @@
-#include <filezilla.h>
+#include "filezilla.h"
 
 #include "logging_private.h"
+
+#include "../include/optionsbase.h"
 
 #include <libfilezilla/util.hpp>
 

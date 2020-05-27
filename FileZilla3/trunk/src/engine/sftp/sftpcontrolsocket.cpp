@@ -1,23 +1,26 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "chmod.h"
 #include "connect.h"
 #include "cwd.h"
 #include "delete.h"
-#include "../directorycache.h"
-#include "directorylistingparser.h"
-#include "engineprivate.h"
 #include "event.h"
 #include "filetransfer.h"
 #include "list.h"
 #include "input_thread.h"
 #include "mkd.h"
-#include "pathcache.h"
-#include "proxy.h"
 #include "rename.h"
 #include "rmd.h"
-#include "servercapabilities.h"
 #include "sftpcontrolsocket.h"
+
+#include "../directorycache.h"
+#include "../directorylistingparser.h"
+#include "../engineprivate.h"
+#include "../pathcache.h"
+#include "../proxy.h"
+#include "../servercapabilities.h"
+
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/process.hpp>
@@ -578,7 +581,7 @@ void CSftpControlSocket::OnQuotaRequest(fz::direction::type const d)
 	}
 	else if (bytes > 0) {
 		int b;
-		if (bytes > std::numeric_limits<int>::max()) {
+		if (bytes > static_cast<size_t>(std::numeric_limits<int>::max())) {
 			b = std::numeric_limits<int>::max();
 		}
 		else {

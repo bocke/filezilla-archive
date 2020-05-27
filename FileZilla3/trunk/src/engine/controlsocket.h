@@ -1,16 +1,15 @@
 #ifndef FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 
+#include "../include/directorylisting.h"
+#include "../include/server.h"
+#include "../include/serverpath.h"
+
 #include "logging_private.h"
+#include "oplock_manager.h"
 
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>
-
-#include <directorylisting.h>
-
-#include "oplock_manager.h"
-#include "server.h"
-#include "serverpath.h"
 
 class COpData
 {

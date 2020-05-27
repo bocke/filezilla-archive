@@ -2,8 +2,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 noinst_LIBRARIES = libengine.a
 
-libengine_a_CPPFLAGS = -I$(srcdir)/../include
-libengine_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libengine_a_CPPFLAGS = $(LIBFILEZILLA_CFLAGS)
 
 libengine_a_SOURCES = \
 		commands.cpp \

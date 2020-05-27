@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 
 CDirectoryListingNotification::CDirectoryListingNotification(CServerPath const& path, bool const primary, bool const failed)
 	: primary_(primary), m_failed(failed), m_path(path)

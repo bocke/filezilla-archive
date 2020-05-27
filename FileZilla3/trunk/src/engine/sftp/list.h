@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_SFTP_LIST_HEADER
 #define FILEZILLA_ENGINE_SFTP_LIST_HEADER
 
-#include "directorylistingparser.h"
+#include "../directorylistingparser.h"
 #include "sftpcontrolsocket.h"
 
 class CSftpListOpData final : public COpData, public CSftpOpData

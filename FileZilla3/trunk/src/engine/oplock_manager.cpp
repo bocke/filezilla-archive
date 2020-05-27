@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 
 #include "controlsocket.h"
 #include "oplock_manager.h"

@@ -1,6 +1,10 @@
 #ifndef FILEZILLA_ENGINE_SFTP_EVENT_HEADER
 #define FILEZILLA_ENGINE_SFTP_EVENT_HEADER
 
+#include <libfilezilla/event.hpp>
+
+#include <string>
+
 #define FZSFTP_PROTOCOL_VERSION 9
 
 enum class sftpEvent {

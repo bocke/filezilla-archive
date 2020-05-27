@@ -2,8 +2,7 @@
 #define FILEZILLA_ENGINE_ENGINE_HEADER
 
 #include "commands.h"
-
-#include <notification.h>
+#include "notification.h"
 
 class CAsyncRequestNotification;
 class CFileZillaEngineContext;

@@ -1,9 +1,11 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "connect.h"
 #include "event.h"
 #include "input_thread.h"
-#include "proxy.h"
+#include "../proxy.h"
+
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>

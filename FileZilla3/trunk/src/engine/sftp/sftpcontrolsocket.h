@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_SFTP_SFTPCONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_SFTP_SFTPCONTROLSOCKET_HEADER
 
-#include "controlsocket.h"
+#include "../controlsocket.h"
 
 #include <libfilezilla/rate_limiter.hpp>
 

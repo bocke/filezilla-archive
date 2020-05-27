@@ -1,8 +1,8 @@
 #ifndef FILEZILLA_ENGINE_FTP_TRANSFERSOCKET_HEADER
 #define FILEZILLA_ENGINE_FTP_TRANSFERSOCKET_HEADER
 
-#include "iothread.h"
-#include "controlsocket.h"
+#include "../iothread.h"
+#include "../controlsocket.h"
 
 class CFileZillaEnginePrivate;
 class CFtpControlSocket;
