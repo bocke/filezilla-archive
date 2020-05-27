@@ -1,20 +1,20 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "connect.h"
 #include "delete.h"
 #include "event.h"
 #include "input_thread.h"
 #include "../directorycache.h"
-#include "directorylistingparser.h"
-#include "engineprivate.h"
+#include "../directorylistingparser.h"
+#include "../engineprivate.h"
 #include "file_transfer.h"
 #include "list.h"
 #include "mkd.h"
-#include "pathcache.h"
-#include "proxy.h"
+#include "../pathcache.h"
+#include "../proxy.h"
 #include "resolve.h"
 #include "rmd.h"
-#include "servercapabilities.h"
+#include "../servercapabilities.h"
 #include "storjcontrolsocket.h"
 
 #include <libfilezilla/event_loop.hpp>

@@ -3,6 +3,8 @@
 
 class CStorjControlSocket;
 
+#include "event.h"
+
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/thread_pool.hpp>
 

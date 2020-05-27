@@ -21,9 +21,8 @@
 
 #include "commands.h"
 #include "local_path.h"
+#include "logging.h"
 #include "server.h"
-
-#include <logging.h>
 
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_info.hpp>

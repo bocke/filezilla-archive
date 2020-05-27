@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "event.h"
 #include "input_thread.h"

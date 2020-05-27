@@ -1,9 +1,11 @@
-#include <filezilla.h>
+#include "../filezilla.h"
+
+#include "filetransfer.h"
+#include "transfersocket.h"
 
 #include "../directorycache.h"
-#include "filetransfer.h"
-#include "servercapabilities.h"
-#include "transfersocket.h"
+#include "../servercapabilities.h"
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/local_filesys.hpp>

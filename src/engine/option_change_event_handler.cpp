@@ -1,5 +1,5 @@
-#include <filezilla.h>
-#include "option_change_event_handler.h"
+#include "filezilla.h"
+#include "../include/option_change_event_handler.h"
 
 #include <libfilezilla/util.hpp>
 

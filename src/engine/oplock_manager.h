@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_OPLOCK_MANAGER_HEADER
 #define FILEZILLA_ENGINE_OPLOCK_MANAGER_HEADER
 
-#include "serverpath.h"
+#include "../include/serverpath.h"
 
 #include <libfilezilla/event.hpp>
 #include <libfilezilla/mutex.hpp>

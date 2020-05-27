@@ -1,12 +1,14 @@
-#include <filezilla.h>
-#include "directorylistingparser.h"
-#include "engineprivate.h"
-#include "ftp/ftpcontrolsocket.h"
-#include "iothread.h"
-#include "optionsbase.h"
-#include "proxy.h"
-#include "servercapabilities.h"
+#include "../filezilla.h"
+#include "../directorylistingparser.h"
+#include "../engineprivate.h"
+#include "../iothread.h"
+#include "../proxy.h"
+#include "../servercapabilities.h"
+
+#include "ftpcontrolsocket.h"
 #include "transfersocket.h"
+
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/rate_limited_layer.hpp>
 #include <libfilezilla/tls_layer.hpp>

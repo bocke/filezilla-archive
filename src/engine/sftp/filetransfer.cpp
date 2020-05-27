@@ -1,7 +1,9 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "../directorycache.h"
 #include "filetransfer.h"
+
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/local_filesys.hpp>
 

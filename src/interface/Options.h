@@ -1,9 +1,9 @@
 #ifndef FILEZILLA_INTERFACE_OPTIONS_HEADER
 #define FILEZILLA_INTERFACE_OPTIONS_HEADER
 
-#include "local_path.h"
-
-#include <option_change_event_handler.h>
+#include "../include/local_path.h"
+#include "../include/optionsbase.h"
+#include "../include/option_change_event_handler.h"
 
 #include <libfilezilla/mutex.hpp>
 

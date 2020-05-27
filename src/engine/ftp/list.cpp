@@ -1,7 +1,8 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "../directorycache.h"
 #include "../servercapabilities.h"
+#include "../../include/optionsbase.h"
 #include "list.h"
 #include "transfersocket.h"
 

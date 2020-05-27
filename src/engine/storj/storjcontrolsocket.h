@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_STORJCONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_STORJCONTROLSOCKET_HEADER
 
-#include "controlsocket.h"
+#include "../controlsocket.h"
 
 namespace fz {
 class process;

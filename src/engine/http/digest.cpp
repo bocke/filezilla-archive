@@ -1,7 +1,8 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "digest.h"
-#include "logging_private.h"
+
+#include "../logging_private.h"
 
 #include <libfilezilla/encode.hpp>
 #include <libfilezilla/format.hpp>

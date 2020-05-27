@@ -1,9 +1,9 @@
 #ifndef FILEZILLA_ENGINE_SERVERCAPABILITIES_HEADER
 #define FILEZILLA_ENGINE_SERVERCAPABILITIES_HEADER
 
-#include <libfilezilla/mutex.hpp>
+#include "../include/server.h"
 
-#include <server.h>
+#include <libfilezilla/mutex.hpp>
 
 #include <map>
 

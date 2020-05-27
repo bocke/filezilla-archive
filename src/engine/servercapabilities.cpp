@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "servercapabilities.h"
 
 #include <assert.h>

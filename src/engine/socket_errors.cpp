@@ -5,7 +5,7 @@
   #include <ws2tcpip.h>
   #include <mstcpip.h>
 #endif
-#include <filezilla.h>
+#include "filezilla.h"
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/socket.hpp>
 #ifndef FZ_WINDOWS

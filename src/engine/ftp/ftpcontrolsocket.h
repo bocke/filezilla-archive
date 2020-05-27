@@ -1,10 +1,9 @@
 #ifndef FILEZILLA_ENGINE_FTP_FTPCONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_FTP_FTPCONTROLSOCKET_HEADER
 
-#include "logging_private.h"
-#include "controlsocket.h"
-#include "externalipresolver.h"
-#include "rtt.h"
+#include "../logging_private.h"
+#include "../controlsocket.h"
+#include "../rtt.h"
 
 #include <regex>
 
@@ -13,6 +12,7 @@ auto const cwd = Command::private1;
 auto const rawtransfer = Command::private2;
 }
 
+class CExternalIPResolver;
 class CTransferSocket;
 class CFtpTransferOpData;
 class CFtpRawTransferOpData;
@@ -30,7 +30,7 @@ class CFtpControlSocket final : public CRealControlSocket
 public:
 	CFtpControlSocket(CFileZillaEnginePrivate & engine);
 	virtual ~CFtpControlSocket();
-	
+
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) override;
 
 protected:
@@ -58,7 +58,7 @@ protected:
 
 	virtual void OnConnect() override;
 	virtual void OnReceive() override;
-	
+
 	void OnVerifyCert(fz::tls_layer* source, fz::tls_session_info& info);
 
 	virtual void ResetSocket() override;

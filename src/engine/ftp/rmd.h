@@ -2,7 +2,7 @@
 #define FILEZILLA_ENGINE_FTP_RMD_HEADER
 
 #include "ftpcontrolsocket.h"
-#include "serverpath.h"
+#include "../../include/serverpath.h"
 
 class CFtpRemoveDirOpData final : public COpData, public CFtpOpData
 {

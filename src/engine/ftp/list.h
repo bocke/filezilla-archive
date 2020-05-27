@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_ENGINE_FTP_LIST_HEADER
 #define FILEZILLA_ENGINE_FTP_LIST_HEADER
 
-#include "directorylistingparser.h"
+#include "../directorylistingparser.h"
 #include "ftpcontrolsocket.h"
 
 class CDirectoryListingParser;

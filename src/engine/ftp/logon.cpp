@@ -1,8 +1,10 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "logon.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"
+
+#include "../../include/optionsbase.h"
 
 #include <libfilezilla/tls_layer.hpp>
 

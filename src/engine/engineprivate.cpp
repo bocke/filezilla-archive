@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "controlsocket.h"
 #include "directorycache.h"
 #include "engineprivate.h"
@@ -10,6 +10,8 @@
 #if ENABLE_STORJ
 #include "storj/storjcontrolsocket.h"
 #endif
+
+#include "../include/optionsbase.h"
 
 #include <libfilezilla/event_loop.hpp>
 

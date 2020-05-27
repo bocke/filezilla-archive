@@ -1,7 +1,7 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "../directorycache.h"
-#include "pathcache.h"
+#include "../pathcache.h"
 #include "rmd.h"
 
 int CSftpRemoveDirOpData::Send()

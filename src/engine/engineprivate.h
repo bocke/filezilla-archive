@@ -1,14 +1,14 @@
 #ifndef FILEZILLA_ENGINEPRIVATE_HEADER
 #define FILEZILLA_ENGINEPRIVATE_HEADER
 
+#include "../include/engine_context.h"
+#include "../include/FileZillaEngine.h"
+#include "../include/option_change_event_handler.h"
+
 #include <libfilezilla/event.hpp>
 #include <libfilezilla/event_handler.hpp>
 #include <libfilezilla/mutex.hpp>
 #include <libfilezilla/time.hpp>
-
-#include "engine_context.h"
-#include "FileZillaEngine.h"
-#include "option_change_event_handler.h"
 
 #include <atomic>
 #include <list>

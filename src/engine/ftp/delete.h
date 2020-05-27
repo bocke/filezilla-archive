@@ -3,7 +3,7 @@
 
 #include "ftpcontrolsocket.h"
 
-#include "serverpath.h"
+#include "../../include/serverpath.h"
 
 class CFtpDeleteOpData final : public COpData, public CFtpOpData
 {

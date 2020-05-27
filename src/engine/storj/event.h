@@ -1,7 +1,9 @@
 #ifndef FILEZILLA_ENGINE_STORJ_EVENT_HEADER
 #define FILEZILLA_ENGINE_STORJ_EVENT_HEADER
 
-#include "../storj/events.hpp"
+#include "../../storj/events.hpp"
+
+#include <libfilezilla/event.hpp>
 
 struct storj_message
 {

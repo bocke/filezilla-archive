@@ -1,5 +1,6 @@
-#include <filezilla.h>
-#include "xmlutils.h"
+#include "filezilla.h"
+
+#include "../include/xmlutils.h"
 
 #include <cstring>
 #include <cassert>
