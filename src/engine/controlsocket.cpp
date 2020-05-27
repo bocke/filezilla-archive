@@ -1210,7 +1210,7 @@ int64_t CalculateNextChunkSize(int64_t remaining, int64_t lastChunkSize, fz::dur
 
 	if (multiple) {
 		// Round up
-		int modulus = newChunkSize % multiple;
+		auto modulus = newChunkSize % multiple;
 		if (modulus) {
 			newChunkSize += multiple - modulus;
 		}
