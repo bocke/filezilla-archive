@@ -1,3 +1,4 @@
+#include "../src/interface/filezilla.h"
 #include <wx/imaglist.h>
 #include <wx/scrolwin.h>
 #include <wx/listctrl.h>
