@@ -12,7 +12,7 @@
 #include <security.h>
 #include <wchar.h>
 
-DWORD osMajorVersion, osMinorVersion, osPlatformId;
+extern DWORD osMajorVersion, osMinorVersion, osPlatformId;
 
 char *platform_get_x_display(void) {
     /* We may as well check for DISPLAY in case it's useful. */
