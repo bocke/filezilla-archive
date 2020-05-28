@@ -1168,8 +1168,6 @@ void CSearchDialog::Stop()
 
 void CSearchDialog::SetCtrlState()
 {
-	bool const localSearch = xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::GetValue);
-
 	xrc_call(*this, "ID_START", &wxButton::Enable, !searching_);
 	xrc_call(*this, "ID_STOP", &wxButton::Enable, searching_);
 	xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::Enable, !searching_);
