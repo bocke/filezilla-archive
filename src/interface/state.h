@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_STATE_HEADER
 #define FILEZILLA_INTERFACE_STATE_HEADER
 
-#include "local_path.h"
+#include "../include/local_path.h"
 #include "sitemanager.h"
 #include "sitemanager_dialog.h"
 #include "filter.h"

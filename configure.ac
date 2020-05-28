@@ -1,8 +1,8 @@
 AC_INIT([FileZilla],[3.48.1],[tim.kosse@filezilla-project.org],[],[https://filezilla-project.org/])
-AC_CONFIG_HEADERS([src/include/config.h])
+AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip nostdinc])
 
 AC_CANONICAL_HOST
 

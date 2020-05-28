@@ -1,7 +1,6 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "state.h"
 #include "commandqueue.h"
-#include "FileZillaEngine.h"
 #include "Options.h"
 #include "Mainfrm.h"
 #include "queue.h"
@@ -10,6 +9,8 @@
 #include "remote_recursive_operation.h"
 #include "listingcomparison.h"
 #include "xrc_helper.h"
+
+#include "../include/FileZillaEngine.h"
 
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/glue/wx.hpp>

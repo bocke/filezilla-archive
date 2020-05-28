@@ -1,5 +1,4 @@
-#include <filezilla.h>
-#include "directorylistingparser.h"
+#include "../src/engine/directorylistingparser.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include <list>
 

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "export.h"
 #include "filezillaapp.h"
 #include "xmlfunctions.h"

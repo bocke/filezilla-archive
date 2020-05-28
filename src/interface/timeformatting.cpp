@@ -1,7 +1,8 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "timeformatting.h"
 #include "Options.h"
-#include <option_change_event_handler.h>
+
+#include "../include/option_change_event_handler.h"
 
 namespace {
 

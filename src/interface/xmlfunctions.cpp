@@ -1,8 +1,10 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "buildinfo.h"
 #include "xmlfunctions.h"
-#include "xmlutils.h"
 #include "Options.h"
+
+#include "../include/xmlutils.h"
+
 #include <wx/ffile.h>
 #include <wx/log.h>
 

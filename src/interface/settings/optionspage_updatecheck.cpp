@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #if FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
 
@@ -6,8 +6,8 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_updatecheck.h"
-#include "updater.h"
-#include "update_dialog.h"
+#include "../updater.h"
+#include "../update_dialog.h"
 
 BEGIN_EVENT_TABLE(COptionsPageUpdateCheck, COptionsPage)
 EVT_BUTTON(XRCID("ID_RUNUPDATECHECK"), COptionsPageUpdateCheck::OnRunUpdateCheck)

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "sitemanager_controls.h"
 
 #include "dialogex.h"
@@ -12,7 +12,7 @@
 #include "xrc_helper.h"
 #include "wxext/spinctrlex.h"
 
-#include <s3sse.h>
+#include "../include/s3sse.h"
 
 #include <libfilezilla/translate.hpp>
 

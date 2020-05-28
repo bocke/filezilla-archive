@@ -1,17 +1,17 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 
 #include "../Options.h"
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_themes.h"
 #include "../themeprovider.h"
-#include "wxext/spinctrlex.h"
+#include "../wxext/spinctrlex.h"
+#include "../xrc_helper.h"
 
 #include <wx/dcclient.h>
 #include <wx/scrolwin.h>
 #include <wx/statbox.h>
 
-#include "xrc_helper.h"
 
 BEGIN_EVENT_TABLE(COptionsPageThemes, COptionsPage)
 EVT_CHOICE(XRCID("ID_THEME"), COptionsPageThemes::OnThemeChange)

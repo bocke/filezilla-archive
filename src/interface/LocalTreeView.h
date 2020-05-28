@@ -1,10 +1,11 @@
 #ifndef FILEZILLA_INTERFACE_LOCALTREEVIEW_HEADER
 #define FILEZILLA_INTERFACE_LOCALTREEVIEW_HEADER
 
-#include <option_change_event_handler.h>
 #include "systemimagelist.h"
 #include "state.h"
 #include "treectrlex.h"
+
+#include "../include/option_change_event_handler.h"
 
 class CQueueView;
 class CWindowTinter;

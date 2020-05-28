@@ -1,10 +1,12 @@
 #ifndef FILEZILLA_INTERFACES_NETCONFWIZARD_HEADER
 #define FILEZILLA_INTERFACES_NETCONFWIZARD_HEADER
 
-#include <wx/wizard.h>
 #include "wrapengine.h"
-#include "externalipresolver.h"
+
+#include "../include/externalipresolver.h"
+
 #include <wx/timer.h>
+#include <wx/wizard.h>
 
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>

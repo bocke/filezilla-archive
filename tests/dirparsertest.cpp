@@ -1,5 +1,5 @@
-#include <libfilezilla_engine.h>
-#include <directorylistingparser.h>
+#include "../src/include/libfilezilla_engine.h"
+#include "../src/engine/directorylistingparser.h"
 
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/util.hpp>

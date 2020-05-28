@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "remote_recursive_operation.h"
 #include "commandqueue.h"
 #include "chmoddialog.h"

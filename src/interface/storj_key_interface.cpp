@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "storj_key_interface.h"
 #include "Options.h"
 #include "filezillaapp.h"

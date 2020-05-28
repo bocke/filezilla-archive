@@ -188,7 +188,7 @@ if USE_RESOURCEFILE
   RESOURCEFILE = windows/psftp.o
 endif
 
-AM_CPPFLAGS = -I../../config.h
+AM_CPPFLAGS = -I$(srcdir) -I$(top_builddir)/config
 
 fzsftp_LDADD = libfzputtycommon.a
 fzsftp_LDADD += $(NETTLE_LIBS)

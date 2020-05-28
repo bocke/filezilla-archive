@@ -12,7 +12,7 @@
 #include "../pugixml/pugixml.hpp"
 #endif
 
-#include "xmlutils.h"
+#include "../include/xmlutils.h"
 #include "serverdata.h"
 
 class CXmlFile final

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "verifyhostkeydialog.h"
 #include "dialogex.h"
 #include "ipcmutex.h"

@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_FILEZILLAAPP_HEADER
 #define FILEZILLA_INTERFACE_FILEZILLAAPP_HEADER
 
-#include "local_path.h"
+#include "../include/local_path.h"
 
 #include <vector>
 

@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_LIST_SEARCH_PANEL_HEADER
 #define FILEZILLA_INTERFACE_LIST_SEARCH_PANEL_HEADER
 
-#include <filter.h>
+#include "filter.h"
 
 class wxBitmapButton;
 
@@ -13,7 +13,7 @@ public:
 
 	virtual bool Show(bool show);
 	void Close();
-	
+
 private:
 	wxDECLARE_EVENT_TABLE();
 	void OnPaint(wxPaintEvent& ev);
@@ -35,7 +35,7 @@ private:
 	wxWindow* m_listView{};
 	CState* m_pState{};
 
-	bool m_local{};		// or remote
+	bool m_local{}; // or remote
 	wxString m_text;
 	bool m_caseInsensitive{true};
 	bool m_useRegex{};

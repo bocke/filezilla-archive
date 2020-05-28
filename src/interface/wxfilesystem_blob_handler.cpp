@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "wxfilesystem_blob_handler.h"
 
 #include <libfilezilla/encode.hpp>

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "inputdialog.h"
 #include "textctrlex.h"
 

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "osx_sandbox_userdirs.h"
 
 #include "filezillaapp.h"

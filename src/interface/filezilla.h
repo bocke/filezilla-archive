@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_FILEZILLA_HEADER
 #define FILEZILLA_INTERFACE_FILEZILLA_HEADER
 
-#include <libfilezilla_engine.h>
+#include "../include/libfilezilla_engine.h"
 
 #include "msgbox.h"
 

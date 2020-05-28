@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "recursive_operation.h"
 
 void CRecursiveOperation::SetQueue(CQueueView * pQueue)

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 
 #define FILELISTCTRL_INCLUDE_TEMPLATE_DEFINITION
 
