@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_INTERFACE_SYSTEMIMAGELIST_HEADER
 #define FILEZILLA_INTERFACE_SYSTEMIMAGELIST_HEADER
 
+#include "filezilla.h"
+
 #ifdef __WXMSW__
 #include <shellapi.h>
 #include <commctrl.h>
