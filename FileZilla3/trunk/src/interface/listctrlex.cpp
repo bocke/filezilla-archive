@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "listctrlex.h"
 #include "filezillaapp.h"
 

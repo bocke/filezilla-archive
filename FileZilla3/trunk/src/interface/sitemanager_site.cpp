@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "sitemanager_site.h"
 
 #include "filezillaapp.h"
@@ -11,7 +11,7 @@
 #include "textctrlex.h"
 #include "xrc_helper.h"
 
-#include <s3sse.h>
+#include "../include/s3sse.h"
 
 #include <libfilezilla/translate.hpp>
 

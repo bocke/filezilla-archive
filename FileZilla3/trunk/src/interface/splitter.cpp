@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "splitter.h"
 
 BEGIN_EVENT_TABLE(CSplitterWindowEx, wxSplitterWindow)

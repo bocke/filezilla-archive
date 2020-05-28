@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "StatusView.h"
 #include "Options.h"
 #include "state.h"

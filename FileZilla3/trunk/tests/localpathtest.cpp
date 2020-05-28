@@ -1,6 +1,6 @@
-#include <filezilla.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "local_path.h"
+
+#include "../src/include/local_path.h"
 
 /*
  * This testsuite asserts the correctness of the CLocalPathTest class.

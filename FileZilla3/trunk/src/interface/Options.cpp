@@ -1,11 +1,12 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "Options.h"
 #include "filezillaapp.h"
 #include "file_utils.h"
 #include "ipcmutex.h"
 #include "locale_initializer.h"
-#include <option_change_event_handler.h>
 #include "sizeformatting.h"
+
+#include "../include/option_change_event_handler.h"
 
 #include <libfilezilla/local_filesys.hpp>
 

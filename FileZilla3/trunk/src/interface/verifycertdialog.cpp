@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "filezillaapp.h"
 #include "verifycertdialog.h"
 #include "dialogex.h"

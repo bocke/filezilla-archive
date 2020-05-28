@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_SIZEFORMATTING_HEADER
 #define FILEZILLA_INTERFACE_SIZEFORMATTING_HEADER
 
-#include <sizeformatting_base.h>
+#include "../include/sizeformatting_base.h"
 
 class CSizeFormat final : public CSizeFormatBase
 {

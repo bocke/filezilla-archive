@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "cmdline.h"
 #include "commandqueue.h"
 #include "context_control.h"

@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "fzputtygen_interface.h"
 #include "Options.h"
 #include "filezillaapp.h"

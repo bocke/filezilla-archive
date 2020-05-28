@@ -2,6 +2,9 @@
 #define FILEZILLA_INTERFACE_LISTCTRLEX_HEADER
 
 #include "systemimagelist.h"
+
+#include <libfilezilla/time.hpp>
+
 #include <wx/dnd.h>
 #include <wx/listctrl.h>
 

@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_FILELIST_STATUSBAR_HEADER
 #define FILEZILLA_INTERFACE_FILELIST_STATUSBAR_HEADER
 
-#include <option_change_event_handler.h>
+#include "../include/option_change_event_handler.h"
 
 #include <wx/statusbr.h>
 #include <wx/timer.h>

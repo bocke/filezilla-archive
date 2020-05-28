@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "fileexistsdlg.h"
 #include "file_utils.h"
 #include "Options.h"

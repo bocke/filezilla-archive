@@ -1,8 +1,9 @@
 #ifndef FILEZILLA_INTERFACE_MENU_BAR_HEADER
 #define FILEZILLA_INTERFACE_MENU_BAR_HEADER
 
-#include <option_change_event_handler.h>
 #include "state.h"
+
+#include "../include/option_change_event_handler.h"
 
 #include <wx/menu.h>
 

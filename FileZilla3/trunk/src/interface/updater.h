@@ -3,7 +3,7 @@
 
 #if FZ_MANUALUPDATECHECK
 
-#include "notification.h"
+#include "../include/notification.h"
 
 #include <wx/timer.h>
 

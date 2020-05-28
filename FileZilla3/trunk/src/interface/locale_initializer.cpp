@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "locale_initializer.h"
 #ifdef HAVE_LIBPUGIXML
 #include <pugixml.hpp>

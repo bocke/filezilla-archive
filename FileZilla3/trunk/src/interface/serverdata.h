@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_SERVER_HEADER
 #define FILEZILLA_INTERFACE_SERVER_HEADER
 
-#include <server.h>
+#include "../include/server.h"
 
 #include <libfilezilla/encryption.hpp>
 

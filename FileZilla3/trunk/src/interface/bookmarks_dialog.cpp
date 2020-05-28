@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "bookmarks_dialog.h"
 #include "filezillaapp.h"
 #include "sitemanager.h"

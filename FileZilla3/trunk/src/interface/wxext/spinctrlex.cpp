@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 #include "spinctrlex.h"
 
 #define DEFAULT_LENGTH_LIMIT 26 // Big enough for all 64bit values with thousands separator

@@ -1,8 +1,9 @@
 #ifndef FILEZILLA_INTERFACE_TOOLBAR_HEADER
 #define FILEZILLA_INTERFACE_TOOLBAR_HEADER
 
-#include <option_change_event_handler.h>
 #include "state.h"
+
+#include "../include/option_change_event_handler.h"
 
 #include <wx/toolbar.h>
 

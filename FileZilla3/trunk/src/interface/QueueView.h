@@ -2,14 +2,13 @@
 #define FILEZILLA_INTERFACE_QUEUEVIEW_HEADER
 
 #include "dndobjects.h"
-#include "queue.h"
-
-#include <libfilezilla_engine.h>
-#include <option_change_event_handler.h>
-
-#include "queue_storage.h"
 #include "local_recursive_operation.h"
-#include "notification.h"
+#include "queue.h"
+#include "queue_storage.h"
+
+#include "../include/libfilezilla_engine.h"
+#include "../include/notification.h"
+#include "../include/option_change_event_handler.h"
 
 #include <wx/progdlg.h>
 

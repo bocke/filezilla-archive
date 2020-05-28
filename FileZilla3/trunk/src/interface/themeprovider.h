@@ -1,7 +1,8 @@
 #ifndef FILEZILLA_INTERFACE_THEMEPROVIDER_HEADER
 #define FILEZILLA_INTERFACE_THEMEPROVIDER_HEADER
 
-#include <option_change_event_handler.h>
+#include "../include/option_change_event_handler.h"
+
 #include <memory>
 
 #include <libfilezilla/time.hpp>

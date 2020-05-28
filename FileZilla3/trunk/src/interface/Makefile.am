@@ -289,7 +289,7 @@ endif
 
 filezilla_DEPENDENCIES += ../engine/libengine.a
 
-filezilla_CPPFLAGS = -I$(srcdir)/../include
+filezilla_CPPFLAGS = -I$(top_builddir)/config
 filezilla_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
 filezilla_CPPFLAGS += $(WX_CPPFLAGS)
 filezilla_CXXFLAGS = $(WX_CXXFLAGS_ONLY)

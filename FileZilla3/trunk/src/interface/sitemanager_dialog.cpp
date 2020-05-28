@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #include "sitemanager_dialog.h"
 
 #include "asksavepassworddialog.h"

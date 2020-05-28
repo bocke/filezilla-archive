@@ -1,4 +1,4 @@
-#include <filezilla.h>
+#include "filezilla.h"
 #ifdef _MSC_VER
 #pragma hdrstop
 #endif
@@ -18,7 +18,7 @@
 #include <wx/evtloop.h>
 
 #ifdef WITH_LIBDBUS
-#include <../dbus/session_manager.h>
+#include "../dbus/session_manager.h"
 #endif
 
 #if defined(__WXMAC__) || defined(__UNIX__)

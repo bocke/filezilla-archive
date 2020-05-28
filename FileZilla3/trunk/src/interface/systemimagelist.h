@@ -4,6 +4,8 @@
 #ifdef __WXMSW__
 #include <shellapi.h>
 #include <commctrl.h>
+#else
+#include <map>
 #endif
 
 enum class iconType

@@ -1,11 +1,11 @@
-#include <filezilla.h>
+#include "../filezilla.h"
 #include "../Options.h"
 #include "../sizeformatting.h"
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_transfer.h"
-#include "textctrlex.h"
-#include "wxext/spinctrlex.h"
+#include "../textctrlex.h"
+#include "../wxext/spinctrlex.h"
 
 #include <wx/statbox.h>
 

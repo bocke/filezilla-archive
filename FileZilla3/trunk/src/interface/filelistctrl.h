@@ -6,6 +6,7 @@
 #include "listingcomparison.h"
 
 #include <cstring>
+#include <deque>
 #include <memory>
 
 class CQueueView;

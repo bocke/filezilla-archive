@@ -1,16 +1,18 @@
-#include <filezilla.h>
+#include "filezilla.h"
 
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/iputils.hpp>
 #include <libfilezilla/translate.hpp>
 #include <libfilezilla/util.hpp>
-#include "engine_context.h"
-#include "netconfwizard.h"
-#include "Options.h"
+
+#include "../include/engine_context.h"
+#include "../include/externalipresolver.h"
+
 #include "dialogex.h"
 #include "filezillaapp.h"
-#include "externalipresolver.h"
+#include "netconfwizard.h"
+#include "Options.h"
 #include "xrc_helper.h"
 
 DECLARE_EVENT_TYPE(fzEVT_ON_EXTERNAL_IP_ADDRESS, -1)

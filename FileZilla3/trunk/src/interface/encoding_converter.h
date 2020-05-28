@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_ENCODING_CONVERTER_HEADER
 #define FILEZILLA_INTERFACE_ENCODING_CONVERTER_HEADER
 
-#include "engine_context.h"
+#include "../include/engine_context.h"
 
 #include <memory>
 

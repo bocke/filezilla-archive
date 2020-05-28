@@ -2,7 +2,8 @@
 
 noinst_LIBRARIES = libfzdbus.a
 
-libfzdbus_a_CPPFLAGS = $(LIBDBUS_CFLAGS) $(WX_CPPFLAGS) $(LIBFILEZILLA_CFLAGS)
+libfzdbus_a_CPPFLAGS = -I$(top_builddir)/config
+libfzdbus_a_CPPFLAGS += $(LIBDBUS_CFLAGS) $(WX_CPPFLAGS) $(LIBFILEZILLA_CFLAGS)
 libfzdbus_a_CXXFLAGS = $(WX_CXXFLAGS_ONLY)
 libfzdbus_a_CFLAGS = $(WX_CFLAGS_ONLY)
 

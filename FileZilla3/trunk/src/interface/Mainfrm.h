@@ -2,8 +2,8 @@
 #define FILEZILLA_INTERFACE_MAINFRM_HEADER
 
 #include "statusbar.h"
-#include "engine_context.h"
-#include "notification.h"
+#include "../include/engine_context.h"
+#include "../include/notification.h"
 #include "serverdata.h"
 
 #include <wx/timer.h>
