@@ -8,7 +8,7 @@
 
 #include <wx/osx/core/cfdataref.h>
 
-#include <CoreFoundation/CFUrl.h>
+#include <CoreFoundation/CFURL.h>
 
 class OSXSandboxUserdirs final
 {
