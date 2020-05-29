@@ -161,29 +161,40 @@ void CContextControl::CreateContextControls(CState& state)
 #else
 	const wxPoint initial_position(wxDefaultPosition);
 #endif
-
+	wxSize paneSizes[3] = { {-1, -1}, {-1, -1}, {-1, -1}};
 	std::tuple<double, int, int> splitterPositions;
 
 	if (!m_context_controls.empty()) {
 
-		splitterPositions = m_context_controls[m_current_context_controls].GetSplitterPositions();
-		m_context_controls[m_current_context_controls].pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
-		m_context_controls[m_current_context_controls].pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+		auto & currentControls = m_context_controls[m_current_context_controls];
+
+		if (currentControls.pViewSplitter) {
+			paneSizes[0] = currentControls.pViewSplitter->GetSize();
+		}
+		if (currentControls.pLocalSplitter) {
+			paneSizes[1] = currentControls.pLocalSplitter->GetSize();
+		}
+		if (currentControls.pRemoteSplitter) {
+			paneSizes[2] = currentControls.pRemoteSplitter->GetSize();
+		}
+
+		splitterPositions = currentControls.GetSplitterPositions();
+		currentControls.pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
+		currentControls.pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
 		
 		if (!m_tabs) {
 			m_tabs = new wxAuiNotebookEx();
 
-			wxSize splitter_size = m_context_controls[m_current_context_controls].pViewSplitter->GetSize();
-			m_tabs->Create(this, wxID_ANY, initial_position, splitter_size, wxNO_BORDER | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_WINDOWLIST_BUTTON | wxAUI_NB_CLOSE_ON_ALL_TABS | wxAUI_NB_TAB_MOVE);
+			m_tabs->Create(this, wxID_ANY, initial_position, paneSizes[0], wxNO_BORDER | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_WINDOWLIST_BUTTON | wxAUI_NB_CLOSE_ON_ALL_TABS | wxAUI_NB_TAB_MOVE);
 			m_tabs->SetExArtProvider();
 			m_tabs->SetSelectedFont(*wxNORMAL_FONT);
 			m_tabs->SetMeasuringFont(*wxNORMAL_FONT);
 
-			m_context_controls[m_current_context_controls].pViewSplitter->Reparent(m_tabs);
+			currentControls.pViewSplitter->Reparent(m_tabs);
 
-			m_tabs->AddPage(m_context_controls[m_current_context_controls].pViewSplitter, m_context_controls[m_current_context_controls].pState->GetTitle());
-			m_tabs->SetTabColour(0, m_context_controls[m_current_context_controls].pState->GetSite().m_colour);
-			ReplaceWindow(m_context_controls[m_current_context_controls].pViewSplitter, m_tabs);
+			m_tabs->AddPage(currentControls.pViewSplitter, currentControls.pState->GetTitle());
+			m_tabs->SetTabColour(0, currentControls.pState->GetSite().m_colour);
+			ReplaceWindow(currentControls.pViewSplitter, m_tabs);
 
 			m_tabs->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler(CContextControl::OnTabChanged), 0, this);
 			m_tabs->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, wxAuiNotebookEventHandler(CContextControl::OnTabClosing), 0, this);
@@ -203,14 +214,14 @@ void CContextControl::CreateContextControls(CState& state)
 	CContextControl::_context_controls context_controls;
 
 	context_controls.pState = &state;
-	context_controls.pViewSplitter = new CSplitterWindowEx(parent, -1, initial_position, wxDefaultSize, wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pViewSplitter = new CSplitterWindowEx(parent, -1, initial_position, paneSizes[0], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
 	context_controls.pViewSplitter->SetMinimumPaneSize(50, 100);
 	context_controls.pViewSplitter->SetSashGravity(0.5);
 
-	context_controls.pLocalSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pLocalSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, paneSizes[1], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
 	context_controls.pLocalSplitter->SetMinimumPaneSize(50, 100);
 
-	context_controls.pRemoteSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pRemoteSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, paneSizes[2], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
 	context_controls.pRemoteSplitter->SetMinimumPaneSize(50, 100);
 
 	context_controls.pLocalTreeViewPanel = new CView(context_controls.pLocalSplitter);
