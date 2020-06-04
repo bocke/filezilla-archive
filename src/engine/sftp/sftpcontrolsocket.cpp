@@ -140,7 +140,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 				DoClose(FZ_REPLY_INTERNALERROR);
 				break;
 			}
-			SendAsyncRequest(new CHostKeyNotification(message.text[0], port, m_sftpEncryptionDetails, message.type == sftpEvent::AskHostkeyChanged));
+			SendAsyncRequest(std::make_unique<CHostKeyNotification>(message.text[0], port, m_sftpEncryptionDetails, message.type == sftpEvent::AskHostkeyChanged));
 		}
 		break;
 	case sftpEvent::AskHostkeyBetteralg:
@@ -173,12 +173,12 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 				if (message.text[0] != L"Password:") {
 					challenge += message.text[0];
 				}
-				CInteractiveLoginNotification *pNotification = new CInteractiveLoginNotification(t, challenge, data.lastChallenge == challengeIdentifier);
-				pNotification->server = currentServer_;
-				pNotification->handle_ = handle_;
-				pNotification->credentials = credentials_;
+				auto notification = std::make_unique<CInteractiveLoginNotification>(t, challenge, data.lastChallenge == challengeIdentifier);
+				notification->server = currentServer_;
+				notification->handle_ = handle_;
+				notification->credentials = credentials_;
 
-				SendAsyncRequest(pNotification);
+				SendAsyncRequest(std::move(notification));
 			}
 			else {
 				if (!data.lastChallenge.empty() && data.lastChallengeType != CInteractiveLoginNotification::keyfile) {

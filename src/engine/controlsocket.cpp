@@ -391,37 +391,37 @@ int CControlSocket::CheckOverwriteFile()
 		}
 	}
 
-	CFileExistsNotification *pNotification = new CFileExistsNotification;
+	auto notification = std::make_unique<CFileExistsNotification>();
 
-	pNotification->download = data.download_;
-	pNotification->localFile = data.localFile_;
-	pNotification->remoteFile = data.remoteFile_;
-	pNotification->remotePath = data.remotePath_;
-	pNotification->localSize = data.localFileSize_;
-	pNotification->remoteSize = data.remoteFileSize_;
-	pNotification->remoteTime = data.fileTime_;
-	pNotification->ascii = !data.transferSettings_.binary;
+	notification->download = data.download_;
+	notification->localFile = data.localFile_;
+	notification->remoteFile = data.remoteFile_;
+	notification->remotePath = data.remotePath_;
+	notification->localSize = data.localFileSize_;
+	notification->remoteSize = data.remoteFileSize_;
+	notification->remoteTime = data.fileTime_;
+	notification->ascii = !data.transferSettings_.binary;
 
-	if (data.download_ && pNotification->localSize >= 0) {
-		pNotification->canResume = true;
+	if (data.download_ && notification->localSize >= 0) {
+		notification->canResume = true;
 	}
-	else if (!data.download_ && pNotification->remoteSize >= 0) {
-		pNotification->canResume = true;
+	else if (!data.download_ && notification->remoteSize >= 0) {
+		notification->canResume = true;
 	}
 	else {
-		pNotification->canResume = false;
+		notification->canResume = false;
 	}
 
-	pNotification->localTime = fz::local_filesys::get_modification_time(fz::to_native(data.localFile_));
+	notification->localTime = fz::local_filesys::get_modification_time(fz::to_native(data.localFile_));
 
 	if (found) {
-		if (pNotification->remoteTime.empty() && entry.has_date()) {
-			pNotification->remoteTime = entry.time;
+		if (notification->remoteTime.empty() && entry.has_date()) {
+			notification->remoteTime = entry.time;
 			data.fileTime_ = entry.time;
 		}
 	}
 
-	SendAsyncRequest(pNotification);
+	SendAsyncRequest(std::move(notification));
 
 	return FZ_REPLY_WOULDBLOCK;
 }
@@ -669,17 +669,17 @@ fz::duration CControlSocket::GetInferredTimezoneOffset() const
 	return ret;
 }
 
-void CControlSocket::SendAsyncRequest(CAsyncRequestNotification* pNotification)
+void CControlSocket::SendAsyncRequest(std::unique_ptr<CAsyncRequestNotification> && notification)
 {
-	assert(pNotification);
-	assert(!operations_.empty());
-
-	pNotification->requestNumber = engine_.GetNextAsyncRequestNumber();
+	if (!notification || operations_.empty()) {
+		return;
+	}
+	notification->requestNumber = engine_.GetNextAsyncRequestNumber();
 
 	if (!operations_.empty()) {
 		operations_.back()->waitForAsyncRequest = true;
 	}
-	engine_.AddNotification(pNotification);
+	engine_.AddNotification(std::move(notification));
 }
 
 // ------------------
@@ -1086,14 +1086,15 @@ void CControlSocket::CreateLocalDir(std::wstring const& local_file)
 		return;
 	}
 
-	CLocalPath last_successful;
-	local_path.Create(&last_successful);
+	fz::native_string last_created;
+	fz::mkdir(fz::to_native(local_path.GetPath()), true, false, &last_created);
 
-	if (!last_successful.empty()) {
+	if (!last_created.empty()) {
 		// Send out notification
-		CLocalDirCreatedNotification *n = new CLocalDirCreatedNotification;
-		n->dir = last_successful;
-		engine_.AddNotification(n);
+		auto n = std::make_unique<CLocalDirCreatedNotification>();
+		if (n->dir.SetPath(fz::to_wstring(last_created))) {
+			engine_.AddNotification(std::move(n));
+		}
 	}
 }
 
@@ -1161,7 +1162,7 @@ void CControlSocket::SendDirectoryListingNotification(CServerPath const& path, b
 		return;
 	}
 
-	engine_.AddNotification(new CDirectoryListingNotification(path, operations_.size() == 1 && operations_.back()->opId == Command::list, failed));
+	engine_.AddNotification(std::make_unique<CDirectoryListingNotification>(path, operations_.size() == 1 && operations_.back()->opId == Command::list, failed));
 }
 
 void CControlSocket::CallSetAsyncRequestReply(CAsyncRequestNotification *pNotification)

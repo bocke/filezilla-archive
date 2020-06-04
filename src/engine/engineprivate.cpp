@@ -143,9 +143,11 @@ bool CFileZillaEnginePrivate::IsConnected() const
 	return controlSocket_ != nullptr;
 }
 
-void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock& lock, CNotification *pNotification)
+void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification)
 {
-	m_NotificationList.push_back(pNotification);
+	if (notification) {
+		m_NotificationList.push_back(notification.release());
+	}
 
 	if (m_maySendNotificationEvent) {
 		m_maySendNotificationEvent = false;
@@ -154,32 +156,32 @@ void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock& lock, CNotificati
 	}
 }
 
-void CFileZillaEnginePrivate::AddNotification(CNotification *pNotification)
+void CFileZillaEnginePrivate::AddNotification(std::unique_ptr<CNotification> && notification)
 {
 	fz::scoped_lock lock(notification_mutex_);
-	AddNotification(lock, pNotification);
+	AddNotification(lock, std::move(notification));
 }
 
-void CFileZillaEnginePrivate::AddLogNotification(CLogmsgNotification *pNotification)
+void CFileZillaEnginePrivate::AddLogNotification(std::unique_ptr<CLogmsgNotification> && notification)
 {
 	fz::scoped_lock lock(notification_mutex_);
 
-	if (pNotification->msgType == logmsg::error) {
+	if (notification->msgType == logmsg::error) {
 		queue_logs_ = false;
 
 		m_NotificationList.insert(m_NotificationList.end(), queued_logs_.begin(), queued_logs_.end());
 		queued_logs_.clear();
-		AddNotification(lock, pNotification);
+		AddNotification(lock, std::move(notification));
 	}
-	else if (pNotification->msgType == logmsg::status) {
+	else if (notification->msgType == logmsg::status) {
 		ClearQueuedLogs(lock, false);
-		AddNotification(lock, pNotification);
+		AddNotification(lock, std::move(notification));
 	}
 	else if (!queue_logs_) {
-		AddNotification(lock, pNotification);
+		AddNotification(lock, std::move(notification));
 	}
 	else {
-		queued_logs_.push_back(pNotification);
+		queued_logs_.push_back(notification.release());
 	}
 }
 
@@ -255,10 +257,7 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 			}
 		}
 
-		COperationNotification *notification = new COperationNotification();
-		notification->nReplyCode = nErrorCode;
-		notification->commandId = currentCommand_->GetId();
-		AddNotification(notification);
+		AddNotification(std::make_unique<COperationNotification>(nErrorCode, currentCommand_->GetId()));
 
 		currentCommand_.reset();
 	}
@@ -351,8 +350,7 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 					}
 					else {
 						if (!avoid) {
-							CDirectoryListingNotification *pNotification = new CDirectoryListingNotification(pListing->path, true);
-							AddNotification(pNotification);
+							AddNotification(std::make_unique<CDirectoryListingNotification>(pListing->path, true));
 						}
 						delete pListing;
 						return FZ_REPLY_OK;
@@ -697,10 +695,7 @@ void CFileZillaEnginePrivate::DoCancel()
 		m_retryTimer = 0;
 
 		logger_->log(logmsg::error, _("Connection attempt interrupted by user"));
-		COperationNotification *notification = new COperationNotification();
-		notification->nReplyCode = FZ_REPLY_DISCONNECTED | FZ_REPLY_CANCELED;
-		notification->commandId = Command::connect;
-		AddNotification(notification);
+		AddNotification(std::make_unique<COperationNotification>(FZ_REPLY_DISCONNECTED | FZ_REPLY_CANCELED, Command::connect));
 
 		ClearQueuedLogs(true);
 	}
@@ -800,7 +795,7 @@ void CFileZillaEnginePrivate::SetActive(int direction)
 {
 	int const old_status = m_activeStatus[direction].fetch_or(0x1);
 	if (!old_status) {
-		AddNotification(new CActiveNotification(direction));
+		AddNotification(std::make_unique<CActiveNotification>(direction));
 	}
 }
 
@@ -882,7 +877,7 @@ void CTransferStatusManager::Reset()
 		send_state_ = 0;
 	}
 
-	engine_.AddNotification(new CTransferStatusNotification());
+	engine_.AddNotification(std::make_unique<CTransferStatusNotification>());
 }
 
 void CTransferStatusManager::Init(int64_t totalSize, int64_t startOffset, bool list)
@@ -918,7 +913,7 @@ void CTransferStatusManager::SetMadeProgress()
 
 void CTransferStatusManager::Update(int64_t transferredBytes)
 {
-	CNotification* notification = nullptr;
+	std::unique_ptr<CNotification> notification;
 
 	{
 		int64_t oldOffset = currentOffset_.fetch_add(transferredBytes);
@@ -930,14 +925,14 @@ void CTransferStatusManager::Update(int64_t transferredBytes)
 
 			if (!send_state_) {
 				status_.currentOffset += currentOffset_.exchange(0);
-				notification = new CTransferStatusNotification(status_);
+				notification = std::make_unique<CTransferStatusNotification>(status_);
 			}
 			send_state_ = 2;
 		}
 	}
 
 	if (notification) {
-		engine_.AddNotification(notification);
+		engine_.AddNotification(std::move(notification));
 	}
 }
 
