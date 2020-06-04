@@ -61,7 +61,7 @@ public:
 	int CacheLookup(CServerPath const& path, CDirectoryListing& listing);
 
 private:
-	CFileZillaEnginePrivate* const impl_;
+	std::unique_ptr<CFileZillaEnginePrivate> impl_;
 };
 
 #endif
