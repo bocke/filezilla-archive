@@ -87,7 +87,7 @@ wxTextEntry* GetSpecialTextEntry(wxWindow* w, wxChar cmd)
 {
 	if (cmd == 'A' || cmd == 'V') {
 		wxTextCtrl* text = dynamic_cast<wxTextCtrl*>(w);
-		if (text && text->GetWindowStyle() & wxTE_PASSWORD) {
+		if (text) {
 			return text;
 		}
 	}

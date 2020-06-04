@@ -20,6 +20,8 @@ std::vector<wxDialogEx*> wxDialogEx::shown_dialogs_;
 std::vector<void*> wxDialogEx::shown_dialogs_creation_events_;
 
 static int const pasteId = wxNewId();
+static int const copyId = wxNewId();
+static int const cutId = wxNewId();
 static int const selectAllId = wxNewId();
 
 extern wxTextEntry* GetSpecialTextEntry(wxWindow*, wxChar);
@@ -33,6 +35,14 @@ bool wxDialogEx::ProcessEvent(wxEvent& event)
 	wxTextEntry* e = GetSpecialTextEntry(FindFocus(), 'V');
 	if (e && event.GetId() == pasteId) {
 		e->Paste();
+		return true;
+	}
+	else if (e && event.GetId() == copyId) {
+		e->Copy();
+		return true;
+	}
+	else if (e && event.GetId() == cutId) {
+		e->Cut();
 		return true;
 	}
 	else if (e && event.GetId() == selectAllId) {
@@ -358,6 +368,8 @@ std::wstring LabelEscape(std::wstring const& label)
 void FixPasswordPaste(std::vector<wxAcceleratorEntry> & entries)
 {
 	entries.emplace_back(wxACCEL_CMD, 'V', pasteId);
+	entries.emplace_back(wxACCEL_CMD, 'C', copyId);
+	entries.emplace_back(wxACCEL_CMD, 'X', cutId);
 	entries.emplace_back(wxACCEL_CMD, 'A', selectAllId);
 }
 #endif
