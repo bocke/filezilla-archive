@@ -13,7 +13,7 @@ filezilla_DEPENDENCIES =
 
 if MACAPPBUNDLE
 noinst_LIBRARIES = libfzmac.a
-libfzmac_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzmac_a_CPPFLAGS = $(LIBFILEZILLA_CFLAGS)
 libfzmac_a_OBJCXXFLAGS = -std=c++17
 libfzmac_a_SOURCES = file_utils_osx.mm power_management_osx.mm
 filezilla_DEPENDENCIES += libfzmac.a
