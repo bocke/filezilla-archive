@@ -506,8 +506,8 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 
 	UpdaterState s = UpdaterState::failed;
 
-	int res = operation.nReplyCode;
-	if (res == FZ_REPLY_OK || (operation.commandId == Command::disconnect && res & FZ_REPLY_DISCONNECTED)) {
+	int res = operation.replyCode_;
+	if (res == FZ_REPLY_OK || (operation.commandId_ == Command::disconnect && res & FZ_REPLY_DISCONNECTED)) {
 		pending_commands_.pop_front();
 		res = ContinueDownload();
 		if (res == FZ_REPLY_WOULDBLOCK) {

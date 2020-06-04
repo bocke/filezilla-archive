@@ -150,7 +150,7 @@ int CSftpConnectOpData::ParseResponse()
 		}
 		break;
 	case connect_open:
-		engine_.AddNotification(new CSftpEncryptionNotification(controlSocket_.m_sftpEncryptionDetails));
+		engine_.AddNotification(std::make_unique<CSftpEncryptionNotification>(controlSocket_.m_sftpEncryptionDetails));
 		return FZ_REPLY_OK;
 	default:
 		log(logmsg::debug_warning, L"Unknown op state: %d", opState);

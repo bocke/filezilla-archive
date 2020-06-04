@@ -79,9 +79,9 @@ public:
 	void SetActive(int direction);
 
 	// Add new pending notification
-	void AddNotification(fz::scoped_lock& lock, CNotification *pNotification); // note: Unlocks the mutex!
-	void AddNotification(CNotification *pNotification);
-	void AddLogNotification(CLogmsgNotification *pNotification);
+	void AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification); // note: Unlocks the mutex!
+	void AddNotification(std::unique_ptr<CNotification> && notification);
+	void AddLogNotification(std::unique_ptr<CLogmsgNotification> && notification);
 	std::unique_ptr<CNotification> GetNextNotification();
 
 	COptionsBase& GetOptions() { return m_options; }

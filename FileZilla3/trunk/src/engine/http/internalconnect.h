@@ -38,7 +38,7 @@ public:
 			return;
 		}
 
-		controlSocket_.SendAsyncRequest(new CCertificateNotification(std::move(info)));
+		controlSocket_.SendAsyncRequest(std::make_unique<CCertificateNotification>(std::move(info)));
 	}
 
 	virtual int Send() override;

@@ -133,8 +133,7 @@ int CFtpLogonOpData::Send()
 			return FZ_REPLY_CONTINUE;
 		}
 		else {
-			auto notification = new CInsecureConnectionNotification(currentServer_);
-			controlSocket_.SendAsyncRequest(notification);
+			controlSocket_.SendAsyncRequest(std::make_unique<CInsecureConnectionNotification>(currentServer_));
 			return FZ_REPLY_WOULDBLOCK;
 		}
 	case LOGON_SYST:
@@ -159,13 +158,13 @@ int CFtpLogonOpData::Send()
 				}
 			case loginCommandType::pass:
 				if (!challenge.empty()) {
-					CInteractiveLoginNotification *pNotification = new CInteractiveLoginNotification(CInteractiveLoginNotification::interactive, challenge, false);
-					pNotification->server = currentServer_;
-					pNotification->handle_ = controlSocket_.handle_;
-					pNotification->credentials = controlSocket_.credentials_;
+					auto notification = std::make_unique<CInteractiveLoginNotification>(CInteractiveLoginNotification::interactive, challenge, false);
+					notification->server = currentServer_;
+					notification->handle_ = controlSocket_.handle_;
+					notification->credentials = controlSocket_.credentials_;
 					challenge.clear();
 
-					controlSocket_.SendAsyncRequest(pNotification);
+					controlSocket_.SendAsyncRequest(std::move(notification));
 
 					return FZ_REPLY_WOULDBLOCK;
 				}

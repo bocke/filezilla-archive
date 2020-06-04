@@ -214,7 +214,7 @@ int CHttpFileTransferOpData::OnData(unsigned char const* data, unsigned int len)
 	if (localFile_.empty()) {
 		char* q = new char[len];
 		memcpy(q, data, len);
-		engine_.AddNotification(new CDataNotification(q, len));
+		engine_.AddNotification(std::make_unique<CDataNotification>(q, len));
 	}
 	else {
 		assert(file_.opened());

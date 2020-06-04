@@ -20,7 +20,7 @@ public:
 	virtual void do_log(logmsg::type t, std::wstring&& msg) override final {
 		auto now = fz::datetime::now();
 		LogToFile(t, msg, now);
-		engine_.AddLogNotification(new CLogmsgNotification(t, msg, now));
+		engine_.AddLogNotification(std::make_unique<CLogmsgNotification>(t, msg, now));
 	}
 	
 	void UpdateLogLevel(COptionsBase & options);

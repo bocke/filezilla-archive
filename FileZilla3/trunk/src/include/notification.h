@@ -115,8 +115,14 @@ public:
 class COperationNotification final : public CNotificationHelper<nId_operation>
 {
 public:
-	int nReplyCode{};
-	Command commandId{Command::none};
+	COperationNotification() = default;
+	COperationNotification(int replyCode, Command commandId)
+		: replyCode_(replyCode)
+		, commandId_(commandId)
+	{}
+
+	int replyCode_{};
+	Command commandId_{Command::none};
 };
 
 // You get this type of notification everytime a directory listing has been

@@ -136,7 +136,7 @@ void CCommandQueue::Finish(std::unique_ptr<COperationNotification> && pNotificat
 		return;
 	}
 
-	ProcessReply(pNotification->nReplyCode, pNotification->commandId);
+	ProcessReply(pNotification->replyCode_, pNotification->commandId_);
 }
 
 void CCommandQueue::ProcessReply(int nReplyCode, Command commandId)

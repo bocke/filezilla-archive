@@ -224,7 +224,7 @@ public:
 
 	Command GetCurrentCommandId() const;
 
-	void SendAsyncRequest(CAsyncRequestNotification* pNotification);
+	void SendAsyncRequest(std::unique_ptr<CAsyncRequestNotification> && notification);
 	void CallSetAsyncRequestReply(CAsyncRequestNotification *pNotification);
 	bool SetFileExistsAction(CFileExistsNotification *pFileExistsNotification);
 

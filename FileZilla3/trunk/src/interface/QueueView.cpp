@@ -762,13 +762,13 @@ bool CQueueView::TryStartNextTransfer()
 
 void CQueueView::ProcessReply(t_EngineData* pEngineData, COperationNotification const& notification)
 {
-	wxASSERT(notification.commandId != ::Command::none);
+	wxASSERT(notification.commandId_ != ::Command::none);
 
 	// Cancel pending requests
 	m_pAsyncRequestQueue->ClearPending(pEngineData->pEngine);
 
 	// Process reply from the engine
-	int replyCode = notification.nReplyCode;
+	int replyCode = notification.replyCode_;
 
 	if ((replyCode & FZ_REPLY_CANCELED) == FZ_REPLY_CANCELED) {
 		ResetReason reason;

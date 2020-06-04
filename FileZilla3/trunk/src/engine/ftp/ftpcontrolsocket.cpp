@@ -805,7 +805,7 @@ void CFtpControlSocket::OnVerifyCert(fz::tls_layer* source, fz::tls_session_info
 		return;
 	}
 
-	SendAsyncRequest(new CCertificateNotification(std::move(info)));
+	SendAsyncRequest(std::make_unique<CCertificateNotification>(std::move(info)));
 }
 
 void CFtpControlSocket::Push(std::unique_ptr<COpData> && pNewOpData)
