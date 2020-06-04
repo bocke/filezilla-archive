@@ -4,13 +4,13 @@
 #include "filezilla.h"
 
 CFileZillaEngine::CFileZillaEngine(CFileZillaEngineContext& engine_context, EngineNotificationHandler& notificationHandler)
-	: impl_(new CFileZillaEnginePrivate(engine_context, *this, notificationHandler))
+	: impl_(std::make_unique<CFileZillaEnginePrivate>(engine_context, *this, notificationHandler))
 {
 }
 
 CFileZillaEngine::~CFileZillaEngine()
 {
-	delete impl_;
+	impl_.reset();
 }
 
 int CFileZillaEngine::Execute(const CCommand &command)

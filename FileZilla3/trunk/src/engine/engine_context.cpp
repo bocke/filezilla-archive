@@ -89,7 +89,7 @@ void CFileZillaEngineContext::Impl::OnOptionsChanged(changed_options_t const&)
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
 : options_(options)
 , customEncodingConverter_(customEncodingConverter)
-, impl_(new Impl(options))
+, impl_(std::make_unique<Impl>(options))
 {
 }
 

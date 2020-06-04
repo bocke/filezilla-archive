@@ -341,25 +341,23 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 				}
 			}
 			if (!path.empty()) {
-				CDirectoryListing *pListing = new CDirectoryListing;
+				CDirectoryListing listing;
 				bool is_outdated = false;
-				bool found = directory_cache_.Lookup(*pListing, server, path, true, is_outdated);
+				bool found = directory_cache_.Lookup(listing, server, path, true, is_outdated);
 				if (found && !is_outdated) {
-					if (pListing->get_unsure_flags()) {
+					if (listing.get_unsure_flags()) {
 						flags |= LIST_FLAG_REFRESH;
 					}
 					else {
 						if (!avoid) {
-							AddNotification(std::make_unique<CDirectoryListingNotification>(pListing->path, true));
+							AddNotification(std::make_unique<CDirectoryListingNotification>(listing.path, true));
 						}
-						delete pListing;
 						return FZ_REPLY_OK;
 					}
 				}
 				if (is_outdated) {
 					flags |= LIST_FLAG_REFRESH;
 				}
-				delete pListing;
 			}
 		}
 	}
@@ -572,7 +570,7 @@ void CFileZillaEnginePrivate::InvalidateCurrentWorkingDirs(const CServerPath& pa
 			continue;
 		}
 
-		engine->send_event(new CInvalidateCurrentWorkingDirEvent(ownServer, path));
+		engine->send_event<CInvalidateCurrentWorkingDirEvent>(ownServer, path);
 	}
 }
 
