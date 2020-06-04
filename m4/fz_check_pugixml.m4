@@ -53,20 +53,20 @@ AC_DEFUN([FZ_CHECK_PUGIXML], [
   fi
 
   if test "x$with_pugixml" != "xbuiltin"; then
-    dnl Check for at least version 1.5
-    AC_MSG_CHECKING([for pugixml >= 1.5])
+    dnl Check for at least version 1.9
+    AC_MSG_CHECKING([for pugixml >= 1.9])
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM([
         #include <pugixml.hpp>
       ],[
-          static_assert(PUGIXML_VERSION >= 150, "Need at least pugixml 1.5");
+          static_assert(PUGIXML_VERSION >= 190, "Need at least pugixml 1.9");
       ])
     ],[
       AC_MSG_RESULT([yes])
     ],[
       AC_MSG_RESULT([no])
         if test "x$with_pugixml" = "xsystem"; then
-          AC_MSG_ERROR([pugixml system library is too old, you need at least version 1.5])
+          AC_MSG_ERROR([pugixml system library is too old, you need at least version 1.9])
         else
           with_pugixml=builtin
         fi
