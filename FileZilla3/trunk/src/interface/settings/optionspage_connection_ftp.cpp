@@ -80,7 +80,7 @@ bool COptionsPageConnectionFTP::LoadPage()
 bool COptionsPageConnectionFTP::SavePage()
 {
 	m_pOptions->SetOption(OPTION_USEPASV, impl_->passive_->GetValue() ? 1 : 0);
-	m_pOptions->SetOption(OPTION_ALLOW_TRANSFERMODEFALLBACK, impl_->fallback_ ? 1 : 0);
-	m_pOptions->SetOption(OPTION_FTP_SENDKEEPALIVE, impl_->keepalive_ ? 1 : 0);
+	m_pOptions->SetOption(OPTION_ALLOW_TRANSFERMODEFALLBACK, impl_->fallback_->GetValue() ? 1 : 0);
+	m_pOptions->SetOption(OPTION_FTP_SENDKEEPALIVE, impl_->keepalive_->GetValue() ? 1 : 0);
 	return true;
 }
