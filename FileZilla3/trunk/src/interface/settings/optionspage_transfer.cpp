@@ -6,6 +6,7 @@
 #include "optionspage_transfer.h"
 #include "../textctrlex.h"
 #include "../wxext/spinctrlex.h"
+#include "../xrc_helper.h"
 
 #include <wx/statbox.h>
 
@@ -112,55 +113,55 @@ bool COptionsPageTransfer::LoadPage()
 {
 	bool failure = false;
 
-	bool enable_speedlimits = m_pOptions->GetOptionVal(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	bool enable_speedlimits = m_pOptions->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 	SetCheck(XRCID("ID_ENABLE_SPEEDLIMITS"), enable_speedlimits, failure);
 
 	wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
 	if (!pTextCtrl) {
 		return false;
 	}
-	pTextCtrl->ChangeValue(m_pOptions->GetOption(OPTION_SPEEDLIMIT_INBOUND));
+	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_INBOUND));
 	pTextCtrl->Enable(enable_speedlimits);
 
 	pTextCtrl = XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl);
 	if (!pTextCtrl) {
 		return false;
 	}
-	pTextCtrl->ChangeValue(m_pOptions->GetOption(OPTION_SPEEDLIMIT_OUTBOUND));
+	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_OUTBOUND));
 	pTextCtrl->Enable(enable_speedlimits);
 
-	XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->SetValue(m_pOptions->GetOptionVal(OPTION_NUMTRANSFERS));
-	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->SetValue(m_pOptions->GetOptionVal(OPTION_CONCURRENTDOWNLOADLIMIT));
-	XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->SetValue(m_pOptions->GetOptionVal(OPTION_CONCURRENTUPLOADLIMIT));
+	XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_NUMTRANSFERS));
+	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_CONCURRENTDOWNLOADLIMIT));
+	XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_CONCURRENTUPLOADLIMIT));
 
-	SetChoice(XRCID("ID_BURSTTOLERANCE"), m_pOptions->GetOptionVal(OPTION_SPEEDLIMIT_BURSTTOLERANCE), failure);
+	SetChoice(XRCID("ID_BURSTTOLERANCE"), m_pOptions->get_int(OPTION_SPEEDLIMIT_BURSTTOLERANCE), failure);
 	XRCCTRL(*this, "ID_BURSTTOLERANCE", wxChoice)->Enable(enable_speedlimits);
 
 	pTextCtrl = XRCCTRL(*this, "ID_REPLACE", wxTextCtrl);
-	pTextCtrl->ChangeValue(m_pOptions->GetOption(OPTION_INVALID_CHAR_REPLACE));
+	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_INVALID_CHAR_REPLACE));
 
 	SetCheckFromOption(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE, failure);
 
-	SetCheckFromOption(XRCID("ID_PREALLOCATE"), OPTION_PREALLOCATE_SPACE, failure);
+	xrc_call(*this, "ID_PREALLOCATE", &wxCheckBox::SetValue, m_pOptions->get_bool(OPTION_PREALLOCATE_SPACE));
 
 	return !failure;
 }
 
 bool COptionsPageTransfer::SavePage()
 {
-	SetOptionFromCheck(XRCID("ID_ENABLE_SPEEDLIMITS"), OPTION_SPEEDLIMIT_ENABLE);
+	m_pOptions->set(OPTION_SPEEDLIMIT_ENABLE, xrc_call(*this, "ID_ENABLE_SPEEDLIMITS", &wxCheckBox::GetValue));
 
-	m_pOptions->SetOption(OPTION_NUMTRANSFERS,				XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->GetValue());
-	m_pOptions->SetOption(OPTION_CONCURRENTDOWNLOADLIMIT,	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->GetValue());
-	m_pOptions->SetOption(OPTION_CONCURRENTUPLOADLIMIT,		XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->GetValue());
+	m_pOptions->set(OPTION_NUMTRANSFERS,				XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->GetValue());
+	m_pOptions->set(OPTION_CONCURRENTDOWNLOADLIMIT,	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->GetValue());
+	m_pOptions->set(OPTION_CONCURRENTUPLOADLIMIT,		XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->GetValue());
 
-	SetOptionFromText(XRCID("ID_DOWNLOADLIMIT"), OPTION_SPEEDLIMIT_INBOUND);
-	SetOptionFromText(XRCID("ID_UPLOADLIMIT"), OPTION_SPEEDLIMIT_OUTBOUND);
-	m_pOptions->SetOption(OPTION_SPEEDLIMIT_BURSTTOLERANCE, GetChoice(XRCID("ID_BURSTTOLERANCE")));
+	m_pOptions->set(OPTION_SPEEDLIMIT_INBOUND, xrc_call(*this, "ID_DOWNLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_SPEEDLIMIT_OUTBOUND, xrc_call(*this, "ID_UPLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_SPEEDLIMIT_BURSTTOLERANCE, GetChoice(XRCID("ID_BURSTTOLERANCE")));
 	SetOptionFromText(XRCID("ID_REPLACE"), OPTION_INVALID_CHAR_REPLACE);
 	SetOptionFromCheck(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE);
 
-	SetOptionFromCheck(XRCID("ID_PREALLOCATE"), OPTION_PREALLOCATE_SPACE);
+	m_pOptions->set(OPTION_PREALLOCATE_SPACE, xrc_call(*this, "ID_PREALLOCATE", &wxCheckBox::GetValue));
 
 	return true;
 }

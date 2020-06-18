@@ -361,7 +361,7 @@ CRemoteListView::CRemoteListView(CView* pParent, CState& state, CQueueView* pQue
 CRemoteListView::~CRemoteListView()
 {
 	wxString str = wxString::Format(_T("%d %d"), m_sortDirection, m_sortColumn);
-	COptions::Get()->SetOption(OPTION_REMOTEFILELIST_SORTORDER, str.ToStdWstring());
+	COptions::Get()->set(OPTION_REMOTEFILELIST_SORTORDER, str.ToStdWstring());
 }
 
 // See comment to OnGetItemText
@@ -876,7 +876,7 @@ std::wstring StripVMSRevision(std::wstring const& name)
 
 void CRemoteListView::OnItemActivated(wxListEvent &event)
 {
-	int const action = COptions::Get()->GetOptionVal(OPTION_DOUBLECLICK_ACTION_DIRECTORY);
+	int const action = COptions::Get()->get_int(OPTION_DOUBLECLICK_ACTION_DIRECTORY);
 	if (!m_state.IsRemoteIdle(action ? false : true)) {
 		wxBell();
 		return;
@@ -961,7 +961,7 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 			}
 		}
 		else {
-			const int action = COptions::Get()->GetOptionVal(OPTION_DOUBLECLICK_ACTION_FILE);
+			const int action = COptions::Get()->get_int(OPTION_DOUBLECLICK_ACTION_FILE);
 			if (action == 3) {
 				// No action
 				wxBell();
@@ -984,7 +984,7 @@ void CRemoteListView::OnItemActivated(wxListEvent &event)
 			}
 
 			std::wstring localFile = CQueueView::ReplaceInvalidCharacters(name);
-			if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->GetOptionVal(OPTION_STRIP_VMS_REVISION)) {
+			if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION)) {
 				localFile = StripVMSRevision(localFile);
 			}
 			m_pQueue->QueueFile(queue_only, true, name,
@@ -1286,7 +1286,7 @@ void CRemoteListView::TransferSelectedFiles(const CLocalPath& local_parent, bool
 		}
 		else {
 			std::wstring localFile = CQueueView::ReplaceInvalidCharacters(name);
-			if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->GetOptionVal(OPTION_STRIP_VMS_REVISION)) {
+			if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION)) {
 				localFile = StripVMSRevision(localFile);
 			}
 			m_pQueue->QueueFile(queue_only, true,
@@ -2166,7 +2166,7 @@ void CRemoteListView::SetInfoText()
 
 void CRemoteListView::OnBeginDrag(wxListEvent&)
 {
-	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
 		return;
 	}
 
@@ -2631,7 +2631,7 @@ void CRemoteListView::LinkIsNotDir(CServerPath const& path, std::wstring const& 
 {
 	if (m_pLinkResolveState && m_pLinkResolveState->remote_path == path && m_pLinkResolveState->link == link) {
 		std::wstring localFile = CQueueView::ReplaceInvalidCharacters(link);
-		if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->GetOptionVal(OPTION_STRIP_VMS_REVISION)) {
+		if (m_pDirectoryListing->path.GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION)) {
 			localFile = StripVMSRevision(localFile);
 		}
 		m_pQueue->QueueFile(false, true,

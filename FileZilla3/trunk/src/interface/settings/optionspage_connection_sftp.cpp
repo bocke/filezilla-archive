@@ -91,7 +91,7 @@ bool COptionsPageConnectionSFTP::LoadPage()
 	size.x = 1;
 	impl_->keys_->SetMinSize(size);
 
-	std::wstring keyFiles = m_pOptions->GetOption(OPTION_SFTP_KEYFILES);
+	std::wstring keyFiles = m_pOptions->get_string(OPTION_SFTP_KEYFILES);
 	auto tokens = fz::strtok(keyFiles, L"\r\n");
 	for (auto const& token : tokens) {
 		AddKey(token, true);
@@ -101,7 +101,7 @@ bool COptionsPageConnectionSFTP::LoadPage()
 
 	SetCtrlState();
 
-	impl_->compression_->SetValue(m_pOptions->GetOptionVal(OPTION_SFTP_COMPRESSION) != 0);
+	impl_->compression_->SetValue(m_pOptions->get_int(OPTION_SFTP_COMPRESSION) != 0);
 
 	return !failure;
 }
@@ -117,10 +117,10 @@ bool COptionsPageConnectionSFTP::SavePage()
 			}
 			keyFiles += impl_->keys_->GetItemText(i).ToStdWstring();
 		}
-		m_pOptions->SetOption(OPTION_SFTP_KEYFILES, keyFiles);
+		m_pOptions->set(OPTION_SFTP_KEYFILES, keyFiles);
 	}
 
-	m_pOptions->SetOption(OPTION_SFTP_COMPRESSION, impl_->compression_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_SFTP_COMPRESSION, impl_->compression_->GetValue() ? 1 : 0);
 
 	return true;
 }

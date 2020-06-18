@@ -135,7 +135,7 @@ bool CSettingsDialog::LoadPages()
 	AddPage(_("File editing"), new COptionsPageEdit, 0);
 	AddPage(_("Filetype associations"), new COptionsPageEditAssociations, 1);
 #if FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
-	if (!m_pOptions->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK)) {
+	if (!m_pOptions->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK)) {
 		AddPage(_("Updates"), new COptionsPageUpdateCheck, 0);
 	}
 #endif //FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
@@ -286,7 +286,7 @@ void CSettingsDialog::OnCancel(wxCommandEvent&)
 	EndModal(wxID_CANCEL);
 
 	for (auto const& saved : m_oldValues) {
-		m_pOptions->SetOption(saved.first, saved.second);
+		m_pOptions->set(saved.first, saved.second);
 	}
 }
 
@@ -301,7 +301,7 @@ void CSettingsDialog::OnPageChanging(wxTreeEvent& event)
 	}
 }
 
-void CSettingsDialog::RememberOldValue(int option)
+void CSettingsDialog::RememberOldValue(interfaceOptions option)
 {
-	m_oldValues[option] = m_pOptions->GetOption(option);
+	m_oldValues[option] = m_pOptions->get_string(option);
 }

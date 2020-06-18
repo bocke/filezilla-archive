@@ -2,65 +2,75 @@
 #include "timeformatting.h"
 #include "Options.h"
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 namespace {
 
-class Impl : public COptionChangeEventHandler
+class Impl final : public wxEvtHandler, public COptionChangeEventHandler
 {
 public:
 	Impl()
+		: COptionChangeEventHandler(this)
 	{
 		InitFormat();
 
-		RegisterOption(OPTION_DATE_FORMAT);
-		RegisterOption(OPTION_TIME_FORMAT);
+		COptions::Get()->watch(OPTION_DATE_FORMAT, this);
+		COptions::Get()->watch(OPTION_TIME_FORMAT, this);
+	}
+
+	~Impl()
+	{
+		//COptions::Get()->unwatch_all(this);
 	}
 
 	void InitFormat()
 	{
-		wxString dateFormat = COptions::Get()->GetOption(OPTION_DATE_FORMAT);
-		wxString timeFormat = COptions::Get()->GetOption(OPTION_TIME_FORMAT);
+		std::wstring dateFormat = COptions::Get()->get_string(OPTION_DATE_FORMAT);
+		std::wstring timeFormat = COptions::Get()->get_string(OPTION_TIME_FORMAT);
 
-		if (dateFormat == _T("1"))
-			m_dateFormat = _T("%Y-%m-%d");
+		if (dateFormat == L"1") {
+			m_dateFormat = L"%Y-%m-%d";
+		}
 		else if (!dateFormat.empty() && dateFormat[0] == '2') {
-			dateFormat = dateFormat.Mid(1);
-			if (fz::datetime::verify_format(dateFormat.ToStdWstring())) {
+			dateFormat = dateFormat.substr(1);
+			if (fz::datetime::verify_format(dateFormat)) {
 				m_dateFormat = dateFormat;
 			}
 			else {
-				m_dateFormat = _T("%x");
+				m_dateFormat = L"%x";
 			}
 		}
-		else
-			m_dateFormat = _T("%x");
+		else {
+			m_dateFormat = L"%x";
+		}
 
 		m_dateTimeFormat = m_dateFormat;
 		m_dateTimeFormat += ' ';
 
-		if (timeFormat == _T("1"))
-			m_dateTimeFormat += _T("%H:%M");
+		if (timeFormat == L"1") {
+			m_dateTimeFormat += L"%H:%M";
+		}
 		else if (!timeFormat.empty() && timeFormat[0] == '2') {
-			timeFormat = timeFormat.Mid(1);
-			if (fz::datetime::verify_format(timeFormat.ToStdWstring())) {
+			timeFormat = timeFormat.substr(1);
+			if (fz::datetime::verify_format(timeFormat)) {
 				m_dateTimeFormat += timeFormat;
 			}
 			else {
-				m_dateTimeFormat += _T("%X");
+				m_dateTimeFormat += L"%X";
 			}
 		}
-		else
-			m_dateTimeFormat += _T("%X");
+		else {
+			m_dateTimeFormat += L"%X";
+		}
 	}
 
-	virtual void OnOptionsChanged(changed_options_t const&)
+	virtual void OnOptionsChanged(watched_options const&)
 	{
 		InitFormat();
 	}
 
-	wxString m_dateFormat;
-	wxString m_dateTimeFormat;
+	std::wstring m_dateFormat;
+	std::wstring m_dateTimeFormat;
 };
 
 Impl& GetImpl()
@@ -88,12 +98,12 @@ wxString CTimeFormat::FormatDateTime(fz::datetime const& time)
 {
 	Impl& impl = GetImpl();
 
-	return time.format(impl.m_dateTimeFormat.ToStdWstring(), fz::datetime::local);
+	return time.format(impl.m_dateTimeFormat, fz::datetime::local);
 }
 
 wxString CTimeFormat::FormatDate(fz::datetime const& time)
 {
 	Impl& impl = GetImpl();
 
-	return time.format(impl.m_dateFormat.ToStdWstring(), fz::datetime::local);
+	return time.format(impl.m_dateFormat, fz::datetime::local);
 }

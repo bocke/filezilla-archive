@@ -79,7 +79,6 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>filezilla.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -136,6 +135,7 @@
     <ClCompile Include="directorylistingparser.cpp" />
     <ClCompile Include="engineprivate.cpp" />
     <ClCompile Include="engine_context.cpp" />
+    <ClCompile Include="engine_options.cpp" />
     <ClCompile Include="externalipresolver.cpp" />
     <ClCompile Include="FileZillaEngine.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -165,7 +165,7 @@
     <ClCompile Include="misc.cpp" />
     <ClCompile Include="notification.cpp" />
     <ClCompile Include="oplock_manager.cpp" />
-    <ClCompile Include="option_change_event_handler.cpp" />
+    <ClCompile Include="optionsbase.cpp" />
     <ClCompile Include="pathcache.cpp" />
     <ClCompile Include="proxy.cpp">
       <PrecompiledHeader />
@@ -200,6 +200,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="..\include\commands.h" />
+    <ClInclude Include="..\include\engine_options.h" />
     <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
     <ClInclude Include="..\include\directorylisting.h" />
@@ -233,7 +234,6 @@
     <ClInclude Include="..\include\logging.h" />
     <ClInclude Include="..\include\misc.h" />
     <ClInclude Include="..\include\notification.h" />
-    <ClInclude Include="..\include\option_change_event_handler.h" />
     <ClInclude Include="..\include\optionsbase.h" />
     <ClInclude Include="..\include\xmlutils.h" />
     <ClInclude Include="logging_private.h" />

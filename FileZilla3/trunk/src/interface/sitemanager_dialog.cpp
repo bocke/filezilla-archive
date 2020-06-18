@@ -585,7 +585,7 @@ public:
 		}
 		m_lastSelectionIt = m_lastSelection.cbegin();
 
-		m_kiosk = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE);
+		m_kiosk = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE);
 	}
 
 	virtual ~CSiteManagerXmlHandler_Tree()
@@ -756,7 +756,7 @@ bool CSiteManagerDialog::Load()
 		return true;
 	}
 
-	std::wstring lastSelection = COptions::Get()->GetOption(OPTION_SITEMANAGER_LASTSELECTED);
+	std::wstring lastSelection = COptions::Get()->get_string(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '0') {
 		if (lastSelection == _T("0")) {
 			tree_->SafeSelectItem(treeId);
@@ -818,7 +818,7 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 		bool res = Save(element, m_ownSites);
 
 		if (!xml.Save(false)) {
-			if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 				return res;
 			}
 			wxString msg = wxString::Format(_("Could not write \"%s\", any changes to the Site Manager could not be saved: %s"), xml.GetFileName(), xml.GetError());
@@ -1523,7 +1523,7 @@ bool CSiteManagerDialog::LoadDefaultSites()
 	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_Expanded);
 	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_SelectedExpanded);
 
-	std::wstring lastSelection = COptions::Get()->GetOption(OPTION_SITEMANAGER_LASTSELECTED);
+	std::wstring lastSelection = COptions::Get()->get_string(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '1') {
 		if (lastSelection == _T("1")) {
 			tree_->SafeSelectItem(m_predefinedSites);
@@ -1567,7 +1567,7 @@ void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 	}
 #endif
 
-	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
 		event.Veto();
 		return;
 	}
@@ -1889,7 +1889,7 @@ void CSiteManagerDialog::RememberLastSelected()
 		path = GetSitePath(sel);
 	}
 	
-	COptions::Get()->SetOption(OPTION_SITEMANAGER_LASTSELECTED, path);
+	COptions::Get()->set(OPTION_SITEMANAGER_LASTSELECTED, path);
 }
 
 void CSiteManagerDialog::OnContextMenu(wxTreeEvent&)

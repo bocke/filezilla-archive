@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_THEMEPROVIDER_HEADER
 #define FILEZILLA_INTERFACE_THEMEPROVIDER_HEADER
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 #include <memory>
 
@@ -69,7 +69,7 @@ private:
 	std::map<std::wstring, cacheEntry> cache_;
 };
 
-class CThemeProvider final : public wxArtProvider, protected COptionChangeEventHandler
+class CThemeProvider final : public wxArtProvider, public wxEvtHandler, protected COptionChangeEventHandler
 {
 public:
 	CThemeProvider();
@@ -93,7 +93,7 @@ public:
 
 protected:
 
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	std::map<std::wstring, CTheme> themes_;
 };

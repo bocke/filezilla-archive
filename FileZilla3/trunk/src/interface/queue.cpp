@@ -1292,7 +1292,7 @@ void CQueueViewBase::CreateColumns(std::vector<ColumnId> const& extraColumns)
 		AddQueueColumn(id);
 	}
 
-	LoadColumnSettings(OPTION_QUEUE_COLUMN_WIDTHS, -1, -1);
+	LoadColumnSettings(OPTION_QUEUE_COLUMN_WIDTHS, OPTIONS_NUM, OPTIONS_NUM);
 }
 
 CServerItem* CQueueViewBase::GetServerItem(Site const& site)

@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_STATUSBAR_HEADER
 #define FILEZILLA_INTERFACE_STATUSBAR_HEADER
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 #include "sizeformatting.h"
 #include "state.h"
 
@@ -87,7 +87,7 @@ protected:
 	void OnSize(wxSizeEvent& event);
 };
 
-class CStatusBar final : public CWidgetsStatusBar, protected COptionChangeEventHandler, protected CGlobalStateEventHandler
+class CStatusBar final : public CWidgetsStatusBar, public COptionChangeEventHandler, protected CGlobalStateEventHandler
 {
 public:
 	CStatusBar(wxTopLevelWindow* parent);
@@ -108,7 +108,7 @@ protected:
 
 	void ShowDataTypeMenu();
 
-	virtual void OnOptionsChanged(changed_options_t const& options) override;
+	virtual void OnOptionsChanged(watched_options const& options) override;
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	void DoDisplayQueueSize();

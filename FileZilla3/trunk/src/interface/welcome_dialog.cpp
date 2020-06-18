@@ -23,13 +23,13 @@ void CWelcomeDialog::RunDelayed(wxWindow* parent)
 bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 {
 	const wxString ownVersion = CBuildInfo::GetVersion();
-	wxString greetingVersion = COptions::Get()->GetOption(OPTION_GREETINGVERSION);
+	wxString greetingVersion = COptions::Get()->get_string(OPTION_GREETINGVERSION);
 
-	wxString const resources = COptions::Get()->GetOption(OPTION_GREETINGRESOURCES);
-	COptions::Get()->SetOption(OPTION_GREETINGRESOURCES, _T(""));
+	wxString const resources = COptions::Get()->get_string(OPTION_GREETINGRESOURCES);
+	COptions::Get()->set(OPTION_GREETINGRESOURCES, _T(""));
 
 	if (!force) {
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
 
@@ -39,10 +39,10 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 			// Been there done that
 			return true;
 		}
-		COptions::Get()->SetOption(OPTION_GREETINGVERSION, ownVersion.ToStdWstring());
+		COptions::Get()->set(OPTION_GREETINGVERSION, ownVersion.ToStdWstring());
 
-		if (greetingVersion.empty() && !COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE)) {
-			COptions::Get()->SetOption(OPTION_PROMPTPASSWORDSAVE, 1);
+		if (greetingVersion.empty() && !COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE)) {
+			COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 1);
 		}
 	}
 
@@ -162,7 +162,7 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 void CWelcomeDialog::InitFooter(wxString const& resources)
 {
 #if FZ_WINDOWS && FZ_MANUALUPDATECHECK
-	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->GetOptionVal(OPTION_DISABLE_UPDATE_FOOTER)) {
+	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_int(OPTION_DISABLE_UPDATE_FOOTER)) {
 		if (!resources.empty()) {
 			wxLogNull null;
 

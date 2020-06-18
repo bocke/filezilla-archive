@@ -346,7 +346,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList(int column /*=
 		}
 	}
 
-	const int dirSortOption = COptions::Get()->GetOptionVal(OPTION_FILELIST_DIRSORT);
+	const int dirSortOption = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
 
 	if (column == m_sortColumn && direction != m_sortDirection && !m_indexMapping.empty() &&
 		dirSortOption != 1)
@@ -419,7 +419,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList_UpdateSelectio
 
 template<class CFileData> CFileListCtrlSortBase::DirSortMode CFileListCtrl<CFileData>::GetDirSortMode()
 {
-	const int dirSortOption = COptions::Get()->GetOptionVal(OPTION_FILELIST_DIRSORT);
+	const int dirSortOption = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
 
 	CFileListCtrlSortBase::DirSortMode dirSortMode;
 	switch (dirSortOption)
@@ -446,7 +446,7 @@ template<class CFileData> CFileListCtrlSortBase::DirSortMode CFileListCtrl<CFile
 
 template<class CFileData> CFileListCtrlSortBase::NameSortMode CFileListCtrl<CFileData>::GetNameSortMode()
 {
-	const int nameSortOption = COptions::Get()->GetOptionVal(OPTION_FILELIST_NAMESORT);
+	const int nameSortOption = COptions::Get()->get_int(OPTION_FILELIST_NAMESORT);
 
 	CFileListCtrlSortBase::NameSortMode nameSortMode;
 	switch (nameSortOption)
@@ -767,9 +767,9 @@ template<class CFileData> void CFileListCtrl<CFileData>::OnColumnRightClicked(wx
 	ShowColumnEditor();
 }
 
-template<class CFileData> void CFileListCtrl<CFileData>::InitSort(int optionID)
+template<class CFileData> void CFileListCtrl<CFileData>::InitSort(interfaceOptions optionID)
 {
-	wxString sortInfo = COptions::Get()->GetOption(optionID);
+	wxString sortInfo = COptions::Get()->get_string(optionID);
 	if (!sortInfo.empty()) {
 		m_sortDirection = sortInfo[0] - '0';
 	}

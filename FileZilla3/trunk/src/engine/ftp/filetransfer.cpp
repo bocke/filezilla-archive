@@ -5,7 +5,7 @@
 
 #include "../directorycache.h"
 #include "../servercapabilities.h"
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/local_filesys.hpp>
@@ -119,7 +119,7 @@ int CFtpFileTransferOpData::Send()
 
 				engine_.transfer_status_.Init(remoteFileSize_, startOffset, false);
 
-				if (engine_.GetOptions().GetOptionVal(OPTION_PREALLOCATE_SPACE)) {
+				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
 					// Try to preallocate the file in order to reduce fragmentation
 					int64_t sizeToPreallocate = remoteFileSize_ - startOffset;
 					if (sizeToPreallocate > 0) {
@@ -160,7 +160,7 @@ int CFtpFileTransferOpData::Send()
 						if (startOffset == localFileSize_ && binary) {
 							log(logmsg::debug_info, L"No need to resume, remote file size matches local file size.");
 
-							if (engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) &&
+							if (engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 								CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
 							{
 								fz::datetime mtime = fz::local_filesys::get_modification_time(fz::to_native(localFile_));
@@ -391,7 +391,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_waitlist;
 				}
-				else if (download_ && engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) && CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes) {
+				else if (download_ && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) && CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes) {
 					opState = filetransfer_mdtm;
 				}
 				else {
@@ -411,7 +411,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 
 						if (download_ &&
 							!entry.has_time() &&
-							engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) &&
+							engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 							CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
 						{
 							opState = filetransfer_mdtm;
@@ -452,7 +452,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					opState = filetransfer_size;
 				}
 				else if (download_ &&
-					engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) &&
+					engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 					CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
 				{
 					opState = filetransfer_mdtm;
@@ -470,7 +470,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 
 					if (download_ &&
 						!entry.has_time() &&
-						engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) &&
+						engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 						CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
 					{
 						opState = filetransfer_mdtm;
@@ -496,7 +496,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 		}
 	}
 	else if (opState == filetransfer_waittransfer) {
-		if (prevResult == FZ_REPLY_OK && engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS)) {
+		if (prevResult == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (!download_ &&
 				CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
 			{

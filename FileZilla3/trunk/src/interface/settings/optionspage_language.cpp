@@ -49,7 +49,7 @@ bool COptionsPageLanguage::SavePage()
 		code = locales_[selection - 1].code;
 	}
 
-	m_pOptions->SetOption(OPTION_LANGUAGE, code);
+	m_pOptions->set(OPTION_LANGUAGE, code);
 
 	return true;
 }
@@ -61,7 +61,7 @@ bool COptionsPageLanguage::Validate()
 
 bool COptionsPageLanguage::OnDisplayedFirstTime()
 {
-	std::wstring currentLanguage = m_pOptions->GetOption(OPTION_LANGUAGE);
+	std::wstring currentLanguage = m_pOptions->get_string(OPTION_LANGUAGE);
 
 	lb_->Clear();
 

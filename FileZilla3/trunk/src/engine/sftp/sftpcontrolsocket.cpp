@@ -20,7 +20,7 @@
 #include "../proxy.h"
 #include "../servercapabilities.h"
 
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/event_loop.hpp>
 #include <libfilezilla/process.hpp>
@@ -587,7 +587,7 @@ void CSftpControlSocket::OnQuotaRequest(fz::direction::type const d)
 		else {
 			b = static_cast<int>(bytes);
 		}
-		AddToStream(fz::sprintf("-%d%d,%d\n", d, b, engine_.GetOptions().GetOptionVal(OPTION_SPEEDLIMIT_INBOUND + static_cast<int>(d))));
+		AddToStream(fz::sprintf("-%d%d,%d\n", d, b, engine_.GetOptions().get_int(d ? OPTION_SPEEDLIMIT_OUTBOUND : OPTION_SPEEDLIMIT_INBOUND)));
 		consume(d, static_cast<size_t>(bytes));
 	}
 }

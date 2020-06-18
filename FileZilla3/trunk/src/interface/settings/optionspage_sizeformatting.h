@@ -6,23 +6,24 @@
 class COptionsPageSizeFormatting final : public COptionsPage
 {
 public:
+	COptionsPageSizeFormatting();
+	virtual ~COptionsPageSizeFormatting();
+
 	virtual bool CreateControls(wxWindow* parent) override;
 
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 	virtual bool Validate() override;
 
+private:
 	void UpdateControls();
-	void UpdateExamples();
 
 	CSizeFormat::_format GetFormat() const;
 
-	DECLARE_EVENT_TABLE()
-	void OnRadio(wxCommandEvent& event);
-	void OnCheck(wxCommandEvent& event);
-	void OnSpin(wxSpinEvent& event);
-
 	wxString FormatSize(int64_t size);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif

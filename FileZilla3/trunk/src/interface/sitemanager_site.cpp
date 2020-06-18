@@ -218,7 +218,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		SetControlVisibility(site.server.GetProtocol(), site.credentials.logonType_);
 	}
 	else {
-		bool const kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+		bool const kiosk_mode = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
 		SetControlVisibility(FTP, logonType);
 	}

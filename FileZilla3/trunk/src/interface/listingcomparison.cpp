@@ -85,7 +85,7 @@ bool CComparisonManager::CompareListings()
 		return true;
 	}
 
-	fz::duration const threshold = fz::duration::from_minutes( COptions::Get()->GetOptionVal(OPTION_COMPARISON_THRESHOLD) );
+	fz::duration const threshold = fz::duration::from_minutes( COptions::Get()->get_int(OPTION_COMPARISON_THRESHOLD) );
 
 	m_pLeft->StartComparison();
 	m_pRight->StartComparison();
@@ -97,7 +97,7 @@ bool CComparisonManager::CompareListings()
 	int64_t localSize, remoteSize;
 	fz::datetime localDate, remoteDate;
 
-	const int dirSortMode = COptions::Get()->GetOptionVal(OPTION_FILELIST_DIRSORT);
+	const int dirSortMode = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
 
 	bool gotLocal = m_pLeft->get_next_file(localFile, localPath, localDir, localSize, localDate);
 	bool gotRemote = m_pRight->get_next_file(remoteFile, remotePath, remoteDir, remoteSize, remoteDate);
@@ -220,8 +220,8 @@ int CComparisonManager::CompareFiles(const int dirSortMode, std::wstring_view co
 CComparisonManager::CComparisonManager(CState& state)
 	: m_state(state)
 {
-	m_comparisonMode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
-	m_hideIdentical = COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0;
+	m_comparisonMode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
+	m_hideIdentical = COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0;
 }
 
 void CComparisonManager::SetListings(CComparableListing* pLeft, CComparableListing* pRight)

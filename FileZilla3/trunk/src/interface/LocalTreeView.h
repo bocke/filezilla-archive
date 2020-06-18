@@ -1,11 +1,11 @@
 #ifndef FILEZILLA_INTERFACE_LOCALTREEVIEW_HEADER
 #define FILEZILLA_INTERFACE_LOCALTREEVIEW_HEADER
 
+#include "option_change_event_handler.h"
 #include "systemimagelist.h"
 #include "state.h"
 #include "treectrlex.h"
 
-#include "../include/option_change_event_handler.h"
 
 class CQueueView;
 class CWindowTinter;
@@ -14,7 +14,7 @@ class CWindowTinter;
 class CVolumeDescriptionEnumeratorThread;
 #endif
 
-class CLocalTreeView final : public wxTreeCtrlEx, CSystemImageList, CStateEventHandler, COptionChangeEventHandler
+class CLocalTreeView final : public wxTreeCtrlEx, CSystemImageList, CStateEventHandler, public COptionChangeEventHandler
 {
 	friend class CLocalTreeViewDropTarget;
 
@@ -45,7 +45,7 @@ protected:
 
 	void UpdateSortMode();
 
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	wxTreeItemId GetNearestParent(wxString& localDir);
 	wxTreeItemId GetSubdir(wxTreeItemId parent, const wxString& subDir);

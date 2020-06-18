@@ -3,6 +3,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_logging.h"
+#include "../xrc_helper.h"
 
 #include <wx/filedlg.h>
 
@@ -16,13 +17,13 @@ bool COptionsPageLogging::LoadPage()
 {
 	bool failure = false;
 
-	SetCheck(XRCID("ID_TIMESTAMPS"), m_pOptions->GetOptionVal(OPTION_MESSAGELOG_TIMESTAMP) ? true : false, failure);
+	SetCheck(XRCID("ID_TIMESTAMPS"), m_pOptions->get_int(OPTION_MESSAGELOG_TIMESTAMP) ? true : false, failure);
 
-	std::wstring const filename = m_pOptions->GetOption(OPTION_LOGGING_FILE);
+	std::wstring const filename = m_pOptions->get_string(OPTION_LOGGING_FILE);
 	SetCheck(XRCID("ID_LOGFILE"), !filename.empty(), failure);
 	SetText(XRCID("ID_FILENAME"), filename, failure);
 
-	int limit = m_pOptions->GetOptionVal(OPTION_LOGGING_FILE_SIZELIMIT);
+	int limit = m_pOptions->get_int(OPTION_LOGGING_FILE_SIZELIMIT);
 	if (limit < 0 || limit > 2000) {
 		limit = 0;
 	}
@@ -46,19 +47,19 @@ bool COptionsPageLogging::LoadPage()
 
 bool COptionsPageLogging::SavePage()
 {
-	m_pOptions->SetOption(OPTION_MESSAGELOG_TIMESTAMP, GetCheck(XRCID("ID_TIMESTAMPS")) ? 1 : 0);
+	m_pOptions->set(OPTION_MESSAGELOG_TIMESTAMP, GetCheck(XRCID("ID_TIMESTAMPS")) ? 1 : 0);
 
 	wxString filename;
 	if (GetCheck(XRCID("ID_LOGFILE"))) {
 		filename = GetText(XRCID("ID_FILENAME"));
 	}
-	m_pOptions->SetOption(OPTION_LOGGING_FILE, filename.ToStdWstring());
+	m_pOptions->set(OPTION_LOGGING_FILE, filename.ToStdWstring());
 
 	if (GetCheck(XRCID("ID_DOLIMIT"))) {
-		SetOptionFromText(XRCID("ID_LIMIT"), OPTION_LOGGING_FILE_SIZELIMIT);
+		m_pOptions->set(OPTION_LOGGING_FILE_SIZELIMIT, xrc_call(*this, "ID_LIMIT", &wxTextCtrl::GetValue).ToStdWstring());
 	}
 	else {
-		m_pOptions->SetOption(OPTION_LOGGING_FILE_SIZELIMIT, 0);
+		m_pOptions->set(OPTION_LOGGING_FILE_SIZELIMIT, 0);
 	}
 
 	return true;

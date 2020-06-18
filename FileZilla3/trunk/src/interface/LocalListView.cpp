@@ -309,7 +309,7 @@ CLocalListView::CLocalListView(CView* pParent, CState& state, CQueueView *pQueue
 CLocalListView::~CLocalListView()
 {
 	wxString str = wxString::Format(_T("%d %d"), m_sortDirection, m_sortColumn);
-	COptions::Get()->SetOption(OPTION_LOCALFILELIST_SORTORDER, str.ToStdWstring());
+	COptions::Get()->set(OPTION_LOCALFILELIST_SORTORDER, str.ToStdWstring());
 
 #ifdef __WXMSW__
 	volumeEnumeratorThread_.reset();
@@ -549,7 +549,7 @@ void CLocalListView::OnItemActivated(wxListEvent &event)
 	}
 
 	if (data->dir) {
-		const int action = COptions::Get()->GetOptionVal(OPTION_DOUBLECLICK_ACTION_DIRECTORY);
+		const int action = COptions::Get()->get_int(OPTION_DOUBLECLICK_ACTION_DIRECTORY);
 		if (action == 3) {
 			// No action
 			wxBell();
@@ -581,7 +581,7 @@ void CLocalListView::OnItemActivated(wxListEvent &event)
 		return;
 	}
 
-	const int action = COptions::Get()->GetOptionVal(OPTION_DOUBLECLICK_ACTION_FILE);
+	const int action = COptions::Get()->get_int(OPTION_DOUBLECLICK_ACTION_FILE);
 	if (action == 3) {
 		// No action
 		wxBell();
@@ -830,7 +830,7 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 		
 	const bool connected = m_state.IsRemoteConnected();
 	if (!connected) {
-		menu.Enable(XRCID("ID_EDIT"), COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL) == 0);
+		menu.Enable(XRCID("ID_EDIT"), COptions::Get()->get_int(OPTION_EDIT_TRACK_LOCAL) == 0);
 		menu.Enable(XRCID("ID_UPLOAD"), false);
 		menu.Enable(XRCID("ID_ADDTOQUEUE"), false);
 	}
@@ -1436,7 +1436,7 @@ void CLocalListView::SetInfoText(wxString const& text)
 
 void CLocalListView::OnBeginDrag(wxListEvent&)
 {
-	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
 		return;
 	}
 
@@ -1806,7 +1806,7 @@ void CLocalListView::OnMenuEdit(wxCommandEvent&)
 	CServerPath path;
 
 	if (!m_state.GetSite()) {
-		if (COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
+		if (COptions::Get()->get_int(OPTION_EDIT_TRACK_LOCAL)) {
 			wxMessageBoxEx(_("Cannot edit file, not connected to any server."), _("Editing failed"), wxICON_EXCLAMATION);
 			return;
 		}

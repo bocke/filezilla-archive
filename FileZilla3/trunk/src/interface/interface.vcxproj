@@ -51,7 +51,7 @@
     <TargetName>FileZilla_dbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(Configuration)\</OutDir>
+    <OutDir>..\bin\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -60,12 +60,11 @@
       <AdditionalOptions>/MP -Zm200 /permissive- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;../include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>PACKAGE_VERSION="3.41.0";_CRT_SECURE_NO_WARNINGS;x64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PACKAGE_VERSION="3.43.0";_CRT_SECURE_NO_WARNINGS;x64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>filezilla.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>.\Debug/filezilla.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
@@ -81,7 +80,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\Debug/FileZilla_dbg.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +122,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>libnettle.dll.a;libhogweed-4-2.lib;libgnutls-30.lib;normaliz.lib;wsock32.lib;odbc32.lib;odbccp32.lib;comctl32.lib;..\engine\Release\engine.lib;x64_static_release\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;wsock32.lib;odbc32.lib;odbccp32.lib;comctl32.lib;..\engine\Release\engine.lib;x64_static_release\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/FileZilla.pdb</ProgramDatabaseFile>
@@ -191,6 +190,7 @@
     <ClCompile Include="msgbox.cpp" />
     <ClCompile Include="netconfwizard.cpp" />
     <ClCompile Include="Options.cpp" />
+    <ClCompile Include="option_change_event_handler.cpp" />
     <ClCompile Include="recursive_operation.cpp" />
     <ClCompile Include="recursive_operation_status.cpp" />
     <ClCompile Include="serverdata.cpp" />
@@ -232,6 +232,7 @@
     <ClCompile Include="settings\settingsdialog.cpp" />
     <ClCompile Include="sftp_crypt_info_dlg.cpp" />
     <ClCompile Include="sitemanager.cpp" />
+    <ClCompile Include="sitemanager_controls.cpp" />
     <ClCompile Include="sitemanager_dialog.cpp" />
     <ClCompile Include="sitemanager_site.cpp" />
     <ClCompile Include="sizeformatting.cpp" />
@@ -258,6 +259,7 @@
     <ClCompile Include="welcome_dialog.cpp" />
     <ClCompile Include="window_state_manager.cpp" />
     <ClCompile Include="wrapengine.cpp" />
+    <ClCompile Include="wxext\spinctrlex.cpp" />
     <ClCompile Include="wxfilesystem_blob_handler.cpp" />
     <ClCompile Include="xh_text_ex.cpp" />
     <ClCompile Include="xmlfunctions.cpp" />
@@ -315,6 +317,7 @@
     <ClInclude Include="msgbox.h" />
     <ClInclude Include="netconfwizard.h" />
     <ClInclude Include="Options.h" />
+    <ClInclude Include="option_change_event_handler.h" />
     <ClInclude Include="recursive_operation.h" />
     <ClInclude Include="recursive_operation_status.h" />
     <ClInclude Include="serverdata.h" />
@@ -356,6 +359,7 @@
     <ClInclude Include="settings\settingsdialog.h" />
     <ClInclude Include="sftp_crypt_info_dlg.h" />
     <ClInclude Include="sitemanager.h" />
+    <ClInclude Include="sitemanager_controls.h" />
     <ClInclude Include="sitemanager_dialog.h" />
     <ClInclude Include="sitemanager_site.h" />
     <ClInclude Include="sizeformatting.h" />
@@ -382,6 +386,7 @@
     <ClInclude Include="welcome_dialog.h" />
     <ClInclude Include="window_state_manager.h" />
     <ClInclude Include="wrapengine.h" />
+    <ClInclude Include="wxext\spinctrlex.h" />
     <ClInclude Include="wxfilesystem_blob_handler.h" />
     <ClInclude Include="xh_text_ex.h" />
     <ClInclude Include="xmlfunctions.h" />

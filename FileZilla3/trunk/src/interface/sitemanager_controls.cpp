@@ -608,13 +608,13 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		logon_type = supportedlogonTypes.front();
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0 &&
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 &&
 			!predefined_ &&
 	        (logon_type == LogonType::account || logon_type == LogonType::normal))
 	{
 		if (!silent) {
 			wxString msg;
-			if (COptions::Get()->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0) {
+			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && COptions::Get()->from_default(OPTION_DEFAULT_KIOSKMODE)) {
 				msg = _("Saving of password has been disabled by your system administrator.");
 			}
 			else {

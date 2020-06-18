@@ -66,17 +66,17 @@ bool COptionsPageConnection::CreateControls(wxWindow* parent)
 
 bool COptionsPageConnection::LoadPage()
 {
-	impl_->timeout_->ChangeValue(fz::to_wstring(m_pOptions->GetOptionVal(OPTION_TIMEOUT)));
-	impl_->tries_->ChangeValue(fz::to_wstring(m_pOptions->GetOptionVal(OPTION_RECONNECTCOUNT)));
-	impl_->delay_->ChangeValue(fz::to_wstring(m_pOptions->GetOptionVal(OPTION_RECONNECTDELAY)));
+	impl_->timeout_->ChangeValue(fz::to_wstring(m_pOptions->get_int(OPTION_TIMEOUT)));
+	impl_->tries_->ChangeValue(fz::to_wstring(m_pOptions->get_int(OPTION_RECONNECTCOUNT)));
+	impl_->delay_->ChangeValue(fz::to_wstring(m_pOptions->get_int(OPTION_RECONNECTDELAY)));
 	return true;
 }
 
 bool COptionsPageConnection::SavePage()
 {
-	m_pOptions->SetOption(OPTION_TIMEOUT, impl_->timeout_->GetValue().ToStdWstring());
-	m_pOptions->SetOption(OPTION_RECONNECTCOUNT, impl_->tries_->GetValue().ToStdWstring());
-	m_pOptions->SetOption(OPTION_RECONNECTDELAY, impl_->delay_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_TIMEOUT, impl_->timeout_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_RECONNECTCOUNT, impl_->tries_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_RECONNECTDELAY, impl_->delay_->GetValue().ToStdWstring());
 	return true;
 }
 

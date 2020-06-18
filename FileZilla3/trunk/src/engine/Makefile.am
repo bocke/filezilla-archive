@@ -12,6 +12,7 @@ libengine_a_SOURCES = \
 		directorylisting.cpp \
 		directorylistingparser.cpp \
 		engine_context.cpp \
+		engine_options.cpp \
 		engineprivate.cpp \
 		externalipresolver.cpp \
 		FileZillaEngine.cpp \
@@ -40,7 +41,7 @@ libengine_a_SOURCES = \
 		misc.cpp \
 		notification.cpp \
 		oplock_manager.cpp \
-		option_change_event_handler.cpp \
+		optionsbase.cpp \
 		pathcache.cpp \
 		proxy.cpp \
 		rtt.cpp \

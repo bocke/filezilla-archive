@@ -171,7 +171,7 @@ bool CFZPuttyGenInterface::LoadProcess(bool silent)
 	}
 	m_initialized = true;
 
-	std::wstring executable = COptions::Get()->GetOption(OPTION_FZSFTP_EXECUTABLE);
+	std::wstring executable = COptions::Get()->get_string(OPTION_FZSFTP_EXECUTABLE);
 	size_t pos = executable.rfind(wxFileName::GetPathSeparator());
 	if (pos == std::wstring::npos) {
 		if (!silent) {

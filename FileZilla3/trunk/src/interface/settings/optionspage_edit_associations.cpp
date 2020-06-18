@@ -39,13 +39,13 @@ bool COptionsPageEditAssociations::CreateControls(wxWindow* parent)
 
 bool COptionsPageEditAssociations::LoadPage()
 {
-	assocs_->ChangeValue(m_pOptions->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS));
+	assocs_->ChangeValue(m_pOptions->get_string(OPTION_EDIT_CUSTOMASSOCIATIONS));
 	return true;
 }
 
 bool COptionsPageEditAssociations::SavePage()
 {
-	m_pOptions->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, assocs_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_EDIT_CUSTOMASSOCIATIONS, assocs_->GetValue().ToStdWstring());
 	return true;
 }
 

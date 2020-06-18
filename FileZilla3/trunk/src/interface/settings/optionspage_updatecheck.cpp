@@ -17,11 +17,11 @@ bool COptionsPageUpdateCheck::LoadPage()
 {
 	bool failure = false;
 	int sel;
-	if (!m_pOptions->GetOptionVal(OPTION_UPDATECHECK))
+	if (!m_pOptions->get_int(OPTION_UPDATECHECK))
 		sel = 0;
 	else
 	{
-		int days = m_pOptions->GetOptionVal(OPTION_UPDATECHECK_INTERVAL);
+		int days = m_pOptions->get_int(OPTION_UPDATECHECK_INTERVAL);
 		if (days < 7)
 			sel = 1;
 		else
@@ -29,7 +29,7 @@ bool COptionsPageUpdateCheck::LoadPage()
 	}
 	SetChoice(XRCID("ID_UPDATECHECK"), sel, failure);
 
-	int type = m_pOptions->GetOptionVal(OPTION_UPDATECHECK_CHECKBETA);
+	int type = m_pOptions->get_int(OPTION_UPDATECHECK_CHECKBETA);
 	if( type < 0 || type > 2 ) {
 		type = 1;
 	}
@@ -41,10 +41,10 @@ bool COptionsPageUpdateCheck::LoadPage()
 bool COptionsPageUpdateCheck::Validate()
 {
 	int type = GetChoice(XRCID("ID_UPDATETYPE"));
-	if( type == 2 && m_pOptions->GetOptionVal(OPTION_UPDATECHECK_CHECKBETA) != 2 ) {
+	if( type == 2 && m_pOptions->get_int(OPTION_UPDATECHECK_CHECKBETA) != 2 ) {
 		if (wxMessageBoxEx(_("Warning, use nightly builds at your own risk.\nNo support is given for nightly builds.\nNightly builds may not work as expected and might even damage your system.\n\nDo you really want to check for nightly builds?"), _("Updates"), wxICON_EXCLAMATION | wxYES_NO, this) != wxYES) {
 			bool tmp;
-			SetChoice(XRCID("ID_UPDATETYPE"), m_pOptions->GetOptionVal(OPTION_UPDATECHECK_CHECKBETA), tmp);
+			SetChoice(XRCID("ID_UPDATETYPE"), m_pOptions->get_int(OPTION_UPDATECHECK_CHECKBETA), tmp);
 		}
 	}
 	return true;
@@ -53,7 +53,7 @@ bool COptionsPageUpdateCheck::Validate()
 bool COptionsPageUpdateCheck::SavePage()
 {
 	int sel = GetChoice(XRCID("ID_UPDATECHECK"));
-	m_pOptions->SetOption(OPTION_UPDATECHECK, (sel > 0) ? 1 : 0);
+	m_pOptions->set(OPTION_UPDATECHECK, (sel > 0) ? 1 : 0);
 	int days = 0;
 	switch (sel)
 	{
@@ -67,13 +67,13 @@ bool COptionsPageUpdateCheck::SavePage()
 		days = 0;
 		break;
 	}
-	m_pOptions->SetOption(OPTION_UPDATECHECK_INTERVAL, days);
+	m_pOptions->set(OPTION_UPDATECHECK_INTERVAL, days);
 
 	int type = GetChoice(XRCID("ID_UPDATETYPE"));
 	if( type < 0 || type > 2 ) {
 		type = 1;
 	}
-	m_pOptions->SetOption(OPTION_UPDATECHECK_CHECKBETA, type);
+	m_pOptions->set(OPTION_UPDATECHECK_CHECKBETA, type);
 
 	return true;
 }

@@ -248,6 +248,7 @@ wxAnimation CTheme::LoadAnimation(std::wstring const& name, wxSize const& size)
 }
 
 CThemeProvider::CThemeProvider()
+	: COptionChangeEventHandler(this)
 {
 	wxArtProvider::Push(this);
 
@@ -261,7 +262,7 @@ CThemeProvider::CThemeProvider()
 		themes_[L"default"] = defaultTheme;
 	}
 
-	std::wstring name = COptions::Get()->GetOption(OPTION_ICONS_THEME);
+	std::wstring name = COptions::Get()->get_string(OPTION_ICONS_THEME);
 	if (name != L"default") {
 		CTheme theme;
 		if (theme.Load(name)) {
@@ -269,8 +270,9 @@ CThemeProvider::CThemeProvider()
 		}
 	}
 
-	RegisterOption(OPTION_ICONS_THEME);
-	RegisterOption(OPTION_ICONS_SCALE);
+	//FIXME
+	//RegisterOption(OPTION_ICONS_THEME);
+	//RegisterOption(OPTION_ICONS_SCALE);
 
 	if (!instance) {
 		instance = this;
@@ -333,7 +335,7 @@ wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& clie
 
 	wxLogNull logNull;
 
-	std::wstring const theme = COptions::Get()->GetOption(OPTION_ICONS_THEME);
+	std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
 	if (!theme.empty() && theme != L"default") {
 		tryTheme(theme);
 	}
@@ -368,7 +370,7 @@ wxAnimation CThemeProvider::CreateAnimation(wxArtID const& id, wxSize const& siz
 
 	wxLogNull logNull;
 
-	std::wstring const theme = COptions::Get()->GetOption(OPTION_ICONS_THEME);
+	std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
 	if (!theme.empty() && theme != L"default") {
 		tryTheme(theme);
 	}
@@ -454,9 +456,9 @@ wxIconBundle CThemeProvider::GetIconBundle(const wxArtID& id, const wxArtClient&
 	return iconBundle;
 }
 
-void CThemeProvider::OnOptionsChanged(changed_options_t const&)
+void CThemeProvider::OnOptionsChanged(watched_options const&)
 {
-	std::wstring name = COptions::Get()->GetOption(OPTION_ICONS_THEME);
+	std::wstring name = COptions::Get()->get_string(OPTION_ICONS_THEME);
 	if (themes_.find(name) == themes_.end()) {
 		CTheme theme;
 		if (theme.Load(name)) {
@@ -525,13 +527,19 @@ wxSize CThemeProvider::GetIconSize(iconSize size, bool userScaled)
 		static gdouble const scale = gdk_screen_get_resolution(screen);
 		if (scale >= 48) {
 			ret = ret.Scale(scale / 96.f, scale / 96.f);
+			if (!ret.x) {
+				ret = wxSize(1, 1);
+			}
 		}
 	}
 #endif
 
 	if (userScaled) {
-		float scale = static_cast<float>(COptions::Get()->GetOptionVal(OPTION_ICONS_SCALE));
+		float scale = static_cast<float>(COptions::Get()->get_int(OPTION_ICONS_SCALE));
 		ret = ret.Scale(scale / 100.f, scale / 100.f);
+		if (!ret.x) {
+			ret = wxSize(1, 1);
+		}
 	}
 
 	return ret;

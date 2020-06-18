@@ -1,8 +1,7 @@
 #include "filezilla.h"
 
 #include "../include/engine_context.h"
-#include "../include/optionsbase.h"
-#include "../include/option_change_event_handler.h"
+#include "../include/engine_options.h"
 
 #include "directorycache.h"
 #include "logging_private.h"
@@ -14,48 +13,50 @@
 #include <libfilezilla/thread_pool.hpp>
 #include <libfilezilla/tls_system_trust_store.hpp>
 
-class CFileZillaEngineContext::Impl final : private COptionChangeEventHandler
+namespace {
+class option_change_handler final : public fz::event_handler
 {
 public:
-	Impl(COptionsBase& options)
-		: options_(options)
-		, rate_limit_mgr_(loop_)
-		, tlsSystemTrustStore_(pool_)
+	option_change_handler(COptionsBase& options, fz::event_loop & loop, fz::rate_limit_manager & rate_limit_mgr, fz::rate_limiter & rate_limiter)
+		: fz::event_handler(loop)
+		, options_(options)
+		, rate_limit_mgr_(rate_limit_mgr)
+		, rate_limiter_(rate_limiter)
 	{
-		directory_cache_.SetTtl(fz::duration::from_seconds(options.GetOptionVal(OPTION_CACHE_TTL)));
-		rate_limit_mgr_.add(&rate_limiter_);
+		UpdateRateLimit();
+		options_.watch(OPTION_SPEEDLIMIT_ENABLE, this);
+		options_.watch(OPTION_SPEEDLIMIT_INBOUND, this);
+		options_.watch(OPTION_SPEEDLIMIT_OUTBOUND, this);
+		options_.watch(OPTION_SPEEDLIMIT_BURSTTOLERANCE, this);
+	}
 
-		RegisterOption(OPTION_SPEEDLIMIT_ENABLE);
-		RegisterOption(OPTION_SPEEDLIMIT_INBOUND);
-		RegisterOption(OPTION_SPEEDLIMIT_OUTBOUND);
-		RegisterOption(OPTION_SPEEDLIMIT_BURSTTOLERANCE);
+	~option_change_handler()
+	{
+		options_.unwatch_all(this);
+		remove_handler();
+	}
 
+private:
+	virtual void operator()(fz::event_base const& ev) override {
+		fz::dispatch<options_changed_event>(ev, this, &option_change_handler::on_options_changed);
+	}
+
+	void on_options_changed(watched_options const&)
+	{
 		UpdateRateLimit();
 	}
 
-	~Impl()
-	{
-		UnregisterAllOptions();
-	}
-
-	virtual void OnOptionsChanged(changed_options_t const& options) override;
 	void UpdateRateLimit();
 
-	COptionsBase& options_;
-	fz::thread_pool pool_;
-	fz::event_loop loop_{pool_};
-	fz::rate_limit_manager rate_limit_mgr_;
-	fz::rate_limiter rate_limiter_;
-	CDirectoryCache directory_cache_;
-	CPathCache path_cache_;
-	OpLockManager opLockManager_;
-	fz::tls_system_trust_store tlsSystemTrustStore_;
+	COptionsBase & options_;
+	fz::rate_limit_manager & rate_limit_mgr_;
+	fz::rate_limiter & rate_limiter_;
 };
 
-void CFileZillaEngineContext::Impl::UpdateRateLimit()
+void option_change_handler::UpdateRateLimit()
 {
 	fz::rate::type tolerance;
-	switch (options_.GetOptionVal(OPTION_SPEEDLIMIT_BURSTTOLERANCE)) {
+	switch (options_.get_int(OPTION_SPEEDLIMIT_BURSTTOLERANCE)) {
 	case 1:
 		tolerance = 2;
 		break;
@@ -67,24 +68,49 @@ void CFileZillaEngineContext::Impl::UpdateRateLimit()
 	}
 	rate_limit_mgr_.set_burst_tolerance(tolerance);
 
-	fz::rate::type limits[2]{fz::rate::unlimited, fz::rate::unlimited};
-	if (options_.GetOptionVal(OPTION_SPEEDLIMIT_ENABLE)) {
-		auto const inbound = options_.GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
+	fz::rate::type limits[2]{ fz::rate::unlimited, fz::rate::unlimited };
+	if (options_.get_int(OPTION_SPEEDLIMIT_ENABLE)) {
+		auto const inbound = options_.get_int(OPTION_SPEEDLIMIT_INBOUND);
 		if (inbound > 0) {
 			limits[0] = inbound * 1024;
 		}
-		auto const outbound = options_.GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
+		auto const outbound = options_.get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 		if (outbound > 0) {
 			limits[1] = outbound * 1024;
 		}
 	}
 	rate_limiter_.set_limits(limits[0], limits[1]);
 }
-
-void CFileZillaEngineContext::Impl::OnOptionsChanged(changed_options_t const&)
-{
-	UpdateRateLimit();
 }
+
+class CFileZillaEngineContext::Impl final
+{
+public:
+	Impl(COptionsBase& options)
+		: options_(options)
+		, rate_limit_mgr_(loop_)
+		, tlsSystemTrustStore_(pool_)
+	{
+		directory_cache_.SetTtl(fz::duration::from_seconds(options.get_int(OPTION_CACHE_TTL)));
+		rate_limit_mgr_.add(&rate_limiter_);
+	}
+
+	~Impl()
+	{
+	}
+
+
+	COptionsBase& options_;
+	fz::thread_pool pool_;
+	fz::event_loop loop_{pool_};
+	fz::rate_limit_manager rate_limit_mgr_;
+	fz::rate_limiter rate_limiter_;
+	option_change_handler option_change_handler_{options_, loop_, rate_limit_mgr_, rate_limiter_};
+	CDirectoryCache directory_cache_;
+	CPathCache path_cache_;
+	OpLockManager opLockManager_;
+	fz::tls_system_trust_store tlsSystemTrustStore_;
+};
 
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
 : options_(options)

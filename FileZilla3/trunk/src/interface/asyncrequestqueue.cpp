@@ -48,7 +48,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 				action = CDefaultFileExistsDlg::GetDefault(pFileExistsNotification->download);
 			}
 			if (action == CFileExistsNotification::unknown) {
-				int option = COptions::Get()->GetOptionVal(pFileExistsNotification->download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
+				int option = COptions::Get()->get_int(pFileExistsNotification->download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
 				if (option < CFileExistsNotification::unknown || option >= CFileExistsNotification::ACTION_COUNT) {
 					action = CFileExistsNotification::unknown;
 				}
@@ -64,7 +64,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 
 			if (action == CFileExistsNotification::resume && pFileExistsNotification->ascii) {
 				// Check if resuming ascii files is allowed
-				if (!COptions::Get()->GetOptionVal(OPTION_ASCIIRESUME)) {
+				if (!COptions::Get()->get_int(OPTION_ASCIIRESUME)) {
 					// Overwrite instead
 					action = CFileExistsNotification::overwrite;
 				}
@@ -247,7 +247,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 		action = CDefaultFileExistsDlg::GetDefault(notification.download);
 	}
 	if (action == CFileExistsNotification::unknown) {
-		int option = COptions::Get()->GetOptionVal(notification.download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
+		int option = COptions::Get()->get_int(notification.download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
 		if (option <= CFileExistsNotification::unknown || option >= CFileExistsNotification::ACTION_COUNT) {
 			action = CFileExistsNotification::ask;
 		}
@@ -322,7 +322,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 
 	if (action == CFileExistsNotification::resume && notification.ascii) {
 		// Check if resuming ascii files is allowed
-		if (!COptions::Get()->GetOptionVal(OPTION_ASCIIRESUME)) {
+		if (!COptions::Get()->get_int(OPTION_ASCIIRESUME)) {
 			// Overwrite instead
 			action = CFileExistsNotification::overwrite;
 		}

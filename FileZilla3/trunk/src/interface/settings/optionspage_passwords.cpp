@@ -25,19 +25,19 @@ bool COptionsPagePasswords::LoadPage()
 	XRCCTRL(*this, "ID_PASSWORDS_NOSAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 	XRCCTRL(*this, "ID_PASSWORDS_USEMASTERPASSWORD", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 
-	bool const disabledByDefault = m_pOptions->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
-	if (disabledByDefault || m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	bool const disabledByDefault = m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && m_pOptions->from_default(OPTION_DEFAULT_KIOSKMODE);
+	if (disabledByDefault || m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		xrc_call(*this, "ID_PASSWORDS_NOSAVE", &wxRadioButton::SetValue, true);
 		xrc_call(*this, "ID_PASSWORDS_SAVE", &wxControl::Disable);
 		xrc_call(*this, "ID_PASSWORDS_NOSAVE", &wxControl::Disable);
 		xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxControl::Disable);
 	}
 	else {
-		if (m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0) {
+		if (m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) != 0) {
 			xrc_call(*this, "ID_PASSWORDS_NOSAVE", &wxRadioButton::SetValue, true);
 		}
 		else {
-			auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+			auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 			if (key) {
 				xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::SetValue, true);
 
@@ -56,11 +56,11 @@ bool COptionsPagePasswords::LoadPage()
 
 bool COptionsPagePasswords::SavePage()
 {
-	int const old_kiosk_mode = m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE);
-	auto const oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+	int const old_kiosk_mode = m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE);
+	auto const oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 
-	bool const disabledByDefault = m_pOptions->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && old_kiosk_mode != 0;
-	if (disabledByDefault || m_pOptions->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	bool const disabledByDefault = old_kiosk_mode != 0 && m_pOptions->from_default(OPTION_DEFAULT_KIOSKMODE);
+	if (disabledByDefault || m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return true;
 	}
 
@@ -99,13 +99,13 @@ bool COptionsPagePasswords::SavePage()
 			wxMessageBoxEx(_("Could not generate key"), _("Error"));
 		}
 		else {
-			m_pOptions->SetOption(OPTION_DEFAULT_KIOSKMODE, 0);
-			m_pOptions->SetOption(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
+			m_pOptions->set(OPTION_DEFAULT_KIOSKMODE, 0);
+			m_pOptions->set(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
 		}
 	}
 	else {
-		m_pOptions->SetOption(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
-		m_pOptions->SetOption(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
+		m_pOptions->set(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
+		m_pOptions->set(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
 	}
 
 	// Now actually change stored passwords
@@ -151,7 +151,7 @@ bool COptionsPagePasswords::Validate()
 			return DisplayError(_T("ID_MASTERPASSWORD"), _("The entered passwords are not the same."));
 		}
 
-		auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+		auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 		if (!key && pw.empty()) {
 			return DisplayError(_T("ID_MASTERPASSWORD"), _("You need to enter a master password."));
 		}

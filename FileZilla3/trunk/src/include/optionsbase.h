@@ -1,107 +1,289 @@
 #ifndef FILEZILLA_ENGINE_OPTIONSBASE_HEADER
 #define FILEZILLA_ENGINE_OPTIONSBASE_HEADER
 
-// The engine of FileZilla 3 can be configured using a few settings.
-// In order to read and set the settings, the engine has to be passed
-// a pointer to a COptionsBase object.
-// Since COptionsBase is virtual, the user of the engine has to create a
-// derived class which handles settings-reading and writing.
-
 #include <memory>
+#include <string>
+#include <vector>
+#include <map>
 
-enum engineOptions
-{
-	OPTION_USEPASV,			// Use passive mode unless overridden by
-							// server settings
-	OPTION_LIMITPORTS,
-	OPTION_LIMITPORTS_LOW,
-	OPTION_LIMITPORTS_HIGH,
-	OPTION_LIMITPORTS_OFFSET,
-	OPTION_EXTERNALIPMODE,		/* External IP Address mode for use in active mode
-								   Values: 0: ask operating system
-										   1: use provided IP
-										   2: use provided resolver
-								*/
-	OPTION_EXTERNALIP,
-	OPTION_EXTERNALIPRESOLVER,
-	OPTION_LASTRESOLVEDIP,
-	OPTION_NOEXTERNALONLOCAL,	// Don't use external IP address if connection is
-								// coming from a local unroutable address
-	OPTION_PASVREPLYFALLBACKMODE,
-	OPTION_TIMEOUT,
-	OPTION_LOGGING_DEBUGLEVEL,
-	OPTION_LOGGING_RAWLISTING,
+#include <libfilezilla/event.hpp>
+#include <libfilezilla/mutex.hpp>
+#include <libfilezilla/string.hpp>
 
-	OPTION_FZSFTP_EXECUTABLE,	// full path to fzsftp executable
-	OPTION_FZSTORJ_EXECUTABLE,
-
-	OPTION_ALLOW_TRANSFERMODEFALLBACK, // If PORT fails, allow PASV and vice versa
-
-	OPTION_RECONNECTCOUNT,
-	OPTION_RECONNECTDELAY,
-
-	OPTION_SPEEDLIMIT_ENABLE,
-	OPTION_SPEEDLIMIT_INBOUND,
-	OPTION_SPEEDLIMIT_OUTBOUND,
-	OPTION_SPEEDLIMIT_BURSTTOLERANCE,
-
-	OPTION_PREALLOCATE_SPACE,
-
-	OPTION_VIEW_HIDDEN_FILES,
-
-	OPTION_PRESERVE_TIMESTAMPS,
-
-	OPTION_SOCKET_BUFFERSIZE_RECV,
-	OPTION_SOCKET_BUFFERSIZE_SEND,
-
-	OPTION_FTP_SENDKEEPALIVE,
-
-	OPTION_FTP_PROXY_TYPE,
-	OPTION_FTP_PROXY_HOST,
-	OPTION_FTP_PROXY_USER,
-	OPTION_FTP_PROXY_PASS,
-	OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE,
-
-	OPTION_SFTP_KEYFILES,
-	OPTION_SFTP_COMPRESSION,
-
-	OPTION_PROXY_TYPE,
-	OPTION_PROXY_HOST,
-	OPTION_PROXY_PORT,
-	OPTION_PROXY_USER,
-	OPTION_PROXY_PASS,
-
-	OPTION_LOGGING_FILE,
-	OPTION_LOGGING_FILE_SIZELIMIT,
-	OPTION_LOGGING_SHOW_DETAILED_LOGS,
-
-	OPTION_SIZE_FORMAT,
-	OPTION_SIZE_USETHOUSANDSEP,
-	OPTION_SIZE_DECIMALPLACES,
-
-	OPTION_TCP_KEEPALIVE_INTERVAL,
-
-	OPTION_CACHE_TTL,
-
-	OPTIONS_ENGINE_NUM
-};
+#include "../pugixml/pugixml.hpp" // TODO hide
 
 namespace pugi {
 class xml_document;
 class xml_node;
 }
 
+namespace fz {
+	class event_handler;
+}
+
+enum class optionsIndex : int
+{
+	invalid = -1
+};
+
+enum class option_type
+{
+	string,
+	number,
+	boolean,
+	xml
+};
+
+enum class option_flags
+{
+	normal = 0,
+	internal = 1, // internal items won't get written to settings file nor loaded from there
+	default_only = 2,
+	default_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
+	platform = 8, // A non-portable platform specific option, nodes have platform attribute
+	numeric_clamp = 16 // For numeric options, fixup input and clamp to allowed value range. If not set, setting invalid values discards
+};
+inline bool operator&(option_flags lhs, option_flags rhs) {
+	return (static_cast<std::underlying_type_t<option_flags>>(lhs) & static_cast<std::underlying_type_t<option_flags>>(rhs)) != 0;
+}
+inline option_flags operator|(option_flags lhs, option_flags rhs)
+{
+	return static_cast<option_flags>(static_cast<std::underlying_type_t<option_flags>>(lhs) | static_cast<std::underlying_type_t<option_flags>>(rhs));
+}
+inline option_flags& operator|=(option_flags& lhs, option_flags rhs)
+{
+	lhs = lhs | rhs;
+	return lhs;
+}
+
+
+struct option_def final
+{
+	option_def(std::string_view name, std::wstring_view def, option_flags flags = option_flags::normal, size_t max_len = 10000000);
+	option_def(std::string_view name, std::wstring_view def, option_flags flags, option_type t, size_t max_len = 10000000, bool (*validator)(std::wstring& v) = nullptr);
+	option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node));
+	option_def(std::string_view name, int def, option_flags flags = option_flags::normal, int min = -2147483648, int max = 2147483647, bool (*validator)(int& v) = nullptr);
+
+	template<typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0> // avoid implicit wchar_t*->bool conversion
+	option_def(std::string_view name, Bool def, option_flags flags = option_flags::normal);
+
+	inline std::string const& name() const { return name_; }
+	inline std::wstring const& def() const { return default_; }
+	inline option_type type() const { return type_; }
+	inline option_flags flags() const { return flags_; }
+	int min() const { return min_; }
+	int max() const { return max_; }
+	void* validator() const { return validator_; }
+
+private:
+	std::string name_;
+	std::wstring default_; // Default values are stored as string even for numerical options
+	option_type type_{};
+	option_flags flags_{};
+	int min_{};
+	int max_{};
+	void* validator_{};
+};
+
+struct watched_options final
+{
+	explicit operator bool() const {
+		return any();
+	}
+
+	template<typename Opt>
+	bool test(Opt opt) const
+	{
+		return test(mapOption(opt));
+	}
+
+	bool any() const;
+	void set(optionsIndex opt);
+	void unset(optionsIndex opt);
+	bool test(optionsIndex opt) const;
+
+	void clear() {
+		options_.clear();
+	}
+
+	watched_options& operator&=(watched_options const& op) {
+		return *this &= op.options_;
+	}
+	watched_options& operator&=(std::vector<uint64_t> const& op);
+
+	std::vector<uint64_t> options_;
+};
+
+enum options_changed_event_type;
+typedef fz::simple_event<options_changed_event_type, watched_options> options_changed_event;
+
+
+typedef void (*watcher_notifier)(void* handler, watched_options&& options);
+std::tuple<void*, watcher_notifier> get_option_watcher_notifier(fz::event_handler* handler);
+
 class COptionsBase
 {
 public:
 	virtual ~COptionsBase() noexcept = default;
-	virtual int GetOptionVal(unsigned int nID) = 0;
-	virtual std::wstring GetOption(unsigned int nID) = 0;
-	virtual pugi::xml_document GetOptionXml(unsigned int nID) = 0;
 
-	virtual bool SetOption(unsigned int nID, int value) = 0;
-	virtual bool SetOption(unsigned int nID, std::wstring_view const& value) = 0;
-	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value) = 0;
+	template<typename T>
+	std::wstring get_string(T opt)
+	{
+		return get_string(mapOption(opt));
+	}
+
+	template<typename T>
+	int get_int(T opt)
+	{
+		return get_int(mapOption(opt));
+	}
+
+	template<typename T>
+	bool get_bool(T opt)
+	{
+		return get_int(opt) != 0;
+	}
+
+	template<typename T>
+	pugi::xml_document get_xml(T opt)
+	{
+		/*FIXMEfor (auto c = m_optionsCache[id].xmlValue.first_child(); c; c = c.next_sibling()) {
+			ret.append_copy(c);
+		}*/
+		return pugi::xml_document();//FIXME
+	}
+
+	template<typename T>
+	bool from_default(T opt)
+	{
+		return from_default(mapOption(opt));
+	}
+	bool from_default(optionsIndex opt);
+
+	template<typename T>
+	void set(T opt, std::wstring_view const& value)
+	{
+		set(mapOption(opt), value);
+	}
+
+	template<typename T>
+	void set(T opt, int value)
+	{
+		set(mapOption(opt), value);
+	}
+
+	template<typename T>
+	void set(T opt, pugi::xml_node const& value)
+	{
+		//FIXME
+		/*
+			pugi::xml_document doc;
+	if (value) {
+		if (value.type() == pugi::node_document) {
+			for (auto c = value.first_child(); c; c = c.next_sibling()) {
+				if (c.type() == pugi::node_element) {
+					doc.append_copy(c);
+				}
+			}
+		}
+		else {
+			doc.append_copy(value);
+		}
+	}
+*/
+	}
+
+	template<typename Opt, typename Handler>
+	void watch(Opt opt, Handler* handler)
+	{
+		watch(mapOption(opt), handler);
+	}
+
+	template<typename Opt, typename Handler>
+	void unwatch(Opt opt, Handler* handler)
+	{
+		unwatch(mapOption(opt), handler);
+	}
+
+	template<typename Handler>
+	void watch(optionsIndex opt, Handler* handler)
+	{
+		watch(opt, get_option_watcher_notifier(handler));
+	}
+
+	template<typename Handler>
+	void watch_all(Handler* handler)
+	{
+		watch_all(get_option_watcher_notifier(handler));
+	}
+
+	template<typename Handler>
+	void unwatch(optionsIndex opt, Handler* handler)
+	{
+		unwatch(opt, get_option_watcher_notifier(handler));
+	}
+
+	template<typename Handler>
+	void unwatch_all(Handler* handler)
+	{
+		unwatch_all(get_option_watcher_notifier(handler));
+	}
+
+	static unsigned int register_options(std::initializer_list<option_def> options);
+
+protected:
+	struct option_value final
+	{
+		std::wstring str_;
+		pugi::xml_document xml_;
+		int v_{};
+		bool from_default_{};
+	};
+
+	int get_int(optionsIndex opt);
+	std::wstring get_string(optionsIndex opt);
+
+	void set(optionsIndex opt, int value);
+	void set(optionsIndex opt, std::wstring_view const& value, bool from_default = false);
+
+	void set(optionsIndex opt, option_def const& def, option_value & val, int value, bool from_default = false);
+	void set(optionsIndex opt, option_def const& def, option_value & val, std::wstring_view const& value, bool from_default = false);
+
+	void add_missing();
+
+	void set_changed(optionsIndex opt);
+
+	void watch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
+	void watch_all(std::tuple<void*, watcher_notifier> handler);
+	void unwatch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
+	void unwatch_all(std::tuple<void*, watcher_notifier> handler);
+
+	static fz::mutex mtx_;
+
+	static std::vector<option_def> options_;
+	static std::map<std::string, size_t, std::less<>> name_to_option_;
+	std::vector<option_value> values_;
+
+	watched_options changed_;
+
+	void notify_changed();
+
+	// Gets called from notify_changed with mtx_ held.
+	virtual void process_changed(watched_options const& changed) {}
+
+
+	fz::mutex notification_mtx_;
+
+
+	struct watcher final
+	{
+		void* handler_{};
+		watcher_notifier notifier_{};
+		watched_options options_;
+		bool all_{};
+	};
+	std::vector<watcher> watchers_;
+	
 };
 
 #endif

@@ -55,7 +55,7 @@ bool CStorjKeyInterface::LoadProcess(bool silent)
 	}
 	m_initialized = true;
 
-	std::wstring executable = COptions::Get()->GetOption(OPTION_FZSTORJ_EXECUTABLE);
+	std::wstring executable = COptions::Get()->get_string(OPTION_FZSTORJ_EXECUTABLE);
 	size_t pos = executable.rfind(wxFileName::GetPathSeparator());
 	if (pos == std::wstring::npos) {
 		if (!silent) {

@@ -52,9 +52,9 @@ void COptionsPage::SetCheck(int id, bool checked, bool& failure)
 	pCheckBox->SetValue(checked);
 }
 
-void COptionsPage::SetCheckFromOption(int control_id, int option_id, bool& failure)
+void COptionsPage::SetCheckFromOption(int control_id, interfaceOptions option_id, bool& failure)
 {
-	SetCheck(control_id, m_pOptions->GetOptionVal(option_id) != 0, failure);
+	SetCheck(control_id, m_pOptions->get_int(option_id) != 0, failure);
 }
 
 bool COptionsPage::GetCheck(int id) const
@@ -65,12 +65,12 @@ bool COptionsPage::GetCheck(int id) const
 	return pCheckBox ? pCheckBox->GetValue() : false;
 }
 
-void COptionsPage::SetOptionFromCheck(int control_id, int option_id)
+void COptionsPage::SetOptionFromCheck(int control_id, interfaceOptions option_id)
 {
-	m_pOptions->SetOption(option_id, GetCheck(control_id) ? 1 : 0);
+	m_pOptions->set(option_id, GetCheck(control_id) ? 1 : 0);
 }
 
-void COptionsPage::SetTextFromOption(int ctrlId, int optionId, bool& failure)
+void COptionsPage::SetTextFromOption(int ctrlId, interfaceOptions optionId, bool& failure)
 {
 	if (ctrlId == -1) {
 		failure = true;
@@ -83,7 +83,7 @@ void COptionsPage::SetTextFromOption(int ctrlId, int optionId, bool& failure)
 		return;
 	}
 
-	const wxString& text = m_pOptions->GetOption(optionId);
+	const wxString& text = m_pOptions->get_string(optionId);
 	pTextCtrl->ChangeValue(text);
 }
 
@@ -127,7 +127,7 @@ bool COptionsPage::GetRCheck(int id) const
 	return pRadioButton ? pRadioButton->GetValue() : false;
 }
 
-void COptionsPage::SetStaticText(int id, const wxString& text, bool& failure)
+void COptionsPage::SetStaticText(int id, wxString const& text, bool& failure)
 {
 	auto pStaticText = dynamic_cast<wxStaticText*>(FindWindow(id));
 	if (!pStaticText) {
@@ -143,20 +143,20 @@ void COptionsPage::ReloadSettings()
 	m_pOwner->LoadSettings();
 }
 
-void COptionsPage::SetOptionFromText(int ctrlId, int optionId)
+void COptionsPage::SetOptionFromText(int ctrlId, interfaceOptions optionId)
 {
 	const wxString& value = GetText(ctrlId);
-	m_pOptions->SetOption(optionId, value.ToStdWstring());
+	m_pOptions->set(optionId, value.ToStdWstring());
 }
 
-void COptionsPage::SetIntOptionFromText(int ctrlId, int optionId)
+void COptionsPage::SetIntOptionFromText(int ctrlId, interfaceOptions optionId)
 {
 	const wxString& value = GetText(ctrlId);
 
 	long n;
 	wxCHECK_RET(value.ToLong(&n), _T("Some options page did not validate user input!"));
 
-	m_pOptions->SetOption(optionId, n);
+	m_pOptions->set(optionId, n);
 }
 
 void COptionsPage::SetChoice(int id, int selection, bool& failure)
@@ -191,7 +191,7 @@ int COptionsPage::GetChoice(int id) const
 	return pChoice->GetSelection();
 }
 
-bool COptionsPage::DisplayError(const wxString& controlToFocus, const wxString& error)
+bool COptionsPage::DisplayError(wxString const& controlToFocus, wxString const& error)
 {
 	int id = wxXmlResource::GetXRCID(controlToFocus);
 	if (id == -1) {
@@ -204,7 +204,7 @@ bool COptionsPage::DisplayError(const wxString& controlToFocus, const wxString& 
 	return false;
 }
 
-bool COptionsPage::DisplayError(wxWindow* pWnd, const wxString& error)
+bool COptionsPage::DisplayError(wxWindow* pWnd, wxString const& error)
 {
 	if (pWnd) {
 		pWnd->SetFocus();

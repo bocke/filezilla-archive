@@ -119,7 +119,7 @@ CFileZillaApp::~CFileZillaApp()
 
 void CFileZillaApp::InitLocale()
 {
-	wxString language = COptions::Get()->GetOption(OPTION_LANGUAGE);
+	wxString language = COptions::Get()->get_string(OPTION_LANGUAGE);
 	const wxLanguageInfo* pInfo = wxLocale::FindLanguageInfo(language);
 	if (!language.empty()) {
 #ifdef __WXGTK__
@@ -157,18 +157,18 @@ void CFileZillaApp::InitLocale()
 			error += _("Please make sure the requested locale is installed on your system.");
 			wxMessageBoxEx(error, _("Failed to change language"), wxICON_EXCLAMATION);
 
-			COptions::Get()->SetOption(OPTION_LANGUAGE, _T(""));
+			COptions::Get()->set(OPTION_LANGUAGE, _T(""));
 		}
 #else
 		if (!pInfo || !SetLocale(pInfo->Language)) {
 			for (language = GetFallbackLocale(language); !language.empty(); language = GetFallbackLocale(language)) {
 				const wxLanguageInfo* fallbackInfo = wxLocale::FindLanguageInfo(language);
 				if (fallbackInfo && SetLocale(fallbackInfo->Language)) {
-					COptions::Get()->SetOption(OPTION_LANGUAGE, language.ToStdWstring());
+					COptions::Get()->set(OPTION_LANGUAGE, language.ToStdWstring());
 					return;
 				}
 			}
-			COptions::Get()->SetOption(OPTION_LANGUAGE, std::wstring());
+			COptions::Get()->set(OPTION_LANGUAGE, std::wstring());
 			if (pInfo && !pInfo->Description.empty()) {
 				wxMessageBoxEx(wxString::Format(_("Failed to set language to %s (%s), using default system language"), pInfo->Description, language), _("Failed to change language"), wxICON_EXCLAMATION);
 			}
@@ -271,8 +271,8 @@ USE AT OWN RISK"), _T("Important Information"));
 	else {
 		std::wstring v = GetEnv("FZDEBUG");
 		if (v != L"1") {
-			COptions::Get()->SetOption(OPTION_LOGGING_DEBUGLEVEL, 0);
-			COptions::Get()->SetOption(OPTION_LOGGING_RAWLISTING, 0);
+			COptions::Get()->set(OPTION_LOGGING_DEBUGLEVEL, 0);
+			COptions::Get()->set(OPTION_LOGGING_RAWLISTING, 0);
 		}
 	}
 #endif
@@ -604,7 +604,7 @@ void CFileZillaApp::CheckExistsFzstorj()
 }
 #endif
 
-void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env, int setting, std::wstring const& description)
+void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env, engineOptions setting, std::wstring const& description)
 {
 	// Get the correct path to the specified tool
 
@@ -689,7 +689,7 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 			_("File not found"), wxICON_ERROR | wxOK);
 		executable.clear();
 	}
-	COptions::Get()->SetOption(setting, executable);
+	COptions::Get()->set(setting, executable);
 }
 
 #ifdef __WXMSW__
@@ -781,7 +781,7 @@ void CFileZillaApp::ShowStartupProfile()
 
 std::wstring CFileZillaApp::GetSettingsFile(std::wstring const& name) const
 {
-	return COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR) + name + _T(".xml");
+	return COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR) + name + _T(".xml");
 }
 
 #if defined(__MINGW32__)

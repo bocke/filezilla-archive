@@ -57,7 +57,7 @@ CConditionalDialog::CConditionalDialog(wxWindow* parent, DialogType type, Modes 
 
 bool CConditionalDialog::Run()
 {
-	wxString dialogs = COptions::Get()->GetOption(OPTION_ONETIME_DIALOGS);
+	wxString dialogs = COptions::Get()->get_string(OPTION_ONETIME_DIALOGS);
 	if (dialogs.size() > static_cast<size_t>(m_type) && dialogs[m_type] == '1') {
 		return true;
 	}
@@ -75,7 +75,7 @@ bool CConditionalDialog::Run()
 			dialogs += _T("0");
 		}
 		dialogs[m_type] = '1';
-		COptions::Get()->SetOption(OPTION_ONETIME_DIALOGS, dialogs.ToStdWstring());
+		COptions::Get()->set(OPTION_ONETIME_DIALOGS, dialogs.ToStdWstring());
 	}
 
 	if (id == wxID_OK || id == wxID_YES) {

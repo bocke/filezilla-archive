@@ -74,7 +74,7 @@ void CRecentServerList::SetMostRecentServer(Site const& site)
 		}
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
 	}
 
@@ -88,7 +88,7 @@ void CRecentServerList::SetMostRecentServers(std::deque<Site> const& sites, bool
 		mutex.Lock();
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
 	}
 

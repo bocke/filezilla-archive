@@ -2,7 +2,7 @@
 
 #include "logging_private.h"
 
-#include "../include/optionsbase.h"
+#include "../include/engine_options.h"
 
 #include <libfilezilla/util.hpp>
 
@@ -29,12 +29,7 @@ int CLogging::m_refcount = 0;
 fz::mutex CLogging::mutex_(false);
 
 
-namespace {
-struct logging_options_changed_event_type;
-typedef fz::simple_event<logging_options_changed_event_type> CLoggingOptionsChangedEvent;
-}
-
-class CLoggingOptionsChanged final : public fz::event_handler, COptionChangeEventHandler
+class CLoggingOptionsChanged final : public fz::event_handler
 {
 public:
 	CLoggingOptionsChanged(CLogging& logger, COptionsBase& options, fz::event_loop& loop)
@@ -42,27 +37,21 @@ public:
 		, logger_(logger)
 		, options_(options)
 	{
-		RegisterOption(OPTION_LOGGING_DEBUGLEVEL);
-		RegisterOption(OPTION_LOGGING_RAWLISTING);
-		send_event<CLoggingOptionsChangedEvent>();
+		logger_.UpdateLogLevel(options_);
+		options_.watch(OPTION_LOGGING_DEBUGLEVEL, this);
+		options_.watch(OPTION_LOGGING_RAWLISTING, this);
 	}
 
 	virtual ~CLoggingOptionsChanged()
 	{
-		UnregisterAllOptions();
+		options_.unwatch_all(this);
 		remove_handler();
-	}
-
-	virtual void OnOptionsChanged(changed_options_t const& options)
-	{
-		if (options.test(OPTION_LOGGING_DEBUGLEVEL) || options.test(OPTION_LOGGING_RAWLISTING)) {
-			send_event<CLoggingOptionsChangedEvent>();
-		}
 	}
 
 	virtual void operator()(const fz::event_base&)
 	{
-		logger_.UpdateLogLevel(options_); // In worker thread
+		 // In worker thread
+		logger_.UpdateLogLevel(options_);
 	}
 
 	CLogging & logger_;
@@ -74,7 +63,7 @@ CLogging::CLogging(CFileZillaEnginePrivate & engine)
 {
 	{
 		fz::scoped_lock l(mutex_);
-		m_refcount++;
+		++m_refcount;
 	}
 	UpdateLogLevel(engine.GetOptions());
 	optionChangeHandler_ = std::make_unique<CLoggingOptionsChanged>(*this, engine_.GetOptions(), engine.event_loop_);
@@ -83,7 +72,7 @@ CLogging::CLogging(CFileZillaEnginePrivate & engine)
 CLogging::~CLogging()
 {
 	fz::scoped_lock l(mutex_);
-	m_refcount--;
+	--m_refcount;
 
 	if (!m_refcount) {
 #ifdef FZ_WINDOWS
@@ -109,7 +98,7 @@ bool CLogging::InitLogFile(fz::scoped_lock& l)
 
 	m_logfile_initialized = true;
 
-	m_file = fz::to_native(engine_.GetOptions().GetOption(OPTION_LOGGING_FILE));
+	m_file = fz::to_native(engine_.GetOptions().get_string(OPTION_LOGGING_FILE));
 	if (m_file.empty()) {
 		return false;
 	}
@@ -144,7 +133,7 @@ bool CLogging::InitLogFile(fz::scoped_lock& l)
 	m_pid = static_cast<unsigned int>(getpid());
 #endif
 
-	m_max_size = engine_.GetOptions().GetOptionVal(OPTION_LOGGING_FILE_SIZELIMIT);
+	m_max_size = engine_.GetOptions().get_int(OPTION_LOGGING_FILE_SIZELIMIT);
 	if (m_max_size < 0) {
 		m_max_size = 0;
 	}
@@ -342,7 +331,7 @@ void CLogging::LogToFile(logmsg::type nMessageType, std::wstring const& msg, fz:
 void CLogging::UpdateLogLevel(COptionsBase & options)
 {
 	logmsg::type enabled{};
-	switch (options.GetOptionVal(OPTION_LOGGING_DEBUGLEVEL)) {
+	switch (options.get_int(OPTION_LOGGING_DEBUGLEVEL)) {
 	case 1:
 		enabled = logmsg::debug_warning;
 		break;
@@ -358,7 +347,7 @@ void CLogging::UpdateLogLevel(COptionsBase & options)
 	default:
 		break;
 	}
-	if (options.GetOptionVal(OPTION_LOGGING_RAWLISTING) != 0) {
+	if (options.get_int(OPTION_LOGGING_RAWLISTING) != 0) {
 		enabled = static_cast<logmsg::type>(enabled | logmsg::listing);
 	}
 

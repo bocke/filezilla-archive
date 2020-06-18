@@ -3,7 +3,7 @@
 
 #include "state.h"
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 #include <wx/toolbar.h>
 
@@ -12,7 +12,7 @@ class CMainFrame;
 class CToolBar final : public wxToolBar, public CGlobalStateEventHandler, public COptionChangeEventHandler
 {
 public:
-	CToolBar() = default;
+	CToolBar();
 	virtual ~CToolBar();
 
 	void UpdateToolbarState();
@@ -31,7 +31,7 @@ protected:
 	void MakeTools();
 
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	CMainFrame* m_pMainFrame{};
 

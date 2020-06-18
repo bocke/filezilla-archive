@@ -5,7 +5,7 @@
 #include "input_thread.h"
 #include "../proxy.h"
 
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
@@ -18,7 +18,7 @@ int CStorjConnectOpData::Send()
 		{
 			log(logmsg::status, _("Connecting to %s..."), currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_));
 
-			auto executable = fz::to_native(engine_.GetOptions().GetOption(OPTION_FZSTORJ_EXECUTABLE));
+			auto executable = fz::to_native(engine_.GetOptions().get_string(OPTION_FZSTORJ_EXECUTABLE));
 			if (executable.empty()) {
 				executable = fzT("fzstorj");
 			}
@@ -40,11 +40,11 @@ int CStorjConnectOpData::Send()
 		}
 		return FZ_REPLY_WOULDBLOCK;
 	case connect_timeout:
-		return controlSocket_.SendCommand(fz::sprintf(L"timeout %d", engine_.GetOptions().GetOptionVal(OPTION_TIMEOUT)));
+		return controlSocket_.SendCommand(fz::sprintf(L"timeout %d", engine_.GetOptions().get_int(OPTION_TIMEOUT)));
 	case connect_proxy:
 		{
 			fz::uri proxy_uri;
-			switch (engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE))
+			switch (engine_.GetOptions().get_int(OPTION_PROXY_TYPE))
 			{
 			case 0:
 				opState = connect_host;
@@ -63,10 +63,10 @@ int CStorjConnectOpData::Send()
 				return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 			}
 
-			proxy_uri.host_ = fz::to_utf8(engine_.GetOptions().GetOption(OPTION_PROXY_HOST));
-			proxy_uri.port_ = engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT);
-			proxy_uri.user_ = fz::to_utf8(engine_.GetOptions().GetOption(OPTION_PROXY_USER));
-			proxy_uri.pass_ = fz::to_utf8(engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
+			proxy_uri.host_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_HOST));
+			proxy_uri.port_ = engine_.GetOptions().get_int(OPTION_PROXY_PORT);
+			proxy_uri.user_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_USER));
+			proxy_uri.pass_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_PASS));
 
 			auto cmd = L"proxy " + fz::to_wstring(proxy_uri.to_string());
 			proxy_uri.pass_.clear();

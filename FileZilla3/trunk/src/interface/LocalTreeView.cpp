@@ -250,10 +250,11 @@ EVT_MENU(XRCID("ID_OPEN"), CLocalTreeView::OnMenuOpen)
 END_EVENT_TABLE()
 
 CLocalTreeView::CLocalTreeView(wxWindow* parent, wxWindowID id, CState& state, CQueueView *pQueueView)
-	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER),
-	CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x),
-	CStateEventHandler(state),
-	m_pQueueView(pQueueView)
+	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER)
+	, CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x)
+	, CStateEventHandler(state)
+	, COptionChangeEventHandler(this)
+	, m_pQueueView(pQueueView)
 {
 	wxGetApp().AddStartupProfileRecord("CLocalTreeView::CLocalTreeView");
 #ifdef __WXMAC__
@@ -267,7 +268,7 @@ CLocalTreeView::CLocalTreeView(wxWindow* parent, wxWindowID id, CState& state, C
 	SetImageList(GetSystemImageList());
 
 	UpdateSortMode();
-	RegisterOption(OPTION_FILELIST_NAMESORT);
+	COptions::Get()->watch(OPTION_FILELIST_NAMESORT, this);
 
 #ifdef __WXMSW__
 	m_pVolumeEnumeratorThread = 0;
@@ -297,6 +298,7 @@ CLocalTreeView::CLocalTreeView(wxWindow* parent, wxWindowID id, CState& state, C
 
 CLocalTreeView::~CLocalTreeView()
 {
+	COptions::Get()->unwatch_all(this);
 #ifdef __WXMSW__
 	delete m_pVolumeEnumeratorThread;
 #endif
@@ -696,7 +698,7 @@ std::wstring CLocalTreeView::GetDirFromItem(wxTreeItemId item)
 void CLocalTreeView::UpdateSortMode()
 {
 	CFileListCtrlSortBase::NameSortMode sortMode;
-	switch (COptions::Get()->GetOptionVal(OPTION_FILELIST_NAMESORT))
+	switch (COptions::Get()->get_int(OPTION_FILELIST_NAMESORT))
 	{
 	case 0:
 	default:
@@ -932,7 +934,7 @@ void CLocalTreeView::OnStateChange(t_statechange_notifications notification, std
 
 void CLocalTreeView::OnBeginDrag(wxTreeEvent& event)
 {
-	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
 		return;
 	}
 
@@ -1664,7 +1666,7 @@ void CLocalTreeView::OnMenuOpen(wxCommandEvent&)
 	OpenInFileManager(path);
 }
 
-void CLocalTreeView::OnOptionsChanged(changed_options_t const& options)
+void CLocalTreeView::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_FILELIST_NAMESORT)) {
 		UpdateSortMode();

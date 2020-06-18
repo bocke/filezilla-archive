@@ -23,7 +23,7 @@
 #include "../servercapabilities.h"
 
 #include "../../include/externalipresolver.h"
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/iputils.hpp>
@@ -597,17 +597,17 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 	// Local IP should work. Only a complete moron would use IPv6
 	// and NAT at the same time.
 	if (socket_->address_family() != fz::address_type::ipv6) {
-		int mode = engine_.GetOptions().GetOptionVal(OPTION_EXTERNALIPMODE);
+		int mode = engine_.GetOptions().get_int(OPTION_EXTERNALIPMODE);
 
 		if (mode) {
-			if (engine_.GetOptions().GetOptionVal(OPTION_NOEXTERNALONLOCAL) &&
+			if (engine_.GetOptions().get_int(OPTION_NOEXTERNALONLOCAL) &&
 				!fz::is_routable_address(socket_->peer_ip()))
 				// Skip next block, use local address
 				goto getLocalIP;
 		}
 
 		if (mode == 1) {
-			std::wstring ip = engine_.GetOptions().GetOption(OPTION_EXTERNALIP);
+			std::wstring ip = engine_.GetOptions().get_string(OPTION_EXTERNALIP);
 			if (!ip.empty()) {
 				address = fz::to_string(ip);
 				return FZ_REPLY_OK;
@@ -619,14 +619,14 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 			if (!m_pIPResolver) {
 				std::string localAddress = socket_->local_ip(true);
 
-				if (!localAddress.empty() && localAddress == fz::to_string(engine_.GetOptions().GetOption(OPTION_LASTRESOLVEDIP))) {
+				if (!localAddress.empty() && localAddress == fz::to_string(engine_.GetOptions().get_string(OPTION_LASTRESOLVEDIP))) {
 					log(logmsg::debug_verbose, L"Using cached external IP address");
 
 					address = localAddress;
 					return FZ_REPLY_OK;
 				}
 
-				std::wstring resolverAddress = engine_.GetOptions().GetOption(OPTION_EXTERNALIPRESOLVER);
+				std::wstring resolverAddress = engine_.GetOptions().get_string(OPTION_EXTERNALIPRESOLVER);
 
 				log(logmsg::debug_info, _("Retrieving external IP address from %s"), resolverAddress);
 
@@ -646,7 +646,7 @@ int CFtpControlSocket::GetExternalIPAddress(std::string& address)
 				log(logmsg::debug_info, L"Got external IP address");
 				address = m_pIPResolver->GetIP();
 
-				engine_.GetOptions().SetOption(OPTION_LASTRESOLVEDIP, fz::to_wstring(address));
+				engine_.GetOptions().set(OPTION_LASTRESOLVEDIP, fz::to_wstring(address));
 
 				m_pIPResolver.reset();
 
@@ -748,7 +748,7 @@ void CFtpControlSocket::OnTimer(fz::timer_id id)
 
 void CFtpControlSocket::StartKeepaliveTimer()
 {
-	if (!engine_.GetOptions().GetOptionVal(OPTION_FTP_SENDKEEPALIVE)) {
+	if (!engine_.GetOptions().get_int(OPTION_FTP_SENDKEEPALIVE)) {
 		return;
 	}
 

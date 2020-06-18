@@ -90,7 +90,7 @@ bool COptionsPageDateFormatting::CreateControls(wxWindow* parent)
 
 bool COptionsPageDateFormatting::LoadPage()
 {
-	std::wstring const dateFormat = m_pOptions->GetOption(OPTION_DATE_FORMAT);
+	std::wstring const dateFormat = m_pOptions->get_string(OPTION_DATE_FORMAT);
 	if (dateFormat == _T("1")) {
 		impl_->date_iso_->SetValue(true);
 	}
@@ -102,7 +102,7 @@ bool COptionsPageDateFormatting::LoadPage()
 		impl_->date_system_->SetValue(true);
 	}
 
-	std::wstring const timeFormat = m_pOptions->GetOption(OPTION_TIME_FORMAT);
+	std::wstring const timeFormat = m_pOptions->get_string(OPTION_TIME_FORMAT);
 	if (timeFormat == _T("1")) {
 		impl_->time_iso_->SetValue(true);
 	}
@@ -131,7 +131,7 @@ bool COptionsPageDateFormatting::SavePage()
 	else {
 		dateFormat = L"0";
 	}
-	m_pOptions->SetOption(OPTION_DATE_FORMAT, dateFormat);
+	m_pOptions->set(OPTION_DATE_FORMAT, dateFormat);
 
 	std::wstring timeFormat;
 	if (impl_->time_custom_->GetValue()) {
@@ -143,7 +143,7 @@ bool COptionsPageDateFormatting::SavePage()
 	else {
 		timeFormat = L"0";
 	}
-	m_pOptions->SetOption(OPTION_TIME_FORMAT, timeFormat);
+	m_pOptions->set(OPTION_TIME_FORMAT, timeFormat);
 
 	return true;
 }
