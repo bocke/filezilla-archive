@@ -114,7 +114,7 @@ struct watched_options final
 	std::vector<uint64_t> options_;
 };
 
-enum options_changed_event_type;
+struct options_changed_event_type{};
 typedef fz::simple_event<options_changed_event_type, watched_options> options_changed_event;
 
 
