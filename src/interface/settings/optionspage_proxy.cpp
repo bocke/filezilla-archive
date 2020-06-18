@@ -4,6 +4,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_proxy.h"
+#include "../xrc_helper.h"
 
 BEGIN_EVENT_TABLE(COptionsPageProxy, COptionsPageProxy::COptionsPage)
 EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_NONE"), COptionsPageProxy::OnProxyTypeChanged)
@@ -16,12 +17,12 @@ bool COptionsPageProxy::LoadPage()
 {
 	bool failure = false;
 
-	SetTextFromOption(XRCID("ID_PROXY_HOST"), OPTION_PROXY_HOST, failure);
-	SetTextFromOption(XRCID("ID_PROXY_PORT"), OPTION_PROXY_PORT, failure);
-	SetTextFromOption(XRCID("ID_PROXY_USER"), OPTION_PROXY_USER, failure);
-	SetTextFromOption(XRCID("ID_PROXY_PASS"), OPTION_PROXY_PASS, failure);
+	xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_HOST));
+	xrc_call(*this, "ID_PROXY_PORT", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_PORT));
+	xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_USER));
+	xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_PASS));
 
-	int type = m_pOptions->GetOptionVal(OPTION_PROXY_TYPE);
+	int type = m_pOptions->get_int(OPTION_PROXY_TYPE);
 	switch (type)
 	{
 	default:
@@ -39,53 +40,60 @@ bool COptionsPageProxy::LoadPage()
 		break;
 	}
 
-	if (!failure)
+	if (!failure) {
 		SetCtrlState();
+	}
 
 	return !failure;
 }
 
 bool COptionsPageProxy::SavePage()
 {
-	SetOptionFromText(XRCID("ID_PROXY_HOST"), OPTION_PROXY_HOST);
-	SetOptionFromText(XRCID("ID_PROXY_PORT"), OPTION_PROXY_PORT);
-	SetOptionFromText(XRCID("ID_PROXY_USER"), OPTION_PROXY_USER);
-	SetOptionFromText(XRCID("ID_PROXY_PASS"), OPTION_PROXY_PASS);
+	m_pOptions->set(OPTION_PROXY_HOST, xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_PORT, xrc_call(*this, "ID_PROXY_PORT", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_USER, xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_PASS, xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::GetValue).ToStdWstring());
 
 	int type;
-	if (GetRCheck(XRCID("ID_PROXYTYPE_HTTP")))
+	if (GetRCheck(XRCID("ID_PROXYTYPE_HTTP"))) {
 		type = 1;
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS5")))
+	}
+	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS5"))) {
 		type = 2;
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS4")))
+	}
+	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS4"))) {
 		type = 3;
-	else
+	}
+	else {
 		type = 0;
-	m_pOptions->SetOption(OPTION_PROXY_TYPE, type);
+	}
+	m_pOptions->set(OPTION_PROXY_TYPE, type);
 
 	return true;
 }
 
 bool COptionsPageProxy::Validate()
 {
-	if (XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue())
+	if (XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue()) {
 		return true;
+	}
 
 	wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_PROXY_HOST", wxTextCtrl);
 	wxString host = pTextCtrl->GetValue();
 	host.Trim(false);
 	host.Trim(true);
-	if (host.empty())
+	if (host.empty()) {
 		return DisplayError(_T("ID_PROXY_HOST"), _("You need to enter a proxy host."));
-	else
-	{
+	}
+	else {
 		pTextCtrl->ChangeValue(host);
 	}
 
 	pTextCtrl = XRCCTRL(*this, "ID_PROXY_PORT", wxTextCtrl);
 	unsigned long port;
-	if (!pTextCtrl->GetValue().ToULong(&port) || port < 1 || port > 65536)
+	if (!pTextCtrl->GetValue().ToULong(&port) || port < 1 || port > 65536) {
 		return DisplayError(_T("ID_PROXY_PORT"), _("You need to enter a proxy port in the range from 1 to 65535"));
+	}
 
 	return true;
 }

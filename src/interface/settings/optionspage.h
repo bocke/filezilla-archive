@@ -3,7 +3,8 @@
 
 #include <wx/panel.h>
 
-class COptions;
+#include "../Options.h"
+
 class CSettingsDialog;
 class COptionsPage : public wxPanel
 {
@@ -17,10 +18,10 @@ public:
 	virtual bool Validate() { return true; }
 
 	void SetCheck(int id, bool checked, bool& failure);
-	void SetCheckFromOption(int control_id, int option_id, bool& failure);
+	void SetCheckFromOption(int control_id, interfaceOptions option_id, bool& failure);
 	void SetRCheck(int id, bool checked, bool& failure);
-	void SetTextFromOption(int ctrlId, int optionId, bool& failure);
-	void SetStaticText(int id, const wxString& text, bool& failure);
+	void SetTextFromOption(int ctrlId, interfaceOptions optionId, bool& failure);
+	void SetStaticText(int id, wxString const& text, bool& failure);
 	void SetChoice(int id, int selection, bool& failure);
 	bool SetText(int id, std::wstring const& text, bool& failure);
 
@@ -31,15 +32,15 @@ public:
 	std::wstring GetText(int id) const;
 	int GetChoice(int id) const;
 
-	void SetOptionFromText(int ctrlId, int optionId);
-	void SetIntOptionFromText(int ctrlId, int optionId); // There's no corresponding GetTextFromIntOption as COptions::GetOption is smart enough to convert
-	void SetOptionFromCheck(int control_id, int option_id);
+	void SetOptionFromText(int ctrlId, interfaceOptions optionId);
+	void SetIntOptionFromText(int ctrlId, interfaceOptions optionId); // There's no corresponding GetTextFromIntOption as COptions::GetOption is smart enough to convert
+	void SetOptionFromCheck(int control_id, interfaceOptions option_id);
 
 	void ReloadSettings();
 
 	// Always returns false
-	bool DisplayError(const wxString& controlToFocus, const wxString& error);
-	bool DisplayError(wxWindow* pWnd, const wxString& error);
+	bool DisplayError(wxString const& controlToFocus, wxString const& error);
+	bool DisplayError(wxWindow* pWnd, wxString const& error);
 
 	bool Display();
 

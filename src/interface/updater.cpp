@@ -61,10 +61,10 @@ PqQuF7sJR6POArUVYkRD/2LIWsB7\n\
 
 void version_information::update_available()
 {
-	if (!nightly_.url_.empty() && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK_CHECKBETA) == 2) {
+	if (!nightly_.url_.empty() && COptions::Get()->get_int(OPTION_UPDATECHECK_CHECKBETA) == 2) {
 		available_ = nightly_;
 	}
-	else if (!beta_.version_.empty() && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK_CHECKBETA) != 0) {
+	else if (!beta_.version_.empty() && COptions::Get()->get_int(OPTION_UPDATECHECK_CHECKBETA) != 0) {
 		available_ = beta_;
 	}
 	else if (!stable_.version_.empty()) {
@@ -91,8 +91,8 @@ void CUpdater::Init()
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !LongTimeSinceLastCheck()) {
-		raw_version_information_ = COptions::Get()->GetOption(OPTION_UPDATECHECK_NEWVERSION);
+	if (COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !LongTimeSinceLastCheck()) {
+		raw_version_information_ = COptions::Get()->get_string(OPTION_UPDATECHECK_NEWVERSION);
 	}
 
 	UpdaterState s = ProcessFinishedData(FZ_AUTOUPDATECHECK);
@@ -128,7 +128,7 @@ void CUpdater::AutoRunIfNeeded()
 {
 #if FZ_AUTOUPDATECHECK
 	if (state_ == UpdaterState::failed || state_ == UpdaterState::idle || state_ == UpdaterState::newversion_stale) {
-		if (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0) {
+		if (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0) {
 			if (LongTimeSinceLastCheck()) {
 				Run(false);
 			}
@@ -158,7 +158,7 @@ void CUpdater::RunIfNeeded()
 
 bool CUpdater::LongTimeSinceLastCheck() const
 {
-	std::wstring const lastCheckStr = COptions::Get()->GetOption(OPTION_UPDATECHECK_LASTDATE);
+	std::wstring const lastCheckStr = COptions::Get()->get_string(OPTION_UPDATECHECK_LASTDATE);
 	if (lastCheckStr.empty()) {
 		return true;
 	}
@@ -177,7 +177,7 @@ bool CUpdater::LongTimeSinceLastCheck() const
 
 	int days = 1;
 	if (!CBuildInfo::IsUnstable()) {
-		days = COptions::Get()->GetOptionVal(OPTION_UPDATECHECK_INTERVAL);
+		days = COptions::Get()->get_int(OPTION_UPDATECHECK_INTERVAL);
 	}
 	return span.get_days() >= days;
 }
@@ -240,7 +240,7 @@ fz::uri CUpdater::GetUrl()
 		qs["cpuid"] = cpuCaps;
 	}
 
-	std::wstring const lastVersion = COptions::Get()->GetOption(OPTION_UPDATECHECK_LASTVERSION);
+	std::wstring const lastVersion = COptions::Get()->get_string(OPTION_UPDATECHECK_LASTVERSION);
 	if (lastVersion != CBuildInfo::GetVersion()) {
 		qs["initial"] = "1";
 	}
@@ -269,7 +269,7 @@ bool CUpdater::Run(bool manual)
 	}
 
 	auto const t = fz::datetime::now();
-	COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
+	COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
 
 	local_file_.clear();
 	log_ = fz::sprintf(_("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
@@ -521,7 +521,7 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 		}
 	}
 	else if (state_ == UpdaterState::checking) {
-		COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTVERSION, CBuildInfo::GetVersion());
+		COptions::Get()->set(OPTION_UPDATECHECK_LASTVERSION, CBuildInfo::GetVersion());
 		s = ProcessFinishedData(true);
 	}
 	else {
@@ -602,7 +602,7 @@ void CUpdater::ProcessData(CDataNotification& dataNotification)
 	size_t len;
 	char* data = dataNotification.Detach(len);
 
-	if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+	if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 		log_ += fz::sprintf(_T("ProcessData %u\n"), len);
 	}
 
@@ -659,7 +659,7 @@ void CUpdater::ParseData()
 			version_information_.changelog_ = raw_version_information;
 			fz::trim(version_information_.changelog_);
 
-			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Changelog: %s\n", version_information_.changelog_);
 			}
 			break;
@@ -667,7 +667,7 @@ void CUpdater::ParseData()
 
 		std::wstring const& type = tokens[0];
 		if (tokens.size() < 2) {
-			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Skipping line with one token of type %s\n", type);
 			}
 			continue;
@@ -715,7 +715,7 @@ void CUpdater::ParseData()
 		if (type == L"nightly") {
 			fz::datetime nightlyDate(versionOrDate, fz::datetime::utc);
 			if (nightlyDate.empty()) {
-				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += L"Could not parse nightly date\n";
 				}
 				continue;
@@ -723,7 +723,7 @@ void CUpdater::ParseData()
 
 			fz::datetime buildDate = CBuildInfo::GetBuildDate();
 			if (buildDate.empty() || nightlyDate.empty() || nightlyDate <= buildDate) {
-				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += L"Nightly isn't newer\n";
 				}
 				continue;
@@ -736,7 +736,7 @@ void CUpdater::ParseData()
 			}
 		}
 		else {
-			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Skipping line with unknown type %s\n", type);
 			}
 			continue;
@@ -746,7 +746,7 @@ void CUpdater::ParseData()
 		b.version_ = versionOrDate;
 
 		if (tokens.size() < 6) {
-			if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Not parsing build line with only %d tokens", tokens.size());
 			}
 		}
@@ -757,7 +757,7 @@ void CUpdater::ParseData()
 			std::wstring const& hash = tokens[5];
 
 			if (GetFilename(url).empty()) {
-				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += fz::sprintf(L"Could not extract filename from URL: %s\n", url);
 				}
 				continue;
@@ -769,7 +769,7 @@ void CUpdater::ParseData()
 
 			auto const size = fz::to_integral<uint64_t>(sizestr);
 			if (!size) {
-				if (COptions::Get()->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += fz::sprintf(L"Could not parse size: %s\n", sizestr);
 				}
 				continue;
@@ -830,7 +830,7 @@ void CUpdater::ParseData()
 
 	version_information_.update_available();
 
-	COptions::Get()->SetOption(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
+	COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
 }
 
 void CUpdater::OnTimer(wxTimerEvent&)

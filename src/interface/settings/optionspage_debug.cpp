@@ -3,14 +3,15 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_debug.h"
+#include "../xrc_helper.h"
 
 bool COptionsPageDebug::LoadPage()
 {
 	bool failure = false;
 
 	SetCheckFromOption(XRCID("ID_DEBUGMENU"), OPTION_DEBUG_MENU, failure);
-	SetCheckFromOption(XRCID("ID_RAWLISTING"), OPTION_LOGGING_RAWLISTING, failure);
-	SetChoice(XRCID("ID_DEBUGLEVEL"), m_pOptions->GetOptionVal(OPTION_LOGGING_DEBUGLEVEL), failure);
+	xrc_call(*this, "ID_RAWLISTING", &wxCheckBox::SetValue, m_pOptions->get_bool(OPTION_LOGGING_RAWLISTING));
+	SetChoice(XRCID("ID_DEBUGLEVEL"), m_pOptions->get_int(OPTION_LOGGING_DEBUGLEVEL), failure);
 
 	return !failure;
 }
@@ -18,8 +19,8 @@ bool COptionsPageDebug::LoadPage()
 bool COptionsPageDebug::SavePage()
 {
 	SetOptionFromCheck(XRCID("ID_DEBUGMENU"), OPTION_DEBUG_MENU);
-	SetOptionFromCheck(XRCID("ID_RAWLISTING"), OPTION_LOGGING_RAWLISTING);
-	m_pOptions->SetOption(OPTION_LOGGING_DEBUGLEVEL, GetChoice(XRCID("ID_DEBUGLEVEL")));
+	m_pOptions->set(OPTION_LOGGING_RAWLISTING, xrc_call(*this, "ID_RAWLISTING", &wxCheckBox::GetValue));
+	m_pOptions->set(OPTION_LOGGING_DEBUGLEVEL, GetChoice(XRCID("ID_DEBUGLEVEL")));
 
 	return true;
 }

@@ -294,7 +294,8 @@ void ShowStorjOverlay(wxWindow* parent, wxWindow* anchor, wxPoint const& offset)
 }*/
 
 CMainFrame::CMainFrame()
-	: m_engineContext(*COptions::Get(), CustomEncodingConverter::Get())
+	: COptionChangeEventHandler(this)
+	, m_engineContext(*COptions::Get(), CustomEncodingConverter::Get())
 	, m_comparisonToggleAcceleratorId(wxNewId())
 {
 	m_pActivityLed[0] = m_pActivityLed[1] = 0;
@@ -345,14 +346,14 @@ CMainFrame::CMainFrame()
 	m_closeEventTimer.SetOwner(this);
 
 	if (CFilterManager::HasActiveFilters(true)) {
-		if (COptions::Get()->GetOptionVal(OPTION_FILTERTOGGLESTATE)) {
+		if (COptions::Get()->get_int(OPTION_FILTERTOGGLESTATE)) {
 			CFilterManager::ToggleFilters();
 		}
 	}
 
 	CreateMenus();
 	CreateMainToolBar();
-	if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUICKCONNECT)) {
+	if (COptions::Get()->get_int(OPTION_SHOW_QUICKCONNECT)) {
 		CreateQuickconnectBar();
 	}
 
@@ -375,7 +376,7 @@ CMainFrame::CMainFrame()
 	m_pBottomSplitter->SetMinimumPaneSize(20, 70);
 	m_pBottomSplitter->SetSashGravity(1.0);
 
-	const int message_log_position = COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION);
+	const int message_log_position = COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION);
 	m_pQueueLogSplitter = new CSplitterWindowEx(m_pBottomSplitter, -1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER | wxSP_LIVE_UPDATE);
 	m_pQueueLogSplitter->SetMinimumPaneSize(50, 250);
 	m_pQueueLogSplitter->SetSashGravity(0.5);
@@ -399,8 +400,8 @@ CMainFrame::CMainFrame()
 	switch (message_log_position) {
 	case 1:
 		m_pTopSplitter->Initialize(m_pBottomSplitter);
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG)) {
-			if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
+		if (COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG)) {
+			if (COptions::Get()->get_int(OPTION_SHOW_QUEUE)) {
 				m_pQueueLogSplitter->SplitVertically(m_pQueuePane, m_pStatusView);
 			}
 			else {
@@ -409,7 +410,7 @@ CMainFrame::CMainFrame()
 			}
 		}
 		else {
-			if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
+			if (COptions::Get()->get_int(OPTION_SHOW_QUEUE)) {
 				m_pStatusView->Hide();
 				m_pQueueLogSplitter->Initialize(m_pQueuePane);
 			}
@@ -422,7 +423,7 @@ CMainFrame::CMainFrame()
 		break;
 	case 2:
 		m_pTopSplitter->Initialize(m_pBottomSplitter);
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
+		if (COptions::Get()->get_int(OPTION_SHOW_QUEUE)) {
 			m_pQueueLogSplitter->Initialize(m_pQueuePane);
 		}
 		else {
@@ -432,14 +433,14 @@ CMainFrame::CMainFrame()
 		m_pQueuePane->AddPage(m_pStatusView, _("Message log"));
 		break;
 	default:
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE)) {
+		if (COptions::Get()->get_int(OPTION_SHOW_QUEUE)) {
 			m_pQueueLogSplitter->Initialize(m_pQueuePane);
 		}
 		else {
 			m_pQueuePane->Hide();
 			m_pQueueLogSplitter->Hide();
 		}
-		if (COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG)) {
+		if (COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG)) {
 			m_pTopSplitter->SplitHorizontally(m_pStatusView, m_pBottomSplitter);
 		}
 		else {
@@ -479,16 +480,16 @@ CMainFrame::CMainFrame()
 
 	FixTabOrder();
 
-	RegisterOption(OPTION_ICONS_THEME);
-	RegisterOption(OPTION_ICONS_SCALE);
-	RegisterOption(OPTION_MESSAGELOG_POSITION);
-	RegisterOption(OPTION_FILEPANE_LAYOUT);
-	RegisterOption(OPTION_FILEPANE_SWAP);
+	COptions::Get()->watch(OPTION_ICONS_THEME, this);
+	COptions::Get()->watch(OPTION_ICONS_SCALE, this);
+	COptions::Get()->watch(OPTION_MESSAGELOG_POSITION, this);
+	COptions::Get()->watch(OPTION_FILEPANE_LAYOUT, this);
+	COptions::Get()->watch(OPTION_FILEPANE_SWAP, this);
 }
 
 CMainFrame::~CMainFrame()
 {
-	UnregisterAllOptions();
+	COptions::Get()->unwatch_all(this);
 
 	CPowerManagement::Destroy();
 
@@ -679,8 +680,8 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 	else if (event.GetId() == XRCID("ID_CLEAR_UPDATER")) {
 #if FZ_MANUALUPDATECHECK
 		if (m_pUpdater) {
-			COptions::Get()->SetOption(OPTION_UPDATECHECK_LASTDATE, std::wstring());
-			COptions::Get()->SetOption(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
+			COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
+			COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
 			m_pUpdater->Init();
 		}
 #endif
@@ -710,7 +711,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		}
 	}
 	else if (event.GetId() == XRCID("ID_MENU_SERVER_VIEWHIDDEN")) {
-		bool showHidden = COptions::Get()->GetOptionVal(OPTION_VIEW_HIDDEN_FILES) ? 0 : 1;
+		bool showHidden = COptions::Get()->get_int(OPTION_VIEW_HIDDEN_FILES) ? 0 : 1;
 		if (showHidden) {
 			CConditionalDialog dlg(this, CConditionalDialog::viewhidden, CConditionalDialog::ok, false);
 			dlg.SetTitle(_("Force showing hidden files"));
@@ -722,7 +723,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 			(void)dlg.Run();
 		}
 
-		COptions::Get()->SetOption(OPTION_VIEW_HIDDEN_FILES, showHidden ? 1 : 0);
+		COptions::Get()->set(OPTION_VIEW_HIDDEN_FILES, showHidden ? 1 : 0);
 		const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 		for (auto & pState : *pStates) {
 			CServerPath path = pState->GetRemotePath();
@@ -744,13 +745,13 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		dlg.ShowModal();
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_TYPE_AUTO")) {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 0);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 0);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_TYPE_ASCII")) {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 1);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 1);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_TYPE_BINARY")) {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 2);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 2);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_PRESERVETIMES")) {
 		if (event.IsChecked()) {
@@ -759,7 +760,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 			dlg.AddText(_("Please note that preserving timestamps on uploads on FTP, FTPS and FTPES servers only works if they support the MFMT command."));
 			dlg.Run();
 		}
-		COptions::Get()->SetOption(OPTION_PRESERVE_TIMESTAMPS, event.IsChecked() ? 1 : 0);
+		COptions::Get()->set(OPTION_PRESERVE_TIMESTAMPS, event.IsChecked() ? 1 : 0);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_PROCESSQUEUE")) {
 		if (m_pQueueView) {
@@ -799,8 +800,8 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		wxLaunchDefaultBrowser(url);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_VIEW_FILELISTSTATUSBAR")) {
-		bool show = COptions::Get()->GetOptionVal(OPTION_FILELIST_STATUSBAR) == 0;
-		COptions::Get()->SetOption(OPTION_FILELIST_STATUSBAR, show ? 1 : 0);
+		bool show = COptions::Get()->get_int(OPTION_FILELIST_STATUSBAR) == 0;
+		COptions::Get()->set(OPTION_FILELIST_STATUSBAR, show ? 1 : 0);
 		CContextControl::_context_controls* controls = m_pContextControl ? m_pContextControl->GetCurrentControls() : 0;
 		if (controls && controls->pLocalListViewPanel) {
 			wxStatusBar* pStatusBar = controls->pLocalListViewPanel->GetStatusBar();
@@ -829,7 +830,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 			wxSize clientSize = GetClientSize();
 			m_pTopSplitter->SetSize(0, 0, clientSize.GetWidth(), clientSize.GetHeight());
 		}
-		COptions::Get()->SetOption(OPTION_SHOW_QUICKCONNECT, m_pQuickconnectBar != 0);
+		COptions::Get()->set(OPTION_SHOW_QUICKCONNECT, m_pQuickconnectBar != 0);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_MANUAL")) {
 		CState* pState = CContextManager::Get()->GetCurrentContext();
@@ -883,16 +884,16 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		dlg.Run(this, true);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_SPEEDLIMITS_ENABLE")) {
-		bool enable = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_ENABLE) == 0;
+		bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) == 0;
 
-		const int downloadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
-		const int uploadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
+		const int downloadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
+		const int uploadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 		if (enable && !downloadLimit && !uploadLimit) {
 			CSpeedLimitsDialog dlg;
 			dlg.Run(this);
 		}
 		else {
-			COptions::Get()->SetOption(OPTION_SPEEDLIMIT_ENABLE, enable ? 1 : 0);
+			COptions::Get()->set(OPTION_SPEEDLIMIT_ENABLE, enable ? 1 : 0);
 		}
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_SPEEDLIMITS_CONFIGURE")) {
@@ -905,8 +906,8 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 			return;
 		}
 
-		int old_mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
-		COptions::Get()->SetOption(OPTION_COMPARISONMODE, old_mode ? 0 : 1);
+		int old_mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
+		COptions::Get()->set(OPTION_COMPARISONMODE, old_mode ? 0 : 1);
 
 		CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 		if (pComparisonManager && pComparisonManager->IsComparing()) {
@@ -975,7 +976,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 			if (m_pStatusView) {
 				m_pStatusView->AddToLog(std::move(static_cast<CLogmsgNotification&>(*pNotification.get())));
 			}
-			if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2 && m_pQueuePane) {
+			if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2 && m_pQueuePane) {
 				m_pQueuePane->Highlight(3);
 			}
 			break;
@@ -1057,17 +1058,17 @@ void CMainFrame::OnUpdateLedTooltip(wxCommandEvent&)
 	wxFileOffset downloadSpeed = m_pQueueView ? m_pQueueView->GetCurrentDownloadSpeed() : 0;
 	wxFileOffset uploadSpeed = m_pQueueView ? m_pQueueView->GetCurrentUploadSpeed() : 0;
 
-	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->GetOptionVal(OPTION_SIZE_FORMAT));
+	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->get_int(OPTION_SIZE_FORMAT));
 	if (format == CSizeFormat::bytes) {
 		format = CSizeFormat::iec;
 	}
 
 	const wxString downloadSpeedStr = CSizeFormat::Format(downloadSpeed, true, format,
-														  COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0,
-														  COptions::Get()->GetOptionVal(OPTION_SIZE_DECIMALPLACES));
+														  COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+														  COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
 	const wxString uploadSpeedStr = CSizeFormat::Format(uploadSpeed, true, format,
-														COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0,
-														COptions::Get()->GetOptionVal(OPTION_SIZE_DECIMALPLACES));
+														COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+														COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
 	tooltipText.Printf(_("Download speed: %s/s\nUpload speed: %s/s"), downloadSpeedStr, uploadSpeedStr);
 
 	m_pActivityLed[0]->SetToolTip(tooltipText);
@@ -1080,7 +1081,7 @@ bool CMainFrame::CreateMainToolBar()
 	if (m_pToolBar) {
 #ifdef __WXMAC__
 		if (m_pToolBar) {
-			COptions::Get()->SetOption(OPTION_TOOLBAR_HIDDEN, m_pToolBar->IsShown() ? 0 : 1);
+			COptions::Get()->set(OPTION_TOOLBAR_HIDDEN, m_pToolBar->IsShown() ? 0 : 1);
 		}
 #endif
 		SetToolBar(0);
@@ -1089,7 +1090,7 @@ bool CMainFrame::CreateMainToolBar()
 	}
 
 #ifndef __WXMAC__
-	if (COptions::Get()->GetOptionVal(OPTION_TOOLBAR_HIDDEN) != 0) {
+	if (COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) != 0) {
 		return true;
 	}
 #endif
@@ -1102,7 +1103,7 @@ bool CMainFrame::CreateMainToolBar()
 	SetToolBar(m_pToolBar);
 
 #ifdef __WXMAC__
-	if (COptions::Get()->GetOptionVal(OPTION_TOOLBAR_HIDDEN) != 0) {
+	if (COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) != 0) {
 		m_pToolBar->Show(false);
 	}
 #endif
@@ -1303,7 +1304,7 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 
 #ifdef __WXMAC__
 		if (m_pToolBar) {
-			COptions::Get()->SetOption(OPTION_TOOLBAR_HIDDEN, m_pToolBar->IsShown() ? 0 : 1);
+			COptions::Get()->set(OPTION_TOOLBAR_HIDDEN, m_pToolBar->IsShown() ? 0 : 1);
 		}
 #endif
 		m_bQuit = true;
@@ -1385,7 +1386,7 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 	CSiteManager::ClearIdMap();
 
 	bool filters_toggled = CFilterManager::HasActiveFilters(true) && !CFilterManager::HasActiveFilters(false);
-	COptions::Get()->SetOption(OPTION_FILTERTOGGLESTATE, filters_toggled ? 1 : 0);
+	COptions::Get()->set(OPTION_FILTERTOGGLESTATE, filters_toggled ? 1 : 0);
 
 	Destroy();
 }
@@ -1553,19 +1554,19 @@ void CMainFrame::OnMenuEditSettings(wxCommandEvent&)
 
 	COptions* pOptions = COptions::Get();
 
-	wxString oldLang = pOptions->GetOption(OPTION_LANGUAGE);
+	wxString oldLang = pOptions->get_string(OPTION_LANGUAGE);
 
-	int oldShowDebugMenu = pOptions->GetOptionVal(OPTION_DEBUG_MENU) != 0;
+	int oldShowDebugMenu = pOptions->get_int(OPTION_DEBUG_MENU) != 0;
 
 	int res = dlg.ShowModal();
 	if (res != wxID_OK) {
 		return;
 	}
 
-	wxString newLang = pOptions->GetOption(OPTION_LANGUAGE);
+	wxString newLang = pOptions->get_string(OPTION_LANGUAGE);
 
 	if (oldLang != newLang ||
-		oldShowDebugMenu != pOptions->GetOptionVal(OPTION_DEBUG_MENU))
+		oldShowDebugMenu != pOptions->get_int(OPTION_DEBUG_MENU))
 	{
 		CreateMenus();
 	}
@@ -1584,7 +1585,7 @@ void CMainFrame::OnToggleLogView(wxCommandEvent&)
 
 	bool shown;
 
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 1) {
+	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 1) {
 		if (!m_pQueueLogSplitter) {
 			return;
 		}
@@ -1618,8 +1619,8 @@ void CMainFrame::OnToggleLogView(wxCommandEvent&)
 		}
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) != 2) {
-		COptions::Get()->SetOption(OPTION_SHOW_MESSAGELOG, shown);
+	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) != 2) {
+		COptions::Get()->set(OPTION_SHOW_MESSAGELOG, shown);
 	}
 }
 
@@ -1646,8 +1647,8 @@ void CMainFrame::ShowDirectoryTree(bool local, bool show)
 		return;
 	}
 
-	const int layout = COptions::Get()->GetOptionVal(OPTION_FILEPANE_LAYOUT);
-	const int swap = COptions::Get()->GetOptionVal(OPTION_FILEPANE_SWAP);
+	const int layout = COptions::Get()->get_int(OPTION_FILEPANE_LAYOUT);
+	const int swap = COptions::Get()->get_int(OPTION_FILEPANE_SWAP);
 	for (int i = 0; i < m_pContextControl->GetTabCount(); ++i) {
 		CContextControl::_context_controls* controls = m_pContextControl->GetControlsFromTabIndex(i);
 		if (!controls) {
@@ -1677,7 +1678,7 @@ void CMainFrame::ShowDirectoryTree(bool local, bool show)
 		}
 	}
 
-	COptions::Get()->SetOption(local ? OPTION_SHOW_TREE_LOCAL : OPTION_SHOW_TREE_REMOTE, show);
+	COptions::Get()->set(local ? OPTION_SHOW_TREE_LOCAL : OPTION_SHOW_TREE_REMOTE, show);
 }
 
 void CMainFrame::OnToggleQueueView(wxCommandEvent&)
@@ -1687,7 +1688,7 @@ void CMainFrame::OnToggleQueueView(wxCommandEvent&)
 	}
 
 	bool shown;
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 1) {
+	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 1) {
 		if (!m_pQueueLogSplitter) {
 			return;
 		}
@@ -1721,7 +1722,7 @@ void CMainFrame::OnToggleQueueView(wxCommandEvent&)
 		shown = m_pBottomSplitter->IsSplit();
 	}
 
-	COptions::Get()->SetOption(OPTION_SHOW_QUEUE, shown);
+	COptions::Get()->set(OPTION_SHOW_QUEUE, shown);
 }
 
 void CMainFrame::OnMenuHelpAbout(wxCommandEvent&)
@@ -1760,7 +1761,7 @@ void CMainFrame::OnCheckForUpdates(wxCommandEvent& event)
 		return;
 	}
 
-	if (event.GetId() == XRCID("ID_CHECKFORUPDATES") || (!COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->GetOptionVal(OPTION_UPDATECHECK) != 0)) {
+	if (event.GetId() == XRCID("ID_CHECKFORUPDATES") || (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0)) {
 		m_pUpdater->RunIfNeeded();
 	}
 
@@ -1838,10 +1839,10 @@ void CMainFrame::TriggerUpdateDialog()
 
 void CMainFrame::UpdateLayout()
 {
-	int const layout = COptions::Get()->GetOptionVal(OPTION_FILEPANE_LAYOUT);
-	int const swap = COptions::Get()->GetOptionVal(OPTION_FILEPANE_SWAP);
+	int const layout = COptions::Get()->get_int(OPTION_FILEPANE_LAYOUT);
+	int const swap = COptions::Get()->get_int(OPTION_FILEPANE_SWAP);
 
-	int const messagelog_position = COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION);
+	int const messagelog_position = COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION);
 
 	// First handle changes in message log position as it can make size of the other panes change
 	{
@@ -2046,7 +2047,7 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pS
 	}
 
 	if (pState->IsRemoteConnected() || !pState->IsRemoteIdle()) {
-		int action = COptions::Get()->GetOptionVal(OPTION_ALREADYCONNECTED_CHOICE);
+		int action = COptions::Get()->get_int(OPTION_ALREADYCONNECTED_CHOICE);
 		if (action < 2) {
 			wxDialogEx dlg;
 			if (!dlg.Load(this, _T("ID_ALREADYCONNECTED"))) {
@@ -2074,7 +2075,7 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pS
 			if (XRCCTRL(dlg, "ID_REMEMBER", wxCheckBox)->IsChecked()) {
 				action |= 2;
 			}
-			COptions::Get()->SetOption(OPTION_ALREADYCONNECTED_CHOICE, action);
+			COptions::Get()->set(OPTION_ALREADYCONNECTED_CHOICE, action);
 		}
 
 		if (!(action & 1)) {
@@ -2251,7 +2252,7 @@ void CMainFrame::RememberSplitterPositions()
 		static_cast<int>(m_pQueueLogSplitter->GetRelativeSashPosition() * 1000000000)
 	);
 
-	COptions::Get()->SetOption(OPTION_MAINWINDOW_SPLITTER_POSITION, posString);
+	COptions::Get()->set(OPTION_MAINWINDOW_SPLITTER_POSITION, posString);
 }
 
 bool CMainFrame::RestoreSplitterPositions()
@@ -2261,7 +2262,7 @@ bool CMainFrame::RestoreSplitterPositions()
 	}
 
 	// top_pos bottom_height view_pos view_height_width local_pos remote_pos
-	std::wstring const positions = COptions::Get()->GetOption(OPTION_MAINWINDOW_SPLITTER_POSITION);
+	std::wstring const positions = COptions::Get()->get_string(OPTION_MAINWINDOW_SPLITTER_POSITION);
 	auto tokens = fz::strtok_view(positions, L" ");
 	if (tokens.size() < 6) {
 		return false;
@@ -2381,7 +2382,7 @@ void CMainFrame::OnToolbarComparison(wxCommandEvent&)
 		return;
 	}
 
-	if (!COptions::Get()->GetOptionVal(OPTION_FILEPANE_LAYOUT)) {
+	if (!COptions::Get()->get_int(OPTION_FILEPANE_LAYOUT)) {
 		CContextControl::_context_controls* controls = m_pContextControl->GetCurrentControls();
 		if (!controls) {
 			return;
@@ -2455,7 +2456,7 @@ void CMainFrame::OnToolbarComparisonDropdown(wxCommandEvent& event)
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 	menu->FindItem(XRCID("ID_TOOLBAR_COMPARISON"))->Check(pComparisonManager->IsComparing());
 
-	const int mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
+	const int mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
 	if (mode == 0) {
 		menu->FindItem(XRCID("ID_COMPARE_SIZE"))->Check();
 	}
@@ -2463,7 +2464,7 @@ void CMainFrame::OnToolbarComparisonDropdown(wxCommandEvent& event)
 		menu->FindItem(XRCID("ID_COMPARE_DATE"))->Check();
 	}
 
-	menu->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+	menu->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 
 	ShowDropdownMenu(menu, m_pToolBar, event);
 }
@@ -2498,9 +2499,9 @@ void CMainFrame::OnDropdownComparisonMode(wxCommandEvent& event)
 		return;
 	}
 
-	int old_mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
+	int old_mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
 	int new_mode = (event.GetId() == XRCID("ID_COMPARE_SIZE")) ? 0 : 1;
-	COptions::Get()->SetOption(OPTION_COMPARISONMODE, new_mode);
+	COptions::Get()->set(OPTION_COMPARISONMODE, new_mode);
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 	if (old_mode != new_mode && pComparisonManager) {
@@ -2518,8 +2519,8 @@ void CMainFrame::OnDropdownComparisonHide(wxCommandEvent&)
 		return;
 	}
 
-	bool old_mode = COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0;
-	COptions::Get()->SetOption(OPTION_COMPARE_HIDEIDENTICAL, old_mode ? 0 : 1);
+	bool old_mode = COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0;
+	COptions::Get()->set(OPTION_COMPARE_HIDEIDENTICAL, old_mode ? 0 : 1);
 
 	CComparisonManager* pComparisonManager = pState->GetComparisonManager();
 	if (pComparisonManager) {
@@ -2555,7 +2556,7 @@ void CMainFrame::ProcessCommandLine()
 
 	std::wstring site;
 	if (pCommandLine->HasSwitch(CCommandLine::sitemanager)) {
-		if (COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION) != 1) {
+		if (COptions::Get()->get_int(OPTION_STARTUP_ACTION) != 1) {
 			OpenSiteManager();
 		}
 	}
@@ -2588,7 +2589,7 @@ void CMainFrame::ProcessCommandLine()
 			wxMessageBoxEx(error, _("Syntax error in command line"));
 		}
 
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
 			site.SetLogonType(LogonType::ask);
 			CLoginManager::Get().RememberPassword(site);
 		}
@@ -2690,7 +2691,7 @@ void CMainFrame::OnIconize(wxIconizeEvent& event)
 		return;
 	}
 
-	if (!COptions::Get()->GetOptionVal(OPTION_MINIMIZE_TRAY)) {
+	if (!COptions::Get()->get_int(OPTION_MINIMIZE_TRAY)) {
 		return;
 	}
 
@@ -2780,7 +2781,7 @@ void CMainFrame::PostInitialize()
 	}
 #endif
 
-	int const startupAction = COptions::Get()->GetOptionVal(OPTION_STARTUP_ACTION);
+	int const startupAction = COptions::Get()->get_int(OPTION_STARTUP_ACTION);
 	bool startupReconnect = startupAction == 2;
 
 	if (startupAction == 1) {
@@ -2794,7 +2795,7 @@ void CMainFrame::PostInitialize()
 	}
 
 	if (m_pContextControl && startupReconnect) {
-		auto xml = COptions::Get()->GetOptionXml(OPTION_TAB_DATA);
+		auto xml = COptions::Get()->get_xml(OPTION_TAB_DATA);
 		pugi::xml_node tabs = xml.child("Tabs");
 		int i = 0;
 		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
@@ -2840,7 +2841,7 @@ void CMainFrame::OnMenuCloseTab(wxCommandEvent&)
 
 void CMainFrame::OnToggleToolBar(wxCommandEvent& event)
 {
-	COptions::Get()->SetOption(OPTION_TOOLBAR_HIDDEN, event.IsChecked() ? 0 : 1);
+	COptions::Get()->set(OPTION_TOOLBAR_HIDDEN, event.IsChecked() ? 0 : 1);
 #ifdef __WXMAC__
 	if (m_pToolBar) {
 		m_pToolBar->Show(event.IsChecked());
@@ -2903,7 +2904,7 @@ void CMainFrame::SetupKeyboardAccelerators()
 	SetAcceleratorTable(accel);
 }
 
-void CMainFrame::OnOptionsChanged(changed_options_t const& options)
+void CMainFrame::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_FILEPANE_LAYOUT) || options.test(OPTION_FILEPANE_SWAP) || options.test(OPTION_MESSAGELOG_POSITION)) {
 		UpdateLayout();

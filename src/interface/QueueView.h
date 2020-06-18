@@ -3,12 +3,12 @@
 
 #include "dndobjects.h"
 #include "local_recursive_operation.h"
+#include "option_change_event_handler.h"
 #include "queue.h"
 #include "queue_storage.h"
 
 #include "../include/libfilezilla_engine.h"
 #include "../include/notification.h"
-#include "../include/option_change_event_handler.h"
 
 #include <wx/progdlg.h>
 
@@ -168,7 +168,7 @@ protected:
 	WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam);
 #endif
 
-	virtual void OnOptionsChanged(changed_options_t const& options) override;
+	virtual void OnOptionsChanged(watched_options const& options) override;
 
 	void AdvanceQueue(bool refresh = true);
 	bool TryStartNextTransfer();

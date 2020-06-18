@@ -1,6 +1,6 @@
 #include "filezilla.h"
 
-#include "../include/optionsbase.h"
+#include "../include/engine_options.h"
 #include "../include/sizeformatting_base.h"
 
 #include <libfilezilla/format.hpp>
@@ -184,16 +184,16 @@ std::wstring CSizeFormatBase::Format(COptionsBase* pOptions, int64_t size, bool 
 
 std::wstring CSizeFormatBase::Format(COptionsBase* pOptions, int64_t size, bool add_bytes_suffix)
 {
-	_format const format = _format(pOptions->GetOptionVal(OPTION_SIZE_FORMAT));
-	bool const thousands_separator = pOptions->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0;
-	int const num_decimal_places = pOptions->GetOptionVal(OPTION_SIZE_DECIMALPLACES);
+	_format const format = _format(pOptions->get_int(OPTION_SIZE_FORMAT));
+	bool const thousands_separator = pOptions->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0;
+	int const num_decimal_places = pOptions->get_int(OPTION_SIZE_DECIMALPLACES);
 
 	return Format(pOptions, size, add_bytes_suffix, format, thousands_separator, num_decimal_places);
 }
 
 std::wstring CSizeFormatBase::FormatUnit(COptionsBase* pOptions, int64_t size, CSizeFormatBase::_unit unit, int base)
 {
-	_format format = _format(pOptions->GetOptionVal(OPTION_SIZE_FORMAT));
+	_format format = _format(pOptions->get_int(OPTION_SIZE_FORMAT));
 	if (base == 1000) {
 		format = si1000;
 	}
@@ -205,7 +205,7 @@ std::wstring CSizeFormatBase::FormatUnit(COptionsBase* pOptions, int64_t size, C
 
 std::wstring CSizeFormatBase::GetUnitWithBase(COptionsBase* pOptions, _unit unit, int base)
 {
-	_format format = _format(pOptions->GetOptionVal(OPTION_SIZE_FORMAT));
+	_format format = _format(pOptions->get_int(OPTION_SIZE_FORMAT));
 	if (base == 1000) {
 		format = si1000;
 	}
@@ -223,7 +223,7 @@ std::wstring CSizeFormatBase::GetUnit(COptionsBase* pOptions, _unit unit, CSizeF
 	}
 
 	if (format == formats_count) {
-		format = _format(pOptions->GetOptionVal(OPTION_SIZE_FORMAT));
+		format = _format(pOptions->get_int(OPTION_SIZE_FORMAT));
 	}
 	if (format == iec || format == bytes) {
 		ret += 'i';
@@ -307,7 +307,7 @@ std::wstring CSizeFormatBase::FormatNumber(COptionsBase* pOptions, int64_t size,
 	wchar_t const* sepBegin = nullptr;
 	wchar_t const* sepEnd = nullptr;
 
-	if ((!thousands_separator || *thousands_separator) && pOptions->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0) {
+	if ((!thousands_separator || *thousands_separator) && pOptions->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0) {
 		sep = GetThousandsSeparator();
 		if (!sep.empty()) {
 			sepBegin = sep.c_str();

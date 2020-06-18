@@ -244,9 +244,10 @@ EVT_MENU(XRCID("ID_GETURL"), CRemoteTreeView::OnMenuGeturl)
 END_EVENT_TABLE()
 
 CRemoteTreeView::CRemoteTreeView(wxWindow* parent, wxWindowID id, CState& state, CQueueView* pQueue)
-	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER | wxTR_HIDE_ROOT),
-	CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x),
-	CStateEventHandler(state)
+	: wxTreeCtrlEx(parent, id, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTAB_TRAVERSAL | wxTR_EDIT_LABELS | wxNO_BORDER | wxTR_HIDE_ROOT)
+	, CSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x)
+	, CStateEventHandler(state)
+	, COptionChangeEventHandler(this)
 {
 #ifdef __WXMAC__
 	SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
@@ -259,7 +260,7 @@ CRemoteTreeView::CRemoteTreeView(wxWindow* parent, wxWindowID id, CState& state,
 	CreateImageList();
 
 	UpdateSortMode();
-	RegisterOption(OPTION_FILELIST_NAMESORT);
+	COptions::Get()->watch(OPTION_FILELIST_NAMESORT, this);
 
 	m_pQueue = pQueue;
 	AddRoot(_T(""));
@@ -274,6 +275,7 @@ CRemoteTreeView::CRemoteTreeView(wxWindow* parent, wxWindowID id, CState& state,
 
 CRemoteTreeView::~CRemoteTreeView()
 {
+	COptions::Get()->unwatch_all(this);
 	SetImageList(0);
 	delete m_pImageList;
 }
@@ -816,7 +818,7 @@ CServerPath CRemoteTreeView::GetPathFromItem(const wxTreeItemId& item) const
 
 void CRemoteTreeView::OnBeginDrag(wxTreeEvent& event)
 {
-	if (COptions::Get()->GetOptionVal(OPTION_DND_DISABLED) != 0) {
+	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
 		return;
 	}
 
@@ -1511,7 +1513,7 @@ void CRemoteTreeView::OnMenuGeturl(wxCommandEvent& event)
 void CRemoteTreeView::UpdateSortMode()
 {
 	CFileListCtrlSortBase::NameSortMode sortMode;
-	switch (COptions::Get()->GetOptionVal(OPTION_FILELIST_NAMESORT))
+	switch (COptions::Get()->get_int(OPTION_FILELIST_NAMESORT))
 	{
 	case 0:
 	default:
@@ -1528,7 +1530,7 @@ void CRemoteTreeView::UpdateSortMode()
 	Resort();
 }
 
-void CRemoteTreeView::OnOptionsChanged(changed_options_t const& options)
+void CRemoteTreeView::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_FILELIST_NAMESORT)) {
 		UpdateSortMode();

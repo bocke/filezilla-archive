@@ -4,14 +4,15 @@
 // This class get used to remember toplevel window size and position across
 // sessions.
 
+enum interfaceOptions;
 class CWindowStateManager final : public wxEvtHandler
 {
 public:
 	explicit CWindowStateManager(wxTopLevelWindow* pWindow);
 	virtual ~CWindowStateManager();
 
-	bool Restore(const unsigned int optionId, const wxSize& default_size = wxSize(-1, -1));
-	void Remember(unsigned int optionId);
+	bool Restore(interfaceOptions const optionId, const wxSize& default_size = wxSize(-1, -1));
+	void Remember(interfaceOptions const optionId);
 
 	static wxRect GetScreenDimensions();
 
@@ -23,7 +24,7 @@ public:
 #endif
 
 protected:
-	bool ReadDefaults(const unsigned int optionId, bool& maximized, wxPoint& position, wxSize& size);
+	bool ReadDefaults(interfaceOptions const optionId, bool& maximized, wxPoint& position, wxSize& size);
 
 	wxTopLevelWindow* m_pWindow;
 

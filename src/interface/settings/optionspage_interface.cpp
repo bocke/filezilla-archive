@@ -20,9 +20,9 @@ bool COptionsPageInterface::LoadPage()
 	bool failure = false;
 
 	SetCheckFromOption(XRCID("ID_FILEPANESWAP"), OPTION_FILEPANE_SWAP, failure);
-	SetChoice(XRCID("ID_FILEPANELAYOUT"), m_pOptions->GetOptionVal(OPTION_FILEPANE_LAYOUT), failure);
+	SetChoice(XRCID("ID_FILEPANELAYOUT"), m_pOptions->get_int(OPTION_FILEPANE_LAYOUT), failure);
 
-	SetChoice(XRCID("ID_MESSAGELOGPOS"), m_pOptions->GetOptionVal(OPTION_MESSAGELOG_POSITION), failure);
+	SetChoice(XRCID("ID_MESSAGELOGPOS"), m_pOptions->get_int(OPTION_MESSAGELOG_POSITION), failure);
 
 #ifndef __WXMAC__
 	SetCheckFromOption(XRCID("ID_MINIMIZE_TRAY"), OPTION_MINIMIZE_TRAY, failure);
@@ -36,7 +36,7 @@ bool COptionsPageInterface::LoadPage()
 		XRCCTRL(*this, "ID_PREVENT_IDLESLEEP", wxCheckBox)->Hide();
 	}
 
-	int const startupAction = m_pOptions->GetOptionVal(OPTION_STARTUP_ACTION);
+	int const startupAction = m_pOptions->get_int(OPTION_STARTUP_ACTION);
 	switch (startupAction) {
 	default:
 		xrc_call(*this, "ID_INTERFACE_STARTUP_NORMAL", &wxRadioButton::SetValue, true);
@@ -49,7 +49,7 @@ bool COptionsPageInterface::LoadPage()
 		break;
 	}
 
-	int action = m_pOptions->GetOptionVal(OPTION_ALREADYCONNECTED_CHOICE);
+	int action = m_pOptions->get_int(OPTION_ALREADYCONNECTED_CHOICE);
 	if (action & 2) {
 		action = 1 + (action & 1);
 	}
@@ -68,9 +68,9 @@ bool COptionsPageInterface::LoadPage()
 bool COptionsPageInterface::SavePage()
 {
 	SetOptionFromCheck(XRCID("ID_FILEPANESWAP"), OPTION_FILEPANE_SWAP);
-	m_pOptions->SetOption(OPTION_FILEPANE_LAYOUT, GetChoice(XRCID("ID_FILEPANELAYOUT")));
+	m_pOptions->set(OPTION_FILEPANE_LAYOUT, GetChoice(XRCID("ID_FILEPANELAYOUT")));
 
-	m_pOptions->SetOption(OPTION_MESSAGELOG_POSITION, GetChoice(XRCID("ID_MESSAGELOGPOS")));
+	m_pOptions->set(OPTION_MESSAGELOG_POSITION, GetChoice(XRCID("ID_MESSAGELOGPOS")));
 
 #ifndef __WXMAC__
 	SetOptionFromCheck(XRCID("ID_MINIMIZE_TRAY"), OPTION_MINIMIZE_TRAY);
@@ -87,25 +87,25 @@ bool COptionsPageInterface::SavePage()
 	else if (xrc_call(*this, "ID_INTERFACE_STARTUP_RESTORE", &wxRadioButton::GetValue)) {
 		startupAction = 2;
 	}
-	m_pOptions->SetOption(OPTION_STARTUP_ACTION, startupAction);
+	m_pOptions->set(OPTION_STARTUP_ACTION, startupAction);
 
 	int action = GetChoice(XRCID("ID_NEWCONN_ACTION"));
 	if (!action) {
-		action = m_pOptions->GetOptionVal(OPTION_ALREADYCONNECTED_CHOICE) & 1;
+		action = m_pOptions->get_int(OPTION_ALREADYCONNECTED_CHOICE) & 1;
 	}
 	else {
 		action += 1;
 	}
-	m_pOptions->SetOption(OPTION_ALREADYCONNECTED_CHOICE, action);
+	m_pOptions->set(OPTION_ALREADYCONNECTED_CHOICE, action);
 
 	return true;
 }
 
 void COptionsPageInterface::OnLayoutChange(wxCommandEvent&)
 {
-	m_pOptions->SetOption(OPTION_FILEPANE_LAYOUT, GetChoice(XRCID("ID_FILEPANELAYOUT")));
-	m_pOptions->SetOption(OPTION_FILEPANE_SWAP, GetCheck(XRCID("ID_FILEPANESWAP")) ? 1 : 0);
-	m_pOptions->SetOption(OPTION_MESSAGELOG_POSITION, GetChoice(XRCID("ID_MESSAGELOGPOS")));
+	m_pOptions->set(OPTION_FILEPANE_LAYOUT, GetChoice(XRCID("ID_FILEPANELAYOUT")));
+	m_pOptions->set(OPTION_FILEPANE_SWAP, GetCheck(XRCID("ID_FILEPANESWAP")) ? 1 : 0);
+	m_pOptions->set(OPTION_MESSAGELOG_POSITION, GetChoice(XRCID("ID_MESSAGELOGPOS")));
 }
 
 bool COptionsPageInterface::CreateControls(wxWindow* parent)

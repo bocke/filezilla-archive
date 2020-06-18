@@ -92,6 +92,7 @@ END_EVENT_TABLE()
 
 
 CStatusView::CStatusView(wxWindow* parent, wxWindowID id)
+	: COptionChangeEventHandler(this)
 {
 	Create(parent, id, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER);
 	m_pTextCtrl = new CFastTextCtrl(this);
@@ -113,11 +114,12 @@ CStatusView::CStatusView(wxWindow* parent, wxWindowID id)
 
 	SetBackgroundStyle(wxBG_STYLE_SYSTEM);
 
-	RegisterOption(OPTION_MESSAGELOG_TIMESTAMP);
+	COptions::Get()->watch(OPTION_MESSAGELOG_TIMESTAMP, this);
 }
 
 CStatusView::~CStatusView()
 {
+	COptions::Get()->unwatch_all(this);
 }
 
 void CStatusView::OnSize(wxSizeEvent &)
@@ -269,7 +271,7 @@ void CStatusView::AddToLog(logmsg::type messagetype, std::wstring && message, fz
 
 void CStatusView::InitDefAttr()
 {
-	m_showTimestamps = COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_TIMESTAMP) != 0;
+	m_showTimestamps = COptions::Get()->get_int(OPTION_MESSAGELOG_TIMESTAMP) != 0;
 	m_lastTime = fz::datetime::now();
 	m_lastTimeString = m_lastTime.format(_T("%H:%M:%S\t"), fz::datetime::local);
 
@@ -436,7 +438,7 @@ void CStatusView::OnContextMenu(wxContextMenuEvent&)
 	menu.Append(XRCID("ID_COPYTOCLIPBOARD"), _("&Copy to clipboard"));
 	menu.Append(XRCID("ID_CLEARALL"), _("C&lear all"));
 
-	menu.Check(XRCID("ID_SHOW_DETAILED_LOG"), COptions::Get()->GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) != 0);
+	menu.Check(XRCID("ID_SHOW_DETAILED_LOG"), COptions::Get()->get_int(OPTION_LOGGING_SHOW_DETAILED_LOGS) != 0);
 
 	CState* pState = CContextManager::Get()->GetCurrentContext();
 	if (pState) {
@@ -452,7 +454,7 @@ void CStatusView::OnContextMenu(wxContextMenuEvent&)
 
 	PopupMenu(&menu);
 
-	COptions::Get()->SetOption(OPTION_LOGGING_SHOW_DETAILED_LOGS, menu.IsChecked(XRCID("ID_SHOW_DETAILED_LOG")) ? 1 : 0);
+	COptions::Get()->set(OPTION_LOGGING_SHOW_DETAILED_LOGS, menu.IsChecked(XRCID("ID_SHOW_DETAILED_LOG")) ? 1 : 0);
 }
 
 void CStatusView::OnClear(wxCommandEvent&)
@@ -509,7 +511,7 @@ bool CStatusView::Show(bool show)
 	return wxWindow::Show(show);
 }
 
-void CStatusView::OnOptionsChanged(changed_options_t const&)
+void CStatusView::OnOptionsChanged(watched_options const&)
 {
 	InitDefAttr();
 }

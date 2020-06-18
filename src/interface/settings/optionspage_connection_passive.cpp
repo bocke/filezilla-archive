@@ -8,7 +8,7 @@ bool COptionsPageConnectionPassive::LoadPage()
 {
 	bool failure = false;
 
-	const int pasv_fallback = m_pOptions->GetOptionVal(OPTION_PASVREPLYFALLBACKMODE);
+	const int pasv_fallback = m_pOptions->get_int(OPTION_PASVREPLYFALLBACKMODE);
 	SetRCheck(XRCID("ID_PASSIVE_FALLBACK1"), pasv_fallback == 0, failure);
 	SetRCheck(XRCID("ID_PASSIVE_FALLBACK2"), pasv_fallback != 0, failure);
 
@@ -17,7 +17,7 @@ bool COptionsPageConnectionPassive::LoadPage()
 
 bool COptionsPageConnectionPassive::SavePage()
 {
-	m_pOptions->SetOption(OPTION_PASVREPLYFALLBACKMODE, GetRCheck(XRCID("ID_PASSIVE_FALLBACK1")) ? 0 : 1);
+	m_pOptions->set(OPTION_PASVREPLYFALLBACKMODE, GetRCheck(XRCID("ID_PASSIVE_FALLBACK1")) ? 0 : 1);
 
 	return true;
 }

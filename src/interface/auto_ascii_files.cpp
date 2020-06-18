@@ -9,7 +9,7 @@ std::vector<std::wstring> CAutoAsciiFiles::ascii_extensions_;
 void CAutoAsciiFiles::SettingsChanged()
 {
 	ascii_extensions_.clear();
-	std::wstring extensions = COptions::Get()->GetOption(OPTION_ASCIIFILES);
+	std::wstring extensions = COptions::Get()->get_string(OPTION_ASCIIFILES);
 	std::wstring ext;
 	size_t pos = extensions.find('|');
 	while (pos != std::wstring::npos) {
@@ -55,7 +55,7 @@ bool CAutoAsciiFiles::TransferLocalAsAscii(std::wstring const& local_file, Serve
 
 bool CAutoAsciiFiles::TransferRemoteAsAscii(std::wstring const& remote_file, ServerType server_type)
 {
-	int mode = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
+	int mode = COptions::Get()->get_int(OPTION_ASCIIBINARY);
 	if (mode == 1) {
 		return true;
 	}
@@ -68,12 +68,12 @@ bool CAutoAsciiFiles::TransferRemoteAsAscii(std::wstring const& remote_file, Ser
 	}
 
 	if (!remote_file.empty() && remote_file[0] == '.') {
-		return COptions::Get()->GetOptionVal(OPTION_ASCIIDOTFILE) != 0;
+		return COptions::Get()->get_int(OPTION_ASCIIDOTFILE) != 0;
 	}
 
 	size_t pos = remote_file.rfind('.');
 	if (pos == std::wstring::npos || pos + 1 == remote_file.size()) {
-		return COptions::Get()->GetOptionVal(OPTION_ASCIINOEXT) != 0;
+		return COptions::Get()->get_int(OPTION_ASCIINOEXT) != 0;
 	}
 	std::wstring ext = remote_file.substr(pos + 1);
 

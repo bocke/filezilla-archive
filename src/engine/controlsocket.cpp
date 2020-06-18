@@ -8,7 +8,7 @@
 #include "servercapabilities.h"
 
 #include "../include/local_path.h"
-#include "../include/optionsbase.h"
+#include "../include/engine_options.h"
 #include "../include/sizeformatting_base.h"
 
 #include <libfilezilla/event_loop.hpp>
@@ -514,7 +514,7 @@ void CControlSocket::OnTimer(fz::timer_id)
 {
 	m_timer = 0; // It's a one-shot timer, no need to stop it
 
-	int const timeout = engine_.GetOptions().GetOptionVal(OPTION_TIMEOUT);
+	int const timeout = engine_.GetOptions().get_int(OPTION_TIMEOUT);
 	if (timeout > 0) {
 		fz::duration elapsed = fz::monotonic_clock::now() - m_lastActivity;
 
@@ -547,7 +547,7 @@ void CControlSocket::SetWait(bool wait)
 
 		m_lastActivity = fz::monotonic_clock::now();
 
-		int timeout = engine_.GetOptions().GetOptionVal(OPTION_TIMEOUT);
+		int timeout = engine_.GetOptions().get_int(OPTION_TIMEOUT);
 		if (!timeout) {
 			return;
 		}
@@ -860,16 +860,16 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(this, *socket_, &engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
-	const int proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
+	const int proxy_type = engine_.GetOptions().get_int(OPTION_PROXY_TYPE);
 	if (proxy_type > static_cast<int>(ProxyType::NONE) && proxy_type < static_cast<int>(ProxyType::count) && !currentServer_.GetBypassProxy()) {
 		log(logmsg::status, _("Connecting to %s through %s proxy"), currentServer_.Format(ServerFormat::with_optional_port), CProxySocket::Name(static_cast<ProxyType>(proxy_type)));
 
-		fz::native_string proxy_host = fz::to_native(engine_.GetOptions().GetOption(OPTION_PROXY_HOST));
+		fz::native_string proxy_host = fz::to_native(engine_.GetOptions().get_string(OPTION_PROXY_HOST));
 
 		proxy_layer_ = std::make_unique<CProxySocket>(this, *active_layer_, this, static_cast<ProxyType>(proxy_type),
-			proxy_host, engine_.GetOptions().GetOptionVal(OPTION_PROXY_PORT),
-			engine_.GetOptions().GetOption(OPTION_PROXY_USER),
-			engine_.GetOptions().GetOption(OPTION_PROXY_PASS));
+			proxy_host, engine_.GetOptions().get_int(OPTION_PROXY_PORT),
+			engine_.GetOptions().get_string(OPTION_PROXY_USER),
+			engine_.GetOptions().get_string(OPTION_PROXY_PASS));
 		active_layer_ = proxy_layer_.get();
 
 		if (fz::get_address_type(proxy_host) == fz::address_type::unknown) {

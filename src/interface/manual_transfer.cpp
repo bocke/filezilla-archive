@@ -76,7 +76,7 @@ void CManualTransfer::Run(wxWindow* pParent, CState* pState)
 
 	SetControlState();
 
-	switch(COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY))
+	switch(COptions::Get()->get_int(OPTION_ASCIIBINARY))
 	{
 	case 1:
 		XRCCTRL(*this, "ID_TYPE_ASCII", wxRadioButton)->SetValue(true);
@@ -335,17 +335,17 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	int const old_data_type = COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY);
+	int const old_data_type = COptions::Get()->get_int(OPTION_ASCIIBINARY);
 
 	// Set data type for the file to add
 	if (xrc_call(*this, "ID_TYPE_ASCII", &wxRadioButton::GetValue)) {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 1);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 1);
 	}
 	else if (xrc_call(*this, "ID_TYPE_BINARY", &wxRadioButton::GetValue)) {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 2);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 2);
 	}
 	else {
-		COptions::Get()->SetOption(OPTION_ASCIIBINARY, 0);
+		COptions::Get()->set(OPTION_ASCIIBINARY, 0);
 	}
 
 	m_pQueueView->QueueFile(!start, download,
@@ -354,7 +354,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		localPath, path, site_, -1);
 
 	// Restore old data type
-	COptions::Get()->SetOption(OPTION_ASCIIBINARY, old_data_type);
+	COptions::Get()->set(OPTION_ASCIIBINARY, old_data_type);
 
 	m_pQueueView->QueueFile_Finish(start);
 
@@ -423,12 +423,12 @@ bool CManualTransfer::VerifyServer()
 		return false;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0 &&
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 &&
 		(logon_type == LogonType::account || logon_type == LogonType::normal))
 	{
 		xrc_call(*this, "ID_LOGONTYPE", &wxChoice::SetFocus);
 		wxString msg;
-		if (COptions::Get()->OptionFromFzDefaultsXml(OPTION_DEFAULT_KIOSKMODE) && COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0) {
+		if (COptions::Get()->from_default(OPTION_DEFAULT_KIOSKMODE)) {
 			msg = _("Saving of password has been disabled by your system administrator.");
 		}
 		else {

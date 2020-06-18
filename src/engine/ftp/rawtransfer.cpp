@@ -3,7 +3,7 @@
 #include "rawtransfer.h"
 #include "../servercapabilities.h"
 #include "transfersocket.h"
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/iputils.hpp>
 
@@ -49,7 +49,7 @@ int CFtpRawTransferOpData::Send()
 				bPasv = false;
 				break;
 			default:
-				bPasv = engine_.GetOptions().GetOptionVal(OPTION_USEPASV) != 0;
+				bPasv = engine_.GetOptions().get_int(OPTION_USEPASV) != 0;
 				break;
 			}
 		}
@@ -89,7 +89,7 @@ int CFtpRawTransferOpData::Send()
 				}
 			}
 
-			if (!engine_.GetOptions().GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK) || bTriedPasv) {
+			if (!engine_.GetOptions().get_int(OPTION_ALLOW_TRANSFERMODEFALLBACK) || bTriedPasv) {
 				log(logmsg::error, _("Failed to create listening socket for active mode transfer"));
 				return FZ_REPLY_ERROR;
 			}
@@ -158,7 +158,7 @@ int CFtpRawTransferOpData::ParseResponse()
 		break;
 	case rawtransfer_port_pasv:
 		if (code != 2 && code != 3) {
-			if (!engine_.GetOptions().GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK)) {
+			if (!engine_.GetOptions().get_int(OPTION_ALLOW_TRANSFERMODEFALLBACK)) {
 				error = true;
 				break;
 			}
@@ -185,7 +185,7 @@ int CFtpRawTransferOpData::ParseResponse()
 				parsed = ParsePasvResponse();
 			}
 			if (!parsed) {
-				if (!engine_.GetOptions().GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK)) {
+				if (!engine_.GetOptions().get_int(OPTION_ALLOW_TRANSFERMODEFALLBACK)) {
 					error = true;
 					break;
 				}
@@ -372,7 +372,7 @@ bool CFtpRawTransferOpData::ParsePasvResponse()
 
 	std::wstring const peerIP = fz::to_wstring(controlSocket_.socket_->peer_ip());
 	if (!fz::is_routable_address(host_) && fz::is_routable_address(peerIP)) {
-		if (engine_.GetOptions().GetOptionVal(OPTION_PASVREPLYFALLBACKMODE) != 1 || bTriedActive) {
+		if (engine_.GetOptions().get_int(OPTION_PASVREPLYFALLBACKMODE) != 1 || bTriedActive) {
 			log(logmsg::status, _("Server sent passive reply with unroutable address. Using server address instead."));
 			log(logmsg::debug_info, L"  Reply: %s, peer: %s", host_, peerIP);
 			host_ = peerIP;
@@ -383,7 +383,7 @@ bool CFtpRawTransferOpData::ParsePasvResponse()
 			return false;
 		}
 	}
-	else if (engine_.GetOptions().GetOptionVal(OPTION_PASVREPLYFALLBACKMODE) == 2) {
+	else if (engine_.GetOptions().get_int(OPTION_PASVREPLYFALLBACKMODE) == 2) {
 		// Always use server address
 		host_ = peerIP;
 	}

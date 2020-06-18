@@ -11,7 +11,7 @@
 #include "storj/storjcontrolsocket.h"
 #endif
 
-#include "../include/optionsbase.h"
+#include "../include/engine_options.h"
 
 #include <libfilezilla/event_loop.hpp>
 
@@ -44,7 +44,7 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 	, opLockManager_(context.GetOpLockManager())
 	, notification_handler_(notificationHandler)
 	, m_engine_id(get_next_engine_id())
-	, m_options(context.GetOptions())
+	, options_(context.GetOptions())
 	, rate_limiter_(context.GetRateLimiter())
 	, directory_cache_(context.GetDirectoryCache())
 	, path_cache_(context.GetPathCache())
@@ -66,17 +66,17 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 		queue_logs_ = queue_logs;
 	}
 
-	RegisterOption(OPTION_LOGGING_SHOW_DETAILED_LOGS);
-	RegisterOption(OPTION_LOGGING_DEBUGLEVEL);
-	RegisterOption(OPTION_LOGGING_RAWLISTING);
+	options_.watch(OPTION_LOGGING_SHOW_DETAILED_LOGS, this);
+	options_.watch(OPTION_LOGGING_DEBUGLEVEL, this);
+	options_.watch(OPTION_LOGGING_RAWLISTING, this);
 }
 
 bool CFileZillaEnginePrivate::ShouldQueueLogsFromOptions() const
 {
 	return
-		m_options.GetOptionVal(OPTION_LOGGING_RAWLISTING) == 0 &&
-		m_options.GetOptionVal(OPTION_LOGGING_DEBUGLEVEL) == 0 &&
-		m_options.GetOptionVal(OPTION_LOGGING_SHOW_DETAILED_LOGS) == 0;
+		options_.get_int(OPTION_LOGGING_RAWLISTING) == 0 &&
+		options_.get_int(OPTION_LOGGING_DEBUGLEVEL) == 0 &&
+		options_.get_int(OPTION_LOGGING_SHOW_DETAILED_LOGS) == 0;
 }
 
 namespace {
@@ -99,8 +99,8 @@ void erase_unordered(C & container, V const& v) noexcept
 
 CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 {
+	options_.unwatch_all(this);
 	remove_handler();
-	UnregisterAllOptions();
 
 	m_maySendNotificationEvent = false;
 
@@ -243,7 +243,7 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 
 				if ((nErrorCode & FZ_REPLY_CRITICALERROR) != FZ_REPLY_CRITICALERROR) {
 					++m_retryCount;
-					if (m_retryCount < m_options.GetOptionVal(OPTION_RECONNECTCOUNT) && connectCommand.RetryConnecting()) {
+					if (m_retryCount < options_.get_int(OPTION_RECONNECTCOUNT) && connectCommand.RetryConnecting()) {
 						fz::duration delay = GetRemainingReconnectDelay(connectCommand.GetServer());
 						if (!delay) {
 							delay = fz::duration::from_seconds(1);
@@ -424,7 +424,7 @@ void CFileZillaEnginePrivate::RegisterFailedLoginAttempt(const CServer& server, 
 	std::list<t_failedLogins>::iterator iter = m_failedLogins.begin();
 	while (iter != m_failedLogins.end()) {
 		fz::duration const span = fz::monotonic_clock::now() - iter->time;
-		if (span.get_seconds() >= m_options.GetOptionVal(OPTION_RECONNECTDELAY) ||
+		if (span.get_seconds() >= options_.get_int(OPTION_RECONNECTDELAY) ||
 			iter->server.SameResource(server) || (!critical && (iter->server.GetHost() == server.GetHost() && iter->server.GetPort() == server.GetPort())))
 		{
 			std::list<t_failedLogins>::iterator prev = iter;
@@ -449,7 +449,7 @@ fz::duration CFileZillaEnginePrivate::GetRemainingReconnectDelay(CServer const& 
 	std::list<t_failedLogins>::iterator iter = m_failedLogins.begin();
 	while (iter != m_failedLogins.end()) {
 		fz::duration const span = fz::monotonic_clock::now() - iter->time;
-		fz::duration const delay = fz::duration::from_seconds(m_options.GetOptionVal(OPTION_RECONNECTDELAY));
+		fz::duration const delay = fz::duration::from_seconds(options_.get_int(OPTION_RECONNECTDELAY));
 		if (span >= delay) {
 			std::list<t_failedLogins>::iterator prev = iter;
 			++iter;
@@ -578,12 +578,13 @@ void CFileZillaEnginePrivate::operator()(fz::event_base const& ev)
 {
 	fz::scoped_lock lock(mutex_);
 
-	fz::dispatch<CFileZillaEngineEvent, CCommandEvent, CAsyncRequestReplyEvent, fz::timer_event, CInvalidateCurrentWorkingDirEvent>(ev, this,
+	fz::dispatch<CFileZillaEngineEvent, CCommandEvent, CAsyncRequestReplyEvent, fz::timer_event, CInvalidateCurrentWorkingDirEvent, options_changed_event>(ev, this,
 		&CFileZillaEnginePrivate::OnEngineEvent,
 		&CFileZillaEnginePrivate::OnCommandEvent,
 		&CFileZillaEnginePrivate::OnSetAsyncRequestReplyEvent,
 		&CFileZillaEnginePrivate::OnTimer,
-		&CFileZillaEnginePrivate::OnInvalidateCurrentWorkingDir
+		&CFileZillaEnginePrivate::OnInvalidateCurrentWorkingDir,
+		&CFileZillaEnginePrivate::OnOptionsChanged
 		);
 }
 
@@ -844,7 +845,7 @@ int CFileZillaEnginePrivate::Cancel()
 	return FZ_REPLY_WOULDBLOCK;
 }
 
-void CFileZillaEnginePrivate::OnOptionsChanged(changed_options_t const&)
+void CFileZillaEnginePrivate::OnOptionsChanged(watched_options const&)
 {
 	bool queue_logs = ShouldQueueLogsFromOptions();
 	if (queue_logs) {

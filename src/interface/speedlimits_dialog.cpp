@@ -19,9 +19,9 @@ void CSpeedLimitsDialog::Run(wxWindow* parent)
 	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap("ART_SPEEDLIMITS", wxString(), CThemeProvider::GetIconSize(iconSizeLarge));
 	xrc_call(*this, "ID_SPEEDLIMITS_ICON", &wxStaticBitmap::SetBitmap, bmp);
 
-	int downloadlimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
-	int uploadlimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
-	bool enable = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	int downloadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
+	int uploadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
+	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 	if (!downloadlimit && !uploadlimit)
 		enable = false;
 
@@ -73,11 +73,11 @@ void CSpeedLimitsDialog::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	COptions::Get()->SetOption(OPTION_SPEEDLIMIT_INBOUND, download);
-	COptions::Get()->SetOption(OPTION_SPEEDLIMIT_OUTBOUND, upload);
+	COptions::Get()->set(OPTION_SPEEDLIMIT_INBOUND, download);
+	COptions::Get()->set(OPTION_SPEEDLIMIT_OUTBOUND, upload);
 
 	bool enable = XRCCTRL(*this, "ID_ENABLE_SPEEDLIMITS", wxCheckBox)->GetValue() ? 1 : 0;
-	COptions::Get()->SetOption(OPTION_SPEEDLIMIT_ENABLE, enable && (download || upload));
+	COptions::Get()->set(OPTION_SPEEDLIMIT_ENABLE, enable && (download || upload));
 
 	EndDialog(wxID_OK);
 }

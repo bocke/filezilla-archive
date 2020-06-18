@@ -3,6 +3,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_connection_active.h"
+#include "xrc_helper.h"
 
 #include <libfilezilla/iputils.hpp>
 
@@ -16,43 +17,48 @@ END_EVENT_TABLE()
 bool COptionsPageConnectionActive::LoadPage()
 {
 	bool failure = false;
-	SetCheckFromOption(XRCID("ID_LIMITPORTS"), OPTION_LIMITPORTS, failure);
-	SetTextFromOption(XRCID("ID_LOWESTPORT"), OPTION_LIMITPORTS_LOW, failure);
-	SetTextFromOption(XRCID("ID_HIGHESTPORT"), OPTION_LIMITPORTS_HIGH, failure);
+	xrc_call(*this, "ID_LIMITPORTS", &wxCheckBox::SetValue, m_pOptions->get_bool(OPTION_LIMITPORTS));
+	xrc_call(*this, "ID_LOWESTPORT", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_LIMITPORTS_LOW));
+	xrc_call(*this, "ID_HIGHESTPORT", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_LIMITPORTS_HIGH));
 
-	SetRCheck(XRCID("ID_ACTIVEMODE1"), m_pOptions->GetOptionVal(OPTION_EXTERNALIPMODE) == 0, failure);
-	SetRCheck(XRCID("ID_ACTIVEMODE2"), m_pOptions->GetOptionVal(OPTION_EXTERNALIPMODE) == 1, failure);
-	SetRCheck(XRCID("ID_ACTIVEMODE3"), m_pOptions->GetOptionVal(OPTION_EXTERNALIPMODE) == 2, failure);
+	SetRCheck(XRCID("ID_ACTIVEMODE1"), m_pOptions->get_int(OPTION_EXTERNALIPMODE) == 0, failure);
+	SetRCheck(XRCID("ID_ACTIVEMODE2"), m_pOptions->get_int(OPTION_EXTERNALIPMODE) == 1, failure);
+	SetRCheck(XRCID("ID_ACTIVEMODE3"), m_pOptions->get_int(OPTION_EXTERNALIPMODE) == 2, failure);
 
-	SetTextFromOption(XRCID("ID_ACTIVEIP"), OPTION_EXTERNALIP, failure);
-	SetTextFromOption(XRCID("ID_ACTIVERESOLVER"), OPTION_EXTERNALIPRESOLVER, failure);
-	SetCheckFromOption(XRCID("ID_NOEXTERNALONLOCAL"), OPTION_NOEXTERNALONLOCAL, failure);
+	xrc_call(*this, "ID_ACTIVEIP", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_EXTERNALIP));
+	xrc_call(*this, "ID_ACTIVERESOLVER", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_EXTERNALIPRESOLVER));
+	xrc_call(*this, "ID_NOEXTERNALONLOCAL", &wxCheckBox::SetValue, m_pOptions->get_bool(OPTION_NOEXTERNALONLOCAL));
 
-	if (!failure)
+	if (!failure) {
 		SetCtrlState();
+	}
 
 	return !failure;
 }
 
 bool COptionsPageConnectionActive::SavePage()
 {
-	SetOptionFromCheck(XRCID("ID_LIMITPORTS"), OPTION_LIMITPORTS);
+	m_pOptions->set(OPTION_LIMITPORTS, xrc_call(*this, "ID_LIMITPORTS", &wxCheckBox::GetValue) ? 1 : 0);
 
-	SetIntOptionFromText(XRCID("ID_LOWESTPORT"), OPTION_LIMITPORTS_LOW);
-	SetIntOptionFromText(XRCID("ID_HIGHESTPORT"), OPTION_LIMITPORTS_HIGH);
+	m_pOptions->set(OPTION_LIMITPORTS_LOW, xrc_call(*this, "ID_LOWESTPORT", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_LIMITPORTS_HIGH, xrc_call(*this, "ID_HIGHESTPORT", &wxTextCtrl::GetValue).ToStdWstring());
 
 	int mode;
-	if (GetRCheck(XRCID("ID_ACTIVEMODE1")))
+	if (GetRCheck(XRCID("ID_ACTIVEMODE1"))) {
 		mode = 0;
-	else
+	}
+	else {
 		mode = GetRCheck(XRCID("ID_ACTIVEMODE2")) ? 1 : 2;
-	m_pOptions->SetOption(OPTION_EXTERNALIPMODE, mode);
+	}
+	m_pOptions->set(OPTION_EXTERNALIPMODE, mode);
 
-	if (mode == 1)
-		SetOptionFromText(XRCID("ID_ACTIVEIP"), OPTION_EXTERNALIP);
-	else if (mode == 2)
-		SetOptionFromText(XRCID("ID_ACTIVERESOLVER"), OPTION_EXTERNALIPRESOLVER);
-	SetOptionFromCheck(XRCID("ID_NOEXTERNALONLOCAL"), OPTION_NOEXTERNALONLOCAL);
+	if (mode == 1) {
+		m_pOptions->set(OPTION_EXTERNALIP, xrc_call(*this, "ID_ACTIVEIP", &wxTextCtrl::GetValue).ToStdWstring());
+	}
+	else if (mode == 2) {
+		m_pOptions->set(OPTION_EXTERNALIPRESOLVER, xrc_call(*this, "ID_ACTIVERESOLVER", &wxTextCtrl::GetValue).ToStdWstring());
+	}
+	m_pOptions->set(OPTION_NOEXTERNALONLOCAL, xrc_call(*this, "ID_NOEXTERNALONLOCAL", &wxCheckBox::GetValue) ? 1 : 0);
 
 	return true;
 }
@@ -60,29 +66,33 @@ bool COptionsPageConnectionActive::SavePage()
 bool COptionsPageConnectionActive::Validate()
 {
 	// Validate port limiting settings
-	if (GetCheck(XRCID("ID_LIMITPORTS")))
-	{
+	if (GetCheck(XRCID("ID_LIMITPORTS"))) {
 		wxTextCtrl* pLow = XRCCTRL(*this, "ID_LOWESTPORT", wxTextCtrl);
 
 		long low;
-		if (!pLow->GetValue().ToLong(&low) || low < 1024 || low > 65535)
+		if (!pLow->GetValue().ToLong(&low) || low < 1024 || low > 65535) {
 			return DisplayError(pLow, _("Lowest available port has to be a number between 1024 and 65535."));
+		}
 
 		wxTextCtrl* pHigh = XRCCTRL(*this, "ID_LOWESTPORT", wxTextCtrl);
 
 		long high;
-		if (!pHigh->GetValue().ToLong(&high) || high < 1024 || high > 65535)
+		if (!pHigh->GetValue().ToLong(&high) || high < 1024 || high > 65535) {
 			return DisplayError(pHigh, _("Highest available port has to be a number between 1024 and 65535."));
+		}
 
-		if (low > high)
+		if (low > high) {
 			return DisplayError(pLow, _("The lowest available port has to be less or equal than the highest available port."));
+		}
 	}
 
 	int mode;
-	if (GetRCheck(XRCID("ID_ACTIVEMODE1")))
+	if (GetRCheck(XRCID("ID_ACTIVEMODE1"))) {
 		mode = 0;
-	else
+	}
+	else {
 		mode = GetRCheck(XRCID("ID_ACTIVEMODE2")) ? 1 : 2;
+	}
 
 	if (mode == 1) {
 		wxTextCtrl* pActiveIP = XRCCTRL(*this, "ID_ACTIVEIP", wxTextCtrl);
@@ -101,10 +111,12 @@ void COptionsPageConnectionActive::SetCtrlState()
 	FindWindow(XRCID("ID_HIGHESTPORT"))->Enable(GetCheck(XRCID("ID_LIMITPORTS")));
 
 	int mode;
-	if (GetRCheck(XRCID("ID_ACTIVEMODE1")))
+	if (GetRCheck(XRCID("ID_ACTIVEMODE1"))) {
 		mode = 0;
-	else
+	}
+	else {
 		mode = GetRCheck(XRCID("ID_ACTIVEMODE2")) ? 1 : 2;
+	}
 	FindWindow(XRCID("ID_ACTIVEIP"))->Enable(mode == 1);
 	FindWindow(XRCID("ID_ACTIVERESOLVER"))->Enable(mode == 2);
 

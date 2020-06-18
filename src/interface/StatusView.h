@@ -5,14 +5,14 @@
 #include "richedit.h"
 #endif
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 #include <wx/timer.h>
 
 #include <list>
 
 class CFastTextCtrl;
-class CStatusView final : public wxNavigationEnabled<wxWindow>, private COptionChangeEventHandler
+class CStatusView final : public wxNavigationEnabled<wxWindow>, public COptionChangeEventHandler
 {
 public:
 	CStatusView(wxWindow* parent, wxWindowID id);
@@ -32,7 +32,7 @@ private:
 	int m_nLineCount{};
 	CFastTextCtrl *m_pTextCtrl{};
 
-	void OnOptionsChanged(changed_options_t const& options);
+	void OnOptionsChanged(watched_options const& options);
 
 	DECLARE_EVENT_TABLE()
 	void OnSize(wxSizeEvent &);

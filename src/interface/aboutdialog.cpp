@@ -117,7 +117,7 @@ bool CAboutDialog::Create(wxWindow* parent)
 		}
 
 		inner->Add(new wxStaticText(box, -1, _("Settings directory:")));
-		inner->Add(new wxStaticText(box, -1, COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR)));
+		inner->Add(new wxStaticText(box, -1, COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR)));
 	}
 
 	main->Add(new wxStaticLine(this), lay.grow);
@@ -217,7 +217,7 @@ void CAboutDialog::OnCopy()
 		text += _T("  CPU features:   ") + cpuCaps + _T("\n");
 	}
 
-	text += _T("  Settings dir:   ") + COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR) + _T("\n");
+	text += _T("  Settings dir:   ") + COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR) + _T("\n");
 
 #ifdef __WXMSW__
 	text.Replace(_T("\n"), _T("\r\n"));

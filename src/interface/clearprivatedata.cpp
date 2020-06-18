@@ -151,7 +151,7 @@ void CClearPrivateDataDialog::Delete()
 
 bool CClearPrivateDataDialog::ClearReconnect()
 {
-	COptions::Get()->SetOptionXml(OPTION_TAB_DATA, pugi::xml_node());
+	COptions::Get()->set(OPTION_TAB_DATA, pugi::xml_node());
 	COptions::Get()->RequireCleanup();
 	COptions::Get()->SaveIfNeeded();
 
@@ -168,7 +168,7 @@ bool CClearPrivateDataDialog::ClearReconnect()
 
 void CClearPrivateDataDialog::RemoveXmlFile(std::wstring const& name)
 {
-	std::wstring const path = COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR);
+	std::wstring const path = COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR);
 	if (!name.empty() && !path.empty()) {
 		fz::remove_file(fz::to_native(path + name + L".xml"));
 		fz::remove_file(fz::to_native(path + name + L".xml~"));

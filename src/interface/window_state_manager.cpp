@@ -25,7 +25,7 @@ CWindowStateManager::~CWindowStateManager()
 	m_pWindow->Disconnect(wxID_ANY, wxEVT_MOVE, wxMoveEventHandler(CWindowStateManager::OnMove), 0, this);
 }
 
-void CWindowStateManager::Remember(unsigned int optionId)
+void CWindowStateManager::Remember(interfaceOptions const optionId)
 {
 	if (!m_lastWindowSize.IsFullySpecified()) {
 		return;
@@ -42,10 +42,10 @@ void CWindowStateManager::Remember(unsigned int optionId)
 	// pos_width pos_height
 	posString += wxString::Format(_T("%d %d "), m_lastWindowSize.x, m_lastWindowSize.y);
 
-	COptions::Get()->SetOption(optionId, posString.ToStdWstring());
+	COptions::Get()->set(optionId, posString.ToStdWstring());
 }
 
-bool CWindowStateManager::ReadDefaults(const unsigned int optionId, bool& maximized, wxPoint& position, wxSize& size)
+bool CWindowStateManager::ReadDefaults(interfaceOptions const optionId, bool& maximized, wxPoint& position, wxSize& size)
 {
 	if (wxGetKeyState(WXK_SHIFT) && wxGetKeyState(WXK_ALT) && wxGetKeyState(WXK_CONTROL)) {
 		return false;
@@ -57,7 +57,7 @@ bool CWindowStateManager::ReadDefaults(const unsigned int optionId, bool& maximi
 	// - y position
 	// - width
 	// - height
-	auto tokens = fz::strtok(COptions::Get()->GetOption(optionId), L" ");
+	auto tokens = fz::strtok(COptions::Get()->get_string(optionId), L" ");
 	if (tokens.size() < 5) {
 		return false;
 	}
@@ -98,7 +98,7 @@ bool CWindowStateManager::ReadDefaults(const unsigned int optionId, bool& maximi
 	return true;
 }
 
-bool CWindowStateManager::Restore(const unsigned int optionId, const wxSize& default_size /*=wxSize(-1, -1)*/)
+bool CWindowStateManager::Restore(interfaceOptions const optionId, wxSize const& default_size)
 {
 	wxPoint position(-1, -1);
 	wxSize size = default_size;

@@ -370,7 +370,7 @@ void ProtectedCredentials::Protect()
 		return;
 	}
 
-	bool kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+	bool kiosk_mode = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 	if (kiosk_mode) {
 		if (logonType_ == LogonType::normal || logonType_ == LogonType::account) {
 			logonType_ = LogonType::ask;
@@ -378,7 +378,7 @@ void ProtectedCredentials::Protect()
 		}
 	}
 	else {
-		auto key = fz::public_key::from_base64(fz::to_utf8(COptions::Get()->GetOption(OPTION_MASTERPASSWORDENCRYPTOR)));
+		auto key = fz::public_key::from_base64(fz::to_utf8(COptions::Get()->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 		Protect(key);
 	}
 }

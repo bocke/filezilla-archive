@@ -93,10 +93,10 @@ bool COptionsPageFiletype::CreateControls(wxWindow* parent)
 
 bool COptionsPageFiletype::LoadPage()
 {
-	impl_->noext_->SetValue(m_pOptions->GetOptionVal(OPTION_ASCIINOEXT) != 0);
-	impl_->dotfile_->SetValue(m_pOptions->GetOptionVal(OPTION_ASCIIDOTFILE) != 0);
+	impl_->noext_->SetValue(m_pOptions->get_int(OPTION_ASCIINOEXT) != 0);
+	impl_->dotfile_->SetValue(m_pOptions->get_int(OPTION_ASCIIDOTFILE) != 0);
 
-	int const mode = m_pOptions->GetOptionVal(OPTION_ASCIIBINARY);
+	int const mode = m_pOptions->get_int(OPTION_ASCIIBINARY);
 	if (mode == 1) {
 		impl_->rbAscii_->SetValue(true);
 	}
@@ -108,7 +108,7 @@ bool COptionsPageFiletype::LoadPage()
 	}
 	impl_->types_->InsertColumn(0, wxString());
 
-	std::wstring extensions = m_pOptions->GetOption(OPTION_ASCIIFILES);
+	std::wstring extensions = m_pOptions->get_string(OPTION_ASCIIFILES);
 	std::wstring ext;
 	size_t pos = extensions.find('|');
 	while (pos != std::wstring::npos) {
@@ -142,8 +142,8 @@ bool COptionsPageFiletype::LoadPage()
 
 bool COptionsPageFiletype::SavePage()
 {
-	m_pOptions->SetOption(OPTION_ASCIINOEXT, impl_->noext_->GetValue() ? 1 : 0);
-	m_pOptions->SetOption(OPTION_ASCIIDOTFILE, impl_->dotfile_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_ASCIINOEXT, impl_->noext_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_ASCIIDOTFILE, impl_->dotfile_->GetValue() ? 1 : 0);
 
 	int mode{};
 	if (impl_->rbAscii_->GetValue()) {
@@ -152,7 +152,7 @@ bool COptionsPageFiletype::SavePage()
 	else if (impl_->rbBinary_->GetValue()) {
 		mode = 2;
 	}
-	m_pOptions->SetOption(OPTION_ASCIIBINARY, mode);
+	m_pOptions->set(OPTION_ASCIIBINARY, mode);
 
 	std::wstring extensions;
 
@@ -165,7 +165,7 @@ bool COptionsPageFiletype::SavePage()
 		}
 		extensions += ext;
 	}
-	m_pOptions->SetOption(OPTION_ASCIIFILES, extensions);
+	m_pOptions->set(OPTION_ASCIIFILES, extensions);
 
 	return true;
 }

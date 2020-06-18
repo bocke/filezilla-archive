@@ -3,7 +3,8 @@
 
 #include "../dialogex.h"
 
-class COptions;
+#include "../Options.h"
+
 class COptionsPage;
 class CMainFrame;
 class wxTreeCtrlEx;
@@ -20,7 +21,7 @@ public:
 
 	CFileZillaEngineContext& GetEngineContext() { return m_engine_context; }
 
-	void RememberOldValue(int option);
+	void RememberOldValue(interfaceOptions option);
 
 protected:
 	bool LoadPages();
@@ -42,7 +43,7 @@ protected:
 	};
 	std::vector<t_page> m_pages;
 
-	std::map<int, std::wstring> m_oldValues;
+	std::map<interfaceOptions, std::wstring> m_oldValues;
 
 	DECLARE_EVENT_TABLE()
 	void OnPageChanging(wxTreeEvent& event);

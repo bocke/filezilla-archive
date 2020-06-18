@@ -72,6 +72,7 @@ filezilla_SOURCES = \
 		msgbox.cpp \
 		netconfwizard.cpp \
 		Options.cpp \
+		option_change_event_handler.cpp \
 		power_management.cpp \
 		queue.cpp \
 		queue_storage.cpp \
@@ -199,6 +200,7 @@ noinst_HEADERS = \
 		msgbox.h \
 		netconfwizard.h \
 		Options.h \
+		option_change_event_handler.h \
 		power_management.h \
 		queue.h \
 		queue_storage.h \

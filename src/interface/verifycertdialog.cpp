@@ -237,7 +237,7 @@ void CertStore::SetInsecure(std::string const& host, unsigned int port, bool per
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
 		auto root = m_xmlFile.GetElement();
 		if (root) {
 			auto certs = root.child("TrustedCerts");
@@ -310,7 +310,7 @@ void CertStore::SetTrusted(fz::tls_session_info const& info, bool permanent, boo
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
 		auto root = m_xmlFile.GetElement();
 		if (root) {
 			auto certs = root.child("TrustedCerts");
@@ -690,7 +690,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 
 	if (!displayOnly) {
 		main->Add(new wxStaticText(this, -1, _("Trust the server certificate and carry on connecting?")));
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 2) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
 			impl_->always_ = new wxCheckBox(this, -1, _("&Always trust this certificate in future sessions."));
 			main->Add(impl_->always_);
 		}

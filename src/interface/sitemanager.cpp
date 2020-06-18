@@ -573,7 +573,7 @@ std::wstring CSiteManager::AddServer(Site site)
 	AddTextElement(xServer, name);
 
 	if (!file.Save(false)) {
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return std::wstring();
 		}
 
@@ -698,7 +698,7 @@ bool CSiteManager::AddBookmark(std::wstring sitePath, wxString const& name, wxSt
 	}
 
 	if (!file.Save(false)) {
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
 
@@ -755,7 +755,7 @@ bool CSiteManager::ClearBookmarks(std::wstring sitePath)
 	}
 
 	if (!file.Save(false)) {
-		if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
 
@@ -803,7 +803,7 @@ wxString CSiteManager::GetColourName(int i)
 
 void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element, bool on_failure_set_to_ask)
 {
-	bool const forget = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+	bool const forget = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 	for (auto child = element.first_child(); child; child = child.next_sibling()) {
 		if (!strcmp(child.name(), "Folder")) {
 			Rewrite(loginManager, child, on_failure_set_to_ask);
@@ -824,7 +824,7 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element,
 
 void CSiteManager::Rewrite(CLoginManager & loginManager, bool on_failure_set_to_ask)
 {
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
 	}
 	CInterProcessMutex mutex(MUTEX_SITEMANAGER);

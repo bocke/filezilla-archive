@@ -4,6 +4,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_ftpproxy.h"
+#include "../xrc_helper.h"
 
 BEGIN_EVENT_TABLE(COptionsPageFtpProxy, COptionsPageFtpProxy::COptionsPage)
 EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_NONE"), COptionsPageFtpProxy::OnProxyTypeChanged)
@@ -18,11 +19,11 @@ bool COptionsPageFtpProxy::LoadPage()
 {
 	bool failure = false;
 
-	SetTextFromOption(XRCID("ID_PROXY_HOST"), OPTION_FTP_PROXY_HOST, failure);
-	SetTextFromOption(XRCID("ID_PROXY_USER"), OPTION_FTP_PROXY_USER, failure);
-	SetTextFromOption(XRCID("ID_PROXY_PASS"), OPTION_FTP_PROXY_PASS, failure);
+	xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_FTP_PROXY_HOST));
+	xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_FTP_PROXY_USER));
+	xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_FTP_PROXY_PASS));
 
-	int type = m_pOptions->GetOptionVal(OPTION_FTP_PROXY_TYPE);
+	int type = m_pOptions->get_int(OPTION_FTP_PROXY_TYPE);
 	switch (type)
 	{
 	default:
@@ -40,53 +41,56 @@ bool COptionsPageFtpProxy::LoadPage()
 		break;
 	case 4:
 		SetRCheck(XRCID("ID_PROXYTYPE_CUSTOM"), true, failure);
-		SetTextFromOption(XRCID("ID_LOGINSEQUENCE"), OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE, failure);
+		xrc_call(*this, "ID_LOGINSEQUENCE", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE));
 		break;
 	}
 
-	if (!failure)
+	if (!failure) {
 		SetCtrlState();
+	}
 
 	return !failure;
 }
 
 bool COptionsPageFtpProxy::SavePage()
 {
-	SetOptionFromText(XRCID("ID_PROXY_HOST"), OPTION_FTP_PROXY_HOST);
-	SetOptionFromText(XRCID("ID_PROXY_USER"), OPTION_FTP_PROXY_USER);
-	SetOptionFromText(XRCID("ID_PROXY_PASS"), OPTION_FTP_PROXY_PASS);
+	m_pOptions->set(OPTION_FTP_PROXY_HOST, xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_FTP_PROXY_USER, xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_FTP_PROXY_PASS, xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::GetValue).ToStdWstring());
 
 	int type = 0;
-	if (GetRCheck(XRCID("ID_PROXYTYPE_USER")))
+	if (GetRCheck(XRCID("ID_PROXYTYPE_USER"))) {
 		type = 1;
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_SITE")))
+	}
+	else if (GetRCheck(XRCID("ID_PROXYTYPE_SITE"))) {
 		type = 2;
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_OPEN")))
+	}
+	else if (GetRCheck(XRCID("ID_PROXYTYPE_OPEN"))) {
 		type = 3;
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_CUSTOM")))
-	{
-		SetOptionFromText(XRCID("ID_LOGINSEQUENCE"), OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE);
+	}
+	else if (GetRCheck(XRCID("ID_PROXYTYPE_CUSTOM"))) {
+		m_pOptions->set(OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE, xrc_call(*this, "ID_LOGINSEQUENCE", &wxTextCtrl::GetValue).ToStdWstring());
 		type = 4;
 	}
-	m_pOptions->SetOption(OPTION_FTP_PROXY_TYPE, type);
+	m_pOptions->set(OPTION_FTP_PROXY_TYPE, type);
 
 	return true;
 }
 
 bool COptionsPageFtpProxy::Validate()
 {
-	if (!XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue())
-	{
+	if (!XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue()) {
 		wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_PROXY_HOST", wxTextCtrl);
-		if (pTextCtrl->GetValue().empty())
+		if (pTextCtrl->GetValue().empty()) {
 			return DisplayError(_T("ID_PROXY_HOST"), _("You need to enter a proxy host."));
+		}
 	}
 
-	if (XRCCTRL(*this, "ID_PROXYTYPE_CUSTOM", wxRadioButton)->GetValue())
-	{
+	if (XRCCTRL(*this, "ID_PROXYTYPE_CUSTOM", wxRadioButton)->GetValue()) {
 		wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_LOGINSEQUENCE", wxTextCtrl);
-		if (pTextCtrl->GetValue().empty())
+		if (pTextCtrl->GetValue().empty()) {
 			return DisplayError(_T("ID_LOGINSEQUENCE"), _("The custom login sequence cannot be empty."));
+		}
 	}
 
 	return true;
@@ -95,8 +99,9 @@ bool COptionsPageFtpProxy::Validate()
 void COptionsPageFtpProxy::SetCtrlState()
 {
 	wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_LOGINSEQUENCE", wxTextCtrl);
-	if (!pTextCtrl)
+	if (!pTextCtrl) {
 		return;
+	}
 
 	if (XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue()) {
 		pTextCtrl->ChangeValue(wxString());
@@ -122,19 +127,22 @@ void COptionsPageFtpProxy::SetCtrlState()
 	XRCCTRL(*this, "ID_PROXY_USER", wxTextCtrl)->Enable(true);
 	XRCCTRL(*this, "ID_PROXY_PASS", wxTextCtrl)->Enable(true);
 
-	if (XRCCTRL(*this, "ID_PROXYTYPE_CUSTOM", wxRadioButton)->GetValue())
+	if (XRCCTRL(*this, "ID_PROXYTYPE_CUSTOM", wxRadioButton)->GetValue()) {
 		return;
+	}
 
 	wxString loginSequence = _T("USER %s\nPASS %w\n");
 
-	if (XRCCTRL(*this, "ID_PROXYTYPE_USER", wxRadioButton)->GetValue())
+	if (XRCCTRL(*this, "ID_PROXYTYPE_USER", wxRadioButton)->GetValue()) {
 		loginSequence += _T("USER %u@%h\n");
-	else
-	{
-		if (XRCCTRL(*this, "ID_PROXYTYPE_SITE", wxRadioButton)->GetValue())
+	}
+	else {
+		if (XRCCTRL(*this, "ID_PROXYTYPE_SITE", wxRadioButton)->GetValue()) {
 			loginSequence += _T("SITE %h\n");
-		else
+		}
+		else {
 			loginSequence += _T("OPEN %h\n");
+		}
 		loginSequence += _T("USER %u\n");
 	}
 

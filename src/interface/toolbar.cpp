@@ -7,8 +7,14 @@
 #include "themeprovider.h"
 #include "toolbar.h"
 
+CToolBar::CToolBar()
+	: COptionChangeEventHandler(this)
+{
+}
+
 CToolBar::~CToolBar()
 {
+	COptions::Get()->unwatch_all(this);
 	for (auto iter = m_hidden_tools.begin(); iter != m_hidden_tools.end(); ++iter) {
 		delete iter->second;
 	}
@@ -89,22 +95,22 @@ CToolBar* CToolBar::Load(CMainFrame* pMainFrame)
 	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_QUEUEPROCESSING, false);
 	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_CHANGEDCONTEXT, false);
 
-	toolbar->RegisterOption(OPTION_SHOW_MESSAGELOG);
-	toolbar->RegisterOption(OPTION_SHOW_QUEUE);
-	toolbar->RegisterOption(OPTION_SHOW_TREE_LOCAL);
-	toolbar->RegisterOption(OPTION_SHOW_TREE_REMOTE);
-	toolbar->RegisterOption(OPTION_MESSAGELOG_POSITION);
+	COptions::Get()->watch(OPTION_SHOW_MESSAGELOG, toolbar);
+	COptions::Get()->watch(OPTION_SHOW_QUEUE, toolbar);
+	COptions::Get()->watch(OPTION_SHOW_TREE_LOCAL, toolbar);
+	COptions::Get()->watch(OPTION_SHOW_TREE_REMOTE, toolbar);
+	COptions::Get()->watch(OPTION_MESSAGELOG_POSITION, toolbar);
 
 	toolbar->ToggleTool(XRCID("ID_TOOLBAR_FILTER"), CFilterManager::HasActiveFilters());
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_LOCAL) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_REMOTE) != 0);
+	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+	toolbar->ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
+	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+	toolbar->ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
 
 	pMainFrame->SetToolBar(toolbar);
 	toolbar->Realize();
 
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
+	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 		toolbar->HideTool(XRCID("ID_TOOLBAR_LOGVIEW"));
 	}
 
@@ -237,27 +243,27 @@ void CToolBar::UpdateToolbarState()
 	EnableTool(XRCID("ID_TOOLBAR_RECONNECT"), canReconnect);
 }
 
-void CToolBar::OnOptionsChanged(changed_options_t const& options)
+void CToolBar::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_SHOW_MESSAGELOG)) {
-		ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUEUE)) {
-		ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_LOCAL)) {
-		ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_LOCAL) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_REMOTE)) {
-		ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_REMOTE) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
 	}
 	if (options.test(OPTION_MESSAGELOG_POSITION)) {
-		if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
+		if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 			HideTool(XRCID("ID_TOOLBAR_LOGVIEW"));
 		}
 		else {
 			ShowTool(XRCID("ID_TOOLBAR_LOGVIEW"));
-			ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
+			ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
 		}
 	}
 }

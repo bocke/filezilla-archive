@@ -2,7 +2,7 @@
 
 #include "../directorycache.h"
 #include "../servercapabilities.h"
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 #include "list.h"
 #include "transfersocket.h"
 
@@ -106,7 +106,7 @@ int CFtpListOpData::Send()
 			controlSocket_.Transfer(L"MLSD", this);
 		}
 		else {
-			if (engine_.GetOptions().GetOptionVal(OPTION_VIEW_HIDDEN_FILES)) {
+			if (engine_.GetOptions().get_int(OPTION_VIEW_HIDDEN_FILES)) {
 				capabilities cap = CServerCapabilities::GetCapability(currentServer_, list_hidden_support);
 				if (cap == unknown) {
 					viewHiddenCheck_ = true;

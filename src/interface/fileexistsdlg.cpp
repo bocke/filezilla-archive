@@ -123,7 +123,7 @@ void CFileExistsDlg::DisplayFile(bool left, std::wstring const& name, int64_t si
 
 	wxString sizeStr = _("Size unknown");
 	if (size >= 0) {
-		bool const thousands_separator = COptions::Get()->GetOptionVal(OPTION_SIZE_USETHOUSANDSEP) != 0;
+		bool const thousands_separator = COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0;
 		sizeStr = CSizeFormat::Format(size, true, CSizeFormat::bytes, thousands_separator, 0);
 	}
 

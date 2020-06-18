@@ -6,9 +6,8 @@
 #include "locale_initializer.h"
 #include "sizeformatting.h"
 
-#include "../include/option_change_event_handler.h"
-
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/util.hpp>
 
 #include <algorithm>
 #include <string>
@@ -26,36 +25,12 @@
 
 COptions* COptions::m_theOptions = 0;
 
-enum Type
-{
-	string,
-	number,
-	xml
-};
-
-enum Flags
-{
-	normal = 0,
-	internal = 1,
-	default_only = 2,
-	default_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
-	platform = 8 // A non-portable platform specific option, nodes have platform attribute
-};
-
-struct t_Option
-{
-	const char name[40];
-	const Type type;
-	const std::wstring defaultValue; // Default values are stored as string even for numerical options
-	const Flags flags; // internal items won't get written to settings file nor loaded from there
-};
-
 #ifdef FZ_WINDOWS
 //case insensitive
-#define DEFAULT_FILENAME_SORT   L"0"
+#define DEFAULT_FILENAME_SORT   0
 #else
 //case sensitive
-#define DEFAULT_FILENAME_SORT   L"1"
+#define DEFAULT_FILENAME_SORT   1
 #endif
 
 namespace {
@@ -68,157 +43,117 @@ namespace {
 #endif
 }
 
-static_assert(OPTIONS_NUM <= changed_options_t().size());
-
-static const t_Option options[OPTIONS_NUM] =
+unsigned int register_interface_options()
 {
 	// Note: A few options are versioned due to a changed
 	// option syntax or past, unhealthy defaults
+	return COptionsBase::register_options({
+		// Default/internal options
+		{ "Config Location", L"", option_flags::default_only | option_flags::platform },
+		{ "Kiosk mode", 0, option_flags::default_priority, 0, 2 },
+		{ "Disable update check", false, option_flags::default_only },
+		{ "Cache directory", L"", option_flags::default_priority | option_flags::platform },
 
-	// Engine settings
-	{ "Use Pasv mode", number, L"1", normal },
-	{ "Limit local ports", number, L"0", normal },
-	{ "Limit ports low", number, L"6000", normal },
-	{ "Limit ports high", number, L"7000", normal },
-	{ "Limit ports offset", number, L"0", normal },
-	{ "External IP mode", number, L"0", normal },
-	{ "External IP", string, L"", normal },
-	{ "External address resolver", string, L"http://ip.filezilla-project.org/ip.php", normal },
-	{ "Last resolved IP", string, L"", normal },
-	{ "No external ip on local conn", number, L"1", normal },
-	{ "Pasv reply fallback mode", number, L"0", normal },
-	{ "Timeout", number, L"20", normal },
-	{ "Logging Debug Level", number, L"0", normal },
-	{ "Logging Raw Listing", number, L"0", normal },
-	{ "fzsftp executable", string, L"", internal },
-	{ "fzstorj executable", string, L"", internal },
-	{ "Allow transfermode fallback", number, L"1", normal },
-	{ "Reconnect count", number, L"2", normal },
-	{ "Reconnect delay", number, L"5", normal },
-	{ "Enable speed limits", number, L"0", normal },
-	{ "Speedlimit inbound", number, L"1000", normal },
-	{ "Speedlimit outbound", number, L"100", normal },
-	{ "Speedlimit burst tolerance", number, L"0", normal },
-	{ "Preallocate space", number, L"0", normal },
-	{ "View hidden files", number, L"0", normal },
-	{ "Preserve timestamps", number, L"0", normal },
-	{ "Socket recv buffer size (v2)", number, L"4194304", normal }, // Make it large enough by default
-														 // to enable a large TCP window scale
-	{ "Socket send buffer size (v2)", number, L"262144", normal },
-	{ "FTP Keep-alive commands", number, L"0", normal },
-	{ "FTP Proxy type", number, L"0", normal },
-	{ "FTP Proxy host", string, L"", normal },
-	{ "FTP Proxy user", string, L"", normal },
-	{ "FTP Proxy password", string, L"", normal },
-	{ "FTP Proxy login sequence", string, L"", normal },
-	{ "SFTP keyfiles", string, L"", platform },
-	{ "SFTP compression", number, L"", normal },
-	{ "Proxy type", number, L"0", normal },
-	{ "Proxy host", string, L"", normal },
-	{ "Proxy port", number, L"0", normal },
-	{ "Proxy user", string, L"", normal },
-	{ "Proxy password", string, L"", normal },
-	{ "Logging file", string, L"", platform },
-	{ "Logging filesize limit", number, L"10", normal },
-	{ "Logging show detailed logs", number, L"0", internal },
-	{ "Size format", number, L"0", normal },
-	{ "Size thousands separator", number, L"1", normal },
-	{ "Size decimal places", number, L"1", normal },
-	{ "TCP Keepalive Interval", number, L"15", normal },
-	{ "Cache TTL", number, L"600", normal },
+		// Normal UI options
+		{ "Number of Transfers", 2, option_flags::numeric_clamp, 1, 10 },
+		{ "Ascii Binary mode", 0, option_flags::normal, 0, 2 },
+		{ "Auto Ascii files", L"ac|am|asp|bat|c|cfm|cgi|conf|cpp|css|dhtml|diff|diz|h|hpp|htm|html|in|inc|java|js|jsp|lua|m4|mak|md5|nfo|nsh|nsi|pas|patch|pem|php|phtml|pl|po|pot|py|qmail|sh|sha1|sha256|sha512|shtml|sql|svg|tcl|tpl|txt|vbs|xhtml|xml|xrc", option_flags::normal },
+		{ "Auto Ascii no extension", L"1", option_flags::normal },
+		{ "Auto Ascii dotfiles", true, option_flags::normal },
+		{ "Language Code", L"", option_flags::normal, 50 },
+		{ "Concurrent download limit", 0, option_flags::numeric_clamp, 0, 10 },
+		{ "Concurrent upload limit", 0, option_flags::numeric_clamp, 0, 10 },
+		{ "Update Check", 1, option_flags::normal, 0, 1 },
+		{ "Update Check Interval", 7, option_flags::normal, 1, 7 },
+		{ "Last automatic update check", L"", option_flags::normal, 100 },
+		{ "Last automatic update version", L"", option_flags::normal },
+		{ "Update Check New Version", L"", option_flags::platform },
+		{ "Update Check Check Beta", 0, option_flags::normal, 0, 2 },
+		{ "Show debug menu", false, option_flags::normal },
+		{ "File exists action download", 0, option_flags::normal },
+		{ "File exists action upload", 0, option_flags::normal },
+		{ "Allow ascii resume", false, option_flags::normal },
+		{ "Greeting version", L"", option_flags::normal },
+		{ "Greeting resources", L"", option_flags::normal },
+		{ "Onetime Dialogs", L"", option_flags::normal },
+		{ "Show Tree Local", true, option_flags::normal },
+		{ "Show Tree Remote", true, option_flags::normal },
+		{ "File Pane Layout", 0, option_flags::normal, 0, 3 },
+		{ "File Pane Swap", false, option_flags::normal },
+		{ "Filelist directory sort", 0, option_flags::normal, 0, 2 },
+		{ "Filelist name sort", DEFAULT_FILENAME_SORT, option_flags::normal, 0, 2 },
+		{ "Queue successful autoclear", false, option_flags::normal },
+		{ "Queue column widths", L"", option_flags::normal },
+		{ "Local filelist colwidths", L"", option_flags::normal },
+		{ "Remote filelist colwidths", L"", option_flags::normal },
+		{ "Window position and size", L"", option_flags::normal },
+		{ "Splitter positions (v2)", L"", option_flags::normal },
+		{ "Local filelist sortorder", L"", option_flags::normal },
+		{ "Remote filelist sortorder", L"", option_flags::normal },
+		{ "Time Format", L"", option_flags::normal },
+		{ "Date Format", L"", option_flags::normal },
+		{ "Show message log", true, option_flags::normal },
+		{ "Show queue", true, option_flags::normal },
+		{ "Default editor", L"", option_flags::platform },
+		{ "Always use default editor", true, option_flags::normal },
+		{ "File associations (v2)", L"", option_flags::platform },
+		{ "Comparison mode", 1, option_flags::normal, 0, 1 },
+		{ "Comparison threshold", 1, option_flags::normal, 0, 1440 },
+		{ "Site Manager position", L"", option_flags::normal },
+		{ "Icon theme", L"default", option_flags::normal },
+		{ "Icon scale", 125, option_flags::numeric_clamp, 25, 400 },
+		{ "Timestamp in message log", false, option_flags::normal },
+		{ "Sitemanager last selected", L"", option_flags::normal },
+		{ "Local filelist shown columns", L"", option_flags::normal },
+		{ "Remote filelist shown columns", L"", option_flags::normal },
+		{ "Local filelist column order", L"", option_flags::normal },
+		{ "Remote filelist column order", L"", option_flags::normal },
+		{ "Filelist status bar", true, option_flags::normal },
+		{ "Filter toggle state", false, option_flags::normal },
+		{ "Show quickconnect bar", true, option_flags::normal },
+		{ "Messagelog position", 0, option_flags::normal, 0, 2 },
+		{ "File doubleclick action", 0, option_flags::normal, 0, 3 },
+		{ "Dir doubleclick action", 0, option_flags::normal, 0, 3 },
+		{ "Minimize to tray", false, option_flags::normal },
+		{ "Search column widths", L"", option_flags::normal },
+		{ "Search column shown", L"", option_flags::normal },
+		{ "Search column order", L"", option_flags::normal },
+		{ "Search window size", L"", option_flags::normal },
+		{ "Comparison hide identical", false, option_flags::normal },
+		{ "Search sort order", L"", option_flags::normal },
+		{ "Edit track local", true, option_flags::normal },
+		{ "Prevent idle sleep", true, option_flags::normal },
+		{ "Filteredit window size", L"", option_flags::normal },
+		{ "Enable invalid char filter", true, option_flags::normal },
+		{ "Invalid char replace", L"_", option_flags::normal, option_type::string, 1, [](std::wstring& v) {
+			return v.size() == 1 && !IsInvalidChar(v[0], true);
+		}},
+		{ "Already connected choice", 0, option_flags::normal },
+		{ "Edit status dialog size", L"", option_flags::normal },
+		{ "Display current speed", false, option_flags::normal },
+		{ "Toolbar hidden", false, option_flags::normal },
+		{ "Strip VMS revisions", false, option_flags::normal },
+		{ "Startup action", 0, option_flags::normal },
+		{ "Prompt password save", 0, option_flags::normal },
+		{ "Persistent Choices", 0, option_flags::normal },
+		{ "Queue completion action", 1, option_flags::normal },
+		{ "Queue completion command", L"", option_flags::normal },
+		{ "Drag and Drop disabled", false, option_flags::normal },
+		{ "Disable update footer", false, option_flags::normal },
+		{ "Master password encryptor", L"", option_flags::normal },
+		{ "Tab data", L"", option_flags::normal, option_type::xml }
+	});
+}
 
-	// Interface settings
-	{ "Number of Transfers", number, L"2", normal },
-	{ "Ascii Binary mode", number, L"0", normal },
-	{ "Auto Ascii files", string, L"ac|am|asp|bat|c|cfm|cgi|conf|cpp|css|dhtml|diff|diz|h|hpp|htm|html|in|inc|java|js|jsp|lua|m4|mak|md5|nfo|nsh|nsi|pas|patch|pem|php|phtml|pl|po|pot|py|qmail|sh|sha1|sha256|sha512|shtml|sql|svg|tcl|tpl|txt|vbs|xhtml|xml|xrc", normal },
-	{ "Auto Ascii no extension", number, L"1", normal },
-	{ "Auto Ascii dotfiles", number, L"1", normal },
-	{ "Language Code", string, L"", normal },
-	{ "Concurrent download limit", number, L"0", normal },
-	{ "Concurrent upload limit", number, L"0", normal },
-	{ "Update Check", number, L"1", normal },
-	{ "Update Check Interval", number, L"7", normal },
-	{ "Last automatic update check", string, L"", normal },
-	{ "Last automatic update version", string, L"", normal },
-	{ "Update Check New Version", string, L"", platform },
-	{ "Update Check Check Beta", number, L"0", normal },
-	{ "Show debug menu", number, L"0", normal },
-	{ "File exists action download", number, L"0", normal },
-	{ "File exists action upload", number, L"0", normal },
-	{ "Allow ascii resume", number, L"0", normal },
-	{ "Greeting version", string, L"", normal },
-	{ "Greeting resources", string, L"", normal },
-	{ "Onetime Dialogs", string, L"", normal },
-	{ "Show Tree Local", number, L"1", normal },
-	{ "Show Tree Remote", number, L"1", normal },
-	{ "File Pane Layout", number, L"0", normal },
-	{ "File Pane Swap", number, L"0", normal },
-	{ "Filelist directory sort", number, L"0", normal },
-	{ "Filelist name sort", number, DEFAULT_FILENAME_SORT, normal },
-	{ "Queue successful autoclear", number, L"0", normal },
-	{ "Queue column widths", string, L"", normal },
-	{ "Local filelist colwidths", string, L"", normal },
-	{ "Remote filelist colwidths", string, L"", normal },
-	{ "Window position and size", string, L"", normal },
-	{ "Splitter positions (v2)", string, L"", normal },
-	{ "Local filelist sortorder", string, L"", normal },
-	{ "Remote filelist sortorder", string, L"", normal },
-	{ "Time Format", string, L"", normal },
-	{ "Date Format", string, L"", normal },
-	{ "Show message log", number, L"1", normal },
-	{ "Show queue", number, L"1", normal },
-	{ "Default editor", string, L"", platform },
-	{ "Always use default editor", number, L"0", normal },
-	{ "File associations (v2)", string, L"", platform },
-	{ "Comparison mode", number, L"1", normal },
-	{ "Comparison threshold", number, L"1", normal },
-	{ "Site Manager position", string, L"", normal },
-	{ "Icon theme", string, L"default", normal },
-	{ "Icon scale", number, L"125", normal },
-	{ "Timestamp in message log", number, L"0", normal },
-	{ "Sitemanager last selected", string, L"", normal },
-	{ "Local filelist shown columns", string, L"", normal },
-	{ "Remote filelist shown columns", string, L"", normal },
-	{ "Local filelist column order", string, L"", normal },
-	{ "Remote filelist column order", string, L"", normal },
-	{ "Filelist status bar", number, L"1", normal },
-	{ "Filter toggle state", number, L"0", normal },
-	{ "Show quickconnect bar", number, L"1", normal },
-	{ "Messagelog position", number, L"0", normal },
-	{ "File doubleclick action", number, L"0", normal },
-	{ "Dir doubleclick action", number, L"0", normal },
-	{ "Minimize to tray", number, L"0", normal },
-	{ "Search column widths", string, L"", normal },
-	{ "Search column shown", string, L"", normal },
-	{ "Search column order", string, L"", normal },
-	{ "Search window size", string, L"", normal },
-	{ "Comparison hide identical", number, L"0", normal },
-	{ "Search sort order", string, L"", normal },
-	{ "Edit track local", number, L"1", normal },
-	{ "Prevent idle sleep", number, L"1", normal },
-	{ "Filteredit window size", string, L"", normal },
-	{ "Enable invalid char filter", number, L"1", normal },
-	{ "Invalid char replace", string, L"_", normal },
-	{ "Already connected choice", number, L"0", normal },
-	{ "Edit status dialog size", string, L"", normal },
-	{ "Display current speed", number, L"0", normal },
-	{ "Toolbar hidden", number, L"0", normal },
-	{ "Strip VMS revisions", number, L"0", normal },
-	{ "Startup action", number, L"0", normal },
-	{ "Prompt password save", number, L"0", normal },
-	{ "Persistent Choices", number, L"0", normal },
-	{ "Queue completion action", number, L"1", normal },
-	{ "Queue completion command", string, L"", normal },
-	{ "Drag and Drop disabled", number, L"0", normal },
-	{ "Disable update footer", number, L"0", normal },
-	{ "Master password encryptor", string, L"", normal },
-	{ "Tab data", xml, std::wstring(), normal },
+optionsIndex mapOption(interfaceOptions opt)
+{
+	static unsigned int const offset = register_interface_options();
 
-	// Default/internal options
-	{ "Config Location", string, L"", static_cast<Flags>(default_only|platform) },
-	{ "Kiosk mode", number, L"0", default_priority },
-	{ "Disable update check", number, L"0", default_only },
-	{ "Cache directory", string, L"", static_cast<Flags>(default_priority|platform) },
+	auto ret = optionsIndex::invalid;
+	if (opt < OPTIONS_NUM) {
+		return static_cast<optionsIndex>(opt + offset);
+	}
+	return ret;
 };
 
 std::wstring GetEnv(char const* name)
@@ -237,53 +172,17 @@ BEGIN_EVENT_TABLE(COptions, wxEvtHandler)
 EVT_TIMER(wxID_ANY, COptions::OnTimer)
 END_EVENT_TABLE()
 
-t_OptionsCache& t_OptionsCache::operator=(std::wstring_view const& v)
-{
-	strValue = v;
-	numValue = fz::to_integral<int>(v);
-	return *this;
-}
-
-t_OptionsCache& t_OptionsCache::operator=(std::wstring && v)
-{
-	numValue = fz::to_integral<int>(v);
-	strValue = std::move(v);
-	return *this;
-}
-
-t_OptionsCache& t_OptionsCache::operator=(int v)
-{
-	numValue = v;
-	strValue = fz::to_wstring(v);
-	return *this;
-}
-
-t_OptionsCache& t_OptionsCache::operator=(pugi::xml_document const& v)
-{
-	xmlValue.reset();
-	for (auto c = v.first_child(); c; c = c.next_sibling()) {
-		xmlValue.append_copy(c);
-	}
-
-	return *this;
-}
-
-t_OptionsCache& t_OptionsCache::operator=(pugi::xml_document && v)
-{
-	xmlValue = std::move(v);
-	return *this;
-}
-
 COptions::COptions()
 {
-	m_theOptions = this;
+	// FIXME: Needs Global initializer
+	mapOption(OPTION_ASCIIBINARY);
+	mapOption(OPTION_PROXY_HOST);
 
-	SetDefaultValues();
+	m_theOptions = this;
 
 	m_save_timer.SetOwner(this);
 
-	auto const nameOptionMap = GetNameOptionMap();
-	LoadGlobalDefaultOptions(nameOptionMap);
+	LoadGlobalDefaultOptions();
 
 	CLocalPath const dir = InitSettingsDir();
 
@@ -295,180 +194,17 @@ COptions::COptions()
 		xmlFile_.reset();
 	}
 	else {
-		CreateSettingsXmlElement();
+		auto settings = CreateSettingsXmlElement();
+		Load(settings, false);
 	}
 
-	LoadOptions(nameOptionMap);
-
-	changedOptions_.reset();
-}
-
-std::map<std::string, unsigned int> COptions::GetNameOptionMap() const
-{
-	std::map<std::string, unsigned int> ret;
-	for (unsigned int i = 0; i < OPTIONS_NUM; ++i) {
-		if (!(options[i].flags & internal)) {
-			ret.insert(std::make_pair(std::string(options[i].name), i));
-		}
+	if (dirty_ && !m_save_timer.IsRunning()) {
+		m_save_timer.Start(15000, true);
 	}
-	return ret;
 }
 
 COptions::~COptions()
 {
-	COptionChangeEventHandler::UnregisterAllHandlers();
-}
-
-int COptions::GetOptionVal(unsigned int nID)
-{
-	if (nID >= OPTIONS_NUM) {
-		return 0;
-	}
-
-	fz::scoped_lock l(m_sync_);
-	return m_optionsCache[nID].numValue;
-}
-
-std::wstring COptions::GetOption(unsigned int nID)
-{
-	if (nID >= OPTIONS_NUM) {
-		return std::wstring();
-	}
-
-	fz::scoped_lock l(m_sync_);
-	return m_optionsCache[nID].strValue;
-}
-
-pugi::xml_document COptions::GetOptionXml(unsigned int nID)
-{
-	pugi::xml_document ret;
-	if (nID < OPTIONS_NUM) {
-		fz::scoped_lock l(m_sync_);
-		for (auto c = m_optionsCache[nID].xmlValue.first_child(); c; c = c.next_sibling()) {
-			ret.append_copy(c);
-		}
-	}
-
-	return ret;
-}
-
-bool COptions::SetOption(unsigned int nID, int value)
-{
-	if (nID >= OPTIONS_NUM) {
-		return false;
-	}
-
-	if (options[nID].type != number) {
-		return false;
-	}
-
-	ContinueSetOption(nID, value);
-	return true;
-}
-
-bool COptions::SetOption(unsigned int nID, std::wstring_view const& value)
-{
-	if (nID >= OPTIONS_NUM) {
-		return false;
-	}
-
-	if (options[nID].type != string) {
-		return SetOption(nID, fz::to_integral<int>(value));
-	}
-
-	ContinueSetOption(nID, value);
-	return true;
-}
-
-bool COptions::SetOptionXml(unsigned int nID, pugi::xml_node const& value)
-{
-	if (nID >= OPTIONS_NUM) {
-		return false;
-	}
-
-	if (options[nID].type != xml) {
-		return false;
-	}
-
-	pugi::xml_document doc;
-	if (value) {
-		if (value.type() == pugi::node_document) {
-			for (auto c = value.first_child(); c; c = c.next_sibling()) {
-				if (c.type() == pugi::node_element) {
-					doc.append_copy(c);
-				}
-			}
-		}
-		else {
-			doc.append_copy(value);
-		}
-	}
-
-	ContinueSetOption(nID, doc);
-
-	return true;
-}
-
-template<typename T>
-void COptions::ContinueSetOption(unsigned int nID, T const& value)
-{
-	auto validated = Validate(nID, value);
-
-	{
-		fz::scoped_lock l(m_sync_);
-		if (m_optionsCache[nID] == validated) {
-			// Nothing to do
-			return;
-		}
-		m_optionsCache[nID] = validated;
-
-		if (changedOptions_.none()) {
-			CallAfter(&COptions::NotifyChangedOptions);
-		}
-		changedOptions_.set(nID);
-	}
-
-	// Fixme: Setting options from other threads
-	if (!wxIsMainThread()) {
-		return;
-	}
-
-	if (!xmlFile_) {
-		return;
-	}
-	auto settings = CreateSettingsXmlElement();
-	if (!settings) {
-		return;
-	}
-
-	if (!(options[nID].flags & (internal | default_only))) {
-		SetXmlValue(nID, settings, validated);
-
-		if (!m_save_timer.IsRunning()) {
-			m_save_timer.Start(15000, true);
-		}
-	}
-}
-
-void COptions::NotifyChangedOptions()
-{
-	// Reset prior to notifying to correctly handle the case of an option being set while notifying
-	changed_options_t changedOptions;
-	{
-		fz::scoped_lock l(m_sync_);
-		std::swap(changedOptions, changedOptions_);
-	}
-	COptionChangeEventHandler::DoNotify(changedOptions);
-}
-
-bool COptions::OptionFromFzDefaultsXml(unsigned int nID)
-{
-	if (nID >= OPTIONS_NUM) {
-		return false;
-	}
-
-	fz::scoped_lock l(m_sync_);
-	return m_optionsCache[nID].from_default;
 }
 
 pugi::xml_node COptions::CreateSettingsXmlElement()
@@ -483,242 +219,11 @@ pugi::xml_node COptions::CreateSettingsXmlElement()
 	}
 
 	auto settings = element.child("Settings");
-	if (settings) {
-		return settings;
+	if (!settings) {
+		settings = element.append_child("Settings");
 	}
-
-	settings = element.append_child("Settings");
-
-	WriteCacheToXml(settings);
 
 	return settings;
-}
-
-void COptions::WriteCacheToXml(pugi::xml_node settings)
-{
-	fz::scoped_lock l(m_sync_);
-	for (int i = 0; i < OPTIONS_NUM; ++i) {
-		if ((options[i].flags & (internal | default_only))) {
-			continue;
-		}
-		if (options[i].type == string) {
-			SetXmlValue(i, settings, m_optionsCache[i].strValue);
-		}
-		else if (options[i].type == xml) {
-			SetXmlValue(i, settings, m_optionsCache[i].xmlValue);
-		}
-		else {
-			SetXmlValue(i, settings, m_optionsCache[i].numValue);
-		}
-	}
-}
-
-void COptions::SetXmlValue(unsigned int nID, pugi::xml_node settings, int value)
-{
-	SetXmlValue(nID, settings, fz::to_wstring(value));
-}
-
-void COptions::SetXmlValue(unsigned int nID, pugi::xml_node settings, std::wstring_view const& value)
-{
-	// No checks are made about the validity of the value, that's done in SetOption
-	std::string utf8 = fz::to_utf8(value);
-
-	for (pugi::xml_node it = settings.child("Setting"); it;) {
-		auto cur = it;
-		it = it.next_sibling("Setting");
-
-		char const *attribute = cur.attribute("name").value();
-		if (strcmp(attribute, options[nID].name)) {
-			continue;
-		}
-
-		if (options[nID].flags & platform) {
-			// Ignore items from the wrong platform
-			char const* p = cur.attribute("platform").value();
-			if (*p && strcmp(p, platform_name)) {
-				continue;
-			}
-		}
-		settings.remove_child(cur);
-	}
-	pugi::xml_node setting = settings.append_child("Setting");
-	SetTextAttribute(setting, "name", options[nID].name);
-	if (options[nID].flags & platform) {
-		SetTextAttribute(setting, "platform", platform_name);
-	}
-	setting.text() = utf8.c_str();
-}
-
-void COptions::SetXmlValue(unsigned int nID, pugi::xml_node settings, pugi::xml_document const& value)
-{
-	for (pugi::xml_node it = settings.child("Setting"); it;) {
-		auto cur = it;
-		it = it.next_sibling("Setting");
-
-		const char *attribute = cur.attribute("name").value();
-		if (strcmp(attribute, options[nID].name)) {
-			continue;
-		}
-		if (options[nID].flags & platform) {
-			// Ignore items from the wrong platform
-			char const* p = cur.attribute("platform").value();
-			if (*p && strcmp(p, platform_name)) {
-				continue;
-			}
-		}
-		settings.remove_child(cur);
-	}
-	pugi::xml_node setting = settings.append_child("Setting");
-	SetTextAttribute(setting, "name", options[nID].name);
-	if (options[nID].flags & platform) {
-		SetTextAttribute(setting, "platform", platform_name);
-	}
-	for (auto c = value.first_child(); c; c = c.next_sibling()) {
-		setting.append_copy(c);
-	}
-}
-
-int COptions::Validate(unsigned int nID, int value)
-{
-	switch (nID)
-	{
-	case OPTION_UPDATECHECK_INTERVAL:
-		if (value < 1 || value > 7) {
-			value = 7;
-		}
-		break;
-	case OPTION_LOGGING_DEBUGLEVEL:
-		if (value < 0 || value > 4) {
-			value = 0;
-		}
-		break;
-	case OPTION_RECONNECTCOUNT:
-		if (value < 0 || value > 99) {
-			value = 5;
-		}
-		break;
-	case OPTION_RECONNECTDELAY:
-		if (value < 0 || value > 999) {
-			value = 5;
-		}
-		break;
-	case OPTION_FILEPANE_LAYOUT:
-		if (value < 0 || value > 3) {
-			value = 0;
-		}
-		break;
-	case OPTION_SPEEDLIMIT_INBOUND:
-	case OPTION_SPEEDLIMIT_OUTBOUND:
-		if (value < 0) {
-			value = 0;
-		}
-		break;
-	case OPTION_SPEEDLIMIT_BURSTTOLERANCE:
-		if (value < 0 || value > 2) {
-			value = 0;
-		}
-		break;
-	case OPTION_FILELIST_DIRSORT:
-	case OPTION_FILELIST_NAMESORT:
-		if (value < 0 || value > 2) {
-			value = 0;
-		}
-		break;
-	case OPTION_SOCKET_BUFFERSIZE_RECV:
-		if (value != -1 && (value < 4096 || value > 4096 * 1024)) {
-			value = -1;
-		}
-		break;
-	case OPTION_SOCKET_BUFFERSIZE_SEND:
-		if (value != -1 && (value < 4096 || value > 4096 * 1024)) {
-			value = 131072;
-		}
-		break;
-	case OPTION_COMPARISONMODE:
-		if (value < 0 || value > 0) {
-			value = 1;
-		}
-		break;
-	case OPTION_COMPARISON_THRESHOLD:
-		if (value < 0 || value > 1440) {
-			value = 1;
-		}
-		break;
-	case OPTION_SIZE_DECIMALPLACES:
-		if (value < 0 || value > 3) {
-			value = 0;
-		}
-		break;
-	case OPTION_MESSAGELOG_POSITION:
-		if (value < 0 || value > 2) {
-			value = 0;
-		}
-		break;
-	case OPTION_DOUBLECLICK_ACTION_FILE:
-	case OPTION_DOUBLECLICK_ACTION_DIRECTORY:
-		if (value < 0 || value > 3) {
-			value = 0;
-		}
-		break;
-	case OPTION_SIZE_FORMAT:
-		if (value < 0 || value >= CSizeFormat::formats_count) {
-			value = 0;
-		}
-		break;
-	case OPTION_TIMEOUT:
-		if (value <= 0) {
-			value = 0;
-		}
-		else if (value < 10) {
-			value = 10;
-		}
-		else if (value > 9999) {
-			value = 9999;
-		}
-		break;
-	case OPTION_CACHE_TTL:
-		if (value < 30) {
-			value = 30;
-		}
-		else if (value > 60*60*24) {
-			value = 60 * 60 * 24;
-		}
-		break;
-	case OPTION_ICONS_SCALE:
-		if (value < 25) {
-			value = 25;
-		}
-		else if (value > 400) {
-			value = 400;
-		}
-		break;
-	}
-	return value;
-}
-
-std::wstring COptions::Validate(unsigned int nID, std::wstring_view const& value)
-{
-	if (nID == OPTION_INVALID_CHAR_REPLACE) {
-		if (value.size() != 1) {
-			return L"_";
-		}
-		if (IsInvalidChar(value[0], true)) {
-			return L"_";
-		}
-	}
-	return std::wstring(value);
-}
-
-pugi::xml_document COptions::Validate(unsigned int, pugi::xml_document const& value)
-{
-	pugi::xml_document res;
-	for (auto c = value.first_child(); c; c = c.next_sibling()) {
-		if (c.type() == pugi::node_element) {
-			res.append_copy(c);
-		}
-	}
-
-	return res;
 }
 
 void COptions::Init()
@@ -745,102 +250,98 @@ COptions* COptions::Get()
 
 void COptions::Import(pugi::xml_node element)
 {
-	bool canNotifyChanged{};
-	{
-		fz::scoped_lock l(m_sync_);
-		canNotifyChanged = changedOptions_.none();
-	}
-	LoadOptions(GetNameOptionMap(), element);
-
-	if (!m_save_timer.IsRunning()) {
-		m_save_timer.Start(15000, true);
-	}
-
-	{
-		fz::scoped_lock l(m_sync_);
-		if (canNotifyChanged && changedOptions_.any()) {
-			CallAfter(&COptions::NotifyChangedOptions);
-		}
-	}
+	Load(element, false);
 }
 
-void COptions::LoadOptions(std::map<std::string, unsigned int> const& nameOptionMap, pugi::xml_node import)
+void COptions::Load(pugi::xml_node settings, bool from_default)
 {
-	pugi::xml_node settings = CreateSettingsXmlElement();
-
-	pugi::xml_node first = import ? import.child("Setting") : settings.child("Setting");
-	for (auto setting = first; setting; setting = setting.next_sibling("Setting")) {
-		LoadOptionFromElement(setting, nameOptionMap, false);
-	}
-
-	if (import) {
-		WriteCacheToXml(settings);
-	}
-}
-
-void COptions::LoadOptionFromElement(pugi::xml_node option, std::map<std::string, unsigned int> const& nameOptionMap, bool allowDefault)
-{
-	const char* name = option.attribute("name").value();
-	if (!name) {
+	// Fixme: When importing, also needs actual settings
+	if (!settings) {
 		return;
 	}
 
-	auto const iter = nameOptionMap.find(name);
-	if (iter != nameOptionMap.end()) {
-		if (!allowDefault && options[iter->second].flags & default_only) {
-			return;
+	fz::scoped_lock l(mtx_);
+	add_missing();
+
+	std::vector<uint8_t> seen;
+	seen.resize(options_.size());
+
+	pugi::xml_node next;
+	for (auto setting = settings.child("Setting"); setting; setting = next) {
+		next = setting.next_sibling("Setting");
+
+		const char* name = setting.attribute("name").value();
+		if (!name) {
+			continue;
 		}
 
-		if (options[iter->second].flags & platform) {
-			char const* p = option.attribute("platform").value();
+		auto def_it = name_to_option_.find(name);
+		if (def_it == name_to_option_.cend()) {
+			continue;
+		}
+
+		auto const& def = options_[def_it->second];
+
+		if (def.flags() & option_flags::platform) {
+			char const* p = setting.attribute("platform").value();
 			if (*p && strcmp(p, platform_name)) {
 				return;
 			}
 		}
 
-		std::wstring value = GetTextElement(option);
-		if (options[iter->second].flags & default_priority) {
-			if (allowDefault) {
-				fz::scoped_lock l(m_sync_);
-				m_optionsCache[iter->second].from_default = true;
+		if (seen[def_it->second]) {
+			if (!from_default) {
+				settings.remove_child(setting);
+			}
+			continue;
+		}
+		seen[def_it->second] = 1;
+
+		auto & val = values_[def_it->second];
+
+		switch (def.type()) {
+		case option_type::number:
+		case option_type::boolean:
+			set(static_cast<optionsIndex>(def_it->second), def, val, setting.text().as_int(), from_default);
+			break;
+		case option_type::xml:
+			// FIXME
+			break;
+		default:
+			set(static_cast<optionsIndex>(def_it->second), def, val, fz::to_wstring_from_utf8(setting.child_value()), from_default);
+		}
+	}
+
+	if (!from_default) {
+		for (size_t i = 0; i < seen.size(); ++i) {
+			if (seen[i]) {
+				continue;
+			}
+
+			auto const& def = options_[i];
+			if (def.flags() & (option_flags::internal | option_flags::default_only)) {
+				return;
+			}
+
+			auto setting = settings.append_child("Setting");
+			setting.append_attribute("name").set_value(def.name().c_str());
+			if (def.flags() & option_flags::platform) {
+				setting.append_attribute("platform").set_value(platform_name);
+			}
+
+			if (def.type() == option_type::xml) {
+				// FIXME
 			}
 			else {
-				fz::scoped_lock l(m_sync_);
-				if (m_optionsCache[iter->second].from_default) {
-					return;
-				}
+				setting.text().set(fz::to_utf8(def.def()).c_str());
 			}
-		}
 
-		if (options[iter->second].type == number) {
-			int numValue = fz::to_integral<int>(value);
-			numValue = Validate(iter->second, numValue);
-			fz::scoped_lock l(m_sync_);
-			if (m_optionsCache[iter->second].numValue != numValue) {
-				m_optionsCache[iter->second] = numValue;
-				changedOptions_.set(iter->second);
-			}
-		}
-		else if (options[iter->second].type == string) {
-			value = Validate(iter->second, value);
-			fz::scoped_lock l(m_sync_);
-			if (m_optionsCache[iter->second].strValue != value) {
-				m_optionsCache[iter->second] = value;
-				changedOptions_.set(iter->second);
-			}
-		}
-		else {
-			fz::scoped_lock l(m_sync_);
-			m_optionsCache[iter->second].xmlValue.reset();
-			for (auto c = option.first_child(); c; c = c.next_sibling()) {
-				m_optionsCache[iter->second].xmlValue.append_copy(c);
-			}
-			changedOptions_.set(iter->second);
+			dirty_ = true;
 		}
 	}
 }
 
-void COptions::LoadGlobalDefaultOptions(std::map<std::string, unsigned int> const& nameOptionMap)
+void COptions::LoadGlobalDefaultOptions()
 {
 	CLocalPath const defaultsDir = wxGetApp().GetDefaultsDir();
 	if (defaultsDir.empty()) {
@@ -861,9 +362,7 @@ void COptions::LoadGlobalDefaultOptions(std::map<std::string, unsigned int> cons
 		return;
 	}
 
-	for (auto setting = element.child("Setting"); setting; setting = setting.next_sibling("Setting")) {
-		LoadOptionFromElement(setting, nameOptionMap, true);
-	}
+	Load(element, true);
 }
 
 void COptions::OnTimer(wxTimerEvent&)
@@ -873,7 +372,13 @@ void COptions::OnTimer(wxTimerEvent&)
 
 void COptions::Save()
 {
-	if (GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (!dirty_) {
+		return;
+	}
+	dirty_ = false;
+	m_save_timer.Stop();
+
+	if (get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
 	}
 
@@ -913,7 +418,7 @@ bool COptions::Cleanup()
 	auto settings = child;
 	child = settings.first_child();
 
-	auto const nameOptionMap = GetNameOptionMap();
+	std::map<std::string, unsigned int> nameOptionMap;
 
 	// Remove unknown settings
 	while (child) {
@@ -937,14 +442,8 @@ bool COptions::Cleanup()
 
 void COptions::SaveIfNeeded()
 {
-	bool save = m_save_timer.IsRunning();
-
-	if (needsCleanup_) {
-		save |= Cleanup();
-	}
-
 	m_save_timer.Stop();
-	if (save) {
+	if (dirty_) {
 		Save();
 	}
 }
@@ -1024,7 +523,7 @@ CLocalPath COptions::GetCacheDirectory()
 {
 	CLocalPath ret;
 
-	std::wstring dir(GetOption(OPTION_DEFAULT_CACHE_DIR));
+	std::wstring dir(get_string(OPTION_DEFAULT_CACHE_DIR));
 	if (!dir.empty()) {
 		dir = ExpandPath(dir);
 		ret.SetPath(wxGetApp().GetDefaultsDir().GetPath());
@@ -1058,7 +557,7 @@ CLocalPath COptions::InitSettingsDir()
 {
 	CLocalPath p;
 
-	std::wstring dir = GetOption(OPTION_DEFAULT_SETTINGSDIR);
+	std::wstring dir = get_string(OPTION_DEFAULT_SETTINGSDIR);
 	if (!dir.empty()) {
 		dir = ExpandPath(dir);
 		p.SetPath(wxGetApp().GetDefaultsDir().GetPath());
@@ -1072,28 +571,77 @@ CLocalPath COptions::InitSettingsDir()
 		fz::mkdir(fz::to_native(p.GetPath()), true, true);
 	}
 
-	SetOption(OPTION_DEFAULT_SETTINGSDIR, p.GetPath());
+	set(mapOption(OPTION_DEFAULT_SETTINGSDIR), p.GetPath(), true);
 
 	return p;
 }
 
-void COptions::SetDefaultValues()
-{
-	fz::scoped_lock l(m_sync_);
-	for (int i = 0; i < OPTIONS_NUM; ++i) {
-		m_optionsCache[i].from_default = false;
-		if (options[i].type == xml) {
-			m_optionsCache[i].xmlValue.reset();
-			m_optionsCache[i].xmlValue.load_string(fz::to_string(options[i].defaultValue).c_str());
-		}
-		else {
-			m_optionsCache[i] = options[i].defaultValue;
-		}
-	}
-}
-
-
 void COptions::RequireCleanup()
 {
 	needsCleanup_ = true;
+}
+
+void COptions::process_changed(watched_options const& changed)
+{
+	auto settings = CreateSettingsXmlElement();
+	if (!settings) {
+		return;
+	}
+	for (size_t i = 0; i < changed.options_.size(); ++i) {
+		uint64_t v = changed.options_[i];
+		while (v) {
+			auto bit = fz::bitscan(v);
+			v ^= 1ull << bit;
+			size_t opt = bit + i * 8;
+
+			set_xml_value(settings, opt);
+		}
+	}
+
+	if (dirty_ && !m_save_timer.IsRunning()) {
+		m_save_timer.Start(15000, true);
+	}
+}
+
+void COptions::set_xml_value(pugi::xml_node settings, size_t opt)
+{
+	auto const& def = options_[opt];
+	if (def.flags() & (option_flags::internal | option_flags::default_only)) {
+		return;
+	}
+
+	for (pugi::xml_node it = settings.child("Setting"); it;) {
+		auto cur = it;
+		it = it.next_sibling("Setting");
+
+		char const* attribute = cur.attribute("name").value();
+		if (strcmp(attribute, def.name().c_str())) {
+			continue;
+		}
+
+		if (def.flags() & option_flags::platform) {
+			// Ignore items from the wrong platform
+			char const* p = cur.attribute("platform").value();
+			if (*p && strcmp(p, platform_name)) {
+				continue;
+			}
+		}
+		settings.remove_child(cur);
+	}
+
+	auto setting = settings.append_child("Setting");
+	setting.append_attribute("name").set_value(def.name().c_str());
+	if (def.flags() & option_flags::platform) {
+		setting.append_attribute("platform").set_value(platform_name);
+	}
+
+	auto const& val = values_[opt];
+	if (def.type() == option_type::xml) {
+		// FIXME
+	}
+	else {
+		setting.text().set(fz::to_utf8(val.str_).c_str());
+	}
+
+	dirty_ = true;
 }

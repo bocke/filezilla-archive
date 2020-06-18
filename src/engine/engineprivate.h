@@ -3,7 +3,7 @@
 
 #include "../include/engine_context.h"
 #include "../include/FileZillaEngine.h"
-#include "../include/option_change_event_handler.h"
+#include "../include/optionsbase.h"
 
 #include <libfilezilla/event.hpp>
 #include <libfilezilla/event_handler.hpp>
@@ -54,7 +54,7 @@ protected:
 	CFileZillaEnginePrivate& engine_;
 };
 
-class CFileZillaEnginePrivate final : public fz::event_handler, COptionChangeEventHandler
+class CFileZillaEnginePrivate final : public fz::event_handler
 {
 public:
 	CFileZillaEnginePrivate(CFileZillaEngineContext& engine_context, CFileZillaEngine& parent, EngineNotificationHandler& notificationHandler);
@@ -84,7 +84,7 @@ public:
 	void AddLogNotification(std::unique_ptr<CLogmsgNotification> && notification);
 	std::unique_ptr<CNotification> GetNextNotification();
 
-	COptionsBase& GetOptions() { return m_options; }
+	COptionsBase& GetOptions() { return options_; }
 	fz::rate_limiter& GetRateLimiter() { return rate_limiter_; }
 	CDirectoryCache& GetDirectoryCache() { return directory_cache_; }
 	CPathCache& GetPathCache() { return path_cache_; }
@@ -112,7 +112,7 @@ public:
 	fz::logger_interface& GetLogger();
 
 protected:
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	void OnOptionsChanged(watched_options const& options);
 
 	void SendQueuedLogs(bool reset_flag = false);
 	void ClearQueuedLogs(bool reset_flag);
@@ -178,7 +178,7 @@ protected:
 
 	std::atomic<unsigned int> asyncRequestCounter_{};
 
-	COptionsBase& m_options;
+	COptionsBase& options_;
 
 	std::unique_ptr<CLogging> logger_;
 

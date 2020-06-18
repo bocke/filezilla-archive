@@ -181,9 +181,9 @@ bool COptionsPageThemes::SavePage()
 	const int sel = pTheme->GetSelection();
 	const wxString theme = ((wxStringClientData*)pTheme->GetClientObject(sel))->GetData();
 
-	m_pOptions->SetOption(OPTION_ICONS_THEME, theme.ToStdWstring());
+	m_pOptions->set(OPTION_ICONS_THEME, theme.ToStdWstring());
 
-	m_pOptions->SetOption(OPTION_ICONS_SCALE, static_cast<int>(100 * xrc_call(*this, "ID_SCALE", &wxSpinCtrlDouble::GetValue)));
+	m_pOptions->set(OPTION_ICONS_SCALE, static_cast<int>(100 * xrc_call(*this, "ID_SCALE", &wxSpinCtrlDouble::GetValue)));
 
 	return true;
 }
@@ -253,9 +253,9 @@ bool COptionsPageThemes::OnDisplayedFirstTime()
 		return false;
 	}
 
-	xrc_call<wxSpinCtrlDouble, double>(*this, "ID_SCALE", &wxSpinCtrlDouble::SetValue, static_cast<double>(m_pOptions->GetOptionVal(OPTION_ICONS_SCALE)) / 100.f);
+	xrc_call<wxSpinCtrlDouble, double>(*this, "ID_SCALE", &wxSpinCtrlDouble::SetValue, static_cast<double>(m_pOptions->get_int(OPTION_ICONS_SCALE)) / 100.f);
 
-	std::wstring activeTheme = m_pOptions->GetOption(OPTION_ICONS_THEME);
+	std::wstring activeTheme = m_pOptions->get_string(OPTION_ICONS_THEME);
 	std::wstring firstName;
 	for (auto const& theme : themes) {
 		std::wstring name, author, mail;

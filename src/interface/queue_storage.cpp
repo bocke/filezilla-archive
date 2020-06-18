@@ -614,7 +614,7 @@ bool CQueueStorage::Impl::BindNull(sqlite3_stmt* statement, int index)
 
 bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 {
-	bool kiosk_mode = COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) != 0;
+	bool kiosk_mode = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 
 	Site const& site = item.GetSite();
 
@@ -1321,7 +1321,7 @@ bool CQueueStorage::Clear()
 
 std::wstring CQueueStorage::GetDatabaseFilename()
 {
-	return COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR) + L"queue.sqlite3";
+	return COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR) + L"queue.sqlite3";
 }
 
 bool CQueueStorage::BeginTransaction()

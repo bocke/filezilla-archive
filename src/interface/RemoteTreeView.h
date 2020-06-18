@@ -4,13 +4,13 @@
 #include "systemimagelist.h"
 #include "state.h"
 #include "filter.h"
+#include "option_change_event_handler.h"
 #include "treectrlex.h"
 
-#include "../include/option_change_event_handler.h"
 
 class CQueueView;
 class CWindowTinter;
-class CRemoteTreeView final : public wxTreeCtrlEx, CSystemImageList, CStateEventHandler, COptionChangeEventHandler
+class CRemoteTreeView final : public wxTreeCtrlEx, CSystemImageList, CStateEventHandler, public COptionChangeEventHandler
 {
 	friend class CRemoteTreeViewDropTarget;
 
@@ -54,7 +54,7 @@ protected:
 
 	void UpdateSortMode();
 
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	std::unique_ptr<CWindowTinter> m_windowTinter;
 

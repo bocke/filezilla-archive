@@ -4,7 +4,7 @@
 #include "../proxy.h"
 #include "../servercapabilities.h"
 
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/tls_layer.hpp>
 
@@ -47,9 +47,9 @@ int CFtpLogonOpData::Send()
 	case LOGON_CONNECT:
 		{
 			// Do not use FTP proxy if generic proxy is set
-			int const generic_proxy_type = engine_.GetOptions().GetOptionVal(OPTION_PROXY_TYPE);
+			int const generic_proxy_type = engine_.GetOptions().get_int(OPTION_PROXY_TYPE);
 			if ((generic_proxy_type <= static_cast<int>(ProxyType::NONE) || generic_proxy_type >= static_cast<int>(ProxyType::count)) && !currentServer_.GetBypassProxy()) {
-				ftp_proxy_type_ = engine_.GetOptions().GetOptionVal(OPTION_FTP_PROXY_TYPE);
+				ftp_proxy_type_ = engine_.GetOptions().get_int(OPTION_FTP_PROXY_TYPE);
 			}
 
 			if (!PrepareLoginSequence()) {
@@ -57,7 +57,7 @@ int CFtpLogonOpData::Send()
 			}
 
 			if (ftp_proxy_type_) {
-				host_ = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_HOST);
+				host_ = engine_.GetOptions().get_string(OPTION_FTP_PROXY_HOST);
 
 				size_t pos = -1;
 				if (!host_.empty() && host_[0] == '[') {
@@ -110,7 +110,7 @@ int CFtpLogonOpData::Send()
 
 				// Enable SO_KEEPALIVE, lots of clueless users have broken routers and
 				// firewalls which terminate the control connection on long transfers.
-				int v = engine_.GetOptions().GetOptionVal(OPTION_TCP_KEEPALIVE_INTERVAL);
+				int v = engine_.GetOptions().get_int(OPTION_TCP_KEEPALIVE_INTERVAL);
 				if (v >= 1 && v < 10000) {
 					controlSocket_.socket_->set_keepalive_interval(fz::duration::from_minutes(v));
 				}
@@ -596,14 +596,14 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		}
 	}
 	else if (ftp_proxy_type_ == 1) {
-		std::wstring const proxyUser = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_USER);
+		std::wstring const proxyUser = engine_.GetOptions().get_string(OPTION_FTP_PROXY_USER);
 		if (!proxyUser.empty()) {
 			// Proxy logon (if credendials are set)
 			t_loginCommand cmd = {false, false, loginCommandType::other, L"USER " + proxyUser};
 			loginSequence.push_back(cmd);
 			cmd.optional = true;
 			cmd.hide_arguments = true;
-			cmd.command = L"PASS " + engine_.GetOptions().GetOption(OPTION_FTP_PROXY_PASS);
+			cmd.command = L"PASS " + engine_.GetOptions().get_string(OPTION_FTP_PROXY_PASS);
 			loginSequence.push_back(cmd);
 		}
 		// User@host
@@ -626,14 +626,14 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		}
 	}
 	else if (ftp_proxy_type_ == 2 || ftp_proxy_type_ == 3) {
-		std::wstring const proxyUser = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_USER);
+		std::wstring const proxyUser = engine_.GetOptions().get_string(OPTION_FTP_PROXY_USER);
 		if (!proxyUser.empty()) {
 			// Proxy logon (if credendials are set)
 			t_loginCommand cmd = {false, false, loginCommandType::other, L"USER " + proxyUser};
 			loginSequence.push_back(cmd);
 			cmd.optional = true;
 			cmd.hide_arguments = true;
-			cmd.command = L"PASS " + engine_.GetOptions().GetOption(OPTION_FTP_PROXY_PASS);
+			cmd.command = L"PASS " + engine_.GetOptions().get_string(OPTION_FTP_PROXY_PASS);
 			loginSequence.push_back(cmd);
 		}
 
@@ -666,8 +666,8 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		}
 	}
 	else if (ftp_proxy_type_ == 4) {
-		std::wstring proxyUser = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_USER);
-		std::wstring proxyPass = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_PASS);
+		std::wstring proxyUser = engine_.GetOptions().get_string(OPTION_FTP_PROXY_USER);
+		std::wstring proxyPass = engine_.GetOptions().get_string(OPTION_FTP_PROXY_PASS);
 		std::wstring host = currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_);
 		std::wstring user = (controlSocket_.credentials_.logonType_ == LogonType::anonymous) ? L"anonymous" : currentServer_.GetUser();
 		std::wstring account = controlSocket_.credentials_.account_;
@@ -677,7 +677,7 @@ bool CFtpLogonOpData::PrepareLoginSequence()
 		fz::replace_substrings(user, L"%", L"%%");
 		fz::replace_substrings(account, L"%", L"%%");
 
-		std::wstring const loginSequenceStr = engine_.GetOptions().GetOption(OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE);
+		std::wstring const loginSequenceStr = engine_.GetOptions().get_string(OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE);
 		std::vector<std::wstring> const tokens = fz::strtok(loginSequenceStr, L"\r\n");
 
 		for (auto token : tokens) {

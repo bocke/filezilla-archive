@@ -4,6 +4,7 @@ noinst_HEADERS = \
 	commands.h \
 	directorylisting.h \
 	engine_context.h \
+	engine_options.h \
 	externalipresolver.h \
 	FileZillaEngine.h \
 	httpheaders.h \
@@ -13,7 +14,6 @@ noinst_HEADERS = \
 	misc.h \
 	notification.h \
 	optionsbase.h \
-	option_change_event_handler.h \
 	s3sse.h \
 	server.h \
 	serverpath.h \

@@ -1,15 +1,16 @@
 #ifndef FILEZILLA_INTERFACE_FILELIST_STATUSBAR_HEADER
 #define FILEZILLA_INTERFACE_FILELIST_STATUSBAR_HEADER
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 #include <wx/statusbr.h>
 #include <wx/timer.h>
 
-class CFilelistStatusBar final : public wxStatusBar, protected COptionChangeEventHandler
+class CFilelistStatusBar final : public wxStatusBar, public COptionChangeEventHandler
 {
 public:
 	CFilelistStatusBar(wxWindow* pParent);
+	~CFilelistStatusBar();
 
 	void SetDirectoryContents(int count_files, int count_dirs, int64_t total_size, int unknown_size, int hidden);
 	void Clear();
@@ -34,7 +35,7 @@ public:
 	void SetConnected(bool connected);
 protected:
 
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	bool m_connected{};
 	int m_count_files{};

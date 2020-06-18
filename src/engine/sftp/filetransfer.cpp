@@ -3,7 +3,7 @@
 #include "../directorycache.h"
 #include "filetransfer.h"
 
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
@@ -137,7 +137,7 @@ int CSftpFileTransferOpData::Send()
 int CSftpFileTransferOpData::ParseResponse()
 {
 	if (opState == filetransfer_transfer) {
-		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS)) {
+		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (download_) {
 				if (!fileTime_.empty()) {
 					if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_))
@@ -208,7 +208,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_waitlist;
 				}
-				else if (download_ && engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS)) {
+				else if (download_ && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 					opState = filetransfer_mtime;
 				}
 				else {
@@ -227,7 +227,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 						}
 
 						if (download_ && !entry.has_time() &&
-							engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS))
+							engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 						{
 							opState = filetransfer_mtime;
 						}
@@ -267,7 +267,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					opState = filetransfer_mtime;
 				}
 				else if (download_ &&
-					engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS))
+					engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 				{
 					opState = filetransfer_mtime;
 				}
@@ -283,7 +283,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					}
 
 					if (download_ && !entry.has_time() &&
-						engine_.GetOptions().GetOptionVal(OPTION_PRESERVE_TIMESTAMPS))
+						engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 					{
 						opState = filetransfer_mtime;
 					}

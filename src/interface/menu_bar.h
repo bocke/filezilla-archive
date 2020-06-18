@@ -3,7 +3,7 @@
 
 #include "state.h"
 
-#include "../include/option_change_event_handler.h"
+#include "option_change_event_handler.h"
 
 #include <wx/menu.h>
 
@@ -32,7 +32,7 @@ protected:
 	void UpdateSpeedLimitMenuItem();
 
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
-	virtual void OnOptionsChanged(changed_options_t const& options);
+	virtual void OnOptionsChanged(watched_options const& options);
 
 	DECLARE_DYNAMIC_CLASS(CMenuBar)
 

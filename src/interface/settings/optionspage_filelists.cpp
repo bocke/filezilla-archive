@@ -8,26 +8,26 @@ bool COptionsPageFilelists::LoadPage()
 {
 	bool failure = false;
 
-	SetChoice(XRCID("ID_SORTMODE"), m_pOptions->GetOptionVal(OPTION_FILELIST_DIRSORT), failure);
-	SetChoice(XRCID("ID_NAMESORTMODE"), m_pOptions->GetOptionVal(OPTION_FILELIST_NAMESORT), failure);
+	SetChoice(XRCID("ID_SORTMODE"), m_pOptions->get_int(OPTION_FILELIST_DIRSORT), failure);
+	SetChoice(XRCID("ID_NAMESORTMODE"), m_pOptions->get_int(OPTION_FILELIST_NAMESORT), failure);
 
 	SetTextFromOption(XRCID("ID_COMPARISON_THRESHOLD"), OPTION_COMPARISON_THRESHOLD, failure);
 
-	SetChoice(XRCID("ID_DOUBLECLICK_FILE"), m_pOptions->GetOptionVal(OPTION_DOUBLECLICK_ACTION_FILE), failure);
-	SetChoice(XRCID("ID_DOUBLECLICK_DIRECTORY"), m_pOptions->GetOptionVal(OPTION_DOUBLECLICK_ACTION_DIRECTORY), failure);
+	SetChoice(XRCID("ID_DOUBLECLICK_FILE"), m_pOptions->get_int(OPTION_DOUBLECLICK_ACTION_FILE), failure);
+	SetChoice(XRCID("ID_DOUBLECLICK_DIRECTORY"), m_pOptions->get_int(OPTION_DOUBLECLICK_ACTION_DIRECTORY), failure);
 
 	return !failure;
 }
 
 bool COptionsPageFilelists::SavePage()
 {
-	m_pOptions->SetOption(OPTION_FILELIST_DIRSORT, GetChoice(XRCID("ID_SORTMODE")));
-	m_pOptions->SetOption(OPTION_FILELIST_NAMESORT, GetChoice(XRCID("ID_NAMESORTMODE")));
+	m_pOptions->set(OPTION_FILELIST_DIRSORT, GetChoice(XRCID("ID_SORTMODE")));
+	m_pOptions->set(OPTION_FILELIST_NAMESORT, GetChoice(XRCID("ID_NAMESORTMODE")));
 
 	SetOptionFromText(XRCID("ID_COMPARISON_THRESHOLD"), OPTION_COMPARISON_THRESHOLD);
 
-	m_pOptions->SetOption(OPTION_DOUBLECLICK_ACTION_FILE, GetChoice(XRCID("ID_DOUBLECLICK_FILE")));
-	m_pOptions->SetOption(OPTION_DOUBLECLICK_ACTION_DIRECTORY, GetChoice(XRCID("ID_DOUBLECLICK_DIRECTORY")));
+	m_pOptions->set(OPTION_DOUBLECLICK_ACTION_FILE, GetChoice(XRCID("ID_DOUBLECLICK_FILE")));
+	m_pOptions->set(OPTION_DOUBLECLICK_ACTION_DIRECTORY, GetChoice(XRCID("ID_DOUBLECLICK_DIRECTORY")));
 
 	return true;
 }

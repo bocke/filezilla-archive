@@ -347,7 +347,7 @@ void CRemoteRecursiveOperation::ProcessDirectoryListing(const CDirectoryListing*
 			case recursive_synchronize_download:
 				{
 					std::wstring localFile = CQueueView::ReplaceInvalidCharacters(entry.name);
-					if (pDirectoryListing->path.GetType() == VMS && COptions::Get()->GetOptionVal(OPTION_STRIP_VMS_REVISION)) {
+					if (pDirectoryListing->path.GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION)) {
 						localFile = StripVMSRevision(localFile);
 					}
 					m_pQueue->QueueFile(!m_immediate, true,

@@ -178,7 +178,7 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		return;
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
 		site.SetLogonType(LogonType::ask);
 		CLoginManager::Get().RememberPassword(site);
 	}
@@ -196,7 +196,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 	wxMenu* pMenu = new wxMenu;
 
 	// We have to start with id 1 since menu items with id 0 don't work under OS X
-	if (COptions::Get()->GetOptionVal(OPTION_FTP_PROXY_TYPE)) {
+	if (COptions::Get()->get_int(OPTION_FTP_PROXY_TYPE)) {
 		pMenu->Append(1, _("Connect bypassing proxy settings"));
 	}
 	pMenu->Append(2, _("Clear quickconnect bar"));

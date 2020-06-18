@@ -237,7 +237,7 @@ void MakeLinksFromTooltips(wxWindow& parent)
 void CUpdateDialog::InitFooter()
 {
 #if FZ_WINDOWS
-	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->GetOptionVal(OPTION_DISABLE_UPDATE_FOOTER)) {
+	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_int(OPTION_DISABLE_UPDATE_FOOTER)) {
 		wxString const resources = updater_.GetResources();
 		if (!resources.empty()) {
 			wxLogNull null;
@@ -374,7 +374,7 @@ void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 		bool const outdated = s == UpdaterState::newversion_stale;
 		bool const manual = s == UpdaterState::newversion || outdated;
 		bool const dlfail = s == UpdaterState::newversion && !v.url_.empty();
-		bool const disabled = COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !COptions::Get()->GetOptionVal(OPTION_UPDATECHECK);
+		bool const disabled = COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !COptions::Get()->get_int(OPTION_UPDATECHECK);
 
 		XRCCTRL(*this, "ID_OUTDATED", wxStaticText)->Show(outdated);
 		XRCCTRL(*this, "ID_DISABLED_CHECK", wxStaticText)->Show(outdated && disabled);
@@ -400,7 +400,7 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 	if (f.empty()) {
 		return;
 	}
-	COptions::Get()->SetOption(OPTION_GREETINGRESOURCES, updater_.GetResources());
+	COptions::Get()->set(OPTION_GREETINGRESOURCES, updater_.GetResources());
 #ifdef __WXMSW__
 	std::vector<std::wstring> cmd_with_args;
 	cmd_with_args.push_back(f);

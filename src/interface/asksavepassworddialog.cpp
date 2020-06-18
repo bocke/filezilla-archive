@@ -54,14 +54,14 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 			return;
 		}
 		else {
-			COptions::Get()->SetOption(OPTION_DEFAULT_KIOSKMODE, 0);
-			COptions::Get()->SetOption(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
+			COptions::Get()->set(OPTION_DEFAULT_KIOSKMODE, 0);
+			COptions::Get()->set(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
 		}
 	}
 	else {
 		bool save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
-		COptions::Get()->SetOption(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
-		COptions::Get()->SetOption(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
+		COptions::Get()->set(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
+		COptions::Get()->set(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
 	}
 	event.Skip();
 }
@@ -70,19 +70,19 @@ bool CAskSavePasswordDialog::Run(wxWindow* parent)
 {
 	bool ret = true;
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 0 && COptions::Get()->GetOptionVal(OPTION_PROMPTPASSWORDSAVE) != 0 &&
-		!CSiteManager::HasSites() && COptions::Get()->GetOption(OPTION_MASTERPASSWORDENCRYPTOR).empty())
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 0 && COptions::Get()->get_int(OPTION_PROMPTPASSWORDSAVE) != 0 &&
+		!CSiteManager::HasSites() && COptions::Get()->get_string(OPTION_MASTERPASSWORDENCRYPTOR).empty())
 	{
 		CAskSavePasswordDialog dlg;
 		if (dlg.Create(parent)) {
 			ret = dlg.ShowModal() == wxID_OK;
 			if (ret) {
-				COptions::Get()->SetOption(OPTION_PROMPTPASSWORDSAVE, 0);
+				COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 0);
 			}
 		}
 	}
 	else {
-		COptions::Get()->SetOption(OPTION_PROMPTPASSWORDSAVE, 0);
+		COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 0);
 	}
 
 	return ret;

@@ -2,8 +2,7 @@
 #define FILEZILLA_INTERFACE_OPTIONS_HEADER
 
 #include "../include/local_path.h"
-#include "../include/optionsbase.h"
-#include "../include/option_change_event_handler.h"
+#include "../include/engine_options.h"
 
 #include <libfilezilla/mutex.hpp>
 
@@ -13,7 +12,13 @@
 
 enum interfaceOptions
 {
-	OPTION_NUMTRANSFERS = OPTIONS_ENGINE_NUM,
+	// Default/internal options
+	OPTION_DEFAULT_SETTINGSDIR, // guaranteed to be (back)slash-terminated
+	OPTION_DEFAULT_KIOSKMODE,
+	OPTION_DEFAULT_DISABLEUPDATECHECK,
+	OPTION_DEFAULT_CACHE_DIR,
+
+	OPTION_NUMTRANSFERS,
 	OPTION_ASCIIBINARY,
 	OPTION_ASCIIFILES,
 	OPTION_ASCIINOEXT,
@@ -99,32 +104,13 @@ enum interfaceOptions
 	OPTION_MASTERPASSWORDENCRYPTOR,
 	OPTION_TAB_DATA,
 
-	// Default/internal options
-	OPTION_DEFAULT_SETTINGSDIR, // guaranteed to be (back)slash-terminated
-	OPTION_DEFAULT_KIOSKMODE,
-	OPTION_DEFAULT_DISABLEUPDATECHECK,
-	OPTION_DEFAULT_CACHE_DIR,
-
 	// Has to be last element
 	OPTIONS_NUM
 };
 
-struct t_OptionsCache
-{
-	bool operator==(std::wstring_view const& v) const { return strValue == v; }
-	bool operator==(int v) const { return numValue == v; }
-	bool operator==(pugi::xml_document const& v) const { return xmlValue == v; }
-	t_OptionsCache& operator=(std::wstring_view const& v);
-	t_OptionsCache& operator=(std::wstring && v);
-	t_OptionsCache& operator=(int v);
-	t_OptionsCache& operator=(pugi::xml_document const& v);
-	t_OptionsCache& operator=(pugi::xml_document && v);
+unsigned int register_interface_options();
 
-	bool from_default;
-	int numValue;
-	std::wstring strValue;
-	pugi::xml_document xmlValue;
-};
+optionsIndex mapOption(interfaceOptions opt);
 
 std::wstring GetEnv(char const* name);
 
@@ -132,16 +118,6 @@ class CXmlFile;
 class COptions final : public wxEvtHandler, public COptionsBase
 {
 public:
-	virtual int GetOptionVal(unsigned int nID);
-	virtual std::wstring GetOption(unsigned int nID);
-	virtual pugi::xml_document GetOptionXml(unsigned int nID);
-
-	virtual bool SetOption(unsigned int nID, int value);
-	virtual bool SetOption(unsigned int nID, std::wstring_view const& value);
-	virtual bool SetOptionXml(unsigned int nID, pugi::xml_node const& value);
-
-	bool OptionFromFzDefaultsXml(unsigned int nID);
-
 	static COptions* Get();
 	static void Init();
 	static void Destroy();
@@ -158,33 +134,21 @@ protected:
 	COptions();
 	virtual ~COptions();
 
-	int Validate(unsigned int nID, int value);
-	std::wstring Validate(unsigned int nID, std::wstring_view const& value);
-	pugi::xml_document Validate(unsigned int nID, pugi::xml_document const& value);
-
-	template<typename T> void ContinueSetOption(unsigned int nID, T const& value);
-	void SetXmlValue(unsigned int nID, pugi::xml_node settings, int value);
-	void SetXmlValue(unsigned int nID, pugi::xml_node settings, std::wstring_view const& value);
-	void SetXmlValue(unsigned int nID, pugi::xml_node settings, pugi::xml_document const& value);
+	void Load(pugi::xml_node settings, bool from_default);
 
 	pugi::xml_node CreateSettingsXmlElement();
 
-	std::map<std::string, unsigned int> GetNameOptionMap() const;
-	void LoadOptions(std::map<std::string, unsigned int> const& nameOptionMap, pugi::xml_node settings = pugi::xml_node());
-	void LoadGlobalDefaultOptions(std::map<std::string, unsigned int> const& nameOptionMap);
-	void LoadOptionFromElement(pugi::xml_node option, std::map<std::string, unsigned int> const& nameOptionMap, bool allowDefault);
+	void LoadGlobalDefaultOptions();
 	CLocalPath InitSettingsDir();
-	void SetDefaultValues();
-	void WriteCacheToXml(pugi::xml_node settings);
 
 	bool Cleanup(); // Removes all unknown elements from the XML
 	void Save();
 
-	void NotifyChangedOptions();
+	virtual void process_changed(watched_options const& changed) override;
+	void set_xml_value(pugi::xml_node settings, size_t opt);
 
+	bool dirty_{};
 	std::unique_ptr<CXmlFile> xmlFile_;
-
-	t_OptionsCache m_optionsCache[OPTIONS_NUM];
 
 	static COptions* m_theOptions;
 
@@ -193,10 +157,6 @@ protected:
 
 	DECLARE_EVENT_TABLE()
 	void OnTimer(wxTimerEvent& event);
-
-	fz::mutex m_sync_{false};
-
-	changed_options_t changedOptions_;
 };
 
 #endif

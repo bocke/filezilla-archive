@@ -8,7 +8,7 @@
 #include "ftpcontrolsocket.h"
 #include "transfersocket.h"
 
-#include "../../include/optionsbase.h"
+#include "../../include/engine_options.h"
 
 #include <libfilezilla/rate_limited_layer.hpp>
 #include <libfilezilla/tls_layer.hpp>
@@ -73,8 +73,8 @@ std::wstring CTransferSocket::SetupActiveTransfer(std::string const& ip)
 		return std::wstring();
 	}
 
-	if (engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS)) {
-		port += static_cast<int>(engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS_OFFSET));
+	if (engine_.GetOptions().get_int(OPTION_LIMITPORTS)) {
+		port += static_cast<int>(engine_.GetOptions().get_int(OPTION_LIMITPORTS_OFFSET));
 		if (port <= 0 || port >= 65536) {
 			controlSocket_.log(logmsg::debug_warning, L"Port outside valid range");
 			return std::wstring();
@@ -567,7 +567,7 @@ std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer(int port)
 
 std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer()
 {
-	if (!engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS)) {
+	if (!engine_.GetOptions().get_int(OPTION_LIMITPORTS)) {
 		// Ask the systen for a port
 		return CreateSocketServer(0);
 	}
@@ -584,8 +584,8 @@ std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer()
 
 	static int start = 0;
 
-	int low = engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS_LOW);
-	int high = engine_.GetOptions().GetOptionVal(OPTION_LIMITPORTS_HIGH);
+	int low = engine_.GetOptions().get_int(OPTION_LIMITPORTS_LOW);
+	int high = engine_.GetOptions().get_int(OPTION_LIMITPORTS_HIGH);
 	if (low > high) {
 		low = high;
 	}
@@ -723,11 +723,11 @@ void CTransferSocket::TriggerPostponedEvents()
 
 void CTransferSocket::SetSocketBufferSizes(fz::socket_base& socket)
 {
-	const int size_read = engine_.GetOptions().GetOptionVal(OPTION_SOCKET_BUFFERSIZE_RECV);
+	const int size_read = engine_.GetOptions().get_int(OPTION_SOCKET_BUFFERSIZE_RECV);
 #if FZ_WINDOWS
 	const int size_write = -1;
 #else
-	const int size_write = engine_.GetOptions().GetOptionVal(OPTION_SOCKET_BUFFERSIZE_SEND);
+	const int size_write = engine_.GetOptions().get_int(OPTION_SOCKET_BUFFERSIZE_SEND);
 #endif
 	socket.set_buffer_sizes(size_read, size_write);
 }

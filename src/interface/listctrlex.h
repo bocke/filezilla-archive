@@ -2,6 +2,7 @@
 #define FILEZILLA_INTERFACE_LISTCTRLEX_HEADER
 
 #include "systemimagelist.h"
+#include "Options.h"
 
 #include <libfilezilla/time.hpp>
 
@@ -49,8 +50,8 @@ public:
 
 	// LoadColumnSettings needs to be called exactly once after adding
 	// all columns
-	void LoadColumnSettings(int widthsOptionId, int visibilityOptionId, int sortOptionId);
-	void SaveColumnSettings(int widthsOptionId, int visibilityOptionId, int sortOptionId);
+	void LoadColumnSettings(interfaceOptions widthsOptionId, interfaceOptions visibilityOptionId, interfaceOptions sortOptionId);
+	void SaveColumnSettings(interfaceOptions widthsOptionId, interfaceOptions visibilityOptionId, interfaceOptions sortOptionId);
 
 	int GetColumnVisibleIndex(int col);
 
@@ -136,13 +137,13 @@ private:
 	fz::datetime m_prefixSearch_lastKeyPress;
 	wxString m_prefixSearch_prefix;
 
-	bool ReadColumnWidths(unsigned int optionId);
-	void SaveColumnWidths(unsigned int optionId);
+	bool ReadColumnWidths(interfaceOptions optionId);
+	void SaveColumnWidths(interfaceOptions optionId);
 
 	void CreateVisibleColumnMapping();
 
-	virtual bool OnBeginRename(const wxListEvent& event);
-	virtual bool OnAcceptRename(const wxListEvent& event);
+	virtual bool OnBeginRename(wxListEvent const& event);
+	virtual bool OnAcceptRename(wxListEvent const& event);
 
 	struct t_columnInfo
 	{

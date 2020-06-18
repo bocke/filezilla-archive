@@ -9,11 +9,28 @@
 
 #include <wx/statbox.h>
 
-BEGIN_EVENT_TABLE(COptionsPageSizeFormatting, COptionsPage)
-EVT_RADIOBUTTON(wxID_ANY, COptionsPageSizeFormatting::OnRadio)
-EVT_CHECKBOX(wxID_ANY, COptionsPageSizeFormatting::OnCheck)
-EVT_SPINCTRL(wxID_ANY, COptionsPageSizeFormatting::OnSpin)
-END_EVENT_TABLE()
+struct COptionsPageSizeFormatting::impl
+{
+	wxRadioButton* bytes_{};
+	wxRadioButton* iec_{};
+	wxRadioButton* binary_{};
+	wxRadioButton* decimal_{};
+
+	wxCheckBox* tsep_{};
+
+	wxSpinCtrlEx* places_{};
+
+	wxStaticText* examples_[6]{};
+};
+
+COptionsPageSizeFormatting::COptionsPageSizeFormatting()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+COptionsPageSizeFormatting::~COptionsPageSizeFormatting()
+{
+}
 
 bool COptionsPageSizeFormatting::CreateControls(wxWindow* parent)
 {
@@ -26,29 +43,38 @@ bool COptionsPageSizeFormatting::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Size formatting"), 1);
-		inner->Add(new wxRadioButton(box, XRCID("ID_SIZEFORMAT_BYTES"), _("&Display size in bytes"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
-		inner->Add(new wxRadioButton(box, XRCID("ID_SIZEFORMAT_IEC"), _("&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)")));
-		inner->Add(new wxRadioButton(box, XRCID("ID_SIZEFORMAT_SI_BINARY"), _("&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)")));
-		inner->Add(new wxRadioButton(box, XRCID("ID_SIZEFORMAT_SI_DECIMAL"), _("D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)")));
-		inner->Add(new wxCheckBox(box, XRCID("ID_SIZEFORMAT_SEPARATE_THOUTHANDS"), _("&Use thousands separator")));
+		impl_->bytes_ = new wxRadioButton(box, -1, _("&Display size in bytes"));
+		impl_->iec_ = new wxRadioButton(box, -1, _("&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"));
+		impl_->binary_ = new wxRadioButton(box, -1, _("&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"));
+		impl_->decimal_ = new wxRadioButton(box, -1, _("D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"));
+		inner->Add(impl_->bytes_, wxRB_GROUP);
+		inner->Add(impl_->iec_);
+		inner->Add(impl_->binary_);
+		inner->Add(impl_->decimal_);
+		impl_->bytes_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&){ UpdateControls(); });
+		impl_->iec_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
+		impl_->binary_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
+		impl_->decimal_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
+		impl_->tsep_ = new wxCheckBox(box, -1, _("&Use thousands separator"));
+		inner->Add(impl_->tsep_);
+		impl_->tsep_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { UpdateControls(); });
 
 		auto row = lay.createFlex(2);
 		inner->Add(row);
 		row->Add(new wxStaticText(box, -1, _("Number of decimal places:")), lay.valign);
-		auto spin = new wxSpinCtrlEx(box, XRCID("ID_SIZEFORMAT_DECIMALPLACES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(30), -1));
-		spin->SetRange(0, 3);
-		spin->SetMaxLength(1);
-		row->Add(spin, lay.valign);
+		impl_->places_ = new wxSpinCtrlEx(box, -1, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(30), -1));
+		impl_->places_->SetRange(0, 3);
+		impl_->places_->SetMaxLength(1);
+		row->Add(impl_->places_, lay.valign);
+		impl_->places_->Bind(wxEVT_SPINCTRL, [this](wxCommandEvent&) { UpdateControls(); });
 	}
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Examples"), 1);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE1"), wxString()), lay.ralign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE2"), wxString()), lay.ralign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE3"), wxString()), lay.ralign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE4"), wxString()), lay.ralign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE5"), wxString()), lay.ralign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EXAMPLE6"), wxString()), lay.ralign);
+		for (size_t i = 0; i < 6; ++i) {
+			impl_->examples_[i] = new wxStaticText(box, -1, wxString());
+			inner->Add(impl_->examples_[i], lay.ralign);
+		}
 	}
 
 	return true;
@@ -58,53 +84,50 @@ bool COptionsPageSizeFormatting::LoadPage()
 {
 	bool failure = false;
 
-	const int format = m_pOptions->GetOptionVal(OPTION_SIZE_FORMAT);
+	const int format = m_pOptions->get_int(OPTION_SIZE_FORMAT);
 	switch (format)
 	{
 	case 1:
-		SetRCheck(XRCID("ID_SIZEFORMAT_IEC"), true, failure);
+		impl_->iec_->SetValue(true);
 		break;
 	case 2:
-		SetRCheck(XRCID("ID_SIZEFORMAT_SI_BINARY"), true, failure);
+		impl_->binary_->SetValue(true);
 		break;
 	case 3:
-		SetRCheck(XRCID("ID_SIZEFORMAT_SI_DECIMAL"), true, failure);
+		impl_->decimal_->SetValue(true);
 		break;
 	default:
-		SetRCheck(XRCID("ID_SIZEFORMAT_BYTES"), true, failure);
+		impl_->bytes_->SetValue(true);
 		break;
 	}
 
-	SetCheckFromOption(XRCID("ID_SIZEFORMAT_SEPARATE_THOUTHANDS"), OPTION_SIZE_USETHOUSANDSEP, failure);
-
-	XRCCTRL(*this, "ID_SIZEFORMAT_DECIMALPLACES", wxSpinCtrl)->SetValue(m_pOptions->GetOptionVal(OPTION_SIZE_DECIMALPLACES));
+	impl_->tsep_->SetValue(m_pOptions->get_bool(OPTION_SIZE_USETHOUSANDSEP));
+	impl_->places_->SetValue(m_pOptions->get_int(OPTION_SIZE_DECIMALPLACES));
 
 	UpdateControls();
-	UpdateExamples();
 
 	return !failure;
 }
 
 bool COptionsPageSizeFormatting::SavePage()
 {
-	m_pOptions->SetOption(OPTION_SIZE_FORMAT, GetFormat());
+	m_pOptions->set(OPTION_SIZE_FORMAT, GetFormat());
 
-	SetOptionFromCheck(XRCID("ID_SIZEFORMAT_SEPARATE_THOUTHANDS"), OPTION_SIZE_USETHOUSANDSEP);
-
-	m_pOptions->SetOption(OPTION_SIZE_DECIMALPLACES, XRCCTRL(*this, "ID_SIZEFORMAT_DECIMALPLACES", wxSpinCtrl)->GetValue());
+	m_pOptions->set(OPTION_SIZE_USETHOUSANDSEP, impl_->tsep_->GetValue());
+	m_pOptions->set(OPTION_SIZE_DECIMALPLACES, impl_->places_->GetValue());
 
 	return true;
 }
 
 CSizeFormat::_format COptionsPageSizeFormatting::GetFormat() const
 {
-	if (GetRCheck(XRCID("ID_SIZEFORMAT_IEC"))) {
+	if (impl_->iec_->GetValue()) {
 		return CSizeFormat::iec;
 	}
-	else if (GetRCheck(XRCID("ID_SIZEFORMAT_SI_BINARY"))) {
+	else if (impl_->binary_->GetValue()) {
 		return CSizeFormat::si1024;
 	}
-	else if (GetRCheck(XRCID("ID_SIZEFORMAT_SI_DECIMAL"))) {
+	else if (impl_->decimal_->GetValue()) {
 		return CSizeFormat::si1000;
 	}
 
@@ -116,48 +139,29 @@ bool COptionsPageSizeFormatting::Validate()
 	return true;
 }
 
-void COptionsPageSizeFormatting::OnRadio(wxCommandEvent&)
-{
-	UpdateControls();
-	UpdateExamples();
-}
-
-void COptionsPageSizeFormatting::OnCheck(wxCommandEvent&)
-{
-	UpdateExamples();
-}
-
-void COptionsPageSizeFormatting::OnSpin(wxSpinEvent&)
-{
-	UpdateExamples();
-}
-
 void COptionsPageSizeFormatting::UpdateControls()
 {
 	const int format = GetFormat();
-	XRCCTRL(*this, "ID_SIZEFORMAT_DECIMALPLACES", wxSpinCtrl)->Enable(format != 0);
-}
+	impl_->places_->Enable(format != 0);
 
-wxString COptionsPageSizeFormatting::FormatSize(int64_t size)
-{
-	const CSizeFormat::_format format = GetFormat();
-	const bool thousands_separator = GetCheck(XRCID("ID_SIZEFORMAT_SEPARATE_THOUTHANDS"));
-	const int num_decimal_places = XRCCTRL(*this, "ID_SIZEFORMAT_DECIMALPLACES", wxSpinCtrl)->GetValue();
-
-	return CSizeFormat::Format(size, false, format, thousands_separator, num_decimal_places);
-}
-
-void COptionsPageSizeFormatting::UpdateExamples()
-{
-	XRCCTRL(*this, "ID_EXAMPLE1", wxStaticText)->SetLabel(FormatSize(12));
-	XRCCTRL(*this, "ID_EXAMPLE2", wxStaticText)->SetLabel(FormatSize(100));
-	XRCCTRL(*this, "ID_EXAMPLE3", wxStaticText)->SetLabel(FormatSize(1234));
-	XRCCTRL(*this, "ID_EXAMPLE4", wxStaticText)->SetLabel(FormatSize(1058817));
-	XRCCTRL(*this, "ID_EXAMPLE5", wxStaticText)->SetLabel(FormatSize(123456789));
-	XRCCTRL(*this, "ID_EXAMPLE6", wxStaticText)->SetLabel(FormatSize(0x39E94F995A72ll));
+	impl_->examples_[0]->SetLabel(FormatSize(12));
+	impl_->examples_[1]->SetLabel(FormatSize(100));
+	impl_->examples_[2]->SetLabel(FormatSize(1234));
+	impl_->examples_[3]->SetLabel(FormatSize(1058817));
+	impl_->examples_[4]->SetLabel(FormatSize(123456789));
+	impl_->examples_[5]->SetLabel(FormatSize(0x39E94F995A72ll));
 
 	GetSizer()->Layout();
 
 	// Otherwise label background isn't cleared properly
 	Refresh();
+}
+
+wxString COptionsPageSizeFormatting::FormatSize(int64_t size)
+{
+	const CSizeFormat::_format format = GetFormat();
+	const bool thousands_separator = impl_->tsep_->GetValue();
+	const int num_decimal_places = impl_->places_->GetValue();
+
+	return CSizeFormat::Format(size, false, format, thousands_separator, num_decimal_places);
 }

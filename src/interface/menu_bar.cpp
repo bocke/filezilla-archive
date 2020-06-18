@@ -20,12 +20,15 @@ EVT_MENU(wxID_ANY, CMenuBar::OnMenuEvent)
 END_EVENT_TABLE()
 
 CMenuBar::CMenuBar()
-	: m_pMainFrame()
+	: COptionChangeEventHandler(this)
+	, m_pMainFrame()
 {
 }
 
 CMenuBar::~CMenuBar()
 {
+	COptions::Get()->unwatch_all(this);
+
 	for (auto hidden_menu : m_hidden_items) {
 		for (auto hidden_item : hidden_menu.second) {
 			delete hidden_item.second;
@@ -159,7 +162,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	menubar->Append(help, _("&Help"));
 
 #if FZ_MANUALUPDATECHECK
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_DISABLEUPDATECHECK) == 0) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) == 0) {
 		help->Append(XRCID("ID_CHECKFORUPDATES"), _("Check for &updates..."), _("Check for newer versions of FileZilla"));
 		help->AppendSeparator();
 	}
@@ -173,7 +176,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 #endif
 	help->Append(XRCID("wxID_ABOUT"), _("&About..."), _("Display about dialog"));
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEBUG_MENU)) {
+	if (COptions::Get()->get_int(OPTION_DEBUG_MENU)) {
 		wxMenu * debug = new wxMenu;
 		debug->Append(XRCID("ID_CLEARCACHE_LAYOUT"), _("Clear &layout cache"));
 		debug->Append(XRCID("ID_CIPHERS"), _("&TLS Ciphers"), _("Shows available TLS ciphers"));
@@ -183,9 +186,9 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 	menubar->UpdateBookmarkMenu();
 
-	menubar->Check(XRCID("ID_MENU_SERVER_VIEWHIDDEN"), COptions::Get()->GetOptionVal(OPTION_VIEW_HIDDEN_FILES) ? true : false);
+	menubar->Check(XRCID("ID_MENU_SERVER_VIEWHIDDEN"), COptions::Get()->get_int(OPTION_VIEW_HIDDEN_FILES) ? true : false);
 
-	int mode = COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE);
+	int mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
 	if (mode != 1) {
 		menubar->Check(XRCID("ID_COMPARE_SIZE"), true);
 	}
@@ -193,17 +196,17 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 		menubar->Check(XRCID("ID_COMPARE_DATE"), true);
 	}
 
-	menubar->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
-	menubar->Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUICKCONNECT) != 0);
-	menubar->Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->GetOptionVal(OPTION_TOOLBAR_HIDDEN) == 0);
-	menubar->Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
-	menubar->Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE) != 0);
-	menubar->Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_LOCAL) != 0);
-	menubar->Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_REMOTE) != 0);
-	menubar->Check(XRCID("ID_MENU_VIEW_FILELISTSTATUSBAR"), COptions::Get()->GetOptionVal(OPTION_FILELIST_STATUSBAR) != 0);
-	menubar->Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) != 0);
+	menubar->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+	menubar->Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->get_int(OPTION_SHOW_QUICKCONNECT) != 0);
+	menubar->Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) == 0);
+	menubar->Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+	menubar->Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
+	menubar->Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+	menubar->Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
+	menubar->Check(XRCID("ID_MENU_VIEW_FILELISTSTATUSBAR"), COptions::Get()->get_int(OPTION_FILELIST_STATUSBAR) != 0);
+	menubar->Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
 
-	switch (COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY))
+	switch (COptions::Get()->get_int(OPTION_ASCIIBINARY))
 	{
 	case 1:
 		menubar->Check(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), true);
@@ -218,7 +221,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 	menubar->UpdateSpeedLimitMenuItem();
 
-	if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
+	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 		menubar->HideItem(XRCID("ID_VIEW_MESSAGELOG"));
 	}
 
@@ -236,20 +239,19 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_GLOBALBOOKMARKS, false);
 
-	menubar->RegisterOption(OPTION_ASCIIBINARY);
-	menubar->RegisterOption(OPTION_PRESERVE_TIMESTAMPS);
-
-	menubar->RegisterOption(OPTION_TOOLBAR_HIDDEN);
-	menubar->RegisterOption(OPTION_SHOW_MESSAGELOG);
-	menubar->RegisterOption(OPTION_SHOW_QUEUE);
-	menubar->RegisterOption(OPTION_SHOW_TREE_LOCAL);
-	menubar->RegisterOption(OPTION_SHOW_TREE_REMOTE);
-	menubar->RegisterOption(OPTION_MESSAGELOG_POSITION);
-	menubar->RegisterOption(OPTION_COMPARISONMODE);
-	menubar->RegisterOption(OPTION_COMPARE_HIDEIDENTICAL);
-	menubar->RegisterOption(OPTION_SPEEDLIMIT_ENABLE);
-	menubar->RegisterOption(OPTION_SPEEDLIMIT_INBOUND);
-	menubar->RegisterOption(OPTION_SPEEDLIMIT_OUTBOUND);
+	COptions::Get()->watch(OPTION_ASCIIBINARY, menubar);
+	COptions::Get()->watch(OPTION_PRESERVE_TIMESTAMPS, menubar);
+	COptions::Get()->watch(OPTION_TOOLBAR_HIDDEN, menubar);
+	COptions::Get()->watch(OPTION_SHOW_MESSAGELOG, menubar);
+	COptions::Get()->watch(OPTION_SHOW_QUEUE, menubar);
+	COptions::Get()->watch(OPTION_SHOW_TREE_LOCAL, menubar);
+	COptions::Get()->watch(OPTION_SHOW_TREE_REMOTE, menubar);
+	COptions::Get()->watch(OPTION_MESSAGELOG_POSITION, menubar);
+	COptions::Get()->watch(OPTION_COMPARISONMODE, menubar);
+	COptions::Get()->watch(OPTION_COMPARE_HIDEIDENTICAL, menubar);
+	COptions::Get()->watch(OPTION_SPEEDLIMIT_ENABLE, menubar);
+	COptions::Get()->watch(OPTION_SPEEDLIMIT_INBOUND, menubar);
+	COptions::Get()->watch(OPTION_SPEEDLIMIT_OUTBOUND, menubar);
 
 #ifdef FZ_MAC
 	wxMenu* editMenu = nullptr;
@@ -495,10 +497,10 @@ void CMenuBar::OnStateChange(CState* pState, t_statechange_notifications notific
 	}
 }
 
-void CMenuBar::OnOptionsChanged(changed_options_t const& options)
+void CMenuBar::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_ASCIIBINARY)) {
-		switch (COptions::Get()->GetOptionVal(OPTION_ASCIIBINARY))
+		switch (COptions::Get()->get_int(OPTION_ASCIIBINARY))
 		{
 		default:
 			Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
@@ -512,31 +514,31 @@ void CMenuBar::OnOptionsChanged(changed_options_t const& options)
 		}
 	}
 	if (options.test(OPTION_PRESERVE_TIMESTAMPS)) {
-		Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->GetOptionVal(OPTION_PRESERVE_TIMESTAMPS) != 0);
+		Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_LOCAL)) {
-		Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_LOCAL) != 0);
+		Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_REMOTE)) {
-		Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->GetOptionVal(OPTION_SHOW_TREE_REMOTE) != 0);
+		Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUICKCONNECT)) {
-		Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUICKCONNECT) != 0);
+		Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->get_int(OPTION_SHOW_QUICKCONNECT) != 0);
 	}
 	if (options.test(OPTION_TOOLBAR_HIDDEN)) {
-		Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->GetOptionVal(OPTION_TOOLBAR_HIDDEN) == 0);
+		Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) == 0);
 	}
 	if (options.test(OPTION_SHOW_MESSAGELOG)) {
-		Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
+		Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUEUE)) {
-		Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->GetOptionVal(OPTION_SHOW_QUEUE) != 0);
+		Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
 	}
 	if (options.test(OPTION_COMPARE_HIDEIDENTICAL)) {
-		Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->GetOptionVal(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+		Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 	}
 	if (options.test(OPTION_COMPARISONMODE)) {
-		if (COptions::Get()->GetOptionVal(OPTION_COMPARISONMODE) != 1) {
+		if (COptions::Get()->get_int(OPTION_COMPARISONMODE) != 1) {
 			Check(XRCID("ID_COMPARE_SIZE"), true);
 		}
 		else {
@@ -544,12 +546,12 @@ void CMenuBar::OnOptionsChanged(changed_options_t const& options)
 		}
 	}
 	if (options.test(OPTION_MESSAGELOG_POSITION)) {
-		if (COptions::Get()->GetOptionVal(OPTION_MESSAGELOG_POSITION) == 2) {
+		if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 			HideItem(XRCID("ID_VIEW_MESSAGELOG"));
 		}
 		else {
 			ShowItem(XRCID("ID_VIEW_MESSAGELOG"));
-			Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->GetOptionVal(OPTION_SHOW_MESSAGELOG) != 0);
+			Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
 		}
 	}
 	if (options.test(OPTION_SPEEDLIMIT_ENABLE) || options.test(OPTION_SPEEDLIMIT_INBOUND) || options.test(OPTION_SPEEDLIMIT_OUTBOUND)) {
@@ -559,10 +561,10 @@ void CMenuBar::OnOptionsChanged(changed_options_t const& options)
 
 void CMenuBar::UpdateSpeedLimitMenuItem()
 {
-	bool enable = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 
-	int downloadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_INBOUND);
-	int uploadLimit = COptions::Get()->GetOptionVal(OPTION_SPEEDLIMIT_OUTBOUND);
+	int downloadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
+	int uploadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 
 	if (!downloadLimit && !uploadLimit) {
 		enable = false;

@@ -31,7 +31,7 @@ Associations LoadAssociations()
 {
 	Associations ret;
 
-	std::wstring const raw_assocs = COptions::Get()->GetOption(OPTION_EDIT_CUSTOMASSOCIATIONS);
+	std::wstring const raw_assocs = COptions::Get()->get_string(OPTION_EDIT_CUSTOMASSOCIATIONS);
 	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
 
 	for (std::wstring_view assoc : assocs) {
@@ -69,7 +69,7 @@ void SaveAssociations(Associations const& assocs)
 		quoted += ' ';
 		quoted += QuoteCommand(assoc.second);
 	}
-	COptions::Get()->SetOption(OPTION_EDIT_CUSTOMASSOCIATIONS, quoted);
+	COptions::Get()->set(OPTION_EDIT_CUSTOMASSOCIATIONS, quoted);
 }
 
 CEditHandler* CEditHandler::m_pEditHandler = 0;
@@ -360,7 +360,7 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring const& loca
 	if (type == local) {
 		bool const launched = LaunchEditor(local, data);
 
-		if (launched && COptions::Get()->GetOptionVal(OPTION_EDIT_TRACK_LOCAL)) {
+		if (launched && COptions::Get()->get_int(OPTION_EDIT_TRACK_LOCAL)) {
 			m_fileDataList[type].emplace_back(std::move(data));
 		}
 		if (!launched) {
@@ -952,12 +952,12 @@ std::vector<std::wstring> CEditHandler::GetAssociation(std::wstring const& file)
 {
 	std::vector<std::wstring> ret;
 
-	if (!COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (!COptions::Get()->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
 		ret = GetCustomAssociation(file);
 	}
 
 	if (ret.empty()) {
-		std::wstring command = COptions::Get()->GetOption(OPTION_EDIT_DEFAULTEDITOR);
+		std::wstring command = COptions::Get()->get_string(OPTION_EDIT_DEFAULTEDITOR);
 		if (!command.empty()) {
 			if (command[0] == '1') {
 				// Text editor
@@ -1192,7 +1192,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 
 			main->AddSpacer(0);
 
-			int choices = COptions::Get()->GetOptionVal(OPTION_PERSISTENT_CHOICES);
+			int choices = COptions::Get()->get_int(OPTION_PERSISTENT_CHOICES);
 
 			wxRadioButton* reopen{};
 			if (type == local) {
@@ -1269,7 +1269,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 					choices &= ~edit_choices::edit_existing_always;
 				}
 			}
-			COptions::Get()->SetOption(OPTION_PERSISTENT_CHOICES, choices);
+			COptions::Get()->set(OPTION_PERSISTENT_CHOICES, choices);
 		}
 
 		if (action == -1) {
@@ -1321,7 +1321,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	// Find associated program
 	bool program_exists = false;
 	std::vector<std::wstring> cmd_with_args;
-	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
 		cmd_with_args = CanOpen(file.name, program_exists);
 	}
 	if (cmd_with_args.empty()) {
@@ -1846,7 +1846,7 @@ void CNewAssociationDialog::OnOK()
 	const bool always = impl_->always_->GetValue();
 
 	if (def && always) {
-		COptions::Get()->SetOption(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
+		COptions::Get()->set(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
 		EndModal(wxID_OK);
 
 		return;

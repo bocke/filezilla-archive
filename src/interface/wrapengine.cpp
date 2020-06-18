@@ -1086,7 +1086,7 @@ bool CWrapEngine::LoadCache()
 		}
 	}
 
-	if (COptions::Get()->GetOptionVal(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		m_use_cache = cacheValid;
 		return true;
 	}
@@ -1102,7 +1102,7 @@ void CWrapEngine::ClearCache()
 	// We have to synchronize access to layout.xml so that multiple processes don't write
 	// to the same file or one is reading while the other one writes.
 	CInterProcessMutex mutex(MUTEX_LAYOUT);
-	std::wstring const path = COptions::Get()->GetOption(OPTION_DEFAULT_SETTINGSDIR);
+	std::wstring const path = COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR);
 	if (!path.empty()) {
 		fz::remove_file(fz::to_native(path + L"layout.xml"));
 	}

@@ -97,7 +97,7 @@ bool COptionsPageEdit::CreateControls(wxWindow* parent)
 
 bool COptionsPageEdit::LoadPage()
 {
-	std::wstring editor = m_pOptions->GetOption(OPTION_EDIT_DEFAULTEDITOR);
+	std::wstring editor = m_pOptions->get_string(OPTION_EDIT_DEFAULTEDITOR);
 	if (editor.empty() || editor[0] == '0') {
 		impl_->default_none_->SetValue(true);
 	}
@@ -112,14 +112,14 @@ bool COptionsPageEdit::LoadPage()
 		impl_->custom_->ChangeValue(editor);
 	}
 
-	if (m_pOptions->GetOptionVal(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (m_pOptions->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
 		impl_->use_default_->SetValue(true);
 	}
 	else {
 		impl_->use_assoc_->SetValue(true);
 	}
 
-	impl_->watch_->SetValue(m_pOptions->GetOptionVal(OPTION_EDIT_TRACK_LOCAL) != 0);
+	impl_->watch_->SetValue(m_pOptions->get_int(OPTION_EDIT_TRACK_LOCAL) != 0);
 
 	SetCtrlState();
 
@@ -129,14 +129,14 @@ bool COptionsPageEdit::LoadPage()
 bool COptionsPageEdit::SavePage()
 {
 	if (impl_->default_custom_->GetValue()) {
-		m_pOptions->SetOption(OPTION_EDIT_DEFAULTEDITOR, L"2" + impl_->custom_->GetValue().ToStdWstring());
+		m_pOptions->set(OPTION_EDIT_DEFAULTEDITOR, L"2" + impl_->custom_->GetValue().ToStdWstring());
 	}
 	else {
-		m_pOptions->SetOption(OPTION_EDIT_DEFAULTEDITOR, impl_->default_system_->GetValue() ? L"1" : L"0");
+		m_pOptions->set(OPTION_EDIT_DEFAULTEDITOR, impl_->default_system_->GetValue() ? L"1" : L"0");
 	}
 
-	m_pOptions->SetOption(OPTION_EDIT_ALWAYSDEFAULT, impl_->use_default_->GetValue() ? 1 : 0);
-	m_pOptions->SetOption(OPTION_EDIT_TRACK_LOCAL, impl_->watch_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_EDIT_ALWAYSDEFAULT, impl_->use_default_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_EDIT_TRACK_LOCAL, impl_->watch_->GetValue() ? 1 : 0);
 
 	return true;
 }
