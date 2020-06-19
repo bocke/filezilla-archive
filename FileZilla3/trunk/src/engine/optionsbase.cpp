@@ -20,7 +20,9 @@ option_def::option_def(std::string_view name, std::wstring_view def, option_flag
 	, type_(t)
 	, flags_(flags)
 	, max_(static_cast<int>(max_len))
-{}
+	, validator_((t == option_type::string) ? reinterpret_cast<void*>(validator) : nullptr)
+{
+}
 
 option_def::option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node))
 	: name_(name)
@@ -28,7 +30,7 @@ option_def::option_def(std::string_view name, std::wstring_view def, option_flag
 	, type_(option_type::xml)
 	, flags_(flags)
 	, max_(10000000)
-	, validator_(validator)
+	, validator_(reinterpret_cast<void*>(validator))
 {}
 
 option_def::option_def(std::string_view name, int def, option_flags flags, int min, int max, bool (*validator)(int& v))
@@ -38,7 +40,7 @@ option_def::option_def(std::string_view name, int def, option_flags flags, int m
 	, flags_(flags)
 	, min_(min)
 	, max_(max)
-	, validator_(validator)
+	, validator_(reinterpret_cast<void*>(validator))
 {}
 
 template<>
@@ -207,7 +209,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 		value = def.max();
 	}
 	if (def.validator()) {
-		if (!static_cast<bool(*)(int&)>(def.validator())(value)) {
+		if (!reinterpret_cast<bool(*)(int&)>(def.validator())(value)) {
 			return;
 		}
 	}
@@ -238,7 +240,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 
 	if (def.validator()) {
 		std::wstring v(value);
-		if (!static_cast<bool(*)(std::wstring&)>(def.validator())(v)) {
+		if (!reinterpret_cast<bool(*)(std::wstring&)>(def.validator())(v)) {
 			return;
 		}
 

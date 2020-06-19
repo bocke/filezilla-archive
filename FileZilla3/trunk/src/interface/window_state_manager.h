@@ -4,7 +4,8 @@
 // This class get used to remember toplevel window size and position across
 // sessions.
 
-enum interfaceOptions;
+#include "Options.h"
+
 class CWindowStateManager final : public wxEvtHandler
 {
 public:

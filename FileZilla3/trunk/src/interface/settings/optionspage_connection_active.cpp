@@ -3,7 +3,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_connection_active.h"
-#include "xrc_helper.h"
+#include "../xrc_helper.h"
 
 #include <libfilezilla/iputils.hpp>
 

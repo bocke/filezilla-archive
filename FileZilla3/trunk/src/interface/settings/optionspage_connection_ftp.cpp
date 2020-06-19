@@ -69,18 +69,18 @@ bool COptionsPageConnectionFTP::CreateControls(wxWindow* parent)
 
 bool COptionsPageConnectionFTP::LoadPage()
 {
-	const bool use_pasv = m_pOptions->GetOptionVal(OPTION_USEPASV) != 0;
+	const bool use_pasv = m_pOptions->get_bool(OPTION_USEPASV);
 	impl_->passive_->SetValue(use_pasv);
 	impl_->active_->SetValue(!use_pasv);
-	impl_->fallback_->SetValue(m_pOptions->GetOptionVal(OPTION_ALLOW_TRANSFERMODEFALLBACK) != 0);
-	impl_->keepalive_->SetValue(m_pOptions->GetOptionVal(OPTION_FTP_SENDKEEPALIVE) != 0);
+	impl_->fallback_->SetValue(m_pOptions->get_bool(OPTION_ALLOW_TRANSFERMODEFALLBACK));
+	impl_->keepalive_->SetValue(m_pOptions->get_bool(OPTION_FTP_SENDKEEPALIVE));
 	return true;
 }
 
 bool COptionsPageConnectionFTP::SavePage()
 {
-	m_pOptions->SetOption(OPTION_USEPASV, impl_->passive_->GetValue() ? 1 : 0);
-	m_pOptions->SetOption(OPTION_ALLOW_TRANSFERMODEFALLBACK, impl_->fallback_->GetValue() ? 1 : 0);
-	m_pOptions->SetOption(OPTION_FTP_SENDKEEPALIVE, impl_->keepalive_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_USEPASV, impl_->passive_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_ALLOW_TRANSFERMODEFALLBACK, impl_->fallback_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_FTP_SENDKEEPALIVE, impl_->keepalive_->GetValue() ? 1 : 0);
 	return true;
 }

@@ -10,7 +10,12 @@
 #include <libfilezilla/mutex.hpp>
 #include <libfilezilla/string.hpp>
 
-#include "../pugixml/pugixml.hpp" // TODO hide
+//TODO hide
+#ifdef HAVE_LIBPUGIXML
+#include <pugixml.hpp>
+#else
+#include "../pugixml/pugixml.hpp"
+#endif
 
 namespace pugi {
 class xml_document;
@@ -73,6 +78,7 @@ struct option_def final
 	inline option_flags flags() const { return flags_; }
 	int min() const { return min_; }
 	int max() const { return max_; }
+
 	void* validator() const { return validator_; }
 
 private:
