@@ -145,7 +145,9 @@ protected:
 	void Save();
 
 	virtual void process_changed(watched_options const& changed) override;
-	void set_xml_value(pugi::xml_node settings, size_t opt);
+	void set_xml_value(pugi::xml_node settings, size_t opt, bool clean);
+
+	virtual void notify_changed() override;
 
 	bool dirty_{};
 	std::unique_ptr<CXmlFile> xmlFile_;

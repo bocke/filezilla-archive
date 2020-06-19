@@ -93,14 +93,13 @@ void COptionsBase::add_missing()
 		auto& val = values_[i];
 		auto const& def = options_[i];
 
-		val.str_ = def.def();
-		val.v_ = fz::to_integral<int>(def.def());
-
-		// FIXME XML
-/*		if (options[i].type == xml) {
-			m_optionsCache[i].xmlValue.reset();
-			m_optionsCache[i].xmlValue.load_string(fz::to_string(options[i].defaultValue).c_str());
-		}*/
+		if (def.type() == option_type::xml) {
+			val.xml_.load_string(fz::to_utf8(def.def()).c_str());
+		}
+		else {
+			val.str_ = def.def();
+			val.v_ = fz::to_integral<int>(def.def());
+		}
 	}
 }
 
@@ -127,6 +126,23 @@ std::wstring COptionsBase::get_string(optionsIndex opt)
 	add_missing();
 	auto& val = values_[static_cast<size_t>(opt)];
 	return val.str_;
+}
+
+pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
+{
+	pugi::xml_document ret;
+
+	fz::scoped_lock l(mtx_);
+	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+		return ret;
+	}
+
+	add_missing();
+	auto& val = values_[static_cast<size_t>(opt)];
+	for (auto c = val.xml_.first_child(); c; c = c.next_sibling()) {
+		ret.append_copy(c);
+	}
+	return ret;
 }
 
 bool COptionsBase::from_default(optionsIndex opt)
@@ -185,6 +201,39 @@ void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool fr
 	else if (def.type() == option_type::string) {
 		set(opt, def, val, value, from_default);
 	}
+}
+
+void COptionsBase::set(optionsIndex opt, pugi::xml_node const& value)
+{
+	pugi::xml_document doc;
+	if (value) {
+		if (value.type() == pugi::node_document) {
+			for (auto c = value.first_child(); c; c = c.next_sibling()) {
+				if (c.type() == pugi::node_element) {
+					doc.append_copy(c);
+				}
+			}
+		}
+		else {
+			doc.append_copy(value);
+		}
+	}
+
+	fz::scoped_lock l(mtx_);
+	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+		return;
+	}
+
+	add_missing();
+	auto const& def = options_[static_cast<size_t>(opt)];
+	auto& val = values_[static_cast<size_t>(opt)];
+
+	// Type check
+	if (def.type() != option_type::xml) {
+		return;
+	}
+
+	set(opt, def, val, std::move(doc));
 }
 
 void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, int value, bool from_default)
@@ -264,10 +313,29 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 	set_changed(opt);
 }
 
+void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document&& value, bool from_default)
+{
+	if ((def.flags() & option_flags::default_only) && !from_default) {
+		return;
+	}
+	if ((def.flags() & option_flags::default_priority) && !from_default && val.from_default_) {
+		return;
+	}
+
+	if (def.validator()) {
+		if (!reinterpret_cast<bool(*)(pugi::xml_node&)>(def.validator())(value)) {
+			return;
+		}
+	}
+	val.xml_ = std::move(value);
+
+	set_changed(opt);
+}
+
 void COptionsBase::set_changed(optionsIndex opt)
 {
 	changed_.set(opt);
-	notify_changed(); // FIXME
+	notify_changed();
 }
 
 bool watched_options::any() const
@@ -320,12 +388,14 @@ watched_options& watched_options::operator&=(std::vector<uint64_t> const& op)
 	return *this;
 }
 
-void COptionsBase::notify_changed()
+void COptionsBase::continue_notify_changed()
 {
 	watched_options changed;
 	{
-		// FIXME
-		//fz::scoped_lock l(mtx_);
+		fz::scoped_lock l(mtx_);
+		if (!changed_) {
+			return;
+		}
 		changed = changed_;
 		changed_.clear();
 		process_changed(changed);
