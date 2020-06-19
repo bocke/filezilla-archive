@@ -333,7 +333,7 @@ int CFileZillaApp::OnExit()
 {
 	CContextManager::Get()->NotifyGlobalHandlers(STATECHANGE_QUITNOW);
 
-	COptions::Get()->SaveIfNeeded();
+	COptions::Get()->Save();
 
 #ifdef WITH_LIBDBUS
 	CSessionManager::Uninit();

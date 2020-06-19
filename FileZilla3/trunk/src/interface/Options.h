@@ -124,25 +124,23 @@ public:
 
 	void Import(pugi::xml_node element);
 
-	void RequireCleanup();
-	void SaveIfNeeded();
+	void Save();
 
 	static CLocalPath GetUnadjustedSettingsDir();
 	CLocalPath GetCacheDirectory();
+
+	bool Cleanup(); // Removes all unknown elements from the XML
 
 protected:
 	COptions();
 	virtual ~COptions();
 
-	void Load(pugi::xml_node settings, bool from_default);
+	void Load(pugi::xml_node settings, bool from_default, bool importing);
 
 	pugi::xml_node CreateSettingsXmlElement();
 
 	void LoadGlobalDefaultOptions();
 	CLocalPath InitSettingsDir();
-
-	bool Cleanup(); // Removes all unknown elements from the XML
-	void Save();
 
 	virtual void process_changed(watched_options const& changed) override;
 	void set_xml_value(pugi::xml_node settings, size_t opt, bool clean);
@@ -155,7 +153,6 @@ protected:
 	static COptions* m_theOptions;
 
 	wxTimer m_save_timer;
-	bool needsCleanup_{};
 
 	DECLARE_EVENT_TABLE()
 	void OnTimer(wxTimerEvent& event);
