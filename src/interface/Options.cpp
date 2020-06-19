@@ -195,7 +195,13 @@ COptions::COptions()
 	}
 	else {
 		auto settings = CreateSettingsXmlElement();
-		Load(settings, false);
+		Load(settings, false, false);
+	}
+
+	{
+		fz::scoped_lock l(mtx_);
+		changed_.clear();
+		can_notify_ = true;
 	}
 
 	if (dirty_ && !m_save_timer.IsRunning()) {
@@ -250,12 +256,11 @@ COptions* COptions::Get()
 
 void COptions::Import(pugi::xml_node element)
 {
-	Load(element, false);
+	Load(element, false, true);
 }
 
-void COptions::Load(pugi::xml_node settings, bool from_default)
+void COptions::Load(pugi::xml_node settings, bool from_default, bool importing)
 {
-	// Fixme: When importing, also needs actual settings
 	if (!settings) {
 		return;
 	}
@@ -290,8 +295,9 @@ void COptions::Load(pugi::xml_node settings, bool from_default)
 		}
 
 		if (seen[def_it->second]) {
-			if (!from_default) {
+			if (!from_default && !importing) {
 				settings.remove_child(setting);
+				dirty_ = true;
 			}
 			continue;
 		}
@@ -318,7 +324,7 @@ void COptions::Load(pugi::xml_node settings, bool from_default)
 		}
 	}
 
-	if (!from_default) {
+	if (!from_default && !importing) {
 		for (size_t i = 0; i < seen.size(); ++i) {
 			if (seen[i]) {
 				continue;
@@ -350,7 +356,7 @@ void COptions::LoadGlobalDefaultOptions()
 		return;
 	}
 
-	Load(element, true);
+	Load(element, true, false);
 }
 
 void COptions::OnTimer(wxTimerEvent&)
@@ -360,11 +366,11 @@ void COptions::OnTimer(wxTimerEvent&)
 
 void COptions::Save()
 {
+	m_save_timer.Stop();
 	if (!dirty_) {
 		return;
 	}
 	dirty_ = false;
-	m_save_timer.Stop();
 
 	if (get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
@@ -382,7 +388,6 @@ bool COptions::Cleanup()
 {
 	bool ret = false;
 
-	needsCleanup_ = false;
 	auto element = xmlFile_->GetElement();
 	auto child = element.first_child();
 
@@ -406,14 +411,14 @@ bool COptions::Cleanup()
 	auto settings = child;
 	child = settings.first_child();
 
-	std::map<std::string, unsigned int> nameOptionMap;
+	fz::scoped_lock l(mtx_);
 
 	// Remove unknown settings
 	while (child) {
 		auto next = child.next_sibling();
 
 		if (child.name() == std::string("Setting")) {
-			if (nameOptionMap.find(child.attribute("name").value()) == nameOptionMap.cend()) {
+			if (name_to_option_.find(child.attribute("name").value()) == name_to_option_.cend()) {
 				settings.remove_child(child);
 				ret = true;
 			}
@@ -425,15 +430,14 @@ bool COptions::Cleanup()
 		child = next;
 	}
 
-	return ret;
-}
-
-void COptions::SaveIfNeeded()
-{
-	m_save_timer.Stop();
-	if (dirty_) {
-		Save();
+	if (ret) {
+		dirty_ = true;
+		if (!m_save_timer.IsRunning()) {
+			m_save_timer.Start(15000, true);
+		}
 	}
+
+	return ret;
 }
 
 namespace {
@@ -562,11 +566,6 @@ CLocalPath COptions::InitSettingsDir()
 	set(mapOption(OPTION_DEFAULT_SETTINGSDIR), p.GetPath(), true);
 
 	return p;
-}
-
-void COptions::RequireCleanup()
-{
-	needsCleanup_ = true;
 }
 
 void COptions::process_changed(watched_options const& changed)

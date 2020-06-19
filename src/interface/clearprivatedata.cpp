@@ -152,8 +152,8 @@ void CClearPrivateDataDialog::Delete()
 bool CClearPrivateDataDialog::ClearReconnect()
 {
 	COptions::Get()->set(OPTION_TAB_DATA, pugi::xml_node());
-	COptions::Get()->RequireCleanup();
-	COptions::Get()->SaveIfNeeded();
+	COptions::Get()->Cleanup();
+	COptions::Get()->Save();
 
 	const std::vector<CState*> *states = CContextManager::Get()->GetAllStates();
 	for (std::vector<CState*>::const_iterator iter = states->begin(); iter != states->end(); ++iter) {

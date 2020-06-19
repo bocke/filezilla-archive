@@ -253,6 +253,7 @@ protected:
 	static std::map<std::string, size_t, std::less<>> name_to_option_;
 	std::vector<option_value> values_;
 
+	bool can_notify_{};
 	watched_options changed_;
 
 	virtual void notify_changed() = 0;

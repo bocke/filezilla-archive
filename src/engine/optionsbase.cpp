@@ -334,8 +334,11 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 
 void COptionsBase::set_changed(optionsIndex opt)
 {
+	bool notify = can_notify_ && !changed_.any();
 	changed_.set(opt);
-	notify_changed();
+	if (notify) {
+		notify_changed();
+	}
 }
 
 bool watched_options::any() const
