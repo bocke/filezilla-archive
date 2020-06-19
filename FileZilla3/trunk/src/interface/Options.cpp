@@ -305,7 +305,13 @@ void COptions::Load(pugi::xml_node settings, bool from_default)
 			set(static_cast<optionsIndex>(def_it->second), def, val, setting.text().as_int(), from_default);
 			break;
 		case option_type::xml:
-			// FIXME
+			{
+				pugi::xml_document doc;
+				for (auto c = setting.first_child(); c; c = c.next_sibling()) {
+					doc.append_copy(c);
+				}
+				set(static_cast<optionsIndex>(def_it->second), def, val, std::move(doc), from_default);
+			}
 			break;
 		default:
 			set(static_cast<optionsIndex>(def_it->second), def, val, fz::to_wstring_from_utf8(setting.child_value()), from_default);
@@ -318,25 +324,7 @@ void COptions::Load(pugi::xml_node settings, bool from_default)
 				continue;
 			}
 
-			auto const& def = options_[i];
-			if (def.flags() & (option_flags::internal | option_flags::default_only)) {
-				return;
-			}
-
-			auto setting = settings.append_child("Setting");
-			setting.append_attribute("name").set_value(def.name().c_str());
-			if (def.flags() & option_flags::platform) {
-				setting.append_attribute("platform").set_value(platform_name);
-			}
-
-			if (def.type() == option_type::xml) {
-				// FIXME
-			}
-			else {
-				setting.text().set(fz::to_utf8(def.def()).c_str());
-			}
-
-			dirty_ = true;
+			set_xml_value(settings, i, false);
 		}
 	}
 }
@@ -592,9 +580,9 @@ void COptions::process_changed(watched_options const& changed)
 		while (v) {
 			auto bit = fz::bitscan(v);
 			v ^= 1ull << bit;
-			size_t opt = bit + i * 8;
+			size_t opt = bit + i * 64;
 
-			set_xml_value(settings, opt);
+			set_xml_value(settings, opt, true);
 		}
 	}
 
@@ -603,30 +591,32 @@ void COptions::process_changed(watched_options const& changed)
 	}
 }
 
-void COptions::set_xml_value(pugi::xml_node settings, size_t opt)
+void COptions::set_xml_value(pugi::xml_node settings, size_t opt, bool clean)
 {
 	auto const& def = options_[opt];
 	if (def.flags() & (option_flags::internal | option_flags::default_only)) {
 		return;
 	}
 
-	for (pugi::xml_node it = settings.child("Setting"); it;) {
-		auto cur = it;
-		it = it.next_sibling("Setting");
+	if (clean) {
+		for (pugi::xml_node it = settings.child("Setting"); it;) {
+			auto cur = it;
+			it = it.next_sibling("Setting");
 
-		char const* attribute = cur.attribute("name").value();
-		if (strcmp(attribute, def.name().c_str())) {
-			continue;
-		}
-
-		if (def.flags() & option_flags::platform) {
-			// Ignore items from the wrong platform
-			char const* p = cur.attribute("platform").value();
-			if (*p && strcmp(p, platform_name)) {
+			char const* attribute = cur.attribute("name").value();
+			if (strcmp(attribute, def.name().c_str())) {
 				continue;
 			}
+
+			if (def.flags() & option_flags::platform) {
+				// Ignore items from the wrong platform
+				char const* p = cur.attribute("platform").value();
+				if (*p && strcmp(p, platform_name)) {
+					continue;
+				}
+			}
+			settings.remove_child(cur);
 		}
-		settings.remove_child(cur);
 	}
 
 	auto setting = settings.append_child("Setting");
@@ -637,11 +627,18 @@ void COptions::set_xml_value(pugi::xml_node settings, size_t opt)
 
 	auto const& val = values_[opt];
 	if (def.type() == option_type::xml) {
-		// FIXME
+		for (auto c = val.xml_.first_child(); c; c = c.next_sibling()) {
+			setting.append_copy(c);
+		}
 	}
 	else {
 		setting.text().set(fz::to_utf8(val.str_).c_str());
 	}
 
 	dirty_ = true;
+}
+
+void COptions::notify_changed()
+{
+	CallAfter([this](){ continue_notify_changed(); });
 }

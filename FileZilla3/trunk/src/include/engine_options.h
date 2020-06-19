@@ -4,11 +4,6 @@
 #include "optionsbase.h"
 
 // The engine of FileZilla 3 can be configured using a few settings.
-// In order to read and set the settings, the engine has to be passed
-// a pointer to a COptionsBase object.
-// FIXME description
-// Since COptionsBase is virtual, the user of the engine has to create a
-// derived class which handles settings-reading and writing.
 
 enum engineOptions : unsigned int
 {

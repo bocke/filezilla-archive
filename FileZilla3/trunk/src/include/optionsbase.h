@@ -61,7 +61,6 @@ inline option_flags& operator|=(option_flags& lhs, option_flags rhs)
 	return lhs;
 }
 
-
 struct option_def final
 {
 	option_def(std::string_view name, std::wstring_view def, option_flags flags = option_flags::normal, size_t max_len = 10000000);
@@ -78,7 +77,6 @@ struct option_def final
 	inline option_flags flags() const { return flags_; }
 	int min() const { return min_; }
 	int max() const { return max_; }
-
 	void* validator() const { return validator_; }
 
 private:
@@ -153,10 +151,7 @@ public:
 	template<typename T>
 	pugi::xml_document get_xml(T opt)
 	{
-		/*FIXMEfor (auto c = m_optionsCache[id].xmlValue.first_child(); c; c = c.next_sibling()) {
-			ret.append_copy(c);
-		}*/
-		return pugi::xml_document();//FIXME
+		return get_xml(mapOption(opt));
 	}
 
 	template<typename T>
@@ -181,22 +176,7 @@ public:
 	template<typename T>
 	void set(T opt, pugi::xml_node const& value)
 	{
-		//FIXME
-		/*
-			pugi::xml_document doc;
-	if (value) {
-		if (value.type() == pugi::node_document) {
-			for (auto c = value.first_child(); c; c = c.next_sibling()) {
-				if (c.type() == pugi::node_element) {
-					doc.append_copy(c);
-				}
-			}
-		}
-		else {
-			doc.append_copy(value);
-		}
-	}
-*/
+		set(mapOption(opt), value);
 	}
 
 	template<typename Opt, typename Handler>
@@ -248,12 +228,15 @@ protected:
 
 	int get_int(optionsIndex opt);
 	std::wstring get_string(optionsIndex opt);
+	pugi::xml_document get_xml(optionsIndex opt);
 
 	void set(optionsIndex opt, int value);
 	void set(optionsIndex opt, std::wstring_view const& value, bool from_default = false);
+	void set(optionsIndex opt, pugi::xml_node const& value);
 
 	void set(optionsIndex opt, option_def const& def, option_value & val, int value, bool from_default = false);
 	void set(optionsIndex opt, option_def const& def, option_value & val, std::wstring_view const& value, bool from_default = false);
+	void set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document && value, bool from_default = false);
 
 	void add_missing();
 
@@ -272,7 +255,8 @@ protected:
 
 	watched_options changed_;
 
-	void notify_changed();
+	virtual void notify_changed() = 0;
+	void continue_notify_changed();
 
 	// Gets called from notify_changed with mtx_ held.
 	virtual void process_changed(watched_options const& changed) {}
