@@ -270,9 +270,8 @@ CThemeProvider::CThemeProvider()
 		}
 	}
 
-	//FIXME
-	//RegisterOption(OPTION_ICONS_THEME);
-	//RegisterOption(OPTION_ICONS_SCALE);
+	COptions::Get()->watch(OPTION_ICONS_THEME, this);
+	COptions::Get()->watch(OPTION_ICONS_SCALE, this);
 
 	if (!instance) {
 		instance = this;
@@ -281,6 +280,7 @@ CThemeProvider::CThemeProvider()
 
 CThemeProvider::~CThemeProvider()
 {
+	COptions::Get()->unwatch_all(this);
 	if (instance == this) {
 		instance = 0;
 	}
