@@ -81,7 +81,8 @@ void CImportDialog::Run()
 			}
 
 			if (settings && xrc_call(*this, "ID_SETTINGS", &wxCheckBox::IsChecked)) {
-				COptions::Get()->Import(fz3Root.child("Settings"));
+				auto settings = fz3Root.child("Settings");
+				COptions::Get()->Import(settings);
 				wxMessageBoxEx(_("The settings have been imported. You have to restart FileZilla for all settings to have effect."), _("Import successful"), wxOK, this);
 			}
 

@@ -10,13 +10,6 @@
 #include <libfilezilla/mutex.hpp>
 #include <libfilezilla/string.hpp>
 
-//TODO hide
-#ifdef HAVE_LIBPUGIXML
-#include <pugixml.hpp>
-#else
-#include "../pugixml/pugixml.hpp"
-#endif
-
 namespace pugi {
 class xml_document;
 class xml_node;
@@ -65,7 +58,7 @@ struct option_def final
 {
 	option_def(std::string_view name, std::wstring_view def, option_flags flags = option_flags::normal, size_t max_len = 10000000);
 	option_def(std::string_view name, std::wstring_view def, option_flags flags, option_type t, size_t max_len = 10000000, bool (*validator)(std::wstring& v) = nullptr);
-	option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node));
+	option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node&));
 	option_def(std::string_view name, int def, option_flags flags = option_flags::normal, int min = -2147483648, int max = 2147483647, bool (*validator)(int& v) = nullptr);
 
 	template<typename Bool, std::enable_if_t<std::is_same_v<Bool, bool>, int> = 0> // avoid implicit wchar_t*->bool conversion
@@ -221,7 +214,7 @@ protected:
 	struct option_value final
 	{
 		std::wstring str_;
-		pugi::xml_document xml_;
+		std::unique_ptr<pugi::xml_document> xml_{};
 		int v_{};
 		bool from_default_{};
 	};

@@ -3,9 +3,10 @@
 #if FZ_MANUALUPDATECHECK
 
 #include "buildinfo.h"
-#include "updater.h"
-#include "Options.h"
 #include "file_utils.h"
+#include "Options.h"
+#include "updater.h"
+#include "serverdata.h"
 #include <string>
 
 #ifdef __WXMSW__
