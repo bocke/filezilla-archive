@@ -2,12 +2,6 @@
 
 #include <libfilezilla/event_handler.hpp>
 
-#ifdef HAVE_LIBPUGIXML
-#include <pugixml.hpp>
-#else
-#include "../pugixml/pugixml.hpp"
-#endif
-
 fz::mutex COptionsBase::mtx_{false};
 std::vector<option_def> COptionsBase::options_;
 std::map<std::string, size_t, std::less<>> COptionsBase::name_to_option_;

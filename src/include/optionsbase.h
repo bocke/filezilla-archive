@@ -10,6 +10,12 @@
 #include <libfilezilla/mutex.hpp>
 #include <libfilezilla/string.hpp>
 
+#ifdef HAVE_LIBPUGIXML
+#include <pugixml.hpp>
+#else
+#include "../pugixml/pugixml.hpp"
+#endif
+
 namespace pugi {
 class xml_document;
 class xml_node;
