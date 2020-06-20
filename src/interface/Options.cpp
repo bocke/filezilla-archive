@@ -5,6 +5,7 @@
 #include "ipcmutex.h"
 #include "locale_initializer.h"
 #include "sizeformatting.h"
+#include "xmlfunctions.h"
 
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/util.hpp>
@@ -254,12 +255,12 @@ COptions* COptions::Get()
 	return m_theOptions;
 }
 
-void COptions::Import(pugi::xml_node element)
+void COptions::Import(pugi::xml_node & element)
 {
 	Load(element, false, true);
 }
 
-void COptions::Load(pugi::xml_node settings, bool from_default, bool importing)
+void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing)
 {
 	if (!settings) {
 		return;
@@ -590,7 +591,7 @@ void COptions::process_changed(watched_options const& changed)
 	}
 }
 
-void COptions::set_xml_value(pugi::xml_node settings, size_t opt, bool clean)
+void COptions::set_xml_value(pugi::xml_node & settings, size_t opt, bool clean)
 {
 	auto const& def = options_[opt];
 	if (def.flags() & (option_flags::internal | option_flags::default_only)) {
@@ -626,7 +627,7 @@ void COptions::set_xml_value(pugi::xml_node settings, size_t opt, bool clean)
 
 	auto const& val = values_[opt];
 	if (def.type() == option_type::xml) {
-		for (auto c = val.xml_.first_child(); c; c = c.next_sibling()) {
+		for (auto c = val.xml_->first_child(); c; c = c.next_sibling()) {
 			setting.append_copy(c);
 		}
 	}

@@ -2,6 +2,12 @@
 
 #include <libfilezilla/event_handler.hpp>
 
+#ifdef HAVE_LIBPUGIXML
+#include <pugixml.hpp>
+#else
+#include "../pugixml/pugixml.hpp"
+#endif
+
 fz::mutex COptionsBase::mtx_{false};
 std::vector<option_def> COptionsBase::options_;
 std::map<std::string, size_t, std::less<>> COptionsBase::name_to_option_;
@@ -24,7 +30,7 @@ option_def::option_def(std::string_view name, std::wstring_view def, option_flag
 {
 }
 
-option_def::option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node))
+option_def::option_def(std::string_view name, std::wstring_view def, option_flags flags, bool (*validator)(pugi::xml_node&))
 	: name_(name)
 	, default_(def)
 	, type_(option_type::xml)
@@ -94,7 +100,8 @@ void COptionsBase::add_missing()
 		auto const& def = options_[i];
 
 		if (def.type() == option_type::xml) {
-			val.xml_.load_string(fz::to_utf8(def.def()).c_str());
+			val.xml_ = std::make_unique<pugi::xml_document>();
+			val.xml_->load_string(fz::to_utf8(def.def()).c_str());
 		}
 		else {
 			val.str_ = def.def();
@@ -139,7 +146,7 @@ pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
 
 	add_missing();
 	auto& val = values_[static_cast<size_t>(opt)];
-	for (auto c = val.xml_.first_child(); c; c = c.next_sibling()) {
+	for (auto c = val.xml_->first_child(); c; c = c.next_sibling()) {
 		ret.append_copy(c);
 	}
 	return ret;
@@ -327,7 +334,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 			return;
 		}
 	}
-	val.xml_ = std::move(value);
+	*val.xml_ = std::move(value);
 
 	set_changed(opt);
 }

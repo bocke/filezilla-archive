@@ -8,8 +8,6 @@
 
 #include <wx/timer.h>
 
-#include "xmlfunctions.h"
-
 enum interfaceOptions
 {
 	// Default/internal options
@@ -122,7 +120,7 @@ public:
 	static void Init();
 	static void Destroy();
 
-	void Import(pugi::xml_node element);
+	void Import(pugi::xml_node & element);
 
 	void Save();
 
@@ -135,7 +133,7 @@ protected:
 	COptions();
 	virtual ~COptions();
 
-	void Load(pugi::xml_node settings, bool from_default, bool importing);
+	void Load(pugi::xml_node & settings, bool from_default, bool importing);
 
 	pugi::xml_node CreateSettingsXmlElement();
 
@@ -143,7 +141,7 @@ protected:
 	CLocalPath InitSettingsDir();
 
 	virtual void process_changed(watched_options const& changed) override;
-	void set_xml_value(pugi::xml_node settings, size_t opt, bool clean);
+	void set_xml_value(pugi::xml_node & settings, size_t opt, bool clean);
 
 	virtual void notify_changed() override;
 
