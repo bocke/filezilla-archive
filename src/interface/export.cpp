@@ -75,6 +75,7 @@ void CExportDialog::Run()
 		}
 	}
 	if (settings) {
+		COptions::Get()->Save();
 		CInterProcessMutex mutex(MUTEX_OPTIONS);
 		CXmlFile file(wxGetApp().GetSettingsFile(_T("filezilla")));
 		auto document = file.Load();
