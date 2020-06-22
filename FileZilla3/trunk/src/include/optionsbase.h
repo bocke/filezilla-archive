@@ -267,7 +267,7 @@ protected:
 	void continue_notify_changed();
 
 	// Gets called from continue_notify_changed with mtx_ held with write_lock.
-	virtual void process_changed(watched_options const& changed) {}
+	virtual void process_changed(watched_options const&) {}
 
 
 	fz::mutex notification_mtx_;

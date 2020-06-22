@@ -82,4 +82,4 @@ unsigned int register_engine_options()
 		{ "Cache TTL", 600, option_flags::numeric_clamp, 30, 60*60*24 }
 	});
 	return value;
-};
+}
