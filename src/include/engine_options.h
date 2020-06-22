@@ -93,6 +93,6 @@ inline optionsIndex mapOption(engineOptions opt)
 		return static_cast<optionsIndex>(opt + offset);
 	}
 	return ret;
-};
+}
 
 #endif
