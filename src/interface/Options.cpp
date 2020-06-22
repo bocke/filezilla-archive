@@ -159,7 +159,7 @@ optionsIndex mapOption(interfaceOptions opt)
 		return static_cast<optionsIndex>(opt + offset);
 	}
 	return ret;
-};
+}
 
 std::wstring GetEnv(char const* name)
 {
