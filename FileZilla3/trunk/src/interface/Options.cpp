@@ -44,11 +44,14 @@ namespace {
 #endif
 }
 
+namespace {
+option_registrator r(&register_interface_options);
+}
 unsigned int register_interface_options()
 {
 	// Note: A few options are versioned due to a changed
 	// option syntax or past, unhealthy defaults
-	return COptionsBase::register_options({
+	static int const value = register_options({
 		// Default/internal options
 		{ "Config Location", L"", option_flags::default_only | option_flags::platform },
 		{ "Kiosk mode", 0, option_flags::default_priority, 0, 2 },
@@ -144,6 +147,7 @@ unsigned int register_interface_options()
 		{ "Master password encryptor", L"", option_flags::normal },
 		{ "Tab data", L"", option_flags::normal, option_type::xml }
 	});
+	return value;
 }
 
 optionsIndex mapOption(interfaceOptions opt)
@@ -175,10 +179,6 @@ END_EVENT_TABLE()
 
 COptions::COptions()
 {
-	// FIXME: Needs Global initializer
-	mapOption(OPTION_ASCIIBINARY);
-	mapOption(OPTION_PROXY_HOST);
-
 	m_theOptions = this;
 
 	m_save_timer.SetOwner(this);
@@ -200,7 +200,7 @@ COptions::COptions()
 	}
 
 	{
-		fz::scoped_lock l(mtx_);
+		fz::scoped_write_lock l(mtx_);
 		changed_.clear();
 		can_notify_ = true;
 	}
@@ -266,8 +266,8 @@ void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing
 		return;
 	}
 
-	fz::scoped_lock l(mtx_);
-	add_missing();
+	fz::scoped_write_lock l(mtx_);
+	add_missing(l);
 
 	std::vector<uint8_t> seen;
 	seen.resize(options_.size());
@@ -412,7 +412,7 @@ bool COptions::Cleanup()
 	auto settings = child;
 	child = settings.first_child();
 
-	fz::scoped_lock l(mtx_);
+	fz::scoped_write_lock l(mtx_);
 
 	// Remove unknown settings
 	while (child) {

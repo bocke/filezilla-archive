@@ -114,6 +114,7 @@ CFileZillaApp::CFileZillaApp()
 
 CFileZillaApp::~CFileZillaApp()
 {
+	themeProvider_.reset();
 	COptions::Destroy();
 }
 

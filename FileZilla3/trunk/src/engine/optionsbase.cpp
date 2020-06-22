@@ -2,10 +2,6 @@
 
 #include <libfilezilla/event_handler.hpp>
 
-fz::mutex COptionsBase::mtx_{false};
-std::vector<option_def> COptionsBase::options_;
-std::map<std::string, size_t, std::less<>> COptionsBase::name_to_option_;
-
 option_def::option_def(std::string_view name, std::wstring_view def, option_flags flags, size_t max_len)
 	: name_(name)
 	, default_(def)
@@ -66,32 +62,58 @@ std::tuple<void*, watcher_notifier> get_option_watcher_notifier(fz::event_handle
 	return std::make_tuple(handler, &event_handler_option_watcher_notifier);
 }
 
+namespace {
+class option_registry final {
+public:
+	fz::mutex mtx_;
+	std::vector<option_def> options_;
+	std::map<std::string, size_t, std::less<>> name_to_option_;
+};
 
-unsigned int COptionsBase::register_options(std::initializer_list<option_def> options)
+std::pair<option_registry&, fz::scoped_lock> get_option_registry()
 {
-	fz::scoped_lock l_(mtx_);
-	size_t const prev = options_.size();
-	options_.insert(options_.end(), options);
-	for (size_t i = prev; i < options_.size(); ++i) {
-		name_to_option_[options_[i].name()] = i;
+	static option_registry reg;
+	return std::make_pair(std::ref(reg), std::move(fz::scoped_lock(reg.mtx_)));
+}
+}
+
+unsigned int register_options(std::initializer_list<option_def> options)
+{
+	auto registry = get_option_registry();
+	size_t const prev = registry.first.options_.size();
+	registry.first.options_.insert(registry.first.options_.end(), options);
+	for (size_t i = prev; i < registry.first.options_.size(); ++i) {
+		registry.first.name_to_option_[registry.first.options_[i].name()] = i;
 	}
 
 	return static_cast<unsigned int>(prev);
 }
 
-
-void COptionsBase::add_missing()
+namespace {
+template<typename Lock>
+bool do_add_missing(optionsIndex opt, Lock & l, fz::rwmutex & mtx, std::vector<option_def> & options, std::map<std::string, size_t, std::less<>> & name_to_option, std::vector<COptionsBase::option_value> & values)
 {
-	if (values_.size() >= options_.size()) {
-		return;
+	l.unlock();
+
+	{
+		auto registry = get_option_registry();
+
+		if (static_cast<size_t>(opt) >= registry.first.options_.size()) {
+			return false;
+		}
+
+		mtx.lock_write();
+
+		options = registry.first.options_;
+		name_to_option = registry.first.name_to_option_;
 	}
+		
+	size_t i = values.size();
+	values.resize(options.size());
 
-	size_t i = values_.size();
-	values_.resize(options_.size());
-
-	for (; i < options_.size(); ++i) {
-		auto& val = values_[i];
-		auto const& def = options_[i];
+	for (; i < options.size(); ++i) {
+		auto& val = values[i];
+		auto const& def = options[i];
 
 		if (def.type() == option_type::xml) {
 			val.xml_ = std::make_unique<pugi::xml_document>();
@@ -102,29 +124,43 @@ void COptionsBase::add_missing()
 			val.v_ = fz::to_integral<int>(def.def());
 		}
 	}
+	mtx.unlock_write();
+	l.lock();
+	return true;
+}
 }
 
+void COptionsBase::add_missing(fz::scoped_write_lock & l)
+{
+	do_add_missing(static_cast<optionsIndex>(0), l, mtx_, options_, name_to_option_, values_);
+}
 
 int COptionsBase::get_int(optionsIndex opt)
 {
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	if (opt == optionsIndex::invalid) {
 		return 0;
 	}
 
-	add_missing();
+	fz::scoped_read_lock l(mtx_);
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
+		return 0;
+	}
+
 	auto& val = values_[static_cast<size_t>(opt)];
 	return val.v_;
 }
 
 std::wstring COptionsBase::get_string(optionsIndex opt)
 {
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	if (opt == optionsIndex::invalid) {
 		return std::wstring();
 	}
 
-	add_missing();
+	fz::scoped_read_lock l(mtx_);
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
+		return std::wstring();
+	}
+
 	auto& val = values_[static_cast<size_t>(opt)];
 	return val.str_;
 }
@@ -132,13 +168,15 @@ std::wstring COptionsBase::get_string(optionsIndex opt)
 pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
 {
 	pugi::xml_document ret;
-
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	if (opt == optionsIndex::invalid) {
 		return ret;
 	}
 
-	add_missing();
+	fz::scoped_write_lock l(mtx_); // Aquire write lock as we don't know what pugixml does internally
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
+		return ret;
+	}
+
 	auto& val = values_[static_cast<size_t>(opt)];
 	for (auto c = val.xml_->first_child(); c; c = c.next_sibling()) {
 		ret.append_copy(c);
@@ -148,24 +186,27 @@ pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
 
 bool COptionsBase::from_default(optionsIndex opt)
 {
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	fz::scoped_read_lock l(mtx_);
+	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= values_.size()) {
+		// No need for add_missing, from_default_ can only be set from set()
 		return false;
 	}
 
-	add_missing();
 	auto& val = values_[static_cast<size_t>(opt)];
 	return val.from_default_;
 }
 
 void COptionsBase::set(optionsIndex opt, int value)
 {
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	if (opt == optionsIndex::invalid) {
 		return;
 	}
 
-	add_missing();
+	fz::scoped_write_lock l(mtx_);
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
+		return;
+	}
+
 	auto const& def = options_[static_cast<size_t>(opt)];
 	auto& val = values_[static_cast<size_t>(opt)];
 
@@ -183,12 +224,15 @@ void COptionsBase::set(optionsIndex opt, int value)
 
 void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool from_default)
 {
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	if (opt == optionsIndex::invalid) {
 		return;
 	}
 
-	add_missing();
+	fz::scoped_write_lock l(mtx_);
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
+		return;
+	}
+
 	auto const& def = options_[static_cast<size_t>(opt)];
 	auto& val = values_[static_cast<size_t>(opt)];
 
@@ -206,6 +250,10 @@ void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool fr
 
 void COptionsBase::set(optionsIndex opt, pugi::xml_node const& value)
 {
+	if (opt == optionsIndex::invalid) {
+		return;
+	}
+
 	pugi::xml_document doc;
 	if (value) {
 		if (value.type() == pugi::node_document) {
@@ -220,12 +268,11 @@ void COptionsBase::set(optionsIndex opt, pugi::xml_node const& value)
 		}
 	}
 
-	fz::scoped_lock l(mtx_);
-	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= options_.size()) {
+	fz::scoped_write_lock l(mtx_);
+	if (static_cast<size_t>(opt) >= values_.size() && !do_add_missing(opt, l, mtx_, options_, name_to_option_, values_)) {
 		return;
 	}
 
-	add_missing();
 	auto const& def = options_[static_cast<size_t>(opt)];
 	auto& val = values_[static_cast<size_t>(opt)];
 
@@ -396,7 +443,7 @@ void COptionsBase::continue_notify_changed()
 {
 	watched_options changed;
 	{
-		fz::scoped_lock l(mtx_);
+		fz::scoped_write_lock l(mtx_);
 		if (!changed_) {
 			return;
 		}
@@ -424,6 +471,7 @@ void COptionsBase::watch(optionsIndex opt, std::tuple<void*, watcher_notifier> h
 		return;
 	}
 
+	fz::scoped_lock l(notification_mtx_);
 	for (size_t i = 0; i < watchers_.size(); ++i) {
 		if (watchers_[i].handler_ == std::get<0>(handler)) {
 			watchers_[i].options_.set(opt);
@@ -443,6 +491,7 @@ void COptionsBase::watch_all(std::tuple<void*, watcher_notifier> handler)
 		return;
 	}
 
+	fz::scoped_lock l(notification_mtx_);
 	for (size_t i = 0; i < watchers_.size(); ++i) {
 		if (watchers_[i].handler_ == std::get<0>(handler)) {
 			watchers_[i].all_ = true;
@@ -462,6 +511,7 @@ void COptionsBase::unwatch(optionsIndex opt, std::tuple<void*, watcher_notifier>
 		return;
 	}
 
+	fz::scoped_lock l(notification_mtx_);
 	for (size_t i = 0; i < watchers_.size(); ++i) {
 		if (watchers_[i].handler_ == std::get<0>(handler)) {
 			watchers_[i].options_.unset(opt);
@@ -481,6 +531,7 @@ void COptionsBase::unwatch_all(std::tuple<void*, watcher_notifier> handler)
 		return;
 	}
 
+	fz::scoped_lock l(notification_mtx_);
 	for (size_t i = 0; i < watchers_.size(); ++i) {
 		if (watchers_[i].handler_ == std::get<0>(handler)) {
 			watchers_[i] = watchers_.back();

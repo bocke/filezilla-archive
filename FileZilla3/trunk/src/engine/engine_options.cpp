@@ -1,8 +1,12 @@
 #include "../include/engine_options.h"
 
+namespace {
+option_registrator r(&register_engine_options);
+}
+
 unsigned int register_engine_options()
 {
-	static int const value = COptionsBase::register_options({
+	static int const value = register_options({
 		{ "Use Pasv mode", 1, option_flags::normal, 0, 1 },
 		{ "Limit local ports", false, option_flags::normal },
 		{ "Limit ports low", 6000, option_flags::normal, 1, 65536 },
@@ -44,7 +48,7 @@ unsigned int register_engine_options()
 				if (v >= 0 && v < 4096) {
 					v = 4096;
 				}
-				return true; 
+				return true;
 			}
 		},
 		{ "Socket send buffer size (v2)", 262144, option_flags::numeric_clamp, -1, 64 * 1024 * 1024, [](int& v)

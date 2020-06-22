@@ -8,6 +8,7 @@
 
 #include <libfilezilla/event.hpp>
 #include <libfilezilla/mutex.hpp>
+#include <libfilezilla/rwmutex.hpp>
 #include <libfilezilla/string.hpp>
 
 #ifdef HAVE_LIBPUGIXML
@@ -87,6 +88,15 @@ private:
 	int max_{};
 	void* validator_{};
 };
+
+struct option_registrator
+{
+	option_registrator(unsigned int (*f)())
+	{
+		f();
+	}
+};
+unsigned int register_options(std::initializer_list<option_def> options);
 
 struct watched_options final
 {
@@ -214,9 +224,6 @@ public:
 		unwatch_all(get_option_watcher_notifier(handler));
 	}
 
-	static unsigned int register_options(std::initializer_list<option_def> options);
-
-protected:
 	struct option_value final
 	{
 		std::wstring str_;
@@ -224,6 +231,9 @@ protected:
 		int v_{};
 		bool from_default_{};
 	};
+
+protected:
+	void add_missing(fz::scoped_write_lock & l);
 
 	int get_int(optionsIndex opt);
 	std::wstring get_string(optionsIndex opt);
@@ -237,8 +247,6 @@ protected:
 	void set(optionsIndex opt, option_def const& def, option_value & val, std::wstring_view const& value, bool from_default = false);
 	void set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document && value, bool from_default = false);
 
-	void add_missing();
-
 	void set_changed(optionsIndex opt);
 
 	void watch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
@@ -246,10 +254,10 @@ protected:
 	void unwatch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
 	void unwatch_all(std::tuple<void*, watcher_notifier> handler);
 
-	static fz::mutex mtx_;
+	fz::rwmutex mtx_;
 
-	static std::vector<option_def> options_;
-	static std::map<std::string, size_t, std::less<>> name_to_option_;
+	std::vector<option_def> options_;
+	std::map<std::string, size_t, std::less<>> name_to_option_;
 	std::vector<option_value> values_;
 
 	bool can_notify_{};
@@ -258,7 +266,7 @@ protected:
 	virtual void notify_changed() = 0;
 	void continue_notify_changed();
 
-	// Gets called from notify_changed with mtx_ held.
+	// Gets called from continue_notify_changed with mtx_ held with write_lock.
 	virtual void process_changed(watched_options const& changed) {}
 
 
@@ -272,8 +280,7 @@ protected:
 		watched_options options_;
 		bool all_{};
 	};
-	std::vector<watcher> watchers_;
-	
+	std::vector<watcher> watchers_;	
 };
 
 #endif
