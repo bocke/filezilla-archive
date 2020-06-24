@@ -97,6 +97,8 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 			event.Skip();
 		}
 	});
+
+	GetSizer()->Fit(this);
 	return true;
 }
 
