@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+<resource>
   <object class="wxPanel" name="ID_SETTINGS_CONNECTION_ACTIVE">
     <object class="wxBoxSizer">
       <orient>wxVERTICAL</orient>
