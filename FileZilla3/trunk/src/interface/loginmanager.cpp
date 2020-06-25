@@ -5,7 +5,6 @@
 #include "filezillaapp.h"
 #include "Options.h"
 #include "textctrlex.h"
-#include "xrc_helper.h"
 
 #include <algorithm>
 
@@ -111,6 +110,7 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 	password->SetFocus();
 	inner->Add(password, lay.valign);
 
+	main->AddSpacer(0);
 	auto* remember = new wxCheckBox(&pwdDlg, -1, _("&Remember master password until FileZilla is closed"));
 	remember->SetValue(true);
 	main->Add(remember);
@@ -233,6 +233,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 	}
 
 	wxTextCtrl* password{};
+	wxTextCtrl* key{}; // for storj
 	if (!site.server.GetUser().empty() || site.credentials.logonType_ != LogonType::interactive) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("&Password:")), lay.valign);
 		password = new wxTextCtrlEx(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
@@ -244,7 +245,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 
 		if (site.server.GetProtocol() == STORJ) {
 			inner->Add(new wxStaticText(&pwdDlg, -1, _("Encryption &key:")), lay.valign);
-			auto * key = new wxTextCtrlEx(&pwdDlg, XRCID("ID_ENCRYPTIONKEY"));
+			key = new wxTextCtrlEx(&pwdDlg, -1);
 			key->SetMinSize(wxSize(150, -1));
 			inner->Add(key, lay.valign);
 		}
@@ -252,6 +253,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 
 	wxCheckBox* remember{};
 	if (canRemember) {
+		main->AddSpacer(0);
 		remember = new wxCheckBox(&pwdDlg, -1, _("&Remember password until FileZilla is closed"));
 		remember->SetValue(true);
 		main->Add(remember);
@@ -287,7 +289,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 
 /* FIXME?
 	if (site.server.GetProtocol() == STORJ) {
-		std::wstring encryptionKey = XRCCTRL(pwdDlg, "ID_ENCRYPTIONKEY", wxTextCtrl)->GetValue().ToStdWstring();
+		std::wstring encryptionKey = key->GetValue().ToStdWstring();
 		if (encryptionKey.empty()) {
 			wxMessageBoxEx(_("No encryption key given."), _("Invalid input"), wxICON_EXCLAMATION);
 			continue;
@@ -297,7 +299,7 @@ bool CLoginManager::DisplayDialog(Site & site, std::wstring const& challenge, bo
 		if (password) {
 			std::wstring pass = password->GetValue().ToStdWstring();
 			if (site.server.GetProtocol() == STORJ) {
-				std::wstring encryptionKey = xrc_call(pwdDlg, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
+				std::wstring encryptionKey = key->GetValue().ToStdWstring();
 				pass += L"|" + encryptionKey;
 			}
 			site.credentials.SetPass(pass);
@@ -356,18 +358,49 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 	}
 
 	wxDialogEx pwdDlg;
-	if (!pwdDlg.Load(wxGetApp().GetTopWindow(), _T("ID_ENTEROLDMASTERPASSWORD"))) {
+	if (!pwdDlg.Create(wxGetApp().GetTopWindow(), -1, _("Enter master password"))) {
 		return false;
 	}
-	xrc_call(pwdDlg, "ID_KEY_IDENTIFIER", &wxStaticText::SetLabel, pub.to_base64().substr(0, 8));
+	auto& lay = pwdDlg.layout();
+	auto* main = lay.createMain(&pwdDlg, 1);
 
-	if (!allowForgotten) {
-		xrc_call(pwdDlg, "ID_FORGOT", &wxControl::Hide);
+	main->Add(new wxStaticText(&pwdDlg, -1, _("Please enter your current master password to change the password settings.")));
+
+	auto* inner = lay.createFlex(2);
+	main->Add(inner);
+
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Key identifier:")));
+	inner->Add(new wxStaticText(&pwdDlg, -1, fz::to_wstring(pub.to_base64().substr(0, 8))));
+
+	inner->Add(new wxStaticText(&pwdDlg, -1, _("Master &Password:")), lay.valign);
+
+	auto* password = new wxTextCtrlEx(&pwdDlg, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	password->SetMinSize(wxSize(150, -1));
+	password->SetFocus();
+	inner->Add(password, lay.valign);
+
+	wxCheckBox* forgot{};
+	if (allowForgotten) {
+		main->AddSpacer(0);
+		forgot = new wxCheckBox(&pwdDlg, -1, _("I &forgot my master password. Delete all passwords stored with this key."));
+		main->Add(forgot);
 	}
-	if (!allowCancel) {
-		wxASSERT(allowForgotten);
-		xrc_call(pwdDlg, "wxID_CANCEL", &wxControl::Disable);
+
+	auto* buttons = lay.createButtonSizer(&pwdDlg, main, true);
+
+	auto ok = new wxButton(&pwdDlg, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	if (allowCancel) {
+		auto cancel = new wxButton(&pwdDlg, wxID_CANCEL, _("Cancel"));
+		buttons->AddButton(cancel);
 	}
+
+	buttons->Realize();
+
+	pwdDlg.GetSizer()->Fit(&pwdDlg);
+	pwdDlg.GetSizer()->SetSizeHints(&pwdDlg);
 
 	while (true) {
 		if (pwdDlg.ShowModal() != wxID_OK) {
@@ -377,9 +410,11 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 			continue;
 		}
 
-		bool const forgot = xrc_call(pwdDlg, "ID_FORGOT", &wxCheckBox::GetValue);
-		if (!forgot) {
-			auto pass = fz::to_utf8(xrc_call(pwdDlg, "ID_PASSWORD", &wxTextCtrl::GetValue).ToStdWstring());
+		if (allowForgotten && forgot->GetValue()) {
+			decryptors_[pub] = fz::private_key();
+		}
+		else {
+			auto pass = fz::to_utf8(password->GetValue().ToStdWstring());
 			auto key = fz::private_key::from_password(pass, pub.salt_);
 
 			if (key.pubkey() != pub) {
@@ -387,9 +422,6 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 				continue;
 			}
 			decryptors_[pub] = key;
-		}
-		else {
-			decryptors_[pub] = fz::private_key();
 		}
 		break;
 	}
