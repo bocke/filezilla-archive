@@ -26,7 +26,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 {
 	m_pMainFrame = pParent;
 
-	if (!wxPanel::Create(pParent, XRCID("ID_QUICKCONNECT"))) {
+	if (!wxPanel::Create(pParent, -1)) {
 		return false;
 	}
 

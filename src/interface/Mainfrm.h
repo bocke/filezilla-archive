@@ -75,7 +75,7 @@ private:
 
 	bool CloseDialogsAndQuit(wxCloseEvent &event);
 	bool CreateMenus();
-	bool CreateQuickconnectBar();
+	void CreateQuickconnectBar();
 	bool CreateMainToolBar();
 	void OpenSiteManager(Site const* site = 0);
 
