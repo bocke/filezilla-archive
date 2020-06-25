@@ -45,6 +45,9 @@ private:
 class OSXSandboxUserdirsDialog final : public wxDialogEx
 {
 public:
+	OSXSandboxUserdirsDialog();
+	~OSXSandboxUserdirsDialog();
+
 	void Run(wxWindow* parent, bool initial = false);
 
 private:
@@ -52,6 +55,9 @@ private:
 
 	void OnAdd(wxCommandEvent&);
 	void OnRemove(wxCommandEvent&);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif
