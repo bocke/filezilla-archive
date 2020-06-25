@@ -575,7 +575,7 @@ bool CMainFrame::CreateMenus()
 	return true;
 }
 
-bool CMainFrame::CreateQuickconnectBar()
+void CMainFrame::CreateQuickconnectBar()
 {
 	wxGetApp().AddStartupProfileRecord("CMainFrame::CreateQuickconnectBar");
 	delete m_pQuickconnectBar;
@@ -593,8 +593,6 @@ bool CMainFrame::CreateQuickconnectBar()
 		}
 		m_pQuickconnectBar->SetSize(0, 0, clientSize.GetWidth(), -1);
 	}
-
-	return true;
 }
 
 void CMainFrame::OnMenuHandler(wxCommandEvent &event)
