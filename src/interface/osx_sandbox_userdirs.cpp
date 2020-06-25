@@ -5,7 +5,6 @@
 #include "ipcmutex.h"
 #include "Options.h"
 #include "xmlfunctions.h"
-#include "xrc_helper.h"
 
 #include <wx/dirdlg.h>
 #include <wx/osx/core/cfstring.h>
@@ -263,20 +262,64 @@ void OSXSandboxUserdirs::Remove(std::wstring const& dir)
 	Save();
 }
 
+struct OSXSandboxUserdirsDialog::impl
+{
+	wxListBox* dirs_{};
+};
+
+OSXSandboxUserdirsDialog::OSXSandboxUserdirsDialog()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+OSXSandboxUserdirsDialog::~OSXSandboxUserdirsDialog()
+{
+}
+
 void OSXSandboxUserdirsDialog::Run(wxWindow* parent, bool initial)
 {
-	if (!Load(parent, L"ID_OSX_SANDBOX_USERDIRS")) {
+	if (!Create(parent, -1, _("Directory access permissions"))) {
 		wxBell();
 		return;
 	}
 
+	auto& lay = layout();
+	auto * main = lay.createMain(this, 1);
+	main->AddGrowableCol(0);
+	main->AddGrowableRow(2);
+
+	main->Add(new wxStaticText(this, -1, _("You need to grant FileZilla acess to the directories you want to download files into or to upload files from.")));
+	main->Add(new wxStaticText(this, -1, _("Please add the local directories you want to use FileZilla with.")));
+
+	impl_->dirs_ = new wxListBox(this, -1);
+	main->Add(impl_->dirs_, lay.grow)->SetMinSize(-1, lay.dlgUnits(100));
+
+	auto * row = lay.createGrid(2);
+	main->Add(row, lay.halign);
+	
+	auto add = new wxButton(this, -1, _("&Add directory..."));
+	row->Add(add, lay.valign);
+	auto remove = new wxButton(this, -1, _("&Remove selected"));
+	row->Add(remove, lay.valign);
+
+	auto * buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+	buttons->Realize();
+
+
 	WrapRecursive(this, GetSizer(), ConvertDialogToPixels(wxSize(250, -1)).x);
 	GetSizer()->Fit(this);
 
-	XRCCTRL(*this, "ID_ADD", wxButton)->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnAdd, this);
-	XRCCTRL(*this, "ID_REMOVE", wxButton)->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnRemove, this);
+	add->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnAdd, this);
+	remove->Bind(wxEVT_BUTTON, &OSXSandboxUserdirsDialog::OnRemove, this);
 
-	XRCCTRL(*this, "wxID_OK", wxButton)->Bind(wxEVT_BUTTON, [initial](wxCommandEvent& evt) {
+	ok->Bind(wxEVT_BUTTON, [initial](wxCommandEvent& evt) {
 		if (initial && OSXSandboxUserdirs::Get().GetDirs().empty()) {
 			wxMessageBoxEx(_("Please add at least one directory you want to download files into or to upload files from."), _("No directory added"));
 		}
@@ -298,9 +341,9 @@ void OSXSandboxUserdirsDialog::OnAdd(wxCommandEvent&)
 
 void OSXSandboxUserdirsDialog::OnRemove(wxCommandEvent&)
 {
-	int pos = xrc_call(*this, "ID_DIRS", &wxListBox::GetSelection);
+	int pos = impl_->dirs_->GetSelection();
 	if (pos != wxNOT_FOUND) {
-		wxString sel = xrc_call(*this, "ID_DIRS", &wxListBox::GetString, pos);
+		wxString sel = impl_->dirs_->GetString(pos);
 		OSXSandboxUserdirs::Get().Remove(sel.ToStdWstring());
 		DisplayCurrentDirs();
 	}
@@ -311,16 +354,16 @@ void OSXSandboxUserdirsDialog::DisplayCurrentDirs()
 	auto dirs = OSXSandboxUserdirs::Get().GetDirs();
 
 	wxString sel;
-	int pos = xrc_call(*this, "ID_DIRS", &wxListBox::GetSelection);
+	int pos = impl_->dirs_->GetSelection();
 	if (pos != wxNOT_FOUND) {
-		sel = xrc_call(*this, "ID_DIRS", &wxListBox::GetString, pos);
+		sel = impl_->dirs_->GetString(pos);
 	}
 
-	xrc_call(*this, "ID_DIRS", &wxListBox::Clear);
+	impl_->dirs_->Clear();
 
 	for (auto const& dir : dirs) {
-		XRCCTRL(*this, "ID_DIRS", wxListBox)->Append(dir);
+		impl_->dirs_->Append(dir);
 	}
 
-	XRCCTRL(*this, "ID_DIRS", wxListBox)->SetStringSelection(sel);
+	impl_->dirs_->SetStringSelection(sel);
 }

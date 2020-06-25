@@ -3,9 +3,6 @@
 
 #include "filezillaapp.h"
 #include "Options.h"
-#if USE_MAC_SANDBOX
-#include "osx_sandbox_userdirs.h"
-#endif
 #include "sitemanager_controls.h"
 #include "sitemanager_dialog.h"
 #include "textctrlex.h"

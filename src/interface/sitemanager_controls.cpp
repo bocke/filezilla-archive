@@ -4,6 +4,9 @@
 #include "dialogex.h"
 #include "fzputtygen_interface.h"
 #include "Options.h"
+#if USE_MAC_SANDBOX
+#include "osx_sandbox_userdirs.h"
+#endif
 #include "sitemanager.h"
 #if ENABLE_STORJ
 #include "storj_key_interface.h"
