@@ -14,6 +14,7 @@
 #include <libfilezilla/process.hpp>
 
 #include <wx/animate.h>
+#include <wx/display.h>
 #include <wx/hyperlink.h>
 #include <wx/statline.h>
 
@@ -237,6 +238,15 @@ void MakeLinksFromTooltips(wxWindow& parent)
 void CUpdateDialog::InitFooter()
 {
 #if FZ_WINDOWS
+	int d = wxDisplay::GetFromWindow(this);
+	if (d != wxNOT_FOUND) {
+		wxDisplay display(d);
+		wxRect r = display.GetGeometry();
+		if (r.GetHeight() < 960) {
+			return;
+		}
+	}
+
 	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_int(OPTION_DISABLE_UPDATE_FOOTER)) {
 		wxString const resources = updater_.GetResources();
 		if (!resources.empty()) {
@@ -272,6 +282,8 @@ void CUpdateDialog::Wrap()
 	if (!content_) {
 		return;
 	}
+
+	GetSizer()->Fit(this);
 
 	wxSize canvas;
 	canvas.x = GetSize().x - content_->GetSize().x;

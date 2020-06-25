@@ -10,6 +10,7 @@
 
 #include <libfilezilla/iputils.hpp>
 
+#include <wx/display.h>
 #include <wx/gbsizer.h>
 #include <wx/scrolwin.h>
 #include <wx/statbox.h>
@@ -428,9 +429,21 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 	impl_->signature_algo_->SetLabel(fz::to_wstring_from_utf8(cert.get_signature_algorithm()));
 
 	auto recalc = [this](wxWindow* panel, wxSizer* sizer) {
+
 		sizer->Fit(panel);
 		wxSize min = sizer->CalcMin();
-		int const maxHeight = (line_height_ + layout().dlgUnits(1)) * 20;
+		int maxHeight = (line_height_ + layout().dlgUnits(1)) * 20;
+
+		int d = wxDisplay::GetFromWindow(this);
+		if (d != wxNOT_FOUND) {
+			wxDisplay display(d);
+			wxRect r = display.GetClientArea();
+			int h = r.GetHeight() - line_height_ * 25; // Assume rest of the dialog is about 25 lines
+			if (maxHeight > h) {
+				maxHeight = h;
+			}
+		}
+
 		if (min.y >= maxHeight) {
 			min.y = maxHeight;
 			min.x += wxSystemSettings::GetMetric(wxSYS_VSCROLL_X);
