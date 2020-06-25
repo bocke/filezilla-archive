@@ -394,28 +394,23 @@
         </object>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="ID_SUMMARY1">
-        </object>
+        <object class="wxStaticText" name="ID_SUMMARY1" />
         <flag>wxTOP|wxBOTTOM</flag>
         <border>5</border>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="ID_SUMMARY2">
-        </object>
+        <object class="wxStaticText" name="ID_SUMMARY2" />
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="ID_SUMMARY3">
-        </object>
+        <object class="wxStaticText" name="ID_SUMMARY3" />
         <flag>wxTOP|wxBOTTOM</flag>
         <border>5</border>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="ID_SUMMARY4">
-        </object>
+        <object class="wxStaticText" name="ID_SUMMARY4" />
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="ID_SUMMARY5">
-        </object>
+        <object class="wxStaticText" name="ID_SUMMARY5" />
         <flag>wxTOP|wxBOTTOM</flag>
         <border>5</border>
       </object>
