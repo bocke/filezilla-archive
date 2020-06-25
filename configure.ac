@@ -394,7 +394,7 @@ if test "$buildmain" = "yes"; then
 
   AC_ARG_ENABLE(mac-sandbox, AS_HELP_STRING([--enable-mac-sandbox],[Enables use of OS X's App Sandbox.]),
     [use_mac_sandbox="$enableval"], [use_mac_sandbox="no"])
-  if test "$use_mac_sandbox" == "yes"; then
+  if test "$use_mac_sandbox" = "yes"; then
     AC_DEFINE([USE_MAC_SANDBOX], [1],
        [Define to 1 if the App Sandbox on OS X should be used.])
     CFBUNDLEIDSUFFIX=".sandbox"
