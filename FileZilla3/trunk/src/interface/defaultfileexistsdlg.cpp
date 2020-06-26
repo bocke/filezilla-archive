@@ -1,22 +1,87 @@
 #include "filezilla.h"
 #include "defaultfileexistsdlg.h"
 
+#include <wx/statbox.h>
+
 CFileExistsNotification::OverwriteAction CDefaultFileExistsDlg::m_defaults[2] = {CFileExistsNotification::unknown, CFileExistsNotification::unknown};
 
-bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue)
+struct CDefaultFileExistsDlg::impl final
 {
-	if (!wxDialogEx::Load(parent, _T("ID_DEFAULTFILEEXISTSDLG"))) {
+	wxChoice* downloadAction_{};
+	wxChoice* uploadAction_{};
+};
+
+CDefaultFileExistsDlg::CDefaultFileExistsDlg()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+CDefaultFileExistsDlg::~CDefaultFileExistsDlg()
+{
+}
+
+bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue, bool local, bool remote)
+{
+	if (!Create(parent, -1, _("Default file exists action"))) {
 		return false;
 	}
 
+	auto & lay = layout();
+	auto main = lay.createMain(this, 1);
+
 	if (fromQueue) {
-		XRCCTRL(*this, "ID_DESCRIPTION", wxStaticText)->SetLabel(_("Select default file exists action only for the currently selected files in the queue."));
+		main->Add(new wxStaticText(this, -1, _("Select default file exists action only for the currently selected files in the queue.")));
 	}
 	else {
-		XRCCTRL(*this, "ID_DESCRIPTION", wxStaticText)->SetLabel(_("Select default file exists action if the target file already exists. This selection is valid only for the current session."));
+		main->Add(new wxStaticText(this, -1, _("Select default file exists action if the target file already exists. This selection is valid only for the current session.")));
 	}
 
-	WrapRecursive(this, 1.8, "DEFAULTFILEEXISTS");
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Default file exists action"), 2);
+		inner->AddGrowableCol(1);
+
+		auto actions = [](wxChoice* c) {
+			c->AppendString(_("Use default action"));
+			c->AppendString(_("Ask for action"));
+			c->AppendString(_("Overwrite file"));
+			c->AppendString(_("Overwrite file if source file newer"));
+			c->AppendString(_("Overwrite file if size differs"));
+			c->AppendString(_("Overwrite file if size differs or source file is newer"));
+			c->AppendString(_("Resume file transfer"));
+			c->AppendString(_("Rename file"));
+			c->AppendString(_("Skip file"));
+		};
+		if (local) {
+			inner->Add(new wxStaticText(box, -1, _("&Downloads:")), lay.valign);
+			impl_->downloadAction_ = new wxChoice(box, -1);
+			inner->Add(impl_->downloadAction_, lay.valigng);
+			actions(impl_->downloadAction_);
+		}
+		if (remote) {
+			inner->Add(new wxStaticText(box, -1, _("&Uploads:")), lay.valign);
+			impl_->uploadAction_ = new wxChoice(box, -1);
+			inner->Add(impl_->uploadAction_, lay.valigng);
+			actions(impl_->uploadAction_);
+		}
+	}
+
+	main->Add(new wxStaticText(this, -1, _("If using 'overwrite if newer', your system time has to be synchronized with the server. If the time differs (e.g. different timezone), specify a time offset in the site manager.")));
+
+	auto buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
+
+	std::string name = "DEFAULTFILEEXISTS";
+	name += fromQueue ? '1' : '0';
+	name += (local && remote) ? '1' : '0';
+	WrapRecursive(this, 1.8, name.c_str());
 	GetSizer()->Fit(this);
 	GetSizer()->SetSizeHints(this);
 
@@ -24,18 +89,16 @@ bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue)
 		return true;
 	}
 
-	SelectDefaults(&m_defaults[0], &m_defaults[1]);
-
 	return true;
 }
 
 void CDefaultFileExistsDlg::SelectDefaults(CFileExistsNotification::OverwriteAction* downloadAction, CFileExistsNotification::OverwriteAction* uploadAction)
 {
-	if (downloadAction) {
-		XRCCTRL(*this, "ID_DOWNLOAD_ACTION", wxChoice)->SetSelection(*downloadAction + 1);
+	if (impl_->downloadAction_) {
+		impl_->downloadAction_->SetSelection((downloadAction ? *downloadAction : m_defaults[0]) + 1);
 	}
-	if (uploadAction) {
-		XRCCTRL(*this, "ID_UPLOAD_ACTION", wxChoice)->SetSelection(*uploadAction + 1);
+	if (impl_->uploadAction_) {
+		impl_->uploadAction_->SetSelection((uploadAction ? *uploadAction : m_defaults[1]) + 1);
 	}
 }
 
@@ -44,19 +107,13 @@ CFileExistsNotification::OverwriteAction CDefaultFileExistsDlg::GetDefault(bool 
 	return m_defaults[download ? 0 : 1];
 }
 
-bool CDefaultFileExistsDlg::Run(CFileExistsNotification::OverwriteAction *downloadAction, CFileExistsNotification::OverwriteAction *uploadAction)
+bool CDefaultFileExistsDlg::Run(wxWindow* parent, bool fromQueue, CFileExistsNotification::OverwriteAction *downloadAction, CFileExistsNotification::OverwriteAction *uploadAction)
 {
+	if (!Load(parent, fromQueue, downloadAction || !uploadAction, uploadAction || !downloadAction)) {
+		return false;
+	}
 	SelectDefaults(downloadAction, uploadAction);
 
-	// Remove one side of the dialog if not needed
-	if (!downloadAction && uploadAction) {
-		XRCCTRL(*this, "ID_DOWNLOAD_ACTION_DESC", wxWindow)->Hide();
-		XRCCTRL(*this, "ID_DOWNLOAD_ACTION", wxWindow)->Hide();
-	}
-	else if (downloadAction && !uploadAction) {
-		XRCCTRL(*this, "ID_UPLOAD_ACTION_DESC", wxStaticText)->Hide();
-		XRCCTRL(*this, "ID_UPLOAD_ACTION", wxWindow)->Hide();
-	}
 	Layout();
 	GetSizer()->Fit(this);
 
@@ -64,8 +121,8 @@ bool CDefaultFileExistsDlg::Run(CFileExistsNotification::OverwriteAction *downlo
 		return false;
 	}
 
-	if (downloadAction || !uploadAction) {
-		int dl = XRCCTRL(*this, "ID_DOWNLOAD_ACTION", wxChoice)->GetSelection();
+	if (impl_->downloadAction_) {
+		int dl = impl_->downloadAction_->GetSelection();
 		if (dl >= 0) {
 			--dl;
 		}
@@ -79,8 +136,8 @@ bool CDefaultFileExistsDlg::Run(CFileExistsNotification::OverwriteAction *downlo
 		}
 	}
 
-	if (!downloadAction || uploadAction) {
-		int ul = XRCCTRL(*this, "ID_UPLOAD_ACTION", wxChoice)->GetSelection();
+	if (impl_->uploadAction_) {
+		int ul = impl_->uploadAction_->GetSelection();
 		if (ul >= 0) {
 			--ul;
 		}
