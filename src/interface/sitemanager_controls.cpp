@@ -617,7 +617,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 	{
 		if (!silent) {
 			wxString msg;
-			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && COptions::Get()->from_default(OPTION_DEFAULT_KIOSKMODE)) {
+			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && COptions::Get()->predefined(OPTION_DEFAULT_KIOSKMODE)) {
 				msg = _("Saving of password has been disabled by your system administrator.");
 			}
 			else {

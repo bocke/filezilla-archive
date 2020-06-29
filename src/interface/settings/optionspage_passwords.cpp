@@ -25,7 +25,7 @@ bool COptionsPagePasswords::LoadPage()
 	XRCCTRL(*this, "ID_PASSWORDS_NOSAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 	XRCCTRL(*this, "ID_PASSWORDS_USEMASTERPASSWORD", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 
-	bool const disabledByDefault = m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && m_pOptions->from_default(OPTION_DEFAULT_KIOSKMODE);
+	bool const disabledByDefault = m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && m_pOptions->predefined(OPTION_DEFAULT_KIOSKMODE);
 	if (disabledByDefault || m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		xrc_call(*this, "ID_PASSWORDS_NOSAVE", &wxRadioButton::SetValue, true);
 		xrc_call(*this, "ID_PASSWORDS_SAVE", &wxControl::Disable);
@@ -59,7 +59,7 @@ bool COptionsPagePasswords::SavePage()
 	int const old_kiosk_mode = m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE);
 	auto const oldPub = fz::public_key::from_base64(fz::to_utf8(m_pOptions->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 
-	bool const disabledByDefault = old_kiosk_mode != 0 && m_pOptions->from_default(OPTION_DEFAULT_KIOSKMODE);
+	bool const disabledByDefault = old_kiosk_mode != 0 && m_pOptions->predefined(OPTION_DEFAULT_KIOSKMODE);
 	if (disabledByDefault || m_pOptions->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return true;
 	}

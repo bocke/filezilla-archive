@@ -686,11 +686,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_FILEEXISTS")) {
 		CDefaultFileExistsDlg dlg;
-		if (!dlg.Load(this, false)) {
-			return;
-		}
-
-		dlg.Run();
+		dlg.Run(this, false);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_EDIT_CLEARPRIVATEDATA")) {
 		CClearPrivateDataDialog* pDlg = CClearPrivateDataDialog::Create(this);

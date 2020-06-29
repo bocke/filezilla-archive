@@ -53,10 +53,10 @@ unsigned int register_interface_options()
 	// option syntax or past, unhealthy defaults
 	static int const value = register_options({
 		// Default/internal options
-		{ "Config Location", L"", option_flags::default_only | option_flags::platform },
-		{ "Kiosk mode", 0, option_flags::default_priority, 0, 2 },
-		{ "Disable update check", false, option_flags::default_only },
-		{ "Cache directory", L"", option_flags::default_priority | option_flags::platform },
+		{ "Config Location", L"", option_flags::predefined_only | option_flags::platform },
+		{ "Kiosk mode", 0, option_flags::predefined_priority, 0, 2 },
+		{ "Disable update check", false, option_flags::predefined_only },
+		{ "Cache directory", L"", option_flags::predefined_priority | option_flags::platform },
 
 		// Normal UI options
 		{ "Number of Transfers", 2, option_flags::numeric_clamp, 1, 10 },
@@ -145,7 +145,7 @@ unsigned int register_interface_options()
 		{ "Drag and Drop disabled", false, option_flags::normal },
 		{ "Disable update footer", false, option_flags::normal },
 		{ "Master password encryptor", L"", option_flags::normal },
-		{ "Tab data", L"", option_flags::normal, option_type::xml }
+		{ "Tab data", L"", option_flags::normal | option_flags::sensitive_data, option_type::xml }
 	});
 	return value;
 }
@@ -260,7 +260,7 @@ void COptions::Import(pugi::xml_node & element)
 	Load(element, false, true);
 }
 
-void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing)
+void COptions::Load(pugi::xml_node & settings, bool predefined, bool importing)
 {
 	if (!settings) {
 		return;
@@ -296,7 +296,7 @@ void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing
 		}
 
 		if (seen[def_it->second]) {
-			if (!from_default && !importing) {
+			if (!predefined && !importing) {
 				settings.remove_child(setting);
 				dirty_ = true;
 			}
@@ -309,7 +309,7 @@ void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing
 		switch (def.type()) {
 		case option_type::number:
 		case option_type::boolean:
-			set(static_cast<optionsIndex>(def_it->second), def, val, setting.text().as_int(), from_default);
+			set(static_cast<optionsIndex>(def_it->second), def, val, setting.text().as_int(), predefined);
 			break;
 		case option_type::xml:
 			{
@@ -317,15 +317,15 @@ void COptions::Load(pugi::xml_node & settings, bool from_default, bool importing
 				for (auto c = setting.first_child(); c; c = c.next_sibling()) {
 					doc.append_copy(c);
 				}
-				set(static_cast<optionsIndex>(def_it->second), def, val, std::move(doc), from_default);
+				set(static_cast<optionsIndex>(def_it->second), def, val, std::move(doc), predefined);
 			}
 			break;
 		default:
-			set(static_cast<optionsIndex>(def_it->second), def, val, fz::to_wstring_from_utf8(setting.child_value()), from_default);
+			set(static_cast<optionsIndex>(def_it->second), def, val, fz::to_wstring_from_utf8(setting.child_value()), predefined);
 		}
 	}
 
-	if (!from_default && !importing) {
+	if (!predefined && !importing) {
 		for (size_t i = 0; i < seen.size(); ++i) {
 			if (seen[i]) {
 				continue;
@@ -362,11 +362,15 @@ void COptions::LoadGlobalDefaultOptions()
 
 void COptions::OnTimer(wxTimerEvent&)
 {
-	Save();
+	Save(false);
 }
 
-void COptions::Save()
+void COptions::Save(bool processChanged)
 {
+	if (processChanged) {
+		continue_notify_changed();
+	}
+
 	m_save_timer.Stop();
 	if (!dirty_) {
 		return;
@@ -389,42 +393,41 @@ bool COptions::Cleanup()
 {
 	bool ret = false;
 
-	auto element = xmlFile_->GetElement();
-	auto child = element.first_child();
-
-	// Remove all but the one settings element
-	while (child) {
-		auto next = child.next_sibling();
-
-		if (child.name() == std::string("Settings")) {
-			break;
-		}
-		element.remove_child(child);
-		child = next;
-		ret = true;
-	}
-
-	pugi::xml_node next;
-	while ((next = child.next_sibling())) {
-		element.remove_child(next);
-	}
-
-	auto settings = child;
-	child = settings.first_child();
-
 	fz::scoped_write_lock l(mtx_);
 
-	// Remove unknown settings
+	// Clear known sensitive settings
+	for (size_t i = 0; i < options_.size(); ++i) {
+		if (options_[i].flags() & option_flags::sensitive_data) {
+			set_default_value(static_cast<optionsIndex>(i));
+			set_changed(static_cast<optionsIndex>(i));
+		}
+	}
+
+	auto element = xmlFile_->GetElement();
+	auto settings = element.child("Settings");
+
+	// Remove all but the first settings element
+	auto child = settings.next_sibling("Settings");
+	while (child) {
+		auto next = child.next_sibling("Settings");
+		element.remove_child(child);
+		child = next;
+	}
+	
+	child = settings.first_child();
+
 	while (child) {
 		auto next = child.next_sibling();
 
 		if (child.name() == std::string("Setting")) {
-			if (name_to_option_.find(child.attribute("name").value()) == name_to_option_.cend()) {
+			// Remove sensitive settings
+			if (!strcmp(child.attribute("sensitive").value(), "1")) {
 				settings.remove_child(child);
 				ret = true;
 			}
 		}
 		else {
+			// Only settings in the settings node.
 			settings.remove_child(child);
 			ret = true;
 		}
@@ -594,7 +597,7 @@ void COptions::process_changed(watched_options const& changed)
 void COptions::set_xml_value(pugi::xml_node & settings, size_t opt, bool clean)
 {
 	auto const& def = options_[opt];
-	if (def.flags() & (option_flags::internal | option_flags::default_only)) {
+	if (def.flags() & (option_flags::internal | option_flags::predefined_only)) {
 		return;
 	}
 
@@ -623,6 +626,10 @@ void COptions::set_xml_value(pugi::xml_node & settings, size_t opt, bool clean)
 	setting.append_attribute("name").set_value(def.name().c_str());
 	if (def.flags() & option_flags::platform) {
 		setting.append_attribute("platform").set_value(platform_name);
+	}
+
+	if (def.flags() & option_flags::sensitive_data) {
+		setting.append_attribute("sensitive").set_value("1");
 	}
 
 	auto const& val = values_[opt];
