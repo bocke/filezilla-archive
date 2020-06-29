@@ -5,8 +5,6 @@
 
 #ifdef __WXMAC__
 
-IMPLEMENT_DYNAMIC_CLASS(wxTextCtrlXmlHandlerEx, wxTextCtrlXmlHandler)
-
 wxObject *wxTextCtrlXmlHandlerEx::DoCreateResource()
 {
 	XRC_MAKE_INSTANCE(text, wxTextCtrlEx);
