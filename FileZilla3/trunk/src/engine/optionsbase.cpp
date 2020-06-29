@@ -90,6 +90,21 @@ unsigned int register_options(std::initializer_list<option_def> options)
 }
 
 namespace {
+void set_default_value(size_t i, std::vector<option_def>& options, std::vector<COptionsBase::option_value>& values)
+{
+	auto& val = values[i];
+	auto const& def = options[i];
+
+	if (def.type() == option_type::xml) {
+		val.xml_ = std::make_unique<pugi::xml_document>();
+		val.xml_->load_string(fz::to_utf8(def.def()).c_str());
+	}
+	else {
+		val.str_ = def.def();
+		val.v_ = fz::to_integral<int>(def.def());
+	} 
+}
+
 template<typename Lock>
 bool do_add_missing(optionsIndex opt, Lock & l, fz::rwmutex & mtx, std::vector<option_def> & options, std::map<std::string, size_t, std::less<>> & name_to_option, std::vector<COptionsBase::option_value> & values)
 {
@@ -112,17 +127,7 @@ bool do_add_missing(optionsIndex opt, Lock & l, fz::rwmutex & mtx, std::vector<o
 	values.resize(options.size());
 
 	for (; i < options.size(); ++i) {
-		auto& val = values[i];
-		auto const& def = options[i];
-
-		if (def.type() == option_type::xml) {
-			val.xml_ = std::make_unique<pugi::xml_document>();
-			val.xml_->load_string(fz::to_utf8(def.def()).c_str());
-		}
-		else {
-			val.str_ = def.def();
-			val.v_ = fz::to_integral<int>(def.def());
-		}
+		set_default_value(i, options, values);
 	}
 	mtx.unlock_write();
 	l.lock();
@@ -184,16 +189,16 @@ pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
 	return ret;
 }
 
-bool COptionsBase::from_default(optionsIndex opt)
+bool COptionsBase::predefined(optionsIndex opt)
 {
 	fz::scoped_read_lock l(mtx_);
 	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= values_.size()) {
-		// No need for add_missing, from_default_ can only be set from set()
+		// No need for add_missing, predefined_ can only be set from set()
 		return false;
 	}
 
 	auto& val = values_[static_cast<size_t>(opt)];
-	return val.from_default_;
+	return val.predefined_;
 }
 
 void COptionsBase::set(optionsIndex opt, int value)
@@ -222,7 +227,7 @@ void COptionsBase::set(optionsIndex opt, int value)
 	}
 }
 
-void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool from_default)
+void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool predefined)
 {
 	if (opt == optionsIndex::invalid) {
 		return;
@@ -238,13 +243,13 @@ void COptionsBase::set(optionsIndex opt, std::wstring_view const& value, bool fr
 
 	// Type conversion
 	if (def.type() == option_type::number) {
-		set(opt, def, val, fz::to_integral<int>(value), from_default);
+		set(opt, def, val, fz::to_integral<int>(value), predefined);
 	}
 	else if (def.type() == option_type::boolean) {
-		set(opt, def, val, fz::to_integral<int>(value), from_default);
+		set(opt, def, val, fz::to_integral<int>(value), predefined);
 	}
 	else if (def.type() == option_type::string) {
-		set(opt, def, val, value, from_default);
+		set(opt, def, val, value, predefined);
 	}
 }
 
@@ -284,12 +289,12 @@ void COptionsBase::set(optionsIndex opt, pugi::xml_node const& value)
 	set(opt, def, val, std::move(doc));
 }
 
-void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, int value, bool from_default)
+void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, int value, bool predefined)
 {
-	if ((def.flags() & option_flags::default_only) && !from_default) {
+	if ((def.flags() & option_flags::predefined_only) && !predefined) {
 		return;
 	}
-	if ((def.flags() & option_flags::default_priority) && !from_default && val.from_default_) {
+	if ((def.flags() & option_flags::predefined_priority) && !predefined && val.predefined_) {
 		return;
 	}
 
@@ -311,7 +316,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 		}
 	}
 
-	val.from_default_ = from_default;
+	val.predefined_ = predefined;
 	if (value == val.v_) {
 		return;
 	}
@@ -322,12 +327,12 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 	set_changed(opt);
 }
 
-void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, std::wstring_view const& value, bool from_default)
+void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, std::wstring_view const& value, bool predefined)
 {
-	if ((def.flags() & option_flags::default_only) && !from_default) {
+	if ((def.flags() & option_flags::predefined_only) && !predefined) {
 		return;
 	}
-	if ((def.flags() & option_flags::default_priority) && !from_default && val.from_default_) {
+	if ((def.flags() & option_flags::predefined_priority) && !predefined && val.predefined_) {
 		return;
 	}
 
@@ -341,7 +346,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 			return;
 		}
 
-		val.from_default_ = from_default;
+		val.predefined_ = predefined;
 		if (v == val.str_) {
 			return;
 		}
@@ -350,7 +355,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 	}
 	else {
 
-		val.from_default_ = from_default;
+		val.predefined_ = predefined;
 		if (value == val.str_) {
 			return;
 		}
@@ -361,12 +366,12 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 	set_changed(opt);
 }
 
-void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document&& value, bool from_default)
+void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document&& value, bool predefined)
 {
-	if ((def.flags() & option_flags::default_only) && !from_default) {
+	if ((def.flags() & option_flags::predefined_only) && !predefined) {
 		return;
 	}
-	if ((def.flags() & option_flags::default_priority) && !from_default && val.from_default_) {
+	if ((def.flags() & option_flags::predefined_priority) && !predefined && val.predefined_) {
 		return;
 	}
 
@@ -539,4 +544,9 @@ void COptionsBase::unwatch_all(std::tuple<void*, watcher_notifier> handler)
 			return;
 		}
 	}
+}
+
+void COptionsBase::set_default_value(optionsIndex opt)
+{
+	::set_default_value(static_cast<size_t>(opt), options_, values_);
 }

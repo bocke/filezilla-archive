@@ -13,8 +13,6 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 
-IMPLEMENT_DYNAMIC_CLASS(CMenuBar, wxMenuBar)
-
 BEGIN_EVENT_TABLE(CMenuBar, wxMenuBar)
 EVT_MENU(wxID_ANY, CMenuBar::OnMenuEvent)
 END_EVENT_TABLE()

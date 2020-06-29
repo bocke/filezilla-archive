@@ -122,7 +122,7 @@ public:
 
 	void Import(pugi::xml_node & element);
 
-	void Save();
+	void Save(bool processChanged = true);
 
 	static CLocalPath GetUnadjustedSettingsDir();
 	CLocalPath GetCacheDirectory();
@@ -133,7 +133,7 @@ protected:
 	COptions();
 	virtual ~COptions();
 
-	void Load(pugi::xml_node & settings, bool from_default, bool importing);
+	void Load(pugi::xml_node & settings, bool predefined, bool importing);
 
 	pugi::xml_node CreateSettingsXmlElement();
 

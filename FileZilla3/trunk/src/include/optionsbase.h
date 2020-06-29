@@ -43,10 +43,11 @@ enum class option_flags
 {
 	normal = 0,
 	internal = 1, // internal items won't get written to settings file nor loaded from there
-	default_only = 2,
-	default_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
+	predefined_only = 2,
+	predefined_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
 	platform = 8, // A non-portable platform specific option, nodes have platform attribute
-	numeric_clamp = 16 // For numeric options, fixup input and clamp to allowed value range. If not set, setting invalid values discards
+	numeric_clamp = 16, // For numeric options, fixup input and clamp to allowed value range. If not set, setting invalid values discards
+	sensitive_data = 32 // Flag to mark sensitive data. Can be used to clear private data even without domain knowledge.
 };
 inline bool operator&(option_flags lhs, option_flags rhs) {
 	return (static_cast<std::underlying_type_t<option_flags>>(lhs) & static_cast<std::underlying_type_t<option_flags>>(rhs)) != 0;
@@ -164,11 +165,11 @@ public:
 	}
 
 	template<typename T>
-	bool from_default(T opt)
+	bool predefined(T opt)
 	{
-		return from_default(mapOption(opt));
+		return predefined(mapOption(opt));
 	}
-	bool from_default(optionsIndex opt);
+	bool predefined(optionsIndex opt);
 
 	template<typename T>
 	void set(T opt, std::wstring_view const& value)
@@ -229,7 +230,7 @@ public:
 		std::wstring str_;
 		std::unique_ptr<pugi::xml_document> xml_{};
 		int v_{};
-		bool from_default_{};
+		bool predefined_{};
 	};
 
 protected:
@@ -240,12 +241,12 @@ protected:
 	pugi::xml_document get_xml(optionsIndex opt);
 
 	void set(optionsIndex opt, int value);
-	void set(optionsIndex opt, std::wstring_view const& value, bool from_default = false);
+	void set(optionsIndex opt, std::wstring_view const& value, bool predefined = false);
 	void set(optionsIndex opt, pugi::xml_node const& value);
 
-	void set(optionsIndex opt, option_def const& def, option_value & val, int value, bool from_default = false);
-	void set(optionsIndex opt, option_def const& def, option_value & val, std::wstring_view const& value, bool from_default = false);
-	void set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document && value, bool from_default = false);
+	void set(optionsIndex opt, option_def const& def, option_value & val, int value, bool predefined = false);
+	void set(optionsIndex opt, option_def const& def, option_value & val, std::wstring_view const& value, bool predefined = false);
+	void set(optionsIndex opt, option_def const& def, option_value& val, pugi::xml_document && value, bool predefined = false);
 
 	void set_changed(optionsIndex opt);
 
@@ -253,6 +254,8 @@ protected:
 	void watch_all(std::tuple<void*, watcher_notifier> handler);
 	void unwatch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
 	void unwatch_all(std::tuple<void*, watcher_notifier> handler);
+
+	void set_default_value(optionsIndex opt);
 
 	fz::rwmutex mtx_;
 

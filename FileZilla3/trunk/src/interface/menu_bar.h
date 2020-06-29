@@ -34,8 +34,6 @@ protected:
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 	virtual void OnOptionsChanged(watched_options const& options);
 
-	DECLARE_DYNAMIC_CLASS(CMenuBar)
-
 	DECLARE_EVENT_TABLE()
 	void OnMenuEvent(wxCommandEvent& event);
 

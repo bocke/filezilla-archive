@@ -151,7 +151,6 @@ void CClearPrivateDataDialog::Delete()
 
 bool CClearPrivateDataDialog::ClearReconnect()
 {
-	COptions::Get()->set(OPTION_TAB_DATA, pugi::xml_node());
 	COptions::Get()->Cleanup();
 	COptions::Get()->Save();
 
