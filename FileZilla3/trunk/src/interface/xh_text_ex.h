@@ -9,8 +9,6 @@
 
 class wxTextCtrlXmlHandlerEx final : public wxTextCtrlXmlHandler
 {
-	DECLARE_DYNAMIC_CLASS(wxTextCtrlXmlHandlerEx)
-
 public:
 	virtual wxObject *DoCreateResource();
 };
