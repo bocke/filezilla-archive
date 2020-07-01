@@ -1,6 +1,10 @@
 #include "filezilla.h"
-#include <wx/aui/aui.h>
 #include "aui_notebook_ex.h"
+#include "themeprovider.h"
+
+#include "filezillaapp.h"
+
+#include <wx/aui/aui.h>
 #include <wx/dcmirror.h>
 #include <wx/graphics.h>
 
@@ -17,6 +21,31 @@ struct wxAuiTabArtExData
 	std::map<wxString, int> maxSizes;
 };
 
+#ifndef wxHAS_NATIVE_TABART
+namespace {
+void PrepareTabIcon(wxBitmap & active, wxBitmap & disabled, wxString const& art, wxSize const& size, wxSize const& canvasSize, wxSize const& offset = wxSize(), std::function<void(wxImage&)> const& f = nullptr, unsigned char brightness = 128)
+{
+	wxBitmap loaded = CThemeProvider::Get()->CreateBitmap(art, wxART_OTHER, size);
+	if (!loaded.IsOk()) {
+		return;
+	}
+
+	wxImage img(canvasSize.x, canvasSize.y);
+	img.SetMaskColour(0, 0, 0);
+	img.InitAlpha();
+
+	int x = (canvasSize.x - loaded.GetSize().x) / 2 + offset.x ;
+	int y = (canvasSize.x - loaded.GetSize().y) / 2 + offset.y;
+	img.Paste(loaded.ConvertToImage(), x, y);
+	if (f) {
+		f(img);
+	}
+	active = wxBitmap(img);
+	disabled = active.ConvertToDisabled(brightness);
+}
+}
+#endif
+
 class wxAuiTabArtEx : public wxAuiDefaultTabArt
 {
 public:
@@ -24,6 +53,25 @@ public:
 		: m_pNotebook(pNotebook)
 		, m_data(data)
 	{
+
+#ifndef wxHAS_NATIVE_TABART
+		wxSize canvas(CThemeProvider::Get()->GetIconSize(iconSizeSmall));
+		wxSize size = canvas;
+		size.Scale(0.75, 0.75);
+
+		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas);
+		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas);
+
+		wxSize offset(0, (canvas.y - size.y) / -4);
+		PrepareTabIcon(m_activeWindowListBmp, m_disabledWindowListBmp, L"ART_DROPDOWN", size, canvas, offset);
+
+		// Up arrow mirrored along top-left to bottom-right diagonal gets a left button with correct drop shadow
+		auto mirror = [](wxImage& img) {
+			img = img = img.Mirror().Rotate90(false);
+		};
+		PrepareTabIcon(m_activeLeftBmp, m_disabledLeftBmp, L"ART_SORT_UP_DARK", size, canvas, offset, mirror, 192);
+		PrepareTabIcon(m_activeRightBmp, m_disabledRightBmp, L"ART_SORT_DOWN_DARK", size, canvas, offset, mirror, 192);
+#endif
 	}
 
 	virtual wxAuiTabArt* Clone()
@@ -41,20 +89,21 @@ public:
 
 		wxString text = caption;
 		int pos;
-		if ((pos = caption.Find(_T(" ("))) != -1)
+		if ((pos = caption.Find(_T(" ("))) != -1) {
 			text = text.Left(pos);
+		}
 		auto iter = m_data->maxSizes.find(text);
-		if (iter == m_data->maxSizes.end())
+		if (iter == m_data->maxSizes.end()) {
 			m_data->maxSizes[text] = size.x;
-		else
-		{
-			if (iter->second > size.x)
-			{
+		}
+		else {
+			if (iter->second > size.x) {
 				size.x = iter->second;
 				*x_extent = size.x;
 			}
-			else
+			else {
 				iter->second = size.x;
+			}
 		}
 
 		return size;
@@ -136,8 +185,7 @@ void wxAuiNotebookEx::OnTabDragMotion(wxAuiNotebookEvent& evt)
 void wxAuiNotebookEx::RemoveExtraBorders()
 {
 	wxAuiPaneInfoArray& panes = m_mgr.GetAllPanes();
-	for (size_t i = 0; i < panes.Count(); i++)
-	{
+	for (size_t i = 0; i < panes.Count(); ++i) {
 		panes[i].PaneBorder(false);
 	}
 	m_mgr.Update();
@@ -151,8 +199,9 @@ void wxAuiNotebookEx::SetExArtProvider()
 bool wxAuiNotebookEx::SetPageText(size_t page_idx, const wxString& text)
 {
 	// Basically identical to the AUI one, but not calling Update
-	if (page_idx >= m_tabs.GetPageCount())
+	if (page_idx >= m_tabs.GetPageCount()) {
 		return false;
+	}
 
 	// update our own tab catalog
 	wxAuiNotebookPage& page_info = m_tabs.GetPage(page_idx);
