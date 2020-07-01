@@ -2,54 +2,95 @@
 #include "sizeformatting.h"
 #include "speedlimits_dialog.h"
 #include "Options.h"
+#include "textctrlex.h"
 #include "themeprovider.h"
-#include "xrc_helper.h"
 
-BEGIN_EVENT_TABLE(CSpeedLimitsDialog, wxDialogEx)
-EVT_BUTTON(wxID_OK, CSpeedLimitsDialog::OnOK)
-EVT_CHECKBOX(XRCID("ID_ENABLE_SPEEDLIMITS"), CSpeedLimitsDialog::OnToggleEnable)
-END_EVENT_TABLE()
+struct CSpeedLimitsDialog::impl final
+{
+	wxCheckBox* enable_{};
+	wxTextCtrlEx* download_{};
+	wxTextCtrlEx* upload_{};
+};
+
+CSpeedLimitsDialog::CSpeedLimitsDialog()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+CSpeedLimitsDialog::~CSpeedLimitsDialog()
+{
+}
+
 
 void CSpeedLimitsDialog::Run(wxWindow* parent)
 {
-	if (!Load(parent, _T("ID_SPEEDLIMITS"))) {
-		return;
-	}
-
-	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap("ART_SPEEDLIMITS", wxString(), CThemeProvider::GetIconSize(iconSizeLarge));
-	xrc_call(*this, "ID_SPEEDLIMITS_ICON", &wxStaticBitmap::SetBitmap, bmp);
-
 	int downloadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
 	int uploadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
-	if (!downloadlimit && !uploadlimit)
+	if (!downloadlimit && !uploadlimit) {
 		enable = false;
-
-	XRCCTRL(*this, "ID_ENABLE_SPEEDLIMITS", wxCheckBox)->SetValue(enable);
-
-	wxTextCtrl* pCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
-	pCtrl->Enable(enable);
-	pCtrl->SetMaxLength(9);
-	pCtrl->ChangeValue(wxString::Format(_T("%d"), downloadlimit));
-
-	pCtrl = XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl);
-	pCtrl->Enable(enable);
-	pCtrl->SetMaxLength(9);
-	pCtrl->ChangeValue(wxString::Format(_T("%d"), uploadlimit));
-
-	const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
-
-	wxStaticText* pUnit = XRCCTRL(*this, "ID_DOWNLOADLIMIT_UNIT", wxStaticText);
-	if (pUnit) {
-		pUnit->SetLabel(wxString::Format(pUnit->GetLabel(), unit));
 	}
 
-	pUnit = XRCCTRL(*this, "ID_UPLOADLIMIT_UNIT", wxStaticText);
-	if (pUnit) {
-		pUnit->SetLabel(wxString::Format(pUnit->GetLabel(), unit));
+	if (!Create(parent, -1, _("Speed limits"))) {
+		return;
 	}
+
+	auto& lay = layout();
+	auto main = lay.createMain(this, 1);
+
+	auto split = lay.createFlex(2);
+	main->Add(split);
+
+	split->Add(new wxStaticBitmap(this, -1, CThemeProvider::Get()->CreateBitmap("ART_SPEEDLIMITS", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))));
+
+	auto right = lay.createFlex(1);
+	split->Add(right);
+
+	impl_->enable_ = new wxCheckBox(this, -1, _("&Enable speed limits"));
+	impl_->enable_->SetFocus();
+	right->Add(impl_->enable_);
+
+	auto inner = lay.createFlex(3);
+	right->Add(inner);
+
+	wxString const unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
+
+	inner->Add(new wxStaticText(this, -1, _("Download &limit:")), lay.valign);
+	impl_->download_ = new wxTextCtrlEx(this, -1);
+	inner->Add(impl_->download_, lay.valign)->SetMinSize(wxSize(lay.dlgUnits(35), -1));
+	inner->Add(new wxStaticText(this, -1, wxString::Format(_("(in %s/s)"), unit)), lay.valign);
+	inner->Add(new wxStaticText(this, -1, _("U&pload limit:")), lay.valign);
+	impl_->upload_ = new wxTextCtrlEx(this, -1);
+	inner->Add(impl_->upload_, lay.valign)->SetMinSize(wxSize(lay.dlgUnits(35), -1));
+	inner->Add(new wxStaticText(this, -1, wxString::Format(_("(in %s/s)"), unit)), lay.valign);
+	
+	right->Add(new wxStaticText(this, -1, _("Enter 0 for unlimited speed.")));
+
+	auto buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+	ok->Bind(wxEVT_BUTTON, &CSpeedLimitsDialog::OnOK, this);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
 
 	GetSizer()->Fit(this);
+
+	impl_->enable_->SetValue(enable);
+
+	impl_->download_->SetMaxLength(9);
+	impl_->download_->ChangeValue(fz::to_wstring(downloadlimit));
+	impl_->download_->Enable(enable);
+
+	impl_->upload_->SetMaxLength(9);
+	impl_->upload_->ChangeValue(fz::to_wstring(uploadlimit));
+	impl_->upload_->Enable(enable);
+
+	impl_->enable_->Bind(wxEVT_CHECKBOX, &CSpeedLimitsDialog::OnToggleEnable, this);
 
 	ShowModal();
 }
@@ -57,17 +98,13 @@ void CSpeedLimitsDialog::Run(wxWindow* parent)
 void CSpeedLimitsDialog::OnOK(wxCommandEvent&)
 {
 	long download, upload;
-	wxTextCtrl* pCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
-	if (!pCtrl->GetValue().ToLong(&download) || (download < 0))
-	{
+	if (!impl_->download_->GetValue().ToLong(&download) || (download < 0)) {
 		const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
 		wxMessageBoxEx(wxString::Format(_("Please enter a download speed limit greater or equal to 0 %s/s."), unit), _("Speed Limits"), wxOK, this);
 		return;
 	}
 
-	pCtrl = XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl);
-	if (!pCtrl->GetValue().ToLong(&upload) || (upload < 0))
-	{
+	if (!impl_->upload_->GetValue().ToLong(&upload) || (upload < 0)) {
 		const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
 		wxMessageBoxEx(wxString::Format(_("Please enter an upload speed limit greater or equal to 0 %s/s."), unit), _("Speed Limits"), wxOK, this);
 		return;
@@ -76,7 +113,7 @@ void CSpeedLimitsDialog::OnOK(wxCommandEvent&)
 	COptions::Get()->set(OPTION_SPEEDLIMIT_INBOUND, download);
 	COptions::Get()->set(OPTION_SPEEDLIMIT_OUTBOUND, upload);
 
-	bool enable = XRCCTRL(*this, "ID_ENABLE_SPEEDLIMITS", wxCheckBox)->GetValue() ? 1 : 0;
+	bool enable = impl_->enable_->GetValue() ? 1 : 0;
 	COptions::Get()->set(OPTION_SPEEDLIMIT_ENABLE, enable && (download || upload));
 
 	EndDialog(wxID_OK);
@@ -84,6 +121,6 @@ void CSpeedLimitsDialog::OnOK(wxCommandEvent&)
 
 void CSpeedLimitsDialog::OnToggleEnable(wxCommandEvent& event)
 {
-	XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl)->Enable(event.IsChecked());
-	XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl)->Enable(event.IsChecked());
+	impl_->download_->Enable(event.IsChecked());
+	impl_->upload_->Enable(event.IsChecked());
 }

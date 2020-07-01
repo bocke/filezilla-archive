@@ -6,13 +6,15 @@
 class CSpeedLimitsDialog final : public wxDialogEx
 {
 public:
-	CSpeedLimitsDialog() {}
-	virtual ~CSpeedLimitsDialog() {}
+	CSpeedLimitsDialog();
+	virtual ~CSpeedLimitsDialog();
 
 	void Run(wxWindow* parent);
 
 protected:
-	DECLARE_EVENT_TABLE()
+	struct impl;
+	std::unique_ptr<impl> impl_;
+
 	void OnToggleEnable(wxCommandEvent& event);
 	void OnOK(wxCommandEvent& event);
 };
