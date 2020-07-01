@@ -642,7 +642,7 @@ bool CSearchDialog::Load()
 	auto main = new wxBoxSizer(wxVERTICAL);
 	SetSizer(main);
 
-	auto optionsSizer = new wxFlexGridSizer(3, 7, 5);
+	auto optionsSizer = lay.createFlex(3);
 	optionsSizer->AddGrowableCol(1);
 	main->Add(optionsSizer, 0, wxALL | wxGROW, lay.border);
 
