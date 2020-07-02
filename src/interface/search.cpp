@@ -1183,10 +1183,10 @@ void CSearchDialog::SetCtrlState()
 	xrc_call(*this, "ID_LOCAL_RESULTS_LABEL", &wxStaticText::Show, comparison);
 	xrc_call(*this, "ID_REMOTE_RESULTS_LABEL", &wxStaticText::Show, comparison);
 	if (comparison) {
-		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _T("Local &directory:"));
+		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _("Local &directory:"));
 	}
 	else {
-		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _T("Search &directory:"));
+		xrc_call(*this, "ID_PATH_LABEL", &wxStaticText::SetLabel, _("Search &directory:"));
 	}
 	xrc_call(*this, "ID_COMPARE_LABEL", &wxStaticText::Show, comparison);
 	xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::Show, comparison);
@@ -1263,7 +1263,7 @@ public:
 	{
 		download_ = download;
 
-		if (!Load(parent, download ? _T("ID_SEARCH_DOWNLOAD") : _T("ID_SEARCH_UPLOAD"))) {
+		if (!Load(parent, download ? L"ID_SEARCH_DOWNLOAD" : L"ID_SEARCH_UPLOAD")) {
 			return false;
 		}
 
@@ -1763,7 +1763,7 @@ void CSearchDialog::LoadConditions()
 {
 	CInterProcessMutex mutex(MUTEX_SEARCHCONDITIONS);
 
-	CXmlFile file(wxGetApp().GetSettingsFile(_T("search")));
+	CXmlFile file(wxGetApp().GetSettingsFile(L"search"));
 	auto document = file.Load(true);
 	if (!document) {
 		wxMessageBoxEx(file.GetError(), _("Error loading xml file"), wxICON_ERROR);
@@ -1797,7 +1797,7 @@ void CSearchDialog::SaveConditions()
 {
 	CInterProcessMutex mutex(MUTEX_SEARCHCONDITIONS);
 
-	CXmlFile file(wxGetApp().GetSettingsFile(_T("search")));
+	CXmlFile file(wxGetApp().GetSettingsFile(L"search"));
 	auto document = file.Load(true);
 	if (!document) {
 		wxMessageBoxEx(file.GetError(), _("Error loading xml file"), wxICON_ERROR);
