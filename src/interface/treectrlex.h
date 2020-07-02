@@ -50,11 +50,14 @@ public:
 	bool InPrefixSearch() const { return inPrefixSearch_; }
 
 	void Resort();
+
+	bool ShouldIgnoreChangeEvent() const { return ignore_change_event_ != 0; }
 protected:
 
 	bool inPrefixSearch_{};
 
 	int m_setSelection{};
+	int ignore_change_event_{};
 
 #ifdef __WXMAC__
 	wxDECLARE_EVENT_TABLE();

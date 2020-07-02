@@ -23,6 +23,7 @@
 #include <wx/filedlg.h>
 #include <wx/menu.h>
 #include <wx/statline.h>
+#include <wx/wupdlock.h>
 
 #include <algorithm>
 #include <array>
@@ -1114,7 +1115,7 @@ void CSiteManagerDialog::OnDelete(wxCommandEvent&)
 
 void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 {
-	if (m_is_deleting) {
+	if (m_is_deleting || tree_->ShouldIgnoreChangeEvent()) {
 		return;
 	}
 
@@ -1143,7 +1144,7 @@ void CSiteManagerDialog::OnSelChanging(wxTreeEvent& event)
 
 void CSiteManagerDialog::OnSelChanged(wxTreeEvent& evt)
 {
-	if (m_is_deleting) {
+	if (m_is_deleting || tree_->ShouldIgnoreChangeEvent()) {
 		return;
 	}
 
@@ -1153,6 +1154,7 @@ void CSiteManagerDialog::OnSelChanged(wxTreeEvent& evt)
 		m_is_deleting = false;
 	}
 
+	wxWindowUpdateLocker l(this);
 	SetCtrlState();
 }
 

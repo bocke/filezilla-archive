@@ -93,14 +93,16 @@ void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item, bool clearSelection)
 		std::vector<wxTreeItemId> selections;
 		if (HasFlag(wxTR_MULTIPLE)) {
 			++m_setSelection;
+			++ignore_change_event_;
 			selections = GetSelections();
-			if (clearSelection) {
+			if (clearSelection && !selections.empty()) {
 				UnselectAll();
 			}
 			
 			if (clearSelection || selections.empty()) {
 				SetFocusedItem(item);
 			}
+			--ignore_change_event_;
 			--m_setSelection;
 		}
 		else {
