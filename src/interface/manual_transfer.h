@@ -10,27 +10,15 @@ class CManualTransfer final : public wxDialogEx
 {
 public:
 	CManualTransfer(CQueueView* pQueueView);
+	~CManualTransfer();
 
-	void Run(wxWindow* pParent, CState* pState);
+	void Run(wxWindow* parent, CState* pState);
 
 protected:
 	void DisplayServer();
-	bool UpdateServer();
-	bool VerifyServer();
-
 	void SetControlState();
 	void SetAutoAsciiState();
-	void SetServerState();
 
-	bool m_local_file_exists;
-
-	Site site_;
-	Site lastSite_;
-
-	CState* m_pState;
-	CQueueView* m_pQueueView;
-
-	DECLARE_EVENT_TABLE()
 	void OnLocalChanged(wxCommandEvent& event);
 	void OnLocalBrowse(wxCommandEvent& event);
 	void OnRemoteChanged(wxCommandEvent& event);
@@ -39,7 +27,17 @@ protected:
 	void OnOK(wxCommandEvent& event);
 	void OnSelectSite(wxCommandEvent& event);
 	void OnSelectedSite(wxCommandEvent& event);
-	void OnLogontypeSelChanged(wxCommandEvent& event);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
+
+	bool local_file_exists_{};
+
+	Site site_;
+	Site lastSite_;
+
+	CState* state_{};
+	CQueueView* queue_{};
 };
 
 #endif

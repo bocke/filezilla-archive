@@ -81,6 +81,8 @@ protected:
 	std::vector<wxAcceleratorEntry> acceleratorTable_;
 };
 
+wxWindowID const nullID = wxID_HIGHEST;
+
 std::wstring LabelEscape(std::wstring const& label);
 
 #ifdef __WXMAC__
