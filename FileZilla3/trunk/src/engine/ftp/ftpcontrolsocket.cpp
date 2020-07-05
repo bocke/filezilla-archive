@@ -796,6 +796,10 @@ void CFtpControlSocket::ResetSocket()
 	tls_layer_.reset();
 	m_pendingReplies = 0;
 	m_repliesToSkip = 0;
+	m_Response.clear();
+	m_MultilineResponseCode.clear();;
+	m_MultilineResponseLines.clear();
+
 	CRealControlSocket::ResetSocket();
 }
 
