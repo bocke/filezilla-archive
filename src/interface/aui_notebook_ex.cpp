@@ -21,7 +21,7 @@ struct wxAuiTabArtExData
 	std::map<wxString, int> maxSizes;
 };
 
-#ifndef wxHAS_NATIVE_TABART
+#if !defined(wxHAS_NATIVE_TABART) && defined(__WXMSW__)
 namespace {
 void PrepareTabIcon(wxBitmap & active, wxBitmap & disabled, wxString const& art, wxSize const& size, wxSize const& canvasSize, wxSize const& offset = wxSize(), std::function<void(wxImage&)> const& f = nullptr, unsigned char brightness = 128)
 {
@@ -54,13 +54,14 @@ public:
 		, m_data(data)
 	{
 
-#ifndef wxHAS_NATIVE_TABART
+#if !defined(wxHAS_NATIVE_TABART) && defined(__WXMSW__)
 		wxSize canvas(CThemeProvider::Get()->GetIconSize(iconSizeSmall));
 		wxSize size = canvas;
 		size.Scale(0.75, 0.75);
 
-		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas);
-		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas);
+		wxSize closeOffset(-3, 0);
+		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas, closeOffset);
+		PrepareTabIcon(m_activeCloseBmp, m_disabledCloseBmp, L"ART_CLOSE", size, canvas, closeOffset);
 
 		wxSize offset(0, (canvas.y - size.y) / -4);
 		PrepareTabIcon(m_activeWindowListBmp, m_disabledWindowListBmp, L"ART_DROPDOWN", size, canvas, offset);
