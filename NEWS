@@ -10,12 +10,20 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.49.0-rc1 (2020-07-07)
+
+- MSW: Tab bar icons now scale on high-DPI displays
+- The sizing and spacing of several dialogs has been improved on high-DPI displays
+- MSW: Fix visual glitches when changing the selected site in the Site Manager
+- When creating a new tab, the pane sizes are now inherited from the previous tab.
+- macOS: Additional fixes for handling Cmd+V, Cmd+C and Cmd+X in text input controls
+- Refactored internal settings and option handling
+
 3.48.1 (2020-05-18)
 
 - If FileZilla is configured to restore open tabs on startup, the directory trees no longer shrink in size
 
 3.48.1-rc1 (2020-05-12)
-
 
 ! MSW: The settings directory is now initially created with tight permissions restricted to the user's account. Previously the directory could have had inherited too wide permissions if a custom location outside the user's profile directory had been preconfigured.
 + Redesigned certificate dialog
