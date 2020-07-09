@@ -3,7 +3,7 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_filelists.h"
-#include "textctrlex.h"
+#include "../textctrlex.h"
 
 #include <wx/statbox.h>
 
