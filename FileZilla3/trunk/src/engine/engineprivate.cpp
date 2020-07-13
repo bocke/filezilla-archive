@@ -234,6 +234,10 @@ int CFileZillaEnginePrivate::ResetOperation(int nErrorCode)
 		}
 
 		if (currentCommand_->GetId() == Command::connect) {
+			if (m_retryTimer) {
+				return FZ_REPLY_WOULDBLOCK;
+			}
+
 			if (!(nErrorCode & ~(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED | FZ_REPLY_TIMEOUT | FZ_REPLY_CRITICALERROR | FZ_REPLY_PASSWORDFAILED)) &&
 				nErrorCode & (FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED))
 			{
@@ -474,14 +478,15 @@ void CFileZillaEnginePrivate::OnTimer(fz::timer_id)
 	if (!m_retryTimer) {
 		return;
 	}
-	m_retryTimer = 0;
 
 	if (!currentCommand_ || currentCommand_->GetId() != Command::connect) {
+		m_retryTimer = 0;
 		logger_->log(logmsg::debug_warning, L"CFileZillaEnginePrivate::OnTimer called without pending Command::connect");
 		return;
 	}
 
 	controlSocket_.reset();
+	m_retryTimer = 0;
 
 	int res = ContinueConnect();
 	if (res == FZ_REPLY_CONTINUE) {
