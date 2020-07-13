@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.49.0 (2020-07-13)
+
+- Fixed retrying initial connection attempts
+
 3.49.0-rc1 (2020-07-07)
 
 - MSW: Tab bar icons now scale on high-DPI displays
