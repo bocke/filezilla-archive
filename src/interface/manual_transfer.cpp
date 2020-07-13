@@ -68,6 +68,7 @@ void CManualTransfer::Run(wxWindow* parent, CState* pState)
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Transfer &direction"), 2);
 		impl_->download_ = new wxRadioButton(box, nullID, _("Download"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->download_->SetValue(true);
 		impl_->download_->SetFocus();
 		inner->Add(impl_->download_);
 		auto upload = new wxRadioButton(box, nullID, _("Upload"));
