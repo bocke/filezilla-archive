@@ -102,7 +102,7 @@ void set_default_value(size_t i, std::vector<option_def>& options, std::vector<C
 	else {
 		val.str_ = def.def();
 		val.v_ = fz::to_integral<int>(def.def());
-	} 
+	}
 }
 
 template<typename Lock>
@@ -122,7 +122,7 @@ bool do_add_missing(optionsIndex opt, Lock & l, fz::rwmutex & mtx, std::vector<o
 		options = registry.first.options_;
 		name_to_option = registry.first.name_to_option_;
 	}
-		
+
 	size_t i = values.size();
 	values.resize(options.size());
 
@@ -183,8 +183,10 @@ pugi::xml_document COptionsBase::get_xml(optionsIndex opt)
 	}
 
 	auto& val = values_[static_cast<size_t>(opt)];
-	for (auto c = val.xml_->first_child(); c; c = c.next_sibling()) {
-		ret.append_copy(c);
+	if (val.xml_) {
+		for (auto c = val.xml_->first_child(); c; c = c.next_sibling()) {
+			ret.append_copy(c);
+		}
 	}
 	return ret;
 }
