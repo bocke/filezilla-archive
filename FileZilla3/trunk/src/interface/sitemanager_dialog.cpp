@@ -1412,22 +1412,27 @@ void CSiteManagerDialog::OnSearch(wxCommandEvent&)
 
 	wxString search = dlg.GetValue().Lower();
 
-	m_is_deleting = true;
-	tree_->UnselectAll();
-
 	bool match{};
-	wxTreeItemId item = tree_->GetRootItem();
-	while (item) {
-		auto name = tree_->GetItemText(item).Lower();
-		if (name.find(search) != wxString::npos) {
-			tree_->SafeSelectItem(item, false);
-			match = true;
-		}
 
-		item = tree_->GetNextItemSimple(item, true);
+	{
+		wxWindowUpdateLocker l(this);
+
+		m_is_deleting = true;
+		tree_->UnselectAll();
+
+		wxTreeItemId item = tree_->GetRootItem();
+		while (item) {
+			auto name = tree_->GetItemText(item).Lower();
+			if (name.find(search) != wxString::npos) {
+				tree_->SafeSelectItem(item, false);
+				match = true;
+			}
+
+			item = tree_->GetNextItemSimple(item, true);
+		}
+		SetCtrlState();
+		m_is_deleting = false;
 	}
-	SetCtrlState();
-	m_is_deleting = false;
 
 	if (match) {
 		tree_->SetFocus();
