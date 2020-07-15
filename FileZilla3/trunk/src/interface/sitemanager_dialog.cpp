@@ -1422,8 +1422,15 @@ void CSiteManagerDialog::OnSearch(wxCommandEvent&)
 
 		wxTreeItemId item = tree_->GetRootItem();
 		while (item) {
-			auto name = tree_->GetItemText(item).Lower();
-			if (name.find(search) != wxString::npos) {
+			bool select{};
+			if (item != tree_->GetRootItem() && item != m_ownSites && item != m_predefinedSites) {
+				auto name = tree_->GetItemText(item).Lower();
+				if (name.find(search) != wxString::npos) {
+					select = true;
+				}
+			}
+
+			if (select) {
 				tree_->SafeSelectItem(item, false);
 				match = true;
 			}
