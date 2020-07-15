@@ -99,9 +99,11 @@ void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item, bool clearSelection)
 				UnselectAll();
 			}
 			
+#ifdef __WXMSW__
 			if (clearSelection || selections.empty()) {
 				SetFocusedItem(item);
 			}
+#endif
 			--ignore_change_event_;
 			--m_setSelection;
 		}
