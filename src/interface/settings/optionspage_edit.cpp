@@ -50,46 +50,46 @@ bool COptionsPageEdit::CreateControls(wxWindow* parent)
 	main->AddGrowableCol(0);
 	SetSizer(main);
 
-	main->Add(new wxStaticText(this, -1, _("&Default editor:")));
+	main->Add(new wxStaticText(this, nullID, _("&Default editor:")));
 
 	auto onRadio = [this](wxCommandEvent const&) { SetCtrlState(); };
 
-	impl_->default_none_ = new wxRadioButton(this, -1, _("Do &not use default editor"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	impl_->default_none_ = new wxRadioButton(this, nullID, _("Do &not use default editor"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	impl_->default_none_->Bind(wxEVT_RADIOBUTTON, onRadio);
 	main->Add(impl_->default_none_);
-	impl_->default_system_ = new wxRadioButton(this, -1, _("&Use system's default editor for text files"));
+	impl_->default_system_ = new wxRadioButton(this, nullID, _("&Use system's default editor for text files"));
 	impl_->default_system_->Bind(wxEVT_RADIOBUTTON, onRadio);
 	main->Add(impl_->default_system_);
-	impl_->default_custom_ = new wxRadioButton(this, -1, _("Use &custom editor:"));
+	impl_->default_custom_ = new wxRadioButton(this, nullID, _("Use &custom editor:"));
 	impl_->default_custom_->Bind(wxEVT_RADIOBUTTON, onRadio);
 	main->Add(impl_->default_custom_);
 
 	auto row = lay.createFlex(2);
 	row->AddGrowableCol(0);
-	impl_->custom_ = new wxTextCtrlEx(this, -1);
+	impl_->custom_ = new wxTextCtrlEx(this, nullID);
 	row->Add(impl_->custom_, lay.valigng);
-	impl_->browse_ = new wxButton(this, -1, _("&Browse..."));
+	impl_->browse_ = new wxButton(this, nullID, _("&Browse..."));
 	row->Add(impl_->browse_, lay.valign);
 	main->Add(row, 0, wxLEFT|wxGROW, lay.indent);
 	impl_->browse_->Bind(wxEVT_BUTTON, [this](wxCommandEvent const&) { OnBrowseEditor(); });
 
 	row = lay.createFlex(2);
-	row->Add(new wxStaticText(this, -1, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, lay.indent);
-	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
+	row->Add(new wxStaticText(this, nullID, _("Command and its arguments need to be properly quoted.")), 0, wxLEFT|wxALIGN_CENTER_VERTICAL, lay.indent);
+	auto rules = new wxHyperlinkCtrl(this, nullID, _("Quoting rules"), wxString());
 	row->Add(rules, lay.valign);
 	main->Add(row, lay.grow);
 	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
 
 	main->Add(new wxStaticLine(this), lay.grow);
 
-	impl_->use_assoc_ = new wxRadioButton(this, -1, _("U&se filetype associations if available"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	impl_->use_assoc_ = new wxRadioButton(this, nullID, _("U&se filetype associations if available"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	main->Add(impl_->use_assoc_);
-	impl_->use_default_ = new wxRadioButton(this, -1, _("&Always use default editor"));
+	impl_->use_default_ = new wxRadioButton(this, nullID, _("&Always use default editor"));
 	main->Add(impl_->use_default_);
 
 	main->Add(new wxStaticLine(this), lay.grow);
 
-	impl_->watch_ = new wxCheckBox(this, -1, _("&Watch locally edited files and prompt to upload modifications"));
+	impl_->watch_ = new wxCheckBox(this, nullID, _("&Watch locally edited files and prompt to upload modifications"));
 	main->Add(impl_->watch_);
 
 	return true;

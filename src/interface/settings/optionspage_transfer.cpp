@@ -21,24 +21,24 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Concurrent transfers"), 3);
-		inner->Add(new wxStaticText(box, -1, _("Maximum simultaneous &transfers:")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("Maximum simultaneous &transfers:")), lay.valign);
 		auto spin = new wxSpinCtrlEx(box, XRCID("ID_NUMTRANSFERS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 		spin->SetRange(1, 10);
 		spin->SetMaxLength(2);
 		inner->Add(spin, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("(1-10)")), lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Limit for concurrent &downloads:")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("(1-10)")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("Limit for concurrent &downloads:")), lay.valign);
 		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMDOWNLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 		spin->SetRange(0, 10);
 		spin->SetMaxLength(2);
 		inner->Add(spin, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("(0 for no limit)")), lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Limit for concurrent &uploads:")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("(0 for no limit)")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("Limit for concurrent &uploads:")), lay.valign);
 		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMUPLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 		spin->SetRange(0, 10);
 		spin->SetMaxLength(2);
 		inner->Add(spin, lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("(0 for no limit)")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("(0 for no limit)")), lay.valign);
 	}
 
 	{
@@ -49,23 +49,23 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 
 		auto innermost = lay.createFlex(2);
 		inner->Add(innermost);
-		innermost->Add(new wxStaticText(box, -1, _("Download &limit:")), lay.valign);
+		innermost->Add(new wxStaticText(box, nullID, _("Download &limit:")), lay.valign);
 		auto row = lay.createFlex(2);
 		innermost->Add(row, lay.valign);
 		auto dllimit = new wxTextCtrlEx(box, XRCID("ID_DOWNLOADLIMIT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
 		dllimit->SetMaxLength(9);
 		row->Add(dllimit, lay.valign);
-		row->Add(new wxStaticText(box, -1, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
+		row->Add(new wxStaticText(box, nullID, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
 
-		innermost->Add(new wxStaticText(box, -1, _("Upload &limit:")), lay.valign);
+		innermost->Add(new wxStaticText(box, nullID, _("Upload &limit:")), lay.valign);
 		row = lay.createFlex(2);
 		innermost->Add(row, lay.valign);
 		auto ullimit = new wxTextCtrlEx(box, XRCID("ID_UPLOADLIMIT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
 		ullimit->SetMaxLength(9);
 		row->Add(ullimit, lay.valign);
-		row->Add(new wxStaticText(box, -1, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
+		row->Add(new wxStaticText(box, nullID, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
 
-		innermost->Add(new wxStaticText(box, -1, _("&Burst tolerance:")), lay.valign);
+		innermost->Add(new wxStaticText(box, nullID, _("&Burst tolerance:")), lay.valign);
 		auto choice = new wxChoice(box, XRCID("ID_BURSTTOLERANCE"));
 		choice->AppendString(_("Normal"));
 		choice->AppendString(_("High"));
@@ -82,10 +82,10 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Filter invalid characters in filenames"), 1);
 		inner->Add(new wxCheckBox(box, XRCID("ID_ENABLE_REPLACE"), _("Enable invalid character &filtering")));
-		inner->Add(new wxStaticText(box, -1, _("When enabled, characters that are not supported by the local operating system in filenames are replaced if downloading such a file.")));
+		inner->Add(new wxStaticText(box, nullID, _("When enabled, characters that are not supported by the local operating system in filenames are replaced if downloading such a file.")));
 		auto innermost = lay.createFlex(2);
 		inner->Add(innermost);
-		innermost->Add(new wxStaticText(box, -1, _("&Replace invalid characters with:")), lay.valign);
+		innermost->Add(new wxStaticText(box, nullID, _("&Replace invalid characters with:")), lay.valign);
 		auto replace = new wxTextCtrlEx(box, XRCID("ID_REPLACE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(10), -1));
 		replace->SetMaxLength(1);
 		innermost->Add(replace, lay.valign);
@@ -96,7 +96,7 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 		wxString invalid = _T("/");
 		wxString filtered = wxString::Format(_("The following character will be replaced: %s"), invalid);
 #endif
-		inner->Add(new wxStaticText(box, -1, filtered));
+		inner->Add(new wxStaticText(box, nullID, filtered));
 	}
 
 	{

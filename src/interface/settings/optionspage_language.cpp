@@ -21,9 +21,9 @@ bool COptionsPageLanguage::CreateControls(wxWindow* parent)
 
 	auto [box, inner] = lay.createStatBox(main, _("&Select language:"), 1);
 	inner->AddGrowableRow(0);
-	lb_ = new wxListBox(box, -1, wxDefaultPosition, wxDefaultSize, wxArrayString(), wxLB_SINGLE | wxLB_NEEDED_SB);
+	lb_ = new wxListBox(box, nullID, wxDefaultPosition, wxDefaultSize, wxArrayString(), wxLB_SINGLE | wxLB_NEEDED_SB);
 	inner->Add(lb_, lay.grow);
-	inner->Add(new wxStaticText(box, -1, _("If you change the language, you need to restart FileZilla.")));
+	inner->Add(new wxStaticText(box, nullID, _("If you change the language, you need to restart FileZilla.")));
 
 	return true;
 }

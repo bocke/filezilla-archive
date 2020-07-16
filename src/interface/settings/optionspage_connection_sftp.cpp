@@ -49,32 +49,32 @@ bool COptionsPageConnectionSFTP::CreateControls(wxWindow* parent)
 		auto [box, inner] = lay.createStatBox(main, _("Public Key Authentication"), 1);
 		inner->AddGrowableCol(0);
 		inner->AddGrowableRow(2);
-		inner->Add(new wxStaticText(box, -1, _("To support public key authentication, FileZilla needs to know the private keys to use.")));
-		inner->Add(new wxStaticText(box, -1, _("Private &keys:")));
-		impl_->keys_ = new wxListCtrl(box, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxBORDER_SUNKEN);
+		inner->Add(new wxStaticText(box, nullID, _("To support public key authentication, FileZilla needs to know the private keys to use.")));
+		inner->Add(new wxStaticText(box, nullID, _("Private &keys:")));
+		impl_->keys_ = new wxListCtrl(box, nullID, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxBORDER_SUNKEN);
 		impl_->keys_->Bind(wxEVT_LIST_ITEM_SELECTED, &COptionsPageConnectionSFTP::OnSelChanged, this);
 		impl_->keys_->Bind(wxEVT_LIST_ITEM_DESELECTED, &COptionsPageConnectionSFTP::OnSelChanged, this);
 		inner->Add(impl_->keys_, lay.grow);
 
 		auto row = lay.createGrid(2);
 		inner->Add(row, lay.halign);
-		impl_->add_ = new wxButton(box, -1, _("&Add key file..."));
+		impl_->add_ = new wxButton(box, nullID, _("&Add key file..."));
 		impl_->add_->Bind(wxEVT_BUTTON, &COptionsPageConnectionSFTP::OnAdd, this);
 		row->Add(impl_->add_, lay.valign);
-		impl_->remove_ = new wxButton(box, -1, _("&Remove key"));
+		impl_->remove_ = new wxButton(box, nullID, _("&Remove key"));
 		impl_->remove_->Bind(wxEVT_BUTTON, &COptionsPageConnectionSFTP::OnRemove, this);
 		row->Add(impl_->remove_, lay.valign);
 
 #ifdef __WXMSW__
-		inner->Add(new wxStaticText(box, -1, _("Alternatively you can use the Pageant tool from PuTTY to manage your keys, FileZilla does recognize Pageant.")));
+		inner->Add(new wxStaticText(box, nullID, _("Alternatively you can use the Pageant tool from PuTTY to manage your keys, FileZilla does recognize Pageant.")));
 #else
-		inner->Add(new wxStaticText(box, -1, _("Alternatively you can use your system's SSH agent. To do so, make sure the SSH_AUTH_SOCK environment variable is set.")));
+		inner->Add(new wxStaticText(box, nullID, _("Alternatively you can use your system's SSH agent. To do so, make sure the SSH_AUTH_SOCK environment variable is set.")));
 #endif
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Other SFTP options"), 1);
 
-		impl_->compression_ = new wxCheckBox(box, -1, _("&Enable compression"));
+		impl_->compression_ = new wxCheckBox(box, nullID, _("&Enable compression"));
 		inner->Add(impl_->compression_);
 	}
 	return true;

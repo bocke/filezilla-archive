@@ -51,7 +51,7 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 	m_pMainFrame = pMainFrame;
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-	if (!wxDialogEx::Create(pMainFrame, -1, _("Settings"))) {
+	if (!wxDialogEx::Create(pMainFrame, nullID, _("Settings"))) {
 		return false;
 	}
 
@@ -63,7 +63,7 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 	left->AddGrowableRow(1);
 	main->Add(left, 1, wxGROW);
 
-	left->Add(new wxStaticText(this, -1, _("Select &page:")));
+	left->Add(new wxStaticText(this, nullID, _("Select &page:")));
 
 	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTR_HIDE_ROOT);
 	tree_->SetFocus();

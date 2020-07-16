@@ -35,8 +35,8 @@ bool COptionsPageConnectionFTP::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Overview"), 1);
-		inner->Add(new wxStaticText(box, -1, _("For more detailed information about what these options do, please run the network configuration wizard.")));
-		auto run = new wxButton(box, -1, _("&Run configuration wizard now..."));
+		inner->Add(new wxStaticText(box, nullID, _("For more detailed information about what these options do, please run the network configuration wizard.")));
+		auto run = new wxButton(box, nullID, _("&Run configuration wizard now..."));
 		inner->Add(run);
 		run->Bind(wxEVT_BUTTON, [this](wxCommandEvent const&) {
 			CNetConfWizard wizard(GetParent(), m_pOptions, m_pOwner->GetEngineContext());
@@ -50,19 +50,19 @@ bool COptionsPageConnectionFTP::CreateControls(wxWindow* parent)
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Transfer Mode"), 1);
-		impl_->passive_ = new wxRadioButton(box, -1, _("Pa&ssive (recommended)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->passive_ = new wxRadioButton(box, nullID, _("Pa&ssive (recommended)"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		inner->Add(impl_->passive_);
-		impl_->active_ = new wxRadioButton(box, -1, _("&Active"));
+		impl_->active_ = new wxRadioButton(box, nullID, _("&Active"));
 		inner->Add(impl_->active_);
-		impl_->fallback_ = new wxCheckBox(box, -1, _("Allow &fall back to other transfer mode on failure"));
+		impl_->fallback_ = new wxCheckBox(box, nullID, _("Allow &fall back to other transfer mode on failure"));
 		inner->Add(impl_->fallback_);
-		inner->Add(new wxStaticText(box, -1, _("If you have problems to retrieve directory listings or to transfer files, try to change the default transfer mode.")));
+		inner->Add(new wxStaticText(box, nullID, _("If you have problems to retrieve directory listings or to transfer files, try to change the default transfer mode.")));
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("FTP Keep-alive"), 1);
-		impl_->keepalive_ = new wxCheckBox(box, -1, _("Send FTP &keep-alive commands"));
+		impl_->keepalive_ = new wxCheckBox(box, nullID, _("Send FTP &keep-alive commands"));
 		inner->Add(impl_->keepalive_);
-		inner->Add(new wxStaticText(box, -1, _("A proper server does not require this. Contact the server administrator if you need this.")));
+		inner->Add(new wxStaticText(box, nullID, _("A proper server does not require this. Contact the server administrator if you need this.")));
 	}
 	return true;
 }

@@ -21,16 +21,16 @@ bool COptionsPageEditAssociations::CreateControls(wxWindow* parent)
 	main->AddGrowableRow(1);
 	SetSizer(main);
 
-	main->Add(new wxStaticText(this, -1, _("C&ustom filetype associations:")));
+	main->Add(new wxStaticText(this, nullID, _("C&ustom filetype associations:")));
 
-	assocs_ = new wxTextCtrlEx(this, -1, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+	assocs_ = new wxTextCtrlEx(this, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	main->Add(assocs_, lay.grow);
 
-	main->Add(new wxStaticText(this, -1, _("Format: Extension followed by properly quoted command and arguments.")));
+	main->Add(new wxStaticText(this, nullID, _("Format: Extension followed by properly quoted command and arguments.")));
 
-	main->Add(new wxStaticText(this, -1, _("Example: png \"c:\\program files\\viewer\\viewer.exe\" -open")));
+	main->Add(new wxStaticText(this, nullID, _("Example: png \"c:\\program files\\viewer\\viewer.exe\" -open")));
 
-	auto rules = new wxHyperlinkCtrl(this, -1, _("Quoting rules"), wxString());
+	auto rules = new wxHyperlinkCtrl(this, nullID, _("Quoting rules"), wxString());
 	main->Add(rules);
 	rules->Bind(wxEVT_HYPERLINK, [this](wxHyperlinkEvent const&) { ShowQuotingRules(this); });
 

@@ -4,6 +4,9 @@
 class COptionsPageThemes final : public COptionsPage
 {
 public:
+	COptionsPageThemes();
+	virtual ~COptionsPageThemes();
+
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 	virtual bool Validate() override;
@@ -12,10 +15,12 @@ public:
 protected:
 	bool DisplayTheme(std::wstring const& theme);
 
-	virtual bool OnDisplayedFirstTime();
+	virtual bool OnDisplayedFirstTime() override;
 
-	DECLARE_EVENT_TABLE()
 	void OnThemeChange(wxCommandEvent& event);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif

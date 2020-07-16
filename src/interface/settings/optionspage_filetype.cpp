@@ -45,22 +45,22 @@ bool COptionsPageFiletype::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Default transfer type:"), 1);
-		impl_->rbAuto_ = new wxRadioButton(box, -1, _("&Auto"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->rbAuto_ = new wxRadioButton(box, nullID, _("&Auto"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		inner->Add(impl_->rbAuto_);
-		impl_->rbAscii_ = new wxRadioButton(box, -1, _("A&SCII"));
+		impl_->rbAscii_ = new wxRadioButton(box, nullID, _("A&SCII"));
 		inner->Add(impl_->rbAscii_);
-		impl_->rbBinary_ = new wxRadioButton(box, -1, _("&Binary"));
+		impl_->rbBinary_ = new wxRadioButton(box, nullID, _("&Binary"));
 		inner->Add(impl_->rbBinary_);
 	}
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Automatic file type classification"), 1);
 
-		inner->Add(new wxStaticText(box, -1, _("Treat the &following filetypes as ASCII files:")));
+		inner->Add(new wxStaticText(box, nullID, _("Treat the &following filetypes as ASCII files:")));
 		auto row = lay.createFlex(3);
 		inner->Add(row);
 
-		impl_->types_ = new wxListCtrl(box, -1, wxDefaultPosition, wxDefaultSize, wxLC_SORT_ASCENDING | wxLC_REPORT | wxLC_NO_HEADER | wxBORDER_SUNKEN);
+		impl_->types_ = new wxListCtrl(box, nullID, wxDefaultPosition, wxDefaultSize, wxLC_SORT_ASCENDING | wxLC_REPORT | wxLC_NO_HEADER | wxBORDER_SUNKEN);
 		impl_->types_->SetMinSize(wxSize(100, 150));
 		impl_->types_->Bind(wxEVT_LIST_ITEM_SELECTED, [this](auto const&) { SetCtrlState(); });
 		impl_->types_->Bind(wxEVT_LIST_ITEM_DESELECTED, [this](auto const&) { SetCtrlState(); });
@@ -68,24 +68,24 @@ bool COptionsPageFiletype::CreateControls(wxWindow* parent)
 
 		auto col = lay.createGrid(1);
 		row->Add(col);
-		impl_->extension_ = new wxTextCtrlEx(box, -1);
+		impl_->extension_ = new wxTextCtrlEx(box, nullID);
 		impl_->extension_->Bind(wxEVT_TEXT, [this](auto const&) { SetCtrlState(); });
 		col->Add(impl_->extension_, lay.grow)->SetMinSize(wxSize(lay.dlgUnits(20), -1));
-		impl_->add_ = new wxButton(box, -1, _("A&dd"));
+		impl_->add_ = new wxButton(box, nullID, _("A&dd"));
 		impl_->add_->Bind(wxEVT_BUTTON, [this](auto const&) { OnAdd(); });
 		col->Add(impl_->add_, lay.grow);
-		impl_->remove_ = new wxButton(box, -1, _("&Remove"));
+		impl_->remove_ = new wxButton(box, nullID, _("&Remove"));
 		impl_->remove_->Bind(wxEVT_BUTTON, [this](auto const&) { OnRemove(); });
 		col->Add(impl_->remove_, lay.grow);
 
-		row->Add(new wxStaticText(box, -1, _("If you enter the wrong filetypes, those files may get corrupted when transferred.")));
+		row->Add(new wxStaticText(box, nullID, _("If you enter the wrong filetypes, those files may get corrupted when transferred.")));
 
-		impl_->noext_ = new wxCheckBox(box, -1, _("Treat files &without extension as ASCII file"));
+		impl_->noext_ = new wxCheckBox(box, nullID, _("Treat files &without extension as ASCII file"));
 		inner->Add(impl_->noext_);
-		impl_->dotfile_ = new wxCheckBox(box, -1, _("&Treat dotfiles as ASCII files"));
+		impl_->dotfile_ = new wxCheckBox(box, nullID, _("&Treat dotfiles as ASCII files"));
 		inner->Add(impl_->dotfile_);
 
-		inner->Add(new wxStaticText(box, -1, _("Dotfiles are filenames starting with a dot, e.g. .htaccess")));
+		inner->Add(new wxStaticText(box, nullID, _("Dotfiles are filenames starting with a dot, e.g. .htaccess")));
 	}
 
 	return true;
