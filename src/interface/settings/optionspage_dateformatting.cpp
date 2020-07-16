@@ -59,7 +59,7 @@ bool COptionsPageDateFormatting::CreateControls(wxWindow* parent)
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Time formatting"), 1);
-		impl_->time_system_ = new wxRadioButton(box, -1, _("Us&e system &defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->time_system_ = new wxRadioButton(box, -1, _("Us&e system defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		inner->Add(impl_->time_system_);
 		impl_->time_iso_ = new wxRadioButton(box, -1, _("I&SO 8601 (example: 15:47)"));
 		inner->Add(impl_->time_iso_);
