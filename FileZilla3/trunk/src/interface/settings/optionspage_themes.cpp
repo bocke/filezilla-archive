@@ -6,16 +6,11 @@
 #include "optionspage_themes.h"
 #include "../themeprovider.h"
 #include "../wxext/spinctrlex.h"
-#include "../xrc_helper.h"
 
 #include <wx/dcclient.h>
 #include <wx/scrolwin.h>
 #include <wx/statbox.h>
 
-
-BEGIN_EVENT_TABLE(COptionsPageThemes, COptionsPage)
-EVT_CHOICE(XRCID("ID_THEME"), COptionsPageThemes::OnThemeChange)
-END_EVENT_TABLE()
 
 const int BORDER = 5;
 
@@ -24,9 +19,10 @@ class CIconPreview final : public wxScrolledWindow
 public:
 	CIconPreview() = default;
 
-	CIconPreview(wxWindow* pParent, int id = -1)
-		: wxScrolledWindow(pParent, id, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
+	CIconPreview(wxWindow* pParent)
+		: wxScrolledWindow(pParent, nullID, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
 	{
+		Bind(wxEVT_PAINT, &CIconPreview::OnPaint, this);
 	}
 
 	void LoadIcons(std::wstring const& theme, wxSize const& size)
@@ -81,7 +77,6 @@ public:
 	}
 
 protected:
-	DECLARE_EVENT_TABLE()
 	virtual void OnPaint(wxPaintEvent&)
 	{
 		CalcSize();
@@ -119,9 +114,22 @@ protected:
 	int m_extra_padding{};
 };
 
-BEGIN_EVENT_TABLE(CIconPreview, wxScrolledWindow)
-EVT_PAINT(CIconPreview::OnPaint)
-END_EVENT_TABLE()
+struct COptionsPageThemes::impl
+{
+	wxChoice* theme_{};
+	wxStaticText* author_{};
+	wxStaticText* email_{};
+	wxSpinCtrlDoubleEx* scale_{};
+	CIconPreview* preview_{};
+};
+
+COptionsPageThemes::COptionsPageThemes()
+	: impl_(std::make_unique<impl>())
+{}
+
+COptionsPageThemes::~COptionsPageThemes()
+{
+}
 
 bool COptionsPageThemes::CreateControls(wxWindow* parent)
 {
@@ -135,33 +143,39 @@ bool COptionsPageThemes::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Select Theme"), 2);
-		inner->Add(new wxStaticText(box, -1, _("&Theme:")), lay.valign);
-		inner->Add(new wxChoice(box, XRCID("ID_THEME")));
-		inner->Add(new wxStaticText(box, -1, _("Author:")), lay.valign);
-		inner->Add(new wxStaticText(box, XRCID("ID_AUTHOR"), wxString()), lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Email:")), lay.valign);
-		inner->Add(new wxStaticText(box, XRCID("ID_EMAIL"), wxString()), lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("Scale factor:")), lay.valign);
-		auto scale = new wxSpinCtrlDoubleEx(box, XRCID("ID_SCALE"));
-		scale->SetRange(0.5, 4);
-		scale->SetIncrement(0.25);
-		scale->SetValue(1.25);
-		scale->SetDigits(2);
-		scale->SetMaxLength(10);
-		scale->Connect(wxEVT_SPINCTRLDOUBLE, wxCommandEventHandler(COptionsPageThemes::OnThemeChange), 0, this);
-		inner->Add(scale, lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("&Theme:")), lay.valign);
+		impl_->theme_ = new wxChoice(box, nullID);
+		inner->Add(impl_->theme_);
+		inner->Add(new wxStaticText(box, nullID, _("Author:")), lay.valign);
+		impl_->author_ = new wxStaticText(box, nullID, wxString());
+		inner->Add(impl_->author_, lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("Email:")), lay.valign);
+		impl_->email_ = new wxStaticText(box, nullID, wxString());
+		inner->Add(impl_->email_, lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("Scale factor:")), lay.valign);
+		impl_->scale_ = new wxSpinCtrlDoubleEx(box, nullID);
+		impl_->scale_->SetRange(0.5, 4);
+		impl_->scale_->SetIncrement(0.25);
+		impl_->scale_->SetValue(1.25);
+		impl_->scale_->SetDigits(2);
+		impl_->scale_->SetMaxLength(10);
+		impl_->scale_->Bind(wxEVT_SPINCTRLDOUBLE, &COptionsPageThemes::OnThemeChange, this);
+		inner->Add(impl_->scale_, lay.valign);
 	}
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Preview"), 1);
 		inner->AddGrowableCol(0);
 		inner->AddGrowableRow(0);
-		inner->Add(new CIconPreview(box, XRCID("ID_PREVIEW")), 1, wxGROW);
+		impl_->preview_ = new CIconPreview(box);
+		inner->Add(impl_->preview_, 1, wxGROW);
 	}
 
 	GetSizer()->Layout();
 	GetSizer()->Fit(this);
 	
+	impl_->theme_->Bind(wxEVT_CHOICE, &COptionsPageThemes::OnThemeChange, this);
+
 	return true;
 }
 
@@ -176,14 +190,12 @@ bool COptionsPageThemes::SavePage()
 		return true;
 	}
 
-	wxChoice* pTheme = XRCCTRL(*this, "ID_THEME", wxChoice);
-
-	const int sel = pTheme->GetSelection();
-	const wxString theme = ((wxStringClientData*)pTheme->GetClientObject(sel))->GetData();
+	const int sel = impl_->theme_->GetSelection();
+	const wxString theme = ((wxStringClientData*)impl_->theme_->GetClientObject(sel))->GetData();
 
 	m_pOptions->set(OPTION_ICONS_THEME, theme.ToStdWstring());
 
-	m_pOptions->set(OPTION_ICONS_SCALE, static_cast<int>(100 * xrc_call(*this, "ID_SCALE", &wxSpinCtrlDouble::GetValue)));
+	m_pOptions->set(OPTION_ICONS_SCALE, static_cast<int>(100 * impl_->scale_->GetValue()));
 
 	return true;
 }
@@ -210,25 +222,22 @@ bool COptionsPageThemes::DisplayTheme(std::wstring const& theme)
 		mail = _("N/a").ToStdWstring();
 	}
 
-	bool failure = false;
-	SetStaticText(XRCID("ID_AUTHOR"), author, failure);
-	SetStaticText(XRCID("ID_EMAIL"), mail, failure);
+	impl_->author_->SetLabel(LabelEscape(author));
+	impl_->email_->SetLabel(LabelEscape(mail));
 
-	auto scale_factor = xrc_call(*this, "ID_SCALE", &wxSpinCtrlDouble::GetValue);
+	auto scale_factor = impl_->scale_->GetValue();
 	wxSize size = CThemeProvider::Get()->GetIconSize(iconSizeSmall);
 	size.Scale(scale_factor, scale_factor);
 
-	xrc_call(*this, "ID_PREVIEW", &CIconPreview::LoadIcons, theme, size);
+	impl_->preview_->LoadIcons(theme, size);
 
-	return !failure;
+	return true;
 }
 
 void COptionsPageThemes::OnThemeChange(wxCommandEvent&)
 {
-	wxChoice* pTheme = XRCCTRL(*this, "ID_THEME", wxChoice);
-
-	const int sel = pTheme->GetSelection();
-	std::wstring const theme = ((wxStringClientData*)pTheme->GetClientObject(sel))->GetData().ToStdWstring();
+	const int sel = impl_->theme_->GetSelection();
+	std::wstring const theme = ((wxStringClientData*)impl_->theme_->GetClientObject(sel))->GetData().ToStdWstring();
 	DisplayTheme(theme);
 }
 
@@ -236,25 +245,13 @@ bool COptionsPageThemes::OnDisplayedFirstTime()
 {
 	bool failure = false;
 
-	wxChoice* pTheme = XRCCTRL(*this, "ID_THEME", wxChoice);
-	if (!pTheme) {
-		return false;
-	}
-
-	if (!pTheme || !XRCCTRL(*this, "ID_PREVIEW", CIconPreview) ||
-		!XRCCTRL(*this, "ID_AUTHOR", wxStaticText) ||
-		!XRCCTRL(*this, "ID_EMAIL", wxStaticText))
-	{
-		return false;
-	}
-
 	auto const themes = CThemeProvider::GetThemes();
 	if (themes.empty()) {
 		return false;
 	}
 
-	xrc_call<wxSpinCtrlDouble, double>(*this, "ID_SCALE", &wxSpinCtrlDouble::SetValue, static_cast<double>(m_pOptions->get_int(OPTION_ICONS_SCALE)) / 100.f);
-
+	impl_->scale_->SetValue(static_cast<double>(m_pOptions->get_int(OPTION_ICONS_SCALE)) / 100.f);
+	
 	std::wstring activeTheme = m_pOptions->get_string(OPTION_ICONS_THEME);
 	std::wstring firstName;
 	for (auto const& theme : themes) {
@@ -265,26 +262,26 @@ bool COptionsPageThemes::OnDisplayedFirstTime()
 		if (firstName.empty()) {
 			firstName = name;
 		}
-		int n = pTheme->Append(name, new wxStringClientData(theme));
+		int n = impl_->theme_->Append(name, new wxStringClientData(theme));
 		if (theme == activeTheme) {
-			pTheme->SetSelection(n);
+			impl_->theme_->SetSelection(n);
 		}
 	}
-	if (pTheme->GetSelection() == wxNOT_FOUND) {
-		pTheme->SetSelection(pTheme->FindString(firstName));
+	if (impl_->theme_->GetSelection() == wxNOT_FOUND) {
+		impl_->theme_->SetSelection(impl_->theme_->FindString(firstName));
 	}
-	activeTheme = ((wxStringClientData*)pTheme->GetClientObject(pTheme->GetSelection()))->GetData().ToStdWstring();
+	activeTheme = ((wxStringClientData*)impl_->theme_->GetClientObject(impl_->theme_->GetSelection()))->GetData().ToStdWstring();
 
 	if (!DisplayTheme(activeTheme)) {
 		failure = true;
 	}
 
-	pTheme->GetContainingSizer()->Layout();
+	impl_->theme_->GetContainingSizer()->Layout();
 
 #ifdef __WXMAC__
 	if (!failure) {
 		CallAfter([this]{
-			xrc_call(*this, "ID_PREVIEW", &CIconPreview::Refresh, true, nullptr);
+			impl_->preview_->Refresh(true, nullptr);
 		});
 	}
 #endif

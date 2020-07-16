@@ -43,10 +43,10 @@ bool COptionsPageSizeFormatting::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Size formatting"), 1);
-		impl_->bytes_ = new wxRadioButton(box, -1, _("&Display size in bytes"));
-		impl_->iec_ = new wxRadioButton(box, -1, _("&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"));
-		impl_->binary_ = new wxRadioButton(box, -1, _("&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"));
-		impl_->decimal_ = new wxRadioButton(box, -1, _("D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"));
+		impl_->bytes_ = new wxRadioButton(box, nullID, _("&Display size in bytes"));
+		impl_->iec_ = new wxRadioButton(box, nullID, _("&IEC binary prefixes (e.g. 1 KiB = 1024 bytes)"));
+		impl_->binary_ = new wxRadioButton(box, nullID, _("&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"));
+		impl_->decimal_ = new wxRadioButton(box, nullID, _("D&ecimal prefixes using SI symbols (e.g. 1 KB = 1000 bytes)"));
 		inner->Add(impl_->bytes_, wxRB_GROUP);
 		inner->Add(impl_->iec_);
 		inner->Add(impl_->binary_);
@@ -55,14 +55,14 @@ bool COptionsPageSizeFormatting::CreateControls(wxWindow* parent)
 		impl_->iec_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
 		impl_->binary_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
 		impl_->decimal_->Bind(wxEVT_RADIOBUTTON, [this](wxCommandEvent&) { UpdateControls(); });
-		impl_->tsep_ = new wxCheckBox(box, -1, _("&Use thousands separator"));
+		impl_->tsep_ = new wxCheckBox(box, nullID, _("&Use thousands separator"));
 		inner->Add(impl_->tsep_);
 		impl_->tsep_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { UpdateControls(); });
 
 		auto row = lay.createFlex(2);
 		inner->Add(row);
-		row->Add(new wxStaticText(box, -1, _("Number of decimal places:")), lay.valign);
-		impl_->places_ = new wxSpinCtrlEx(box, -1, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(30), -1));
+		row->Add(new wxStaticText(box, nullID, _("Number of decimal places:")), lay.valign);
+		impl_->places_ = new wxSpinCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(30), -1));
 		impl_->places_->SetRange(0, 3);
 		impl_->places_->SetMaxLength(1);
 		row->Add(impl_->places_, lay.valign);
@@ -72,7 +72,7 @@ bool COptionsPageSizeFormatting::CreateControls(wxWindow* parent)
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Examples"), 1);
 		for (size_t i = 0; i < 6; ++i) {
-			impl_->examples_[i] = new wxStaticText(box, -1, wxString());
+			impl_->examples_[i] = new wxStaticText(box, nullID, wxString());
 			inner->Add(impl_->examples_[i], lay.ralign);
 		}
 	}

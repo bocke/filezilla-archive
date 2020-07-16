@@ -122,14 +122,14 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 
 		auto rows = lay.createFlex(2);
 		inner->Add(rows);
-		rows->Add(new wxStaticText(box, -1, _("&Layout of file and directory panes:")), lay.valign);
+		rows->Add(new wxStaticText(box, nullID, _("&Layout of file and directory panes:")), lay.valign);
 		auto choice = new wxChoice(box, XRCID("ID_FILEPANELAYOUT"));
 		choice->Append(_("Classic"));
 		choice->Append(_("Explorer"));
 		choice->Append(_("Widescreen"));
 		choice->Append(_("Blackboard"));
 		rows->Add(choice, lay.valign);
-		rows->Add(new wxStaticText(box, -1, _("Message log positio&n:")), lay.valign);
+		rows->Add(new wxStaticText(box, nullID, _("Message log positio&n:")), lay.valign);
 		choice = new wxChoice(box, XRCID("ID_MESSAGELOGPOS"));
 		choice->Append(_("Above the file lists"));
 		choice->Append(_("Next to the transfer queue"));
@@ -146,12 +146,12 @@ bool COptionsPageInterface::CreateControls(wxWindow* parent)
 #endif
 		inner->Add(new wxCheckBox(box, XRCID("ID_PREVENT_IDLESLEEP"), _("P&revent system from entering idle sleep during transfers and other operations")));
 		inner->AddSpacer(0);
-		inner->Add(new wxStaticText(box, -1, _("On startup of FileZilla:")));
+		inner->Add(new wxStaticText(box, nullID, _("On startup of FileZilla:")));
 		inner->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_NORMAL"), _("S&tart normally"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP));
 		inner->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_SITEMANAGER"), _("S&how the Site Manager on startup")));
 		inner->Add(new wxRadioButton(box, XRCID("ID_INTERFACE_STARTUP_RESTORE"), _("Restore ta&bs and reconnect")));
 		inner->AddSpacer(0);
-		inner->Add(new wxStaticText(box, -1, _("When st&arting a new connection while already connected:")));
+		inner->Add(new wxStaticText(box, nullID, _("When st&arting a new connection while already connected:")));
 		auto choice = new wxChoice(box, XRCID("ID_NEWCONN_ACTION"));
 		choice->Append(_("Ask for action"));
 		choice->Append(_("Connect in new tab"));

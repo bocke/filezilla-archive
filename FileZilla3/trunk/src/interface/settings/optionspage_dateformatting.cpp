@@ -44,36 +44,36 @@ bool COptionsPageDateFormatting::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Date formatting"), 1);
-		impl_->date_system_ = new wxRadioButton(box, -1, _("Use system &defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->date_system_ = new wxRadioButton(box, nullID, _("Use system &defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		inner->Add(impl_->date_system_);
-		impl_->date_iso_ = new wxRadioButton(box, -1, _("&ISO 8601 (example: 2007-09-15)"));
+		impl_->date_iso_ = new wxRadioButton(box, nullID, _("&ISO 8601 (example: 2007-09-15)"));
 		inner->Add(impl_->date_iso_);
-		impl_->date_custom_ = new wxRadioButton(box, -1, _("C&ustom"));
+		impl_->date_custom_ = new wxRadioButton(box, nullID, _("C&ustom"));
 		inner->Add(impl_->date_custom_);
 
 		auto row = lay.createFlex(2);
 		inner->Add(row, 0, wxLEFT, lay.indent);
-		impl_->date_format_ = new wxTextCtrlEx(box, -1);
+		impl_->date_format_ = new wxTextCtrlEx(box, nullID);
 		row->Add(impl_->date_format_, lay.valign);
-		row->Add(new wxStaticText(box, -1, _("(example: %Y-%m-%d)")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("(example: %Y-%m-%d)")), lay.valign);
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Time formatting"), 1);
-		impl_->time_system_ = new wxRadioButton(box, -1, _("Us&e system defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		impl_->time_system_ = new wxRadioButton(box, nullID, _("Us&e system defaults for current language"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 		inner->Add(impl_->time_system_);
-		impl_->time_iso_ = new wxRadioButton(box, -1, _("I&SO 8601 (example: 15:47)"));
+		impl_->time_iso_ = new wxRadioButton(box, nullID, _("I&SO 8601 (example: 15:47)"));
 		inner->Add(impl_->time_iso_);
-		impl_->time_custom_ = new wxRadioButton(box, -1, _("Cus&tom"));
+		impl_->time_custom_ = new wxRadioButton(box, nullID, _("Cus&tom"));
 		inner->Add(impl_->time_custom_);
 
 		auto row = lay.createFlex(2);
 		inner->Add(row, 0, wxLEFT, lay.indent);
-		impl_->time_format_ = new wxTextCtrlEx(box, -1);
+		impl_->time_format_ = new wxTextCtrlEx(box, nullID);
 		row->Add(impl_->time_format_, lay.valign);
-		row->Add(new wxStaticText(box, -1, _("(example: %Y-%m-%d)")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("(example: %Y-%m-%d)")), lay.valign);
 	}
 
-	auto link = new wxHyperlinkCtrl(this, -1, _("Show details about custom date and time formats"), L"https://wiki.filezilla-project.org/Date_and_Time_formatting");
+	auto link = new wxHyperlinkCtrl(this, nullID, _("Show details about custom date and time formats"), L"https://wiki.filezilla-project.org/Date_and_Time_formatting");
 	link->SetToolTip(L"https://wiki.filezilla-project.org/Date_and_Time_formatting");
 	main->Add(link);
 

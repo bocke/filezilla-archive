@@ -180,14 +180,14 @@ bool COptionsPagePasswords::CreateControls(wxWindow* parent)
 
 	auto changeSizer = lay.createFlex(2);
 	changeSizer->AddGrowableCol(1);
-	changeSizer->Add(new wxStaticText(box, -1, _("Master password:")), lay.valign);
+	changeSizer->Add(new wxStaticText(box, nullID, _("Master password:")), lay.valign);
 	auto pw = new wxTextCtrlEx(box, XRCID("ID_MASTERPASSWORD"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
 	changeSizer->Add(pw, lay.valigng);
-	changeSizer->Add(new wxStaticText(box, -1, _("Repeat password:")), lay.valign);
+	changeSizer->Add(new wxStaticText(box, nullID, _("Repeat password:")), lay.valign);
 	changeSizer->Add(new wxTextCtrlEx(box, XRCID("ID_MASTERPASSWORD_REPEAT"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
 
 	inner->Add(changeSizer, 0, wxGROW | wxLEFT, lay.indent);
-	inner->Add(new wxStaticText(box, -1, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, lay.indent);
+	inner->Add(new wxStaticText(box, nullID, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, lay.indent);
 
 	return true;
 }

@@ -37,29 +37,29 @@ bool COptionsPageConnection::CreateControls(wxWindow* parent)
 		auto [box, inner] = lay.createStatBox(main, _("Timeout"), 1);
 		auto row = lay.createFlex(3);
 		inner->Add(row);
-		row->Add(new wxStaticText(box, -1, _("Time&out in seconds:")), lay.valign);
-		impl_->timeout_ = new wxTextCtrlEx(box, -1, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
+		row->Add(new wxStaticText(box, nullID, _("Time&out in seconds:")), lay.valign);
+		impl_->timeout_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
 		impl_->timeout_->SetMaxLength(4);
 		row->Add(impl_->timeout_, lay.valign);
-		row->Add(new wxStaticText(box, -1, _("(10-9999, 0 to disable)")), lay.valign);
-		inner->Add(new wxStaticText(box, -1, _("If no data is sent or received during an operation for longer than the specified time, the connection will be closed and FileZilla will try to reconnect.")));
+		row->Add(new wxStaticText(box, nullID, _("(10-9999, 0 to disable)")), lay.valign);
+		inner->Add(new wxStaticText(box, nullID, _("If no data is sent or received during an operation for longer than the specified time, the connection will be closed and FileZilla will try to reconnect.")));
 	}
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Reconnection settings"), 1);
 		auto rows = lay.createFlex(3);
 		inner->Add(rows);
-		rows->Add(new wxStaticText(box, -1, _("&Maximum number of retries:")), lay.valign);
-		impl_->tries_ = new wxTextCtrlEx(box, -1, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
+		rows->Add(new wxStaticText(box, nullID, _("&Maximum number of retries:")), lay.valign);
+		impl_->tries_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
 		impl_->tries_->SetMaxLength(2);
 		rows->Add(impl_->tries_, lay.valign);
-		rows->Add(new wxStaticText(box, -1, _("(0-99)")), lay.valign);
-		rows->Add(new wxStaticText(box, -1, _("&Delay between failed login attempts:")), lay.valign);
-		impl_->delay_ = new wxTextCtrlEx(box, -1, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
+		rows->Add(new wxStaticText(box, nullID, _("(0-99)")), lay.valign);
+		rows->Add(new wxStaticText(box, nullID, _("&Delay between failed login attempts:")), lay.valign);
+		impl_->delay_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(22), -1));
 		impl_->delay_->SetMaxLength(3);
 		rows->Add(impl_->delay_, lay.valign);
-		rows->Add(new wxStaticText(box, -1, _("(0-999 seconds)")), lay.valign);
+		rows->Add(new wxStaticText(box, nullID, _("(0-999 seconds)")), lay.valign);
 
-		inner->Add(new wxStaticText(box, -1, _("Please note that some servers might ban you if you try to reconnect too often or in too short intervals.")));
+		inner->Add(new wxStaticText(box, nullID, _("Please note that some servers might ban you if you try to reconnect too often or in too short intervals.")));
 	}
 	return true;
 }
