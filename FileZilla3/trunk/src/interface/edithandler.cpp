@@ -1829,21 +1829,21 @@ bool CNewAssociationDialog::Run(std::wstring const& file)
 void CNewAssociationDialog::SetCtrlState()
 {
 	if (impl_->custom_) {
-		impl_->custom_->Enable(impl_->rbCustom_->GetValue());
+		impl_->custom_->Enable(impl_->rbCustom_ && impl_->rbCustom_->GetValue());
 	}
 	if (impl_->browse_) {
-		impl_->browse_->Enable(impl_->rbCustom_->GetValue());
+		impl_->browse_->Enable(impl_->rbCustom_ && impl_->rbCustom_->GetValue());
 	}
 	if (impl_->always_) {
-		impl_->always_->Enable(impl_->rbDefault_->GetValue());
+		impl_->always_->Enable(impl_->rbDefault_ && impl_->rbDefault_->GetValue());
 	}
 }
 
 void CNewAssociationDialog::OnOK()
 {
-	const bool custom = impl_->rbCustom_->GetValue();
-	const bool def = impl_->rbDefault_->GetValue();
-	const bool always = impl_->always_->GetValue();
+	const bool custom = impl_->rbCustom_ && impl_->rbCustom_->GetValue();
+	const bool def = impl_->rbDefault_ && impl_->rbDefault_->GetValue();
+	const bool always = impl_->always_ && impl_->always_->GetValue();
 
 	if (def && always) {
 		COptions::Get()->set(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
