@@ -10,6 +10,24 @@
 
 #include <wx/statbox.h>
 
+struct COptionsPageTransfer::impl final
+{
+	wxSpinCtrlEx* transfers_{};
+	wxSpinCtrlEx* downloads_{};
+	wxSpinCtrlEx* uploads_{};
+
+	wxChoice* burst_tolerance_{};
+};
+
+COptionsPageTransfer::COptionsPageTransfer()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+COptionsPageTransfer::~COptionsPageTransfer()
+{
+}
+
 bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 {
 	auto const& lay = m_pOwner->layout();
@@ -22,22 +40,22 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Concurrent transfers"), 3);
 		inner->Add(new wxStaticText(box, nullID, _("Maximum simultaneous &transfers:")), lay.valign);
-		auto spin = new wxSpinCtrlEx(box, XRCID("ID_NUMTRANSFERS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(1, 10);
-		spin->SetMaxLength(2);
-		inner->Add(spin, lay.valign);
+		impl_->transfers_ = new wxSpinCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		impl_->transfers_->SetRange(1, 10);
+		impl_->transfers_->SetMaxLength(2);
+		inner->Add(impl_->transfers_, lay.valign);
 		inner->Add(new wxStaticText(box, nullID, _("(1-10)")), lay.valign);
 		inner->Add(new wxStaticText(box, nullID, _("Limit for concurrent &downloads:")), lay.valign);
-		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMDOWNLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(0, 10);
-		spin->SetMaxLength(2);
-		inner->Add(spin, lay.valign);
+		impl_->downloads_ = new wxSpinCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		impl_->downloads_->SetRange(0, 10);
+		impl_->downloads_->SetMaxLength(2);
+		inner->Add(impl_->downloads_, lay.valign);
 		inner->Add(new wxStaticText(box, nullID, _("(0 for no limit)")), lay.valign);
 		inner->Add(new wxStaticText(box, nullID, _("Limit for concurrent &uploads:")), lay.valign);
-		spin = new wxSpinCtrlEx(box, XRCID("ID_NUMUPLOADS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
-		spin->SetRange(0, 10);
-		spin->SetMaxLength(2);
-		inner->Add(spin, lay.valign);
+		impl_->uploads_ = new wxSpinCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
+		impl_->uploads_->SetRange(0, 10);
+		impl_->uploads_->SetMaxLength(2);
+		inner->Add(impl_->uploads_, lay.valign);
 		inner->Add(new wxStaticText(box, nullID, _("(0 for no limit)")), lay.valign);
 	}
 
@@ -66,16 +84,16 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 		row->Add(new wxStaticText(box, nullID, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
 
 		innermost->Add(new wxStaticText(box, nullID, _("&Burst tolerance:")), lay.valign);
-		auto choice = new wxChoice(box, XRCID("ID_BURSTTOLERANCE"));
-		choice->AppendString(_("Normal"));
-		choice->AppendString(_("High"));
-		choice->AppendString(_("Very high"));
-		innermost->Add(choice, lay.valign);
+		impl_->burst_tolerance_ = new wxChoice(box, nullID);
+		impl_->burst_tolerance_->AppendString(_("Normal"));
+		impl_->burst_tolerance_->AppendString(_("High"));
+		impl_->burst_tolerance_->AppendString(_("Very high"));
+		innermost->Add(impl_->burst_tolerance_, lay.valign);
 
-		enable->Bind(wxEVT_CHECKBOX, [dllimit, ullimit, choice](wxCommandEvent const& ev) {
+		enable->Bind(wxEVT_CHECKBOX, [dllimit, ullimit, this](wxCommandEvent const& ev) {
 			dllimit->Enable(ev.IsChecked());
 			ullimit->Enable(ev.IsChecked());
-			choice->Enable(ev.IsChecked());
+			impl_->burst_tolerance_->Enable(ev.IsChecked());
 		});
 	}
 	
@@ -130,12 +148,12 @@ bool COptionsPageTransfer::LoadPage()
 	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_OUTBOUND));
 	pTextCtrl->Enable(enable_speedlimits);
 
-	XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_NUMTRANSFERS));
-	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_CONCURRENTDOWNLOADLIMIT));
-	XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->SetValue(m_pOptions->get_int(OPTION_CONCURRENTUPLOADLIMIT));
+	impl_->transfers_->SetValue(m_pOptions->get_int(OPTION_NUMTRANSFERS));
+	impl_->downloads_->SetValue(m_pOptions->get_int(OPTION_CONCURRENTDOWNLOADLIMIT));
+	impl_->uploads_->SetValue(m_pOptions->get_int(OPTION_CONCURRENTUPLOADLIMIT));
 
-	SetChoice(XRCID("ID_BURSTTOLERANCE"), m_pOptions->get_int(OPTION_SPEEDLIMIT_BURSTTOLERANCE), failure);
-	XRCCTRL(*this, "ID_BURSTTOLERANCE", wxChoice)->Enable(enable_speedlimits);
+	impl_->burst_tolerance_->SetSelection(m_pOptions->get_int(OPTION_SPEEDLIMIT_BURSTTOLERANCE));
+	impl_->burst_tolerance_->Enable(enable_speedlimits);
 
 	pTextCtrl = XRCCTRL(*this, "ID_REPLACE", wxTextCtrl);
 	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_INVALID_CHAR_REPLACE));
@@ -151,13 +169,13 @@ bool COptionsPageTransfer::SavePage()
 {
 	m_pOptions->set(OPTION_SPEEDLIMIT_ENABLE, xrc_call(*this, "ID_ENABLE_SPEEDLIMITS", &wxCheckBox::GetValue));
 
-	m_pOptions->set(OPTION_NUMTRANSFERS,				XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl)->GetValue());
-	m_pOptions->set(OPTION_CONCURRENTDOWNLOADLIMIT,	XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl)->GetValue());
-	m_pOptions->set(OPTION_CONCURRENTUPLOADLIMIT,		XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl)->GetValue());
+	m_pOptions->set(OPTION_NUMTRANSFERS, impl_->transfers_->GetValue());
+	m_pOptions->set(OPTION_CONCURRENTDOWNLOADLIMIT,	impl_->downloads_->GetValue());
+	m_pOptions->set(OPTION_CONCURRENTUPLOADLIMIT, impl_->uploads_->GetValue());
 
 	m_pOptions->set(OPTION_SPEEDLIMIT_INBOUND, xrc_call(*this, "ID_DOWNLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
 	m_pOptions->set(OPTION_SPEEDLIMIT_OUTBOUND, xrc_call(*this, "ID_UPLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
-	m_pOptions->set(OPTION_SPEEDLIMIT_BURSTTOLERANCE, GetChoice(XRCID("ID_BURSTTOLERANCE")));
+	m_pOptions->set(OPTION_SPEEDLIMIT_BURSTTOLERANCE, impl_->burst_tolerance_->GetSelection());
 	SetOptionFromText(XRCID("ID_REPLACE"), OPTION_INVALID_CHAR_REPLACE);
 	SetOptionFromCheck(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE);
 
@@ -168,30 +186,20 @@ bool COptionsPageTransfer::SavePage()
 
 bool COptionsPageTransfer::Validate()
 {
-	long tmp;
-	wxTextCtrl* pCtrl;
-	wxSpinCtrl* pSpinCtrl;
-	int spinValue;
-
-	pSpinCtrl = XRCCTRL(*this, "ID_NUMTRANSFERS", wxSpinCtrl);
-	spinValue = pSpinCtrl->GetValue();
-	if (spinValue < 1 || spinValue > 10) {
-		return DisplayError(pSpinCtrl, _("Please enter a number between 1 and 10 for the number of concurrent transfers."));
+	if (impl_->transfers_->GetValue() < 1 || impl_->transfers_->GetValue() > 10) {
+		return DisplayError(impl_->transfers_, _("Please enter a number between 1 and 10 for the number of concurrent transfers."));
 	}
 
-	pSpinCtrl = XRCCTRL(*this, "ID_NUMDOWNLOADS", wxSpinCtrl);
-	spinValue = pSpinCtrl->GetValue();
-	if (spinValue < 0 || spinValue > 10) {
-		return DisplayError(pSpinCtrl, _("Please enter a number between 0 and 10 for the number of concurrent downloads."));
+	if (impl_->downloads_->GetValue() < 0 || impl_->downloads_->GetValue() > 10) {
+		return DisplayError(impl_->downloads_, _("Please enter a number between 0 and 10 for the number of concurrent downloads."));
 	}
 
-	pSpinCtrl = XRCCTRL(*this, "ID_NUMUPLOADS", wxSpinCtrl);
-	spinValue = pSpinCtrl->GetValue();
-	if (spinValue < 0 || spinValue > 10) {
-		return DisplayError(pSpinCtrl, _("Please enter a number between 0 and 10 for the number of concurrent uploads."));
+	if (impl_->uploads_->GetValue() < 0 || impl_->uploads_->GetValue() > 10) {
+		return DisplayError(impl_->uploads_, _("Please enter a number between 0 and 10 for the number of concurrent uploads."));
 	}
 
-	pCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
+	long tmp{};
+	auto pCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
 	if (!pCtrl->GetValue().ToLong(&tmp) || (tmp < 0)) {
 		const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
 		return DisplayError(pCtrl, wxString::Format(_("Please enter a download speed limit greater or equal to 0 %s/s."), unit));

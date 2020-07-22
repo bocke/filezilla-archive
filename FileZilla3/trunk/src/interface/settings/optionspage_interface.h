@@ -6,6 +6,9 @@
 class COptionsPageInterface final : public COptionsPage
 {
 public:
+	COptionsPageInterface();
+	virtual ~COptionsPageInterface();
+
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 
@@ -13,8 +16,10 @@ protected:
 	virtual bool CreateControls(wxWindow* parent) override;
 
 private:
-	DECLARE_EVENT_TABLE()
 	void OnLayoutChange(wxCommandEvent& event);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif

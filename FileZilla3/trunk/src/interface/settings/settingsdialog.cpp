@@ -190,8 +190,10 @@ bool CSettingsDialog::LoadPages()
 	Show();
 #endif
 
+	GetSizer()->Fit(this);
+
 	// Keep track of maximum page size
-	size = wxSize(0, 0);
+	size = pagePanel_->GetClientSize();//wxSize(0, 0);
 	for (auto const& page : m_pages) {
 		auto sizer = page.page->GetSizer();
 		if (sizer) {
@@ -219,7 +221,6 @@ bool CSettingsDialog::LoadPages()
 	}
 
 	GetSizer()->Fit(this);
-	GetSizer()->SetSizeHints(this);
 
 	for (auto const& page : m_pages) {
 		page.page->Hide();

@@ -159,38 +159,6 @@ void COptionsPage::SetIntOptionFromText(int ctrlId, interfaceOptions optionId)
 	m_pOptions->set(optionId, n);
 }
 
-void COptionsPage::SetChoice(int id, int selection, bool& failure)
-{
-	if (selection < -1) {
-		failure = true;
-		return;
-	}
-
-	auto pChoice = dynamic_cast<wxChoice*>(FindWindow(id));
-	if (!pChoice) {
-		failure = true;
-		return;
-	}
-
-	if (selection >= (int)pChoice->GetCount()) {
-		failure = true;
-		return;
-	}
-
-	pChoice->SetSelection(selection);
-}
-
-int COptionsPage::GetChoice(int id) const
-{
-	auto pChoice = dynamic_cast<wxChoice*>(FindWindow(id));
-	wxASSERT(pChoice);
-	if (!pChoice) {
-		return 0;
-	}
-
-	return pChoice->GetSelection();
-}
-
 bool COptionsPage::DisplayError(wxString const& controlToFocus, wxString const& error)
 {
 	int id = wxXmlResource::GetXRCID(controlToFocus);
