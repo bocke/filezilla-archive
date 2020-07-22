@@ -114,7 +114,7 @@ protected:
 	int m_extra_padding{};
 };
 
-struct COptionsPageThemes::impl
+struct COptionsPageThemes::impl final
 {
 	wxChoice* theme_{};
 	wxStaticText* author_{};

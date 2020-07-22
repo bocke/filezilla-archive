@@ -6,7 +6,10 @@
 class COptionsPageUpdateCheck final : public COptionsPage
 {
 public:
-	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_UPDATECHECK"); }
+	COptionsPageUpdateCheck();
+	virtual ~COptionsPageUpdateCheck();
+
+	virtual bool CreateControls(wxWindow* parent) override;
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 	virtual bool Validate() override;
@@ -14,7 +17,8 @@ public:
 protected:
 	void OnRunUpdateCheck(wxCommandEvent&);
 
-	DECLARE_EVENT_TABLE()
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif
