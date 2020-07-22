@@ -40,7 +40,6 @@ void InitHandlers(wxXmlResource& res)
 	res.AddHandler(new wxStdDialogButtonSizerXmlHandler);
 	res.AddHandler(new wxDialogXmlHandler);
 	res.AddHandler(new wxPanelXmlHandler);
-	res.AddHandler(new wxChoiceXmlHandler);
 	res.AddHandler(new wxStaticLineXmlHandler);
 	res.AddHandler(new wxStaticBitmapXmlHandler);
 	res.AddHandler(new wxHyperlinkCtrlXmlHandler);

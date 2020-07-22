@@ -22,7 +22,6 @@ public:
 	void SetRCheck(int id, bool checked, bool& failure);
 	void SetTextFromOption(int ctrlId, interfaceOptions optionId, bool& failure);
 	void SetStaticText(int id, wxString const& text, bool& failure);
-	void SetChoice(int id, int selection, bool& failure);
 	bool SetText(int id, std::wstring const& text, bool& failure);
 
 	// The GetXXX functions do never return an error since the controls were
@@ -30,7 +29,6 @@ public:
 	bool GetCheck(int id) const;
 	bool GetRCheck(int id) const;
 	std::wstring GetText(int id) const;
-	int GetChoice(int id) const;
 
 	void SetOptionFromText(int ctrlId, interfaceOptions optionId);
 	void SetIntOptionFromText(int ctrlId, interfaceOptions optionId); // There's no corresponding GetTextFromIntOption as COptions::GetOption is smart enough to convert
