@@ -6,7 +6,6 @@
 #include "Options.h"
 #include "timeformatting.h"
 #include "themeprovider.h"
-#include "xrc_helper.h"
 
 #include <libfilezilla/iputils.hpp>
 
@@ -465,13 +464,13 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 			str += LabelEscape(fz::to_wstring_from_utf8(altName.name)) + L"\n";
 		}
 		str.RemoveLast();
-		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, wxID_ANY, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
-		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, wxID_ANY, str));
+		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, nullID, wxPLURAL("Alternative name:", "Alternative names:", altNames.size())));
+		impl_->subjectSizer_->Add(new wxStaticText(impl_->certPanel_, nullID, str));
 	}
 
 	if (cert.self_signed()) {
 		impl_->issuerSizer_->Clear(true);
-		impl_->issuerSizer_->Add(new wxStaticText(impl_->certPanel_, -1, _("Same as subject, certificate is self-signed")));
+		impl_->issuerSizer_->Add(new wxStaticText(impl_->certPanel_, nullID, _("Same as subject, certificate is self-signed")));
 	}
 	else {
 		ParseDN(impl_->certPanel_, fz::to_wstring_from_utf8(cert.get_issuer()), impl_->issuerSizer_);
@@ -491,7 +490,7 @@ void CVerifyCertDialog::AddAlgorithm(wxWindow* parent, wxGridBagSizer* sizer, st
 		wname += _("Insecure algorithm!");
 	}
 
-	auto * text = new wxStaticText(parent, -1, LabelEscape(wname.ToStdWstring()));
+	auto * text = new wxStaticText(parent, nullID, LabelEscape(wname.ToStdWstring()));
 	layout().gbAdd(sizer, text);
 
 	if (insecure) {
@@ -535,7 +534,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 	fz::tls_session_info const& info = notification.info_;
 
 	auto& lay = layout();
-	if (!Create(m_parent, -1, displayOnly ? _("Certificate details") : _("Unknown certificate"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)) {
+	if (!Create(m_parent, nullID, displayOnly ? _("Certificate details") : _("Unknown certificate"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)) {
 		return false;
 	}
 	impl_ = std::make_unique<impl>();
@@ -545,7 +544,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 	outer->AddGrowableRow(0);
 
 	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(L"ART_LOCK", wxART_OTHER, CThemeProvider::GetIconSize(iconSizeNormal));
-	auto icon = new wxStaticBitmap(this, -1, bmp);
+	auto icon = new wxStaticBitmap(this, nullID, bmp);
 	outer->Add(icon);
 
 	auto main = lay.createFlex(1);
@@ -555,19 +554,19 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 	if (!displayOnly) {
 		auto label1 = _("The server's certificate is unknown. Please carefully examine the certificate to make sure the server can be trusted.");
 		WrapText(this, label1, 600);
-		main->Add(new wxStaticText(this, -1, label1));
+		main->Add(new wxStaticText(this, nullID, label1));
 		
 		auto label2 =_("Compare the displayed fingerprint with the certificate fingerprint you have received from your server administrator or server hosting provider.");
 		WrapText(this, label2, 600);
-		main->Add(new wxStaticText(this, -1, label2));
+		main->Add(new wxStaticText(this, nullID, label2));
 	}
 
 	impl_->certificates_ = info.get_certificates();
 	if (impl_->certificates_.size() > 1) {
 		auto row = lay.createFlex(2);
 		main->Add(row);
-		row->Add(new wxStaticText(this, -1, _("&Certificate in chain:")), lay.valign);
-		auto choice = new wxChoice(this, -1);
+		row->Add(new wxStaticText(this, nullID, _("&Certificate in chain:")), lay.valign);
+		auto choice = new wxChoice(this, nullID);
 
 		row->Add(choice, lay.valign);
 
@@ -598,7 +597,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		auto [box, boxsizer] = lay.createStatBox(row, _("Certificate"), 1);
 		boxsizer->AddGrowableCol(0);
 		boxsizer->AddGrowableRow(0);
-		impl_->certPanel_ = new wxScrolledWindow(box, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
+		impl_->certPanel_ = new wxScrolledWindow(box, nullID, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
 		impl_->certPanel_->SetScrollRate(0, lay.dlgUnits(8));
 		boxsizer->Add(impl_->certPanel_, lay.grow);
 		impl_->certSizer_ = lay.createFlex(1);
@@ -606,27 +605,27 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		impl_->certPanel_->SetSizer(impl_->certSizer_);
 
 		{
-			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Overview"));
+			auto heading = new wxStaticText(impl_->certPanel_, nullID, _("Overview"));
 			heading->SetFont(heading->GetFont().Bold());
 			impl_->certSizer_->Add(heading);
 			auto inner = lay.createFlex(2);
 			inner->SetVGap(lay.dlgUnits(1));
 			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
 
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Fingerprint (SHA-256):")));
-			impl_->fingerprint_sha256_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Fingerprint (SHA-256):")));
+			impl_->fingerprint_sha256_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->fingerprint_sha256_);
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Fingerprint (SHA-1):")), lay.valign);
-			impl_->fingerprint_sha1_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Fingerprint (SHA-1):")), lay.valign);
+			impl_->fingerprint_sha1_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->fingerprint_sha1_, lay.valign);
 			// @translator: Period as in a span of time with a start and end date
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Validity period:")), lay.valign);
-			impl_->validity_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Validity period:")), lay.valign);
+			impl_->validity_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->validity_, lay.valign);
 		}
 		impl_->certSizer_->AddSpacer(0);
 		{
-			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Subject"));
+			auto heading = new wxStaticText(impl_->certPanel_, nullID, _("Subject"));
 			heading->SetFont(heading->GetFont().Bold());
 			impl_->certSizer_->Add(heading);
 			auto inner = lay.createFlex(2);
@@ -638,7 +637,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		}
 		impl_->certSizer_->AddSpacer(0);
 		{
-			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Issuer"));
+			auto heading = new wxStaticText(impl_->certPanel_, nullID, _("Issuer"));
 			heading->SetFont(heading->GetFont().Bold());
 			impl_->certSizer_->Add(heading);
 			auto inner = lay.createFlex(2);
@@ -650,20 +649,20 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		}
 		impl_->certSizer_->AddSpacer(0);
 		{
-			auto heading = new wxStaticText(impl_->certPanel_, -1, _("Details"));
+			auto heading = new wxStaticText(impl_->certPanel_, nullID, _("Details"));
 			heading->SetFont(heading->GetFont().Bold());
 			impl_->certSizer_->Add(heading);
 			auto inner = lay.createFlex(2);
 			impl_->certSizer_->Add(inner, 0, wxLEFT, lay.indent);
 
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Serial:")), lay.valign);
-			impl_->serial_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Serial:")), lay.valign);
+			impl_->serial_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->serial_, lay.valign);
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Public key algorithm:")), lay.valign);
-			impl_->pubkey_algo_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Public key algorithm:")), lay.valign);
+			impl_->pubkey_algo_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->pubkey_algo_, lay.valign);
-			inner->Add(new wxStaticText(impl_->certPanel_, -1, _("Signature algorithm:")), lay.valign);
-			impl_->signature_algo_ = new wxStaticText(impl_->certPanel_, -1, wxString());
+			inner->Add(new wxStaticText(impl_->certPanel_, nullID, _("Signature algorithm:")), lay.valign);
+			impl_->signature_algo_ = new wxStaticText(impl_->certPanel_, nullID, wxString());
 			inner->Add(impl_->signature_algo_, lay.valign);
 
 		}
@@ -673,10 +672,10 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		auto gb = lay.createGridBag(4);
 		inner->Add(gb);
 		lay.gbNewRow(gb);
-		lay.gbAdd(gb, new wxStaticText(box, -1, _("Host:")));
+		lay.gbAdd(gb, new wxStaticText(box, nullID, _("Host:")));
 		gb->SetVGap(lay.dlgUnits(1));
 
-		wxStaticText* host = new wxStaticText(box, -1, wxString());
+		wxStaticText* host = new wxStaticText(box, nullID, wxString());
 		if (info.mismatched_hostname()) {
 			host->SetLabel(wxString::Format(_("%s:%d - Hostname does not match certificate"), LabelEscape(fz::to_wstring_from_utf8(info.get_host())), info.get_port()));
 			host->SetForegroundColour(wxColour(255, 0, 0));
@@ -688,26 +687,26 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		gb->SetItemSpan(1, wxGBSpan(1, 3));
 
 		lay.gbNewRow(gb);
-		lay.gbAdd(gb, new wxStaticText(box, -1, _("Protocol:")));
+		lay.gbAdd(gb, new wxStaticText(box, nullID, _("Protocol:")));
 		AddAlgorithm(box, gb, info.get_protocol(), (info.get_algorithm_warnings() & fz::tls_session_info::tlsver) != 0);
 
-		lay.gbAdd(gb, new wxStaticText(box, -1, _("Cipher:")));
+		lay.gbAdd(gb, new wxStaticText(box, nullID, _("Cipher:")));
 		AddAlgorithm(box, gb, info.get_session_cipher(), (info.get_algorithm_warnings() & fz::tls_session_info::cipher) != 0);
 		lay.gbNewRow(gb);
-		lay.gbAdd(gb, new wxStaticText(box, -1, _("Key exchange:")));
+		lay.gbAdd(gb, new wxStaticText(box, nullID, _("Key exchange:")));
 		AddAlgorithm(box, gb, info.get_key_exchange(), (info.get_algorithm_warnings() & fz::tls_session_info::kex) != 0);
-		lay.gbAdd(gb, new wxStaticText(box, -1, _("Mac:")));
+		lay.gbAdd(gb, new wxStaticText(box, nullID, _("Mac:")));
 		AddAlgorithm(box, gb, info.get_session_mac(), (info.get_algorithm_warnings() & fz::tls_session_info::mac) != 0);
 	}
 
 
 	if (!displayOnly) {
-		main->Add(new wxStaticText(this, -1, _("Trust the server certificate and carry on connecting?")));
+		main->Add(new wxStaticText(this, nullID, _("Trust the server certificate and carry on connecting?")));
 		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
-			impl_->always_ = new wxCheckBox(this, -1, _("&Always trust this certificate in future sessions."));
+			impl_->always_ = new wxCheckBox(this, nullID, _("&Always trust this certificate in future sessions."));
 			main->Add(impl_->always_);
 		}
-		impl_->san_trust_ = new wxCheckBox(this, -1, _("&Trust this certificate on the listed alternative hostnames."));
+		impl_->san_trust_ = new wxCheckBox(this, nullID, _("&Trust this certificate on the listed alternative hostnames."));
 		main->Add(impl_->san_trust_);
 	}
 
@@ -854,8 +853,8 @@ void CVerifyCertDialog::ParseDN(wxWindow* parent, std::wstring const& dn, wxSize
 			other += pair.second;
 		}
 
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, _("Other:")));
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, LabelEscape(other)));
+		pSizer->Add(new wxStaticText(parent, nullID, _("Other:")));
+		pSizer->Add(new wxStaticText(parent, nullID, LabelEscape(other)));
 	}
 }
 
@@ -879,8 +878,8 @@ void CVerifyCertDialog::ParseDN_by_prefix(wxWindow* parent, std::vector<std::pai
 	}
 
 	if (!value.empty()) {
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, name));
-		pSizer->Add(new wxStaticText(parent, wxID_ANY, LabelEscape(value)));
+		pSizer->Add(new wxStaticText(parent, nullID, name));
+		pSizer->Add(new wxStaticText(parent, nullID, LabelEscape(value)));
 	}
 }
 
@@ -917,7 +916,7 @@ void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecure
 		name = CServer::GetProtocolName(protocol);
 		break;
 	}
-	dlg.Create(parent, wxID_ANY, wxString::Format(_("Insecure %s connection"), name));
+	dlg.Create(parent, nullID, wxString::Format(_("Insecure %s connection"), name));
 
 	auto const& lay = dlg.layout();
 	auto outer = new wxBoxSizer(wxVERTICAL);
@@ -930,32 +929,32 @@ void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecure
 
 	if (warning) {
 		if (protocol == FTP) {
-			main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
-			main->Add(new wxStaticText(&dlg, -1, _("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
+			main->Add(new wxStaticText(&dlg, nullID, _("Warning! You have previously connected to this server using FTP over TLS, yet the server has now rejected FTP over TLS.")));
+			main->Add(new wxStaticText(&dlg, nullID, _("This may be the result of a downgrade attack, only continue after you have spoken to the server administrator or server hosting provider.")));
 		}
 		else {
-			main->Add(new wxStaticText(&dlg, -1, _("Warning! You have previously connected to this server using TLS.")));
+			main->Add(new wxStaticText(&dlg, nullID, _("Warning! You have previously connected to this server using TLS.")));
 		}
 	}
 	else {
 		if (protocol == FTP) {
-			main->Add(new wxStaticText(&dlg, -1, _("This server does not support FTP over TLS.")));
+			main->Add(new wxStaticText(&dlg, nullID, _("This server does not support FTP over TLS.")));
 		}
 		else {
-			main->Add(new wxStaticText(&dlg, -1, wxString::Format(_("Using plain %s is insecure."), name)));
+			main->Add(new wxStaticText(&dlg, nullID, wxString::Format(_("Using plain %s is insecure."), name)));
 		}
 	}
-	main->Add(new wxStaticText(&dlg, -1, _("If you continue, your password and files will be sent in clear over the internet.")));
+	main->Add(new wxStaticText(&dlg, nullID, _("If you continue, your password and files will be sent in clear over the internet.")));
 
 
 	auto flex = lay.createFlex(2);
 	main->Add(flex, 0, wxALL, lay.border);
-	flex->Add(new wxStaticText(&dlg, -1, _("Host:")), lay.valign);
-	flex->Add(new wxStaticText(&dlg, -1, LabelEscape(notification.server_.GetHost())), lay.valign);
-	flex->Add(new wxStaticText(&dlg, -1, _("Port:")), lay.valign);
-	flex->Add(new wxStaticText(&dlg, -1, fz::to_wstring(notification.server_.GetPort())), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, _("Host:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, LabelEscape(notification.server_.GetHost())), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, _("Port:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, fz::to_wstring(notification.server_.GetPort())), lay.valign);
 
-	auto always = new wxCheckBox(&dlg, -1, wxString::Format(_("&Always allow insecure plain %s for this server."), name));
+	auto always = new wxCheckBox(&dlg, nullID, wxString::Format(_("&Always allow insecure plain %s for this server."), name));
 	main->Add(always);
 
 	auto buttons = lay.createButtonSizer(&dlg, main, true);
