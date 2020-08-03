@@ -457,7 +457,7 @@ bool CVerifyCertDialog::DisplayCert(fz::x509_certificate const& cert)
 
 	impl_->certPanel_->Freeze();
 	ParseDN(impl_->certPanel_, fz::to_wstring_from_utf8(cert.get_subject()), impl_->subjectSizer_);
-	
+
 	auto const& altNames = cert.get_alt_subject_names();
 	if (!altNames.empty()) {
 		wxString str;
@@ -557,7 +557,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		WrapText(this, label1, 600);
 		main->Add(new wxStaticText(this, -1, label1));
 		
-		auto label2 =_("Compare the displayed fingerprint with the certificate fingerprint you have received from your server adminstrator or server hosting provider.");
+		auto label2 =_("Compare the displayed fingerprint with the certificate fingerprint you have received from your server administrator or server hosting provider.");
 		WrapText(this, label2, 600);
 		main->Add(new wxStaticText(this, -1, label2));
 	}
@@ -675,7 +675,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		lay.gbNewRow(gb);
 		lay.gbAdd(gb, new wxStaticText(box, -1, _("Host:")));
 		gb->SetVGap(lay.dlgUnits(1));
-		
+
 		wxStaticText* host = new wxStaticText(box, -1, wxString());
 		if (info.mismatched_hostname()) {
 			host->SetLabel(wxString::Format(_("%s:%d - Hostname does not match certificate"), LabelEscape(fz::to_wstring_from_utf8(info.get_host())), info.get_port()));
