@@ -17,7 +17,7 @@ struct COptionsPageEdit::impl final
 	wxRadioButton* default_none_{};
 	wxRadioButton* default_system_{};
 	wxRadioButton* default_custom_{};
-	
+
 	wxTextCtrlEx* custom_{};
 	wxButton* browse_{};
 
@@ -39,7 +39,7 @@ COptionsPageEdit::~COptionsPageEdit()
 void ShowQuotingRules(wxWindow * parent)
 {
 	wxMessageBoxEx(wxString::Format(_("- The command and each argument are separated by spaces\n- A command or argument containing whitespace or a double-quote character need to be enclosed in double-quotes\n- Double-quotes inside of a command or argument need to be doubled up\n- In arguments, %%f is a placeholder for the file to be opened. Use %%%% for literal percents")), _("Quoting rules"), wxICON_INFORMATION, parent);
-};
+}
 
 bool COptionsPageEdit::CreateControls(wxWindow* parent)
 {
@@ -148,7 +148,7 @@ bool COptionsPageEdit::Validate()
 	if (custom) {
 
 		std::wstring editor = fz::trimmed(impl_->custom_->GetValue().ToStdWstring());
-		
+
 		if (editor.empty()) {
 			return DisplayError(impl_->custom_, _("A default editor needs to be set."));
 		}
