@@ -127,36 +127,9 @@ bool COptionsPage::GetRCheck(int id) const
 	return pRadioButton ? pRadioButton->GetValue() : false;
 }
 
-void COptionsPage::SetStaticText(int id, wxString const& text, bool& failure)
-{
-	auto pStaticText = dynamic_cast<wxStaticText*>(FindWindow(id));
-	if (!pStaticText) {
-		failure = true;
-		return;
-	}
-
-	pStaticText->SetLabel(text);
-}
-
 void COptionsPage::ReloadSettings()
 {
 	m_pOwner->LoadSettings();
-}
-
-void COptionsPage::SetOptionFromText(int ctrlId, interfaceOptions optionId)
-{
-	const wxString& value = GetText(ctrlId);
-	m_pOptions->set(optionId, value.ToStdWstring());
-}
-
-void COptionsPage::SetIntOptionFromText(int ctrlId, interfaceOptions optionId)
-{
-	const wxString& value = GetText(ctrlId);
-
-	long n;
-	wxCHECK_RET(value.ToLong(&n), _T("Some options page did not validate user input!"));
-
-	m_pOptions->set(optionId, n);
 }
 
 bool COptionsPage::DisplayError(wxString const& controlToFocus, wxString const& error)

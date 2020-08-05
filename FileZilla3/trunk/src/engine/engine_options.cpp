@@ -9,8 +9,8 @@ unsigned int register_engine_options()
 	static int const value = register_options({
 		{ "Use Pasv mode", 1, option_flags::normal, 0, 1 },
 		{ "Limit local ports", false, option_flags::normal },
-		{ "Limit ports low", 6000, option_flags::normal, 1, 65536 },
-		{ "Limit ports high", 7000, option_flags::normal, 1, 65536 },
+		{ "Limit ports low", 6000, option_flags::normal, 1, 65535 },
+		{ "Limit ports high", 7000, option_flags::normal, 1, 65535 },
 		{ "Limit ports offset", 0, option_flags::normal, -65534, 65534 },
 		{ "External IP mode", 0, option_flags::normal, 0, 2 },
 		{ "External IP", L"", option_flags::normal, 100 },
