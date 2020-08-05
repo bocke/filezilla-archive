@@ -176,7 +176,7 @@ bool COptionsPageTransfer::SavePage()
 	m_pOptions->set(OPTION_SPEEDLIMIT_INBOUND, xrc_call(*this, "ID_DOWNLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
 	m_pOptions->set(OPTION_SPEEDLIMIT_OUTBOUND, xrc_call(*this, "ID_UPLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
 	m_pOptions->set(OPTION_SPEEDLIMIT_BURSTTOLERANCE, impl_->burst_tolerance_->GetSelection());
-	SetOptionFromText(XRCID("ID_REPLACE"), OPTION_INVALID_CHAR_REPLACE);
+	m_pOptions->set(OPTION_INVALID_CHAR_REPLACE, xrc_call(*this, "ID_REPLACE", &wxTextCtrlEx::GetValue).ToStdWstring());
 	SetOptionFromCheck(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE);
 
 	m_pOptions->set(OPTION_PREALLOCATE_SPACE, xrc_call(*this, "ID_PREALLOCATE", &wxCheckBox::GetValue));

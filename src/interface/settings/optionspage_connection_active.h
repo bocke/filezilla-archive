@@ -4,16 +4,19 @@
 class COptionsPageConnectionActive final : public COptionsPage
 {
 public:
-	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_CONNECTION_ACTIVE"); }
+	COptionsPageConnectionActive();
+	virtual ~COptionsPageConnectionActive();
+
+	virtual bool CreateControls(wxWindow* parent) override;
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 	virtual bool Validate() override;
 
 protected:
-	virtual void SetCtrlState();
+	void SetCtrlState();
 
-	DECLARE_EVENT_TABLE()
-	void OnRadioOrCheckEvent(wxCommandEvent& event);
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif

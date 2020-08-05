@@ -344,7 +344,7 @@ std::tuple<wxStaticBox*, wxFlexGridSizer*> DialogLayout::createStatBox(wxSizer* 
 {
 	auto* boxSizer = new wxStaticBoxSizer(wxHORIZONTAL, parent->GetContainingWindow(), title);
 	auto* box = boxSizer->GetStaticBox();
-	parent->Add(boxSizer, 1, wxGROW);
+	parent->Add(boxSizer, nullID, wxGROW);
 
 	auto* flex = createFlex(cols, rows);
 #ifdef __WXMSW__
