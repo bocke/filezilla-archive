@@ -73,7 +73,7 @@ public:
 std::pair<option_registry&, fz::scoped_lock> get_option_registry()
 {
 	static option_registry reg;
-	return std::make_pair(std::ref(reg), std::move(fz::scoped_lock(reg.mtx_)));
+	return std::make_pair(std::ref(reg), fz::scoped_lock(reg.mtx_));
 }
 }
 
