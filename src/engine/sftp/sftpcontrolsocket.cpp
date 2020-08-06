@@ -575,7 +575,7 @@ void CSftpControlSocket::OnQuotaRequest(fz::direction::type const d)
 		return;
 	}
 
-	size_t bytes = available(d);
+	fz::rate::type bytes = available(d);
 	if (bytes == fz::rate::unlimited) {
 		AddToStream(fz::sprintf("-%d-\n", d));
 	}
@@ -588,7 +588,7 @@ void CSftpControlSocket::OnQuotaRequest(fz::direction::type const d)
 			b = static_cast<int>(bytes);
 		}
 		AddToStream(fz::sprintf("-%d%d,%d\n", d, b, engine_.GetOptions().get_int(d ? OPTION_SPEEDLIMIT_OUTBOUND : OPTION_SPEEDLIMIT_INBOUND)));
-		consume(d, static_cast<size_t>(bytes));
+		consume(d, static_cast<fz::rate::type>(b));
 	}
 }
 
