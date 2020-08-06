@@ -299,13 +299,13 @@ std::wstring CBuildInfo::GetCPUCaps(char separator)
 namespace {
 bool IsAtLeast(int major, int minor = 0)
 {
-	OSVERSIONINFOEX vi = { 0 };
+	OSVERSIONINFOEX vi{};
 	vi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	vi.dwMajorVersion = major;
 	vi.dwMinorVersion = minor;
 	vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
 
-	DWORDLONG mask = 0;
+	DWORDLONG mask{};
 	VER_SET_CONDITION(mask, VER_MAJORVERSION, VER_GREATER_EQUAL);
 	VER_SET_CONDITION(mask, VER_MINORVERSION, VER_GREATER_EQUAL);
 	VER_SET_CONDITION(mask, VER_PLATFORMID, VER_EQUAL);
