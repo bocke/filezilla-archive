@@ -21,7 +21,7 @@ protected:
 	void OnCheck(wxCommandEvent& event);
 
 	struct impl;
-	std::unique_ptr<impl> impl_{};
+	std::unique_ptr<impl> impl_;
 };
 
 #endif
