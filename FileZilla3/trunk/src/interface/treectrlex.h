@@ -37,7 +37,7 @@ public:
 	virtual wxTreeItemId GetSelection() const override;
 
 	// wxTreeCtrl::GetSelections has an atrocious interface
-	std::vector<wxTreeItemId> GetSelections() const;
+	std::vector<wxTreeItemId> GetAllSelections() const;
 
 	// Items with a collapsed ancestor are not included
 	wxTreeItemId GetFirstItem() const;
