@@ -935,7 +935,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::OnProcessFocusChange(wx
 
 	if (old_focus >= 0) {
 		bool selected = GetItemState(old_focus, wxLIST_STATE_SELECTED) == wxLIST_STATE_SELECTED;
-		if (!selected && static_cast<size>(old_focus) < m_selections.size() && m_selections[old_focus]) {
+		if (!selected && static_cast<size_t>(old_focus) < m_selections.size() && m_selections[old_focus]) {
 			// Need to deselect all
 			if (m_pFilelistStatusBar) {
 				m_pFilelistStatusBar->UnselectAll();
