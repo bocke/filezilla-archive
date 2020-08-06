@@ -49,7 +49,7 @@ wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 wxTreeItemId wxTreeCtrlEx::GetSelection() const
 {
 	if (HasFlag(wxTR_MULTIPLE)) {
-		auto const selections = GetSelections();
+		auto const selections = GetAllSelections();
 		if (selections.size() != 1) {
 			return wxTreeItemId();
 		}
@@ -60,7 +60,7 @@ wxTreeItemId wxTreeCtrlEx::GetSelection() const
 	}
 }
 
-std::vector<wxTreeItemId> wxTreeCtrlEx::GetSelections() const
+std::vector<wxTreeItemId> wxTreeCtrlEx::GetAllSelections() const
 {
 	std::vector<wxTreeItemId> ret;
 
@@ -94,7 +94,7 @@ void wxTreeCtrlEx::SafeSelectItem(wxTreeItemId const& item, bool clearSelection)
 		if (HasFlag(wxTR_MULTIPLE)) {
 			++m_setSelection;
 			++ignore_change_event_;
-			selections = GetSelections();
+			selections = GetAllSelections();
 			if (clearSelection && !selections.empty()) {
 				UnselectAll();
 			}

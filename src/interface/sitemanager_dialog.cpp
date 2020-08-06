@@ -882,7 +882,7 @@ bool CSiteManagerDialog::SaveChild(pugi::xml_node element, wxTreeItemId child)
 
 void CSiteManagerDialog::OnNewFolder(wxCommandEvent&)
 {
-	auto const selections = tree_->GetSelections();
+	auto const selections = tree_->GetAllSelections();
 	if (selections.empty()) {
 		return;
 	}
@@ -1055,7 +1055,7 @@ void CSiteManagerDialog::OnRename(wxCommandEvent&)
 
 void CSiteManagerDialog::OnDelete(wxCommandEvent&)
 {
-	auto selections = tree_->GetSelections();
+	auto selections = tree_->GetAllSelections();
 	if (selections.empty()) {
 		return;
 	}
@@ -1160,7 +1160,7 @@ void CSiteManagerDialog::OnSelChanged(wxTreeEvent& evt)
 
 void CSiteManagerDialog::OnNewSite(wxCommandEvent&)
 {
-	auto const selections = tree_->GetSelections();
+	auto const selections = tree_->GetAllSelections();
 	if (selections.empty()) {
 		return;
 	}
@@ -1305,7 +1305,7 @@ void CSiteManagerDialog::OnItemActivated(wxTreeEvent&)
 
 void CSiteManagerDialog::SetCtrlState()
 {
-	auto const selections = tree_->GetSelections();
+	auto const selections = tree_->GetAllSelections();
 
 	wxTreeItemId item;
 	if (selections.size() == 1) {
@@ -1470,7 +1470,7 @@ void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
 		items.push_back(item);
 	}
 	else {
-		auto selections = tree_->GetSelections();
+		auto selections = tree_->GetAllSelections();
 
 		wxTreeItemId ancestor;
 		for (auto const& item : selections) {
@@ -1599,7 +1599,7 @@ void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 	}
 
 	std::vector<wxTreeItemId> items;
-	auto selections = tree_->GetSelections();
+	auto selections = tree_->GetAllSelections();
 
 	bool predefined{};
 
@@ -1940,7 +1940,7 @@ void CSiteManagerDialog::OnExportSelected(wxCommandEvent&)
 
 	auto servers = exportRoot.append_child("Servers");
 
-	auto selections = tree_->GetSelections();
+	auto selections = tree_->GetAllSelections();
 
 	wxTreeItemId ancestor;
 	for (auto const& item : selections) {
