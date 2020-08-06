@@ -47,7 +47,7 @@ bool COptionsPageLogging::CreateControls(wxWindow* parent)
 		auto row = lay.createFlex(3);
 		row->AddGrowableCol(1);
 		inner->Add(row, 0, wxLEFT|wxGROW, lay.indent);
-		row->Add(new wxStaticText(box, nullID, _("Filename")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("Filename:")), lay.valign);
 		impl_->file_ = new wxTextCtrlEx(box, nullID, wxString());
 		row->Add(impl_->file_, lay.valigng);
 		impl_->browse_ = new wxButton(box, nullID, _("&Browse"));
@@ -58,9 +58,9 @@ bool COptionsPageLogging::CreateControls(wxWindow* parent)
 		inner->Add(impl_->do_limit_, 0, wxLEFT, lay.indent);
 		row = lay.createFlex(3);
 		inner->Add(row, 0, wxLEFT, lay.indent * 2);
-		row->Add(new wxStaticText(box, nullID, _("Limit")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("Limit:")), lay.valign);
 		impl_->limit_ = new wxTextCtrlEx(box, nullID, wxString());
-		row->Add(impl_->limit_, lay.valign);
+		row->Add(impl_->limit_, lay.valign)->SetMinSize(lay.dlgUnits(20), -1);
 		impl_->limit_->SetMaxLength(4);
 		row->Add(new wxStaticText(box, nullID, _("MiB")), lay.valign);
 
