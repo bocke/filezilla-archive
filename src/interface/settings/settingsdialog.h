@@ -45,7 +45,6 @@ protected:
 
 	std::map<interfaceOptions, std::wstring> m_oldValues;
 
-	DECLARE_EVENT_TABLE()
 	void OnPageChanging(wxTreeEvent& event);
 	void OnPageChanged(wxTreeEvent& event);
 	void OnOK(wxCommandEvent& event);

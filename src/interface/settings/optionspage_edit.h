@@ -10,6 +10,7 @@ class COptionsPageEdit final : public COptionsPage
 public:
 	COptionsPageEdit();
 	virtual ~COptionsPageEdit();
+
 	virtual bool CreateControls(wxWindow* parent) override;
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;

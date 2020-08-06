@@ -3,60 +3,105 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_logging.h"
-#include "../xrc_helper.h"
+#include "../textctrlex.h"
 
 #include <wx/filedlg.h>
+#include <wx/statbox.h>
 
-BEGIN_EVENT_TABLE(COptionsPageLogging, COptionsPage)
-EVT_BUTTON(XRCID("ID_BROWSE"), COptionsPageLogging::OnBrowse)
-EVT_CHECKBOX(XRCID("ID_LOGFILE"), COptionsPageLogging::OnCheck)
-EVT_CHECKBOX(XRCID("ID_DOLIMIT"), COptionsPageLogging::OnCheck)
-END_EVENT_TABLE()
+struct COptionsPageLogging::impl final
+{
+	wxCheckBox* timestamps_{};
+	wxCheckBox* log_{};
+	wxTextCtrlEx* file_{};
+	wxButton* browse_{};
+	wxCheckBox* do_limit_{};
+	wxTextCtrlEx* limit_{};
+};
 
+COptionsPageLogging::COptionsPageLogging()
+	: impl_(std::make_unique<impl>())
+{}
+
+COptionsPageLogging::~COptionsPageLogging()
+{
+}
+
+bool COptionsPageLogging::CreateControls(wxWindow* parent)
+{
+	auto const& lay = m_pOwner->layout();
+
+	Create(parent);
+	auto main = lay.createFlex(1);
+	main->AddGrowableCol(0);
+	main->AddGrowableRow(0);
+	SetSizer(main);
+
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Logging"), 1);
+
+		impl_->timestamps_ = new wxCheckBox(box, nullID, _("&Show timestamps in message log"));
+		inner->Add(impl_->timestamps_);
+
+		impl_->log_ = new wxCheckBox(box, nullID, _("&Log to file"));
+		inner->Add(impl_->log_);
+		auto row = lay.createFlex(3);
+		row->AddGrowableCol(1);
+		inner->Add(row, 0, wxLEFT|wxGROW, lay.indent);
+		row->Add(new wxStaticText(box, nullID, _("Filename")), lay.valign);
+		impl_->file_ = new wxTextCtrlEx(box, nullID, wxString());
+		row->Add(impl_->file_, lay.valigng);
+		impl_->browse_ = new wxButton(box, nullID, _("&Browse"));
+		row->Add(impl_->browse_, lay.valign);
+		impl_->browse_->Bind(wxEVT_BUTTON, &COptionsPageLogging::OnBrowse, this);
+
+		impl_->do_limit_ = new wxCheckBox(box, nullID, _("Limit size of logfile"));
+		inner->Add(impl_->do_limit_, 0, wxLEFT, lay.indent);
+		row = lay.createFlex(3);
+		inner->Add(row, 0, wxLEFT, lay.indent * 2);
+		row->Add(new wxStaticText(box, nullID, _("Limit")), lay.valign);
+		impl_->limit_ = new wxTextCtrlEx(box, nullID, wxString());
+		row->Add(impl_->limit_, lay.valign);
+		impl_->limit_->SetMaxLength(4);
+		row->Add(new wxStaticText(box, nullID, _("MiB")), lay.valign);
+
+		inner->Add(new wxStaticText(box, nullID, _("If the size of the logfile reaches the limit, it gets renamed by adding \".1\" to the end of the filename (possibly overwriting older logfiles) and a new file gets created.")), 0, wxLEFT, lay.indent * 2);
+		inner->Add(new wxStaticText(box, nullID, _("Changing logfile settings requires restart of FileZilla.")), 0, wxLEFT, lay.indent);
+
+		impl_->do_limit_->Bind(wxEVT_CHECKBOX, &COptionsPageLogging::OnCheck, this);
+		impl_->log_->Bind(wxEVT_CHECKBOX, &COptionsPageLogging::OnCheck, this);
+	}
+
+	return true;
+}
 bool COptionsPageLogging::LoadPage()
 {
-	bool failure = false;
-
-	SetCheck(XRCID("ID_TIMESTAMPS"), m_pOptions->get_int(OPTION_MESSAGELOG_TIMESTAMP) ? true : false, failure);
+	impl_->timestamps_->SetValue(m_pOptions->get_bool(OPTION_MESSAGELOG_TIMESTAMP));
 
 	std::wstring const filename = m_pOptions->get_string(OPTION_LOGGING_FILE);
-	SetCheck(XRCID("ID_LOGFILE"), !filename.empty(), failure);
-	SetText(XRCID("ID_FILENAME"), filename, failure);
+	impl_->log_->SetValue(!filename.empty());
+	impl_->file_->ChangeValue(filename);
 
-	int limit = m_pOptions->get_int(OPTION_LOGGING_FILE_SIZELIMIT);
-	if (limit < 0 || limit > 2000) {
-		limit = 0;
-	}
-	SetCheck(XRCID("ID_DOLIMIT"), limit > 0, failure);
-	if (!failure) {
-		XRCCTRL(*this, "ID_LIMIT", wxTextCtrl)->SetMaxLength(4);
-	}
+	int const limit = m_pOptions->get_int(OPTION_LOGGING_FILE_SIZELIMIT);
+	impl_->do_limit_->SetValue(limit > 0);
+	impl_->limit_->ChangeValue(fz::to_wstring(limit));
 
-	std::wstring v;
-	if (limit > 0) {
-		v = fz::to_wstring(limit);
-	}
-	SetText(XRCID("ID_LIMIT"), v, failure);
-
-	if (!failure) {
-		SetCtrlState();
-	}
-
-	return !failure;
+	SetCtrlState();
+	
+	return true;
 }
 
 bool COptionsPageLogging::SavePage()
 {
-	m_pOptions->set(OPTION_MESSAGELOG_TIMESTAMP, GetCheck(XRCID("ID_TIMESTAMPS")) ? 1 : 0);
+	m_pOptions->set(OPTION_MESSAGELOG_TIMESTAMP, impl_->timestamps_->GetValue());
 
-	wxString filename;
-	if (GetCheck(XRCID("ID_LOGFILE"))) {
-		filename = GetText(XRCID("ID_FILENAME"));
+	std::wstring file;
+	if (impl_->log_->GetValue()) {
+		file = impl_->file_->GetValue().ToStdWstring();
 	}
-	m_pOptions->set(OPTION_LOGGING_FILE, filename.ToStdWstring());
+	m_pOptions->set(OPTION_LOGGING_FILE, file);
 
-	if (GetCheck(XRCID("ID_DOLIMIT"))) {
-		m_pOptions->set(OPTION_LOGGING_FILE_SIZELIMIT, xrc_call(*this, "ID_LIMIT", &wxTextCtrl::GetValue).ToStdWstring());
+	if (impl_->do_limit_->GetValue()) {
+		m_pOptions->set(OPTION_LOGGING_FILE_SIZELIMIT, fz::to_integral<int>(impl_->limit_->GetValue().ToStdWstring()));
 	}
 	else {
 		m_pOptions->set(OPTION_LOGGING_FILE_SIZELIMIT, 0);
@@ -67,25 +112,21 @@ bool COptionsPageLogging::SavePage()
 
 bool COptionsPageLogging::Validate()
 {
-	bool log_to_file = GetCheck(XRCID("ID_LOGFILE"));
-	bool limit = GetCheck(XRCID("ID_DOLIMIT"));
-
-	if (log_to_file) {
-		wxTextCtrl *pFileName = XRCCTRL(*this, "ID_FILENAME", wxTextCtrl);
-		if (pFileName->GetValue().empty()) {
-			return DisplayError(pFileName, _("You need to enter a name for the log file."));
+	if (impl_->log_->GetValue()) {
+		wxString file = impl_->file_->GetValue();
+		if (file.empty()) {
+			return DisplayError(impl_->file_, _("You need to enter a name for the log file."));
 		}
 
-		wxFileName fn(pFileName->GetValue());
+		wxFileName fn(file);
 		if (!fn.IsOk() || !fn.DirExists()) {
-			return DisplayError(pFileName, _("Directory containing the logfile does not exist or filename is invalid."));
+			return DisplayError(impl_->file_, _("Directory containing the logfile does not exist or filename is invalid."));
 		}
 
-		if (limit) {
-			unsigned long v;
-			wxTextCtrl *pLimit = XRCCTRL(*this, "ID_LIMIT", wxTextCtrl);
-			if (!pLimit->GetValue().ToULong(&v) || v < 1 || v > 2000) {
-				return DisplayError(pLimit, _("The limit needs to be between 1 and 2000 MiB"));
+		if (impl_->do_limit_->GetValue()) {
+			auto v = fz::to_integral<int>(impl_->limit_->GetValue().ToStdWstring());
+			if (v < 1 || v > 2000) {
+				return DisplayError(impl_->limit_, _("The limit needs to be between 1 and 2000 MiB"));
 			}
 		}
 	}
@@ -94,13 +135,13 @@ bool COptionsPageLogging::Validate()
 
 void COptionsPageLogging::SetCtrlState()
 {
-	bool log_to_file = GetCheck(XRCID("ID_LOGFILE"));
-	bool limit = GetCheck(XRCID("ID_DOLIMIT"));
+	bool const log_to_file = impl_->log_->GetValue();
+	bool const limit = impl_->do_limit_->GetValue();
 
-	XRCCTRL(*this, "ID_FILENAME", wxTextCtrl)->Enable(log_to_file);
-	XRCCTRL(*this, "ID_BROWSE", wxButton)->Enable(log_to_file);
-	XRCCTRL(*this, "ID_DOLIMIT", wxCheckBox)->Enable(log_to_file);
-	XRCCTRL(*this, "ID_LIMIT", wxTextCtrl)->Enable(log_to_file && limit);
+	impl_->file_->Enable(log_to_file);
+	impl_->browse_->Enable(log_to_file);
+	impl_->do_limit_->Enable(log_to_file);
+	impl_->limit_->Enable(log_to_file && limit);
 }
 
 void COptionsPageLogging::OnBrowse(wxCommandEvent&)
@@ -111,7 +152,7 @@ void COptionsPageLogging::OnBrowse(wxCommandEvent&)
 		return;
 	}
 
-	XRCCTRL(*this, "ID_FILENAME", wxTextCtrl)->ChangeValue(dlg.GetPath());
+	impl_->file_->ChangeValue(dlg.GetPath());
 }
 
 void COptionsPageLogging::OnCheck(wxCommandEvent&)
