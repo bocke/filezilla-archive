@@ -6,7 +6,6 @@
 #include "optionspage_transfer.h"
 #include "../textctrlex.h"
 #include "../wxext/spinctrlex.h"
-#include "../xrc_helper.h"
 
 #include <wx/statbox.h>
 
@@ -17,6 +16,15 @@ struct COptionsPageTransfer::impl final
 	wxSpinCtrlEx* uploads_{};
 
 	wxChoice* burst_tolerance_{};
+
+	wxCheckBox* limit_{};
+	wxTextCtrlEx* dllimit_{};
+	wxTextCtrlEx* ullimit_{};
+
+	wxCheckBox* enable_replace_{};
+	wxTextCtrlEx* replace_{};
+
+	wxCheckBox* preallocate_{};
 };
 
 COptionsPageTransfer::COptionsPageTransfer()
@@ -62,25 +70,25 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Speed limits"), 1);
 
-		auto enable = new wxCheckBox(box, XRCID("ID_ENABLE_SPEEDLIMITS"), _("&Enable speed limits"));
-		inner->Add(enable);
+		impl_->limit_ = new wxCheckBox(box, nullID, _("&Enable speed limits"));
+		inner->Add(impl_->limit_);
 
 		auto innermost = lay.createFlex(2);
 		inner->Add(innermost);
 		innermost->Add(new wxStaticText(box, nullID, _("Download &limit:")), lay.valign);
 		auto row = lay.createFlex(2);
 		innermost->Add(row, lay.valign);
-		auto dllimit = new wxTextCtrlEx(box, XRCID("ID_DOWNLOADLIMIT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
-		dllimit->SetMaxLength(9);
-		row->Add(dllimit, lay.valign);
+		impl_->dllimit_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
+		impl_->dllimit_->SetMaxLength(9);
+		row->Add(impl_->dllimit_, lay.valign);
 		row->Add(new wxStaticText(box, nullID, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
 
 		innermost->Add(new wxStaticText(box, nullID, _("Upload &limit:")), lay.valign);
 		row = lay.createFlex(2);
 		innermost->Add(row, lay.valign);
-		auto ullimit = new wxTextCtrlEx(box, XRCID("ID_UPLOADLIMIT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
-		ullimit->SetMaxLength(9);
-		row->Add(ullimit, lay.valign);
+		impl_->ullimit_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(40), -1));
+		impl_->ullimit_->SetMaxLength(9);
+		row->Add(impl_->ullimit_, lay.valign);
 		row->Add(new wxStaticText(box, nullID, wxString::Format(_("(in %s/s)"), CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024))), lay.valign);
 
 		innermost->Add(new wxStaticText(box, nullID, _("&Burst tolerance:")), lay.valign);
@@ -90,23 +98,24 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 		impl_->burst_tolerance_->AppendString(_("Very high"));
 		innermost->Add(impl_->burst_tolerance_, lay.valign);
 
-		enable->Bind(wxEVT_CHECKBOX, [dllimit, ullimit, this](wxCommandEvent const& ev) {
-			dllimit->Enable(ev.IsChecked());
-			ullimit->Enable(ev.IsChecked());
+		impl_->limit_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent const& ev) {
+			impl_->dllimit_->Enable(ev.IsChecked());
+			impl_->ullimit_->Enable(ev.IsChecked());
 			impl_->burst_tolerance_->Enable(ev.IsChecked());
 		});
 	}
 	
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Filter invalid characters in filenames"), 1);
-		inner->Add(new wxCheckBox(box, XRCID("ID_ENABLE_REPLACE"), _("Enable invalid character &filtering")));
+		impl_->enable_replace_ = new wxCheckBox(box, nullID, _("Enable invalid character &filtering"));
+		inner->Add(impl_->enable_replace_);
 		inner->Add(new wxStaticText(box, nullID, _("When enabled, characters that are not supported by the local operating system in filenames are replaced if downloading such a file.")));
 		auto innermost = lay.createFlex(2);
 		inner->Add(innermost);
 		innermost->Add(new wxStaticText(box, nullID, _("&Replace invalid characters with:")), lay.valign);
-		auto replace = new wxTextCtrlEx(box, XRCID("ID_REPLACE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(10), -1));
-		replace->SetMaxLength(1);
-		innermost->Add(replace, lay.valign);
+		impl_->replace_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(10), -1));
+		impl_->replace_->SetMaxLength(1);
+		innermost->Add(impl_->replace_, lay.valign);
 #ifdef __WXMSW__
 		wxString invalid = _T("\\ / : * ? \" < > |");
 		wxString filtered = wxString::Format(_("The following characters will be replaced: %s"), invalid);
@@ -119,7 +128,8 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 
 	{
 		auto [box, inner] = lay.createStatBox(main, _("Preallocation"), 1);
-		inner->Add(new wxCheckBox(box, XRCID("ID_PREALLOCATE"), _("Pre&allocate space before downloading")));
+		impl_->preallocate_ = new wxCheckBox(box, nullID, _("Pre&allocate space before downloading"));
+		inner->Add(impl_->preallocate_);
 	}
 
 	GetSizer()->Fit(this);
@@ -129,24 +139,14 @@ bool COptionsPageTransfer::CreateControls(wxWindow* parent)
 
 bool COptionsPageTransfer::LoadPage()
 {
-	bool failure = false;
+	bool const enable_speedlimits = m_pOptions->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	impl_->limit_->SetValue(enable_speedlimits);
 
-	bool enable_speedlimits = m_pOptions->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
-	SetCheck(XRCID("ID_ENABLE_SPEEDLIMITS"), enable_speedlimits, failure);
+	impl_->dllimit_->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_INBOUND));
+	impl_->dllimit_->Enable(enable_speedlimits);
 
-	wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
-	if (!pTextCtrl) {
-		return false;
-	}
-	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_INBOUND));
-	pTextCtrl->Enable(enable_speedlimits);
-
-	pTextCtrl = XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl);
-	if (!pTextCtrl) {
-		return false;
-	}
-	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_OUTBOUND));
-	pTextCtrl->Enable(enable_speedlimits);
+	impl_->ullimit_->ChangeValue(m_pOptions->get_string(OPTION_SPEEDLIMIT_OUTBOUND));
+	impl_->ullimit_->Enable(enable_speedlimits);
 
 	impl_->transfers_->SetValue(m_pOptions->get_int(OPTION_NUMTRANSFERS));
 	impl_->downloads_->SetValue(m_pOptions->get_int(OPTION_CONCURRENTDOWNLOADLIMIT));
@@ -155,31 +155,28 @@ bool COptionsPageTransfer::LoadPage()
 	impl_->burst_tolerance_->SetSelection(m_pOptions->get_int(OPTION_SPEEDLIMIT_BURSTTOLERANCE));
 	impl_->burst_tolerance_->Enable(enable_speedlimits);
 
-	pTextCtrl = XRCCTRL(*this, "ID_REPLACE", wxTextCtrl);
-	pTextCtrl->ChangeValue(m_pOptions->get_string(OPTION_INVALID_CHAR_REPLACE));
+	impl_->enable_replace_->SetValue(m_pOptions->get_bool(OPTION_INVALID_CHAR_REPLACE_ENABLE));
+	impl_->replace_->ChangeValue(m_pOptions->get_string(OPTION_INVALID_CHAR_REPLACE));
 
-	SetCheckFromOption(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE, failure);
+	impl_->preallocate_->SetValue(m_pOptions->get_bool(OPTION_PREALLOCATE_SPACE));
 
-	xrc_call(*this, "ID_PREALLOCATE", &wxCheckBox::SetValue, m_pOptions->get_bool(OPTION_PREALLOCATE_SPACE));
-
-	return !failure;
+	return true;
 }
 
 bool COptionsPageTransfer::SavePage()
 {
-	m_pOptions->set(OPTION_SPEEDLIMIT_ENABLE, xrc_call(*this, "ID_ENABLE_SPEEDLIMITS", &wxCheckBox::GetValue));
+	m_pOptions->set(OPTION_SPEEDLIMIT_ENABLE, impl_->limit_->GetValue());
 
 	m_pOptions->set(OPTION_NUMTRANSFERS, impl_->transfers_->GetValue());
 	m_pOptions->set(OPTION_CONCURRENTDOWNLOADLIMIT,	impl_->downloads_->GetValue());
 	m_pOptions->set(OPTION_CONCURRENTUPLOADLIMIT, impl_->uploads_->GetValue());
 
-	m_pOptions->set(OPTION_SPEEDLIMIT_INBOUND, xrc_call(*this, "ID_DOWNLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
-	m_pOptions->set(OPTION_SPEEDLIMIT_OUTBOUND, xrc_call(*this, "ID_UPLOADLIMIT", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_SPEEDLIMIT_INBOUND, impl_->dllimit_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_SPEEDLIMIT_OUTBOUND, impl_->ullimit_->GetValue().ToStdWstring());
 	m_pOptions->set(OPTION_SPEEDLIMIT_BURSTTOLERANCE, impl_->burst_tolerance_->GetSelection());
-	m_pOptions->set(OPTION_INVALID_CHAR_REPLACE, xrc_call(*this, "ID_REPLACE", &wxTextCtrlEx::GetValue).ToStdWstring());
-	SetOptionFromCheck(XRCID("ID_ENABLE_REPLACE"), OPTION_INVALID_CHAR_REPLACE_ENABLE);
-
-	m_pOptions->set(OPTION_PREALLOCATE_SPACE, xrc_call(*this, "ID_PREALLOCATE", &wxCheckBox::GetValue));
+	m_pOptions->set(OPTION_INVALID_CHAR_REPLACE, impl_->replace_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_INVALID_CHAR_REPLACE_ENABLE, impl_->enable_replace_->GetValue());
+	m_pOptions->set(OPTION_PREALLOCATE_SPACE, impl_->preallocate_->GetValue());
 
 	return true;
 }
@@ -198,21 +195,17 @@ bool COptionsPageTransfer::Validate()
 		return DisplayError(impl_->uploads_, _("Please enter a number between 0 and 10 for the number of concurrent uploads."));
 	}
 
-	long tmp{};
-	auto pCtrl = XRCCTRL(*this, "ID_DOWNLOADLIMIT", wxTextCtrl);
-	if (!pCtrl->GetValue().ToLong(&tmp) || (tmp < 0)) {
+	if (fz::to_integral<int>(impl_->dllimit_->GetValue().ToStdWstring(), -1) < 0) {
 		const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
-		return DisplayError(pCtrl, wxString::Format(_("Please enter a download speed limit greater or equal to 0 %s/s."), unit));
+		return DisplayError(impl_->dllimit_, wxString::Format(_("Please enter a download speed limit greater or equal to 0 %s/s."), unit));
 	}
 
-	pCtrl = XRCCTRL(*this, "ID_UPLOADLIMIT", wxTextCtrl);
-	if (!pCtrl->GetValue().ToLong(&tmp) || (tmp < 0)) {
-		const wxString unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
-		return DisplayError(pCtrl, wxString::Format(_("Please enter an upload speed limit greater or equal to 0 %s/s."), unit));
+	if (fz::to_integral<int>(impl_->ullimit_->GetValue().ToStdWstring(), -1) < 0) {
+		wxString const unit = CSizeFormat::GetUnitWithBase(CSizeFormat::kilo, 1024);
+		return DisplayError(impl_->ullimit_, wxString::Format(_("Please enter an upload speed limit greater or equal to 0 %s/s."), unit));
 	}
 
-	pCtrl = XRCCTRL(*this, "ID_REPLACE", wxTextCtrl);
-	wxString replace = pCtrl->GetValue();
+	std::wstring replace = impl_->replace_->GetValue().ToStdWstring();
 #ifdef __WXMSW__
 	if (replace == _T("\\") ||
 		replace == _T("/") ||
@@ -227,7 +220,7 @@ bool COptionsPageTransfer::Validate()
 	if (replace == _T("/"))
 #endif
 	{
-		return DisplayError(pCtrl, _("You cannot replace an invalid character with another invalid character. Please enter a character that is allowed in filenames."));
+		return DisplayError(impl_->replace_, _("You cannot replace an invalid character with another invalid character. Please enter a character that is allowed in filenames."));
 	}
 
 	return true;

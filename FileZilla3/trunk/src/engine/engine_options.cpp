@@ -73,7 +73,7 @@ unsigned int register_engine_options()
 		{ "Proxy user", L"", option_flags::normal },
 		{ "Proxy password", L"", option_flags::normal },
 		{ "Logging file", L"", option_flags::platform },
-		{ "Logging filesize limit", 10, option_flags::normal, 0, 1024*1024 },
+		{ "Logging filesize limit", 10, option_flags::normal, 0, 2000 },
 		{ "Logging show detailed logs", false, option_flags::internal },
 		{ "Size format", 0, option_flags::normal, 0, 4 },
 		{ "Size thousands separator", true, option_flags::normal },

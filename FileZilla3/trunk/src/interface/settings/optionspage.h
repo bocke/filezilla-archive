@@ -17,19 +17,11 @@ public:
 	virtual bool SavePage() = 0;
 	virtual bool Validate() { return true; }
 
-	void SetCheck(int id, bool checked, bool& failure);
-	void SetCheckFromOption(int control_id, interfaceOptions option_id, bool& failure);
 	void SetRCheck(int id, bool checked, bool& failure);
-	void SetTextFromOption(int ctrlId, interfaceOptions optionId, bool& failure);
-	bool SetText(int id, std::wstring const& text, bool& failure);
 
 	// The GetXXX functions do never return an error since the controls were
 	// checked to exist while loading the dialog.
-	bool GetCheck(int id) const;
 	bool GetRCheck(int id) const;
-	std::wstring GetText(int id) const;
-
-	void SetOptionFromCheck(int control_id, interfaceOptions option_id);
 
 	void ReloadSettings();
 

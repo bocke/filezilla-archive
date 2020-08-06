@@ -1,10 +1,15 @@
 #ifndef FILEZILLA_INTERFACE_OPTIONSPAGE_LOGGING_HEADER
 #define FILEZILLA_INTERFACE_OPTIONSPAGE_LOGGING_HEADER
 
+#include "optionspage.h"
+
 class COptionsPageLogging final : public COptionsPage
 {
 public:
-	virtual wxString GetResourceName() const override { return _T("ID_SETTINGS_LOGGING"); }
+	COptionsPageLogging();
+	virtual ~COptionsPageLogging();
+
+	virtual bool CreateControls(wxWindow* parent) override;
 	virtual bool LoadPage() override;
 	virtual bool SavePage() override;
 	virtual bool Validate() override;
@@ -12,9 +17,11 @@ public:
 protected:
 	void SetCtrlState();
 
-	DECLARE_EVENT_TABLE()
 	void OnBrowse(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
+
+	struct impl;
+	std::unique_ptr<impl> impl_{};
 };
 
 #endif

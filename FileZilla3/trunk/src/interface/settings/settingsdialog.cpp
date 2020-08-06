@@ -29,13 +29,6 @@
 #include "../treectrlex.h"
 #include "../xrc_helper.h"
 
-BEGIN_EVENT_TABLE(CSettingsDialog, wxDialogEx)
-EVT_TREE_SEL_CHANGING(XRCID("ID_TREE"), CSettingsDialog::OnPageChanging)
-EVT_TREE_SEL_CHANGED(XRCID("ID_TREE"), CSettingsDialog::OnPageChanged)
-EVT_BUTTON(XRCID("wxID_OK"), CSettingsDialog::OnOK)
-EVT_BUTTON(XRCID("wxID_CANCEL"), CSettingsDialog::OnCancel)
-END_EVENT_TABLE()
-
 CSettingsDialog::CSettingsDialog(CFileZillaEngineContext & engine_context)
 	: m_engine_context(engine_context)
 {
@@ -65,17 +58,23 @@ bool CSettingsDialog::Create(CMainFrame* pMainFrame)
 
 	left->Add(new wxStaticText(this, nullID, _("Select &page:")));
 
-	tree_ = new wxTreeCtrlEx(this, XRCID("ID_TREE"), wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTR_HIDE_ROOT);
+	tree_ = new wxTreeCtrlEx(this, nullID, wxDefaultPosition, wxDefaultSize, DEFAULT_TREE_STYLE | wxTR_HIDE_ROOT);
 	tree_->SetFocus();
 	left->Add(tree_, 1, wxGROW);
 
 	auto ok = new wxButton(this, wxID_OK, _("OK"));
+	ok->Bind(wxEVT_BUTTON, &CSettingsDialog::OnOK, this);
 	ok->SetDefault();
 	left->Add(ok, lay.grow);
-	left->Add(new wxButton(this, wxID_CANCEL, _("Cancel")), lay.grow);
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	cancel->Bind(wxEVT_BUTTON, &CSettingsDialog::OnCancel, this);
+	left->Add(cancel, lay.grow);
 
 	pagePanel_ = new wxPanel(this);
 	main->Add(pagePanel_, lay.grow);
+
+	tree_->Bind(wxEVT_TREE_SEL_CHANGING, &CSettingsDialog::OnPageChanging, this);
+	tree_->Bind(wxEVT_TREE_SEL_CHANGED, &CSettingsDialog::OnPageChanged, this);
 
 	if (!LoadPages()) {
 		return false;
@@ -193,7 +192,7 @@ bool CSettingsDialog::LoadPages()
 	GetSizer()->Fit(this);
 
 	// Keep track of maximum page size
-	size = pagePanel_->GetClientSize();//wxSize(0, 0);
+	size = pagePanel_->GetClientSize();
 	for (auto const& page : m_pages) {
 		auto sizer = page.page->GetSizer();
 		if (sizer) {

@@ -55,6 +55,7 @@ bool COptionsPageFilelists::CreateControls(wxWindow* parent)
 		impl_->nameSortMode_->AppendString(_("Case sensitive (default)"));
 		impl_->nameSortMode_->AppendString(_("Case insensitive"));
 #endif
+		impl_->nameSortMode_->AppendString(_("Natural sort"));
 		inner->Add(impl_->nameSortMode_, lay.valign);
 
 	}
