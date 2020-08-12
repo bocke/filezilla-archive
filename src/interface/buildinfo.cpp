@@ -267,7 +267,7 @@ std::wstring CBuildInfo::GetCPUCaps(char separator)
 		std::make_tuple(1, 0, 2, 25, L"aes"),
 		std::make_tuple(1, 0, 2, 1,  L"pclmulqdq"),
 		std::make_tuple(1, 0, 2, 30, L"rdrnd"),
-		std::make_tuple(7, 0, 1, 3,  L"bmi2"),
+		std::make_tuple(7, 0, 1, 3,  L"bmi"),
 		std::make_tuple(7, 0, 1, 8,  L"bmi2"),
 		std::make_tuple(7, 0, 1, 19, L"adx"),
 		std::make_tuple(0x80000001, 0, 3, 29, L"lm")
