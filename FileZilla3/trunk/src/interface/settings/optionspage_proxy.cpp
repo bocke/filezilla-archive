@@ -4,64 +4,128 @@
 #include "settingsdialog.h"
 #include "optionspage.h"
 #include "optionspage_proxy.h"
-#include "../xrc_helper.h"
 
-BEGIN_EVENT_TABLE(COptionsPageProxy, COptionsPageProxy::COptionsPage)
-EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_NONE"), COptionsPageProxy::OnProxyTypeChanged)
-EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_HTTP"), COptionsPageProxy::OnProxyTypeChanged)
-EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_SOCKS4"), COptionsPageProxy::OnProxyTypeChanged)
-EVT_RADIOBUTTON(XRCID("ID_PROXYTYPE_SOCKS5"), COptionsPageProxy::OnProxyTypeChanged)
-END_EVENT_TABLE()
+#include "../textctrlex.h"
+
+#include <wx/statbox.h>
+
+struct COptionsPageProxy::impl final
+{
+	wxRadioButton* none_{};
+	wxRadioButton* http_{};
+	wxRadioButton* socks4_{};
+	wxRadioButton* socks5_{};
+
+	wxTextCtrlEx* host_{};
+	wxTextCtrlEx* port_{};
+	wxTextCtrlEx* user_{};
+	wxTextCtrlEx* pass_{};
+};
+
+COptionsPageProxy::COptionsPageProxy()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+COptionsPageProxy::~COptionsPageProxy() = default;
+
+bool COptionsPageProxy::CreateControls(wxWindow* parent)
+{
+	auto const& lay = m_pOwner->layout();
+
+	Create(parent);
+	auto main = lay.createFlex(1);
+	main->AddGrowableCol(0);
+
+	SetSizer(main);
+
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Generic proxy"), 1);
+		inner->AddGrowableCol(0);
+
+		inner->Add(new wxStaticText(box, nullID, _("Type of generic proxy:")));
+
+		impl_->none_ = new wxRadioButton(box, nullID, _("&None"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		inner->Add(impl_->none_);
+		impl_->http_ = new wxRadioButton(box, nullID, _("&HTTP/1.1 using CONNECT method"));
+		inner->Add(impl_->http_);
+		impl_->socks4_ = new wxRadioButton(box, nullID, L"SOC&KS 4");
+		inner->Add(impl_->socks4_);
+		impl_->socks5_ = new wxRadioButton(box, nullID, L"&SOCKS 5");
+		inner->Add(impl_->socks5_);
+
+		auto rows = lay.createFlex(2);
+		rows->AddGrowableCol(1);
+		inner->Add(rows, lay.grow);
+
+		rows->Add(new wxStaticText(box, nullID, _("P&roxy host:")));
+		impl_->host_ = new wxTextCtrlEx(box, nullID);
+		rows->Add(impl_->host_, lay.grow);
+		rows->Add(new wxStaticText(box, nullID, _("Proxy &port:")));
+		impl_->port_ = new wxTextCtrlEx(box, nullID);
+		rows->Add(impl_->port_);
+		rows->Add(new wxStaticText(box, nullID, _("Proxy &user:")));
+		impl_->user_ = new wxTextCtrlEx(box, nullID);
+		rows->Add(impl_->user_, lay.grow);
+		rows->Add(new wxStaticText(box, nullID, _("Pro&xy password:")));
+		impl_->pass_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+		rows->Add(impl_->pass_, lay.grow);
+
+		inner->Add(new wxStaticText(box, nullID, _("Note: Using a generic proxy forces passive mode on FTP connections.")));
+	}
+
+	impl_->none_->Bind(wxEVT_RADIOBUTTON, &COptionsPageProxy::OnProxyTypeChanged, this);
+	impl_->http_->Bind(wxEVT_RADIOBUTTON, &COptionsPageProxy::OnProxyTypeChanged, this);
+	impl_->socks4_->Bind(wxEVT_RADIOBUTTON, &COptionsPageProxy::OnProxyTypeChanged, this);
+	impl_->socks5_->Bind(wxEVT_RADIOBUTTON, &COptionsPageProxy::OnProxyTypeChanged, this);
+
+	return true;
+}
 
 bool COptionsPageProxy::LoadPage()
 {
-	bool failure = false;
-
-	xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_HOST));
-	xrc_call(*this, "ID_PROXY_PORT", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_PORT));
-	xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_USER));
-	xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::ChangeValue, m_pOptions->get_string(OPTION_PROXY_PASS));
+	impl_->host_->ChangeValue(m_pOptions->get_string(OPTION_PROXY_HOST));
+	impl_->port_->ChangeValue(m_pOptions->get_string(OPTION_PROXY_PORT));
+	impl_->user_->ChangeValue(m_pOptions->get_string(OPTION_PROXY_USER));
+	impl_->pass_->ChangeValue(m_pOptions->get_string(OPTION_PROXY_PASS));
 
 	int type = m_pOptions->get_int(OPTION_PROXY_TYPE);
 	switch (type)
 	{
 	default:
 	case 0:
-		SetRCheck(XRCID("ID_PROXYTYPE_NONE"), true, failure);
+		impl_->none_->SetValue(true);
 		break;
 	case 1:
-		SetRCheck(XRCID("ID_PROXYTYPE_HTTP"), true, failure);
+		impl_->http_->SetValue(true);
 		break;
 	case 2:
-		SetRCheck(XRCID("ID_PROXYTYPE_SOCKS5"), true, failure);
+		impl_->socks5_->SetValue(true);
 		break;
 	case 3:
-		SetRCheck(XRCID("ID_PROXYTYPE_SOCKS4"), true, failure);
+		impl_->socks4_->SetValue(true);
 		break;
 	}
 
-	if (!failure) {
-		SetCtrlState();
-	}
-
-	return !failure;
+	SetCtrlState();
+	return true;
 }
 
 bool COptionsPageProxy::SavePage()
 {
-	m_pOptions->set(OPTION_PROXY_HOST, xrc_call(*this, "ID_PROXY_HOST", &wxTextCtrl::GetValue).ToStdWstring());
-	m_pOptions->set(OPTION_PROXY_PORT, xrc_call(*this, "ID_PROXY_PORT", &wxTextCtrl::GetValue).ToStdWstring());
-	m_pOptions->set(OPTION_PROXY_USER, xrc_call(*this, "ID_PROXY_USER", &wxTextCtrl::GetValue).ToStdWstring());
-	m_pOptions->set(OPTION_PROXY_PASS, xrc_call(*this, "ID_PROXY_PASS", &wxTextCtrl::GetValue).ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_HOST, impl_->host_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_PORT, impl_->port_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_USER, impl_->user_->GetValue().ToStdWstring());
+	m_pOptions->set(OPTION_PROXY_PASS, impl_->pass_->GetValue().ToStdWstring());
 
 	int type;
-	if (GetRCheck(XRCID("ID_PROXYTYPE_HTTP"))) {
+	if (impl_->http_->GetValue()) {
 		type = 1;
 	}
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS5"))) {
+	else if (impl_->socks5_->GetValue()) {
 		type = 2;
 	}
-	else if (GetRCheck(XRCID("ID_PROXYTYPE_SOCKS4"))) {
+	else if (impl_->socks4_->GetValue()) {
 		type = 3;
 	}
 	else {
@@ -74,25 +138,22 @@ bool COptionsPageProxy::SavePage()
 
 bool COptionsPageProxy::Validate()
 {
-	if (XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue()) {
+	if (impl_->none_->GetValue()) {
 		return true;
 	}
 
-	wxTextCtrl* pTextCtrl = XRCCTRL(*this, "ID_PROXY_HOST", wxTextCtrl);
-	wxString host = pTextCtrl->GetValue();
-	host.Trim(false);
-	host.Trim(true);
+	std::wstring host = impl_->host_->GetValue().ToStdWstring();
+	fz::trim(host);
 	if (host.empty()) {
-		return DisplayError(_T("ID_PROXY_HOST"), _("You need to enter a proxy host."));
+		return DisplayError(impl_->host_, _("You need to enter a proxy host."));
 	}
 	else {
-		pTextCtrl->ChangeValue(host);
+		impl_->host_->ChangeValue(host);
 	}
 
-	pTextCtrl = XRCCTRL(*this, "ID_PROXY_PORT", wxTextCtrl);
-	unsigned long port;
-	if (!pTextCtrl->GetValue().ToULong(&port) || port < 1 || port > 65536) {
-		return DisplayError(_T("ID_PROXY_PORT"), _("You need to enter a proxy port in the range from 1 to 65535"));
+	int port = fz::to_integral<int>(impl_->port_->GetValue().ToStdWstring());
+	if (port < 1 || port > 65535) {
+		return DisplayError(impl_->port_, _("You need to enter a proxy port in the range from 1 to 65535"));
 	}
 
 	return true;
@@ -100,13 +161,13 @@ bool COptionsPageProxy::Validate()
 
 void COptionsPageProxy::SetCtrlState()
 {
-	bool enabled = XRCCTRL(*this, "ID_PROXYTYPE_NONE", wxRadioButton)->GetValue() == 0;
-	bool enabled_auth = XRCCTRL(*this, "ID_PROXYTYPE_SOCKS4", wxRadioButton)->GetValue() == 0;
+	bool const enabled = !impl_->none_->GetValue();
+	bool enabled_auth = !impl_->socks4_->GetValue();
 
-	XRCCTRL(*this, "ID_PROXY_HOST", wxTextCtrl)->Enable(enabled);
-	XRCCTRL(*this, "ID_PROXY_PORT", wxTextCtrl)->Enable(enabled);
-	XRCCTRL(*this, "ID_PROXY_USER", wxTextCtrl)->Enable(enabled && enabled_auth);
-	XRCCTRL(*this, "ID_PROXY_PASS", wxTextCtrl)->Enable(enabled && enabled_auth);
+	impl_->host_->Enable(enabled);
+	impl_->port_->Enable(enabled);
+	impl_->user_->Enable(enabled && enabled_auth);
+	impl_->pass_->Enable(enabled && enabled_auth);
 }
 
 void COptionsPageProxy::OnProxyTypeChanged(wxCommandEvent&)

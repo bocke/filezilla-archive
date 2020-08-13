@@ -11,15 +11,27 @@
 
 #include <wx/statbox.h>
 
+struct COptionsPagePasswords::impl final
+{
+	wxTextCtrlEx* masterpw_{};
+	wxTextCtrlEx* masterrepeat_{};
+};
+
+COptionsPagePasswords::COptionsPagePasswords()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+COptionsPagePasswords::~COptionsPagePasswords() = default;
+
 bool COptionsPagePasswords::LoadPage()
 {
 	bool failure = false;
 
 	auto onChange = [this](wxEvent const&) {
 		bool checked = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
-		xrc_call(*this, "ID_MASTERPASSWORD", &wxControl::Enable, checked);
-		xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxControl::Enable, checked);
-
+		impl_->masterpw_->Enable(checked);
+		impl_->masterpw_->Enable(checked);
 	};
 	XRCCTRL(*this, "ID_PASSWORDS_SAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
 	XRCCTRL(*this, "ID_PASSWORDS_NOSAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
@@ -42,7 +54,7 @@ bool COptionsPagePasswords::LoadPage()
 				xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::SetValue, true);
 
 				// @translator: Keep this string as short as possible
-				xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::SetHint, _("Leave empty to keep existing password."));
+				impl_->masterpw_->SetHint(_("Leave empty to keep existing password."));
 			}
 			else {
 				xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::SetValue, true);
@@ -64,7 +76,7 @@ bool COptionsPagePasswords::SavePage()
 		return true;
 	}
 
-	std::wstring const newPw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
+	std::wstring const newPw = impl_->masterpw_->GetValue().ToStdWstring();
 
 	bool const save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
 	bool const useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
@@ -145,19 +157,19 @@ bool COptionsPagePasswords::Validate()
 {
 	bool useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
 	if (useMaster) {
-		wxString pw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue);
-		wxString repeat = xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxTextCtrl::GetValue);
+		wxString const pw = impl_->masterpw_->GetValue();
+		wxString const repeat = impl_->masterrepeat_->GetValue();
 		if (pw != repeat) {
-			return DisplayError(_T("ID_MASTERPASSWORD"), _("The entered passwords are not the same."));
+			return DisplayError(impl_->masterpw_, _("The entered passwords are not the same."));
 		}
 
 		auto key = fz::public_key::from_base64(fz::to_utf8(m_pOptions->get_string(OPTION_MASTERPASSWORDENCRYPTOR)));
 		if (!key && pw.empty()) {
-			return DisplayError(_T("ID_MASTERPASSWORD"), _("You need to enter a master password."));
+			return DisplayError(impl_->masterpw_, _("You need to enter a master password."));
 		}
 
 		if (!pw.empty() && pw.size() < 8) {
-			return DisplayError(_T("ID_MASTERPASSWORD"), _("The master password needs to be at least 8 characters long."));
+			return DisplayError(impl_->masterpw_, _("The master password needs to be at least 8 characters long."));
 		}
 	}
 	return true;
@@ -181,10 +193,11 @@ bool COptionsPagePasswords::CreateControls(wxWindow* parent)
 	auto changeSizer = lay.createFlex(2);
 	changeSizer->AddGrowableCol(1);
 	changeSizer->Add(new wxStaticText(box, nullID, _("Master password:")), lay.valign);
-	auto pw = new wxTextCtrlEx(box, XRCID("ID_MASTERPASSWORD"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
-	changeSizer->Add(pw, lay.valigng);
+	impl_->masterpw_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	changeSizer->Add(impl_->masterpw_, lay.valigng);
 	changeSizer->Add(new wxStaticText(box, nullID, _("Repeat password:")), lay.valign);
-	changeSizer->Add(new wxTextCtrlEx(box, XRCID("ID_MASTERPASSWORD_REPEAT"), wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD), lay.valigng);
+	impl_->masterrepeat_ = new wxTextCtrlEx(box, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	changeSizer->Add(impl_->masterrepeat_, lay.valigng);
 
 	inner->Add(changeSizer, 0, wxGROW | wxLEFT, lay.indent);
 	inner->Add(new wxStaticText(box, nullID, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, lay.indent);

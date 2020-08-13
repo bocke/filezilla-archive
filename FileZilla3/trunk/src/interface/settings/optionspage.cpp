@@ -17,11 +17,6 @@ bool COptionsPage::CreatePage(COptions* pOptions, CSettingsDialog* pOwner, wxWin
 	return true;
 }
 
-bool COptionsPage::CreateControls(wxWindow* parent)
-{
-	return wxXmlResource::Get()->LoadPanel(this, parent, GetResourceName());
-}
-
 void COptionsPage::UpdateMaxPageSize(wxSize& maxSize)
 {
 	wxSize size = GetSize();
@@ -41,41 +36,9 @@ void COptionsPage::UpdateMaxPageSize(wxSize& maxSize)
 	}
 }
 
-void COptionsPage::SetRCheck(int id, bool checked, bool& failure)
-{
-	auto pRadioButton = dynamic_cast<wxRadioButton*>(FindWindow(id));
-	if (!pRadioButton) {
-		failure = true;
-		return;
-	}
-
-	pRadioButton->SetValue(checked);
-}
-
-bool COptionsPage::GetRCheck(int id) const
-{
-	auto pRadioButton = dynamic_cast<wxRadioButton*>(FindWindow(id));
-	wxASSERT(pRadioButton);
-
-	return pRadioButton ? pRadioButton->GetValue() : false;
-}
-
 void COptionsPage::ReloadSettings()
 {
 	m_pOwner->LoadSettings();
-}
-
-bool COptionsPage::DisplayError(wxString const& controlToFocus, wxString const& error)
-{
-	int id = wxXmlResource::GetXRCID(controlToFocus);
-	if (id == -1) {
-		DisplayError(0, error);
-	}
-	else {
-		DisplayError(FindWindow(id), error);
-	}
-
-	return false;
 }
 
 bool COptionsPage::DisplayError(wxWindow* pWnd, wxString const& error)

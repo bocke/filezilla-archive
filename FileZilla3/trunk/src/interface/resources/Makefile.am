@@ -11,7 +11,6 @@ xrcdir = $(pkgdatadir)/resources/xrc
 dist_xrc_DATA = \
 	xrc/dialogs.xrc \
 	xrc/netconfwizard.xrc \
-	xrc/settings.xrc \
 	xrc/storj.xrc
 
 resources16dir = $(pkgdatadir)/resources/16x16
