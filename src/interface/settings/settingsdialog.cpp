@@ -27,7 +27,6 @@
 #include "../filezillaapp.h"
 #include "../Mainfrm.h"
 #include "../treectrlex.h"
-#include "../xrc_helper.h"
 
 CSettingsDialog::CSettingsDialog(CFileZillaEngineContext & engine_context)
 	: m_engine_context(engine_context)
@@ -37,6 +36,14 @@ CSettingsDialog::CSettingsDialog(CFileZillaEngineContext & engine_context)
 
 CSettingsDialog::~CSettingsDialog()
 {
+	m_activePanel = nullptr;
+	m_pages.clear();
+
+	if (tree_) {
+		// Trees can generate these events during destruction, not good.
+		tree_->Unbind(wxEVT_TREE_SEL_CHANGING, &CSettingsDialog::OnPageChanging, this);
+		tree_->Unbind(wxEVT_TREE_SEL_CHANGED, &CSettingsDialog::OnPageChanged, this);
+	}
 }
 
 bool CSettingsDialog::Create(CMainFrame* pMainFrame)
@@ -103,8 +110,6 @@ void CSettingsDialog::AddPage(wxString const& name, COptionsPage* page, int nest
 
 bool CSettingsDialog::LoadPages()
 {
-	InitXrc(L"settings.xrc");
-
 	// Get the tree control.
 
 	if (!tree_) {
@@ -278,11 +283,17 @@ void CSettingsDialog::OnOK(wxCommandEvent&)
 		page.page->SavePage();
 	}
 
+	m_activePanel = nullptr;
+	m_pages.clear();
+
 	EndModal(wxID_OK);
 }
 
 void CSettingsDialog::OnCancel(wxCommandEvent&)
 {
+	m_activePanel = nullptr;
+	m_pages.clear();
+
 	EndModal(wxID_CANCEL);
 
 	for (auto const& saved : m_oldValues) {

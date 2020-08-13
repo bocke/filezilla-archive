@@ -17,16 +17,9 @@ public:
 	virtual bool SavePage() = 0;
 	virtual bool Validate() { return true; }
 
-	void SetRCheck(int id, bool checked, bool& failure);
-
-	// The GetXXX functions do never return an error since the controls were
-	// checked to exist while loading the dialog.
-	bool GetRCheck(int id) const;
-
 	void ReloadSettings();
 
 	// Always returns false
-	bool DisplayError(wxString const& controlToFocus, wxString const& error);
 	bool DisplayError(wxWindow* pWnd, wxString const& error);
 
 	bool Display();
@@ -34,11 +27,7 @@ public:
 	virtual bool OnDisplayedFirstTime();
 
 protected:
-	virtual wxString GetResourceName() const {
-		return wxString();
-	}
-
-	virtual bool CreateControls(wxWindow* parent);
+	virtual bool CreateControls(wxWindow* parent) = 0;
 
 	COptions* m_pOptions{};
 	CSettingsDialog* m_pOwner{};
