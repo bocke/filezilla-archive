@@ -15,6 +15,7 @@
 #include <wx/dcclient.h>
 #include <wx/gbsizer.h>
 #include <wx/statline.h>
+#include <wx/wupdlock.h>
 
 #ifdef __WXMSW__
 #include "commctrl.h"
@@ -33,10 +34,12 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 
 	{
 		auto onChange = [this](ServerProtocol protocol, LogonType type) {
+			wxWindowUpdateLocker l(this);
 			SetControlVisibility(protocol, type);
 			for (auto & controls : controls_) {
 				controls->SetControlState();
 			}
+			GetContainingSizer()->Layout();
 		};
 
 		generalPage_ = new wxPanel(this);
