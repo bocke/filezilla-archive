@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Ryan Lerch <rlerch@redhat.com> -->
 <!-- Copyright 2016 Tim Kosse <tim.kosse@filezilla-project.org> -->
-<application>
-  <id type="desktop">org.filezilla-project.FileZilla</id>
+<component type="desktop">
+  <id>org.filezilla-project.FileZilla</id>
   <launchable type="desktop">filezilla.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>FileZilla</name>
+  <summary>Graphical FTP, FTPS and SFTP client</summary>
   <description>
     <p>FileZilla is a graphical FTP, FTPS and SFTP client. It is platform independent and supports all major desktop operating systems.</p>
     <ul>
@@ -28,9 +31,15 @@
       <li>Remote file search</li>
     </ul>
   </description>
-  <url type="homepage">https://filezilla-project.org/</url>
   <screenshots>
-    <screenshot type="default">https://filezilla-project.org/images/screenshots/fz3_linux_main.png</screenshot>
+    <screenshot type="default">
+      <image>https://filezilla-project.org/images/screenshots/fz3_linux_main.png</image>
+    </screenshot>
   </screenshots>
-  <updatecontact>tim.kosse@filezilla-project.org</updatecontact>
-</application>
+  <provides>
+    <id>filezilla.desktop</id>
+  </provides>
+  <url type="homepage">https://filezilla-project.org/</url>
+  <url type="bugtracker">https://trac.filezilla-project.org/</url>
+  <update_contact>tim.kosse@filezilla-project.org</update_contact>
+</component>
