@@ -71,7 +71,7 @@ process_dylibs()
 process_file()
 {
   local file="$1"
-  process_dylibs "$file" `otool -L "$file" | grep 'dylib' | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/' | grep -v ':$'`
+  process_dylibs "$file" `otool -L "$file" | grep "dylib\\|\\.so" | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/' | grep -v ':$'`
 }
 
 for file in "${bundle}/Contents/MacOS/"*; do
