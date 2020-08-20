@@ -15,10 +15,6 @@ public:
 	virtual int Send() override;
 	virtual int ParseResponse() override;
 	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
-
-private:
-	std::wstring bucket_;
-	std::wstring fileId_;
 };
 
 #endif

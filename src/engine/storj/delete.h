@@ -16,11 +16,9 @@ public:
 
 	virtual int Send() override;
 	virtual int ParseResponse() override;
-	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
 
 	CServerPath path_;
 	std::vector<std::wstring> files_;
-	std::vector<std::wstring> fileIds_;
 
 	// Set to fz::datetime::Now initially and after
 	// sending an updated listing to the UI.
@@ -30,8 +28,6 @@ public:
 
 	// Set to true if deletion of at least one file failed
 	bool deleteFailed_{};
-
-	std::wstring bucket_;
 };
 
 #endif

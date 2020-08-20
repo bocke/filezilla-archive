@@ -1,13 +1,16 @@
-#include <stdio.h>
-
 #include "events.hpp"
 
+#include <libfilezilla/file.hpp>
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/mutex.hpp>
 
-#include "storj.h"
+#define UPLINK_DISABLE_NAMESPACE_COMPAT
+typedef bool _Bool;
+#include <uplink/uplink.h>
 
-#include <map>
+#include <memory>
+
+namespace {
 
 fz::mutex output_mutex;
 
@@ -32,6 +35,19 @@ void fzprintf(storjEvent event, Args &&... args)
 
 	fputc('\n', stdout);
 	fflush(stdout);
+}
+
+void print_error(std::string_view fmt, UplinkError const* err)
+{
+	std::string_view msg(err->message, fz::strlen(err->message));
+	auto lines = fz::strtok_view(msg, "\r\n");
+
+	fzprintf(storjEvent::Error, fmt, lines.empty() ? std::string_view() : lines.front());
+
+	for (size_t i = 1; i < lines.size(); ++i) {
+		fz::trim(lines[i]);
+		fzprintf(storjEvent::Verbose, "%s", lines[i]);
+	}
 }
 
 bool getLine(std::string & line)
@@ -94,331 +110,350 @@ std::string next_argument(std::string & line)
 	return ret;
 }
 
-namespace {
-extern "C" void get_buckets_callback(uv_work_t *work_req, int status)
+void listBuckets(UplinkProject *project)
 {
-	if (status != 0) {
-		fzprintf(storjEvent::Error, "Request failed with outer status code %d", status);
-	}
-	else {
-		get_buckets_request_t *req = static_cast<get_buckets_request_t *>(work_req->data);
+	UplinkBucketIterator *it = uplink_list_buckets(project, nullptr);
 
-		if (req->status_code != 200) {
-			fzprintf(storjEvent::Error, "Request failed with status code %d", req->status_code);
+	while (uplink_bucket_iterator_next(it)) {
+		UplinkBucket *bucket = uplink_bucket_iterator_item(it);
+		std::string name = bucket->name;
+		fz::replace_substrings(name, "\r", "");
+		fz::replace_substrings(name, "\n", "");
+		fzprintf(storjEvent::Listentry, "%s\n-1\n%d", name, bucket->created);
+		uplink_free_bucket(bucket);
+	}
+	UplinkError *err = uplink_bucket_iterator_err(it);
+	if (err) {
+		print_error("bucket listing failed: %s", err);
+		uplink_free_error(err);
+		uplink_free_bucket_iterator(it);
+		return;
+	}
+
+	uplink_free_bucket_iterator(it);
+
+	fzprintf(storjEvent::Done);
+}
+
+void listObjects(UplinkProject *project, std::string const& bucket, std::string const& prefix)
+{
+	if (!prefix.empty() && prefix.back() != '/') {
+		listObjects(project, bucket, prefix + '/');
+	}
+
+	UplinkListObjectsOptions options = {
+		prefix.c_str(),
+		"",
+		false,
+		true,
+		true,
+	};
+
+	UplinkObjectIterator *it = uplink_list_objects(project, bucket.c_str(), &options);
+
+	while (uplink_object_iterator_next(it)) {
+		UplinkObject *object = uplink_object_iterator_item(it);
+
+		std::string objectName = object->key;
+		if (!prefix.empty()) {
+			size_t pos = objectName.find(prefix);
+			if (pos != 0) {
+				continue;
+			}
+			objectName = objectName.substr(prefix.size());
+		}
+		if (objectName != ".") {
+			fzprintf(storjEvent::Listentry, "%s\n%d\n%d", objectName, object->system.content_length, objectName, object->system.created);
+		}
+
+		uplink_free_object(object);
+	}
+
+	UplinkError *err = uplink_object_iterator_err(it);
+	if (err) {
+		print_error("object listing failed: %s", err);
+		uplink_free_error(err);
+		uplink_free_object_iterator(it);
+		return;
+	}
+	uplink_free_object_iterator(it);
+
+	fzprintf(storjEvent::Done);
+}
+
+bool close_and_free_download(UplinkDownloadResult& download_result, bool silent)
+{
+	UplinkError *close_error = uplink_close_download(download_result.download);
+	if (close_error) {
+		if (!silent) {
+			print_error("download failed to close: %s", close_error);
+		}
+		uplink_free_error(close_error);
+		uplink_free_download_result(download_result);
+		return false;
+	}
+
+	uplink_free_download_result(download_result);
+
+	return true;
+}
+
+void downloadObject(UplinkProject *project, std::string bucket, std::string const& id, std::string const& file)
+{
+	UplinkDownloadResult download_result = uplink_download_object(project, bucket.c_str(), id.c_str(), nullptr);
+	if (download_result.error) {
+		print_error("download starting failed: %s", download_result.error);
+		uplink_free_download_result(download_result);
+		return;
+	}
+
+	fz::file f(fz::to_native(fz::to_wstring_from_utf8(file)), fz::file::writing, fz::file::empty);
+	if (!f.opened()) {
+		fzprintf(storjEvent::Error, "Could not local file for writing");
+		close_and_free_download(download_result, true);
+		return;
+	}
+
+	size_t const buffer_size = 32768;
+	auto buffer = std::make_unique<char[]>(buffer_size);
+
+	UplinkDownload *download = download_result.download;
+
+	size_t downloaded_total = 0;
+
+	while (true) {
+		UplinkReadResult result = uplink_download_read(download, buffer.get(), buffer_size);
+		downloaded_total += result.bytes_read;
+
+
+		if (result.error) {
+			if (result.error->code == EOF) {
+				uplink_free_read_result(result);
+				break;
+			}
+			print_error("download failed receiving data: %s", result.error);
+			uplink_free_read_result(result);
+			close_and_free_download(download_result, true);
+
+			return;
+		}
+
+		int written = f.write(buffer.get(), result.bytes_read);
+
+		uplink_free_read_result(result);
+
+		if (written < 0 || static_cast<size_t>(written) != result.bytes_read) {
+			fzprintf(storjEvent::Error, "Could not write to local file");
+			close_and_free_download(download_result, true);
+			return;
+		}
+
+		fzprintf(storjEvent::Transfer, "%u", result.bytes_read);
+	}
+
+	if (!close_and_free_download(download_result, false)) {
+		return;
+	}
+
+	fzprintf(storjEvent::Done);
+}
+
+void uploadObject(UplinkProject *project, std::string const& bucket, std::string const& prefix, std::string const& file, std::string const& objectName)
+{
+	std::string object_key = bucket;
+	if (!prefix.empty()) {
+		object_key += "/" + prefix;
+	}
+
+	fz::file f;
+	if (!file.empty()) {
+		if (!f.open(fz::to_native(fz::to_wstring_from_utf8(file)), fz::file::reading, fz::file::existing)) {
+			fzprintf(storjEvent::Error, "Could not open local file");
+			return;
+		}
+	}
+
+	// get length of file:
+	size_t length = file.empty() ? 0 : f.size();
+
+	size_t const buffer_size = 32768;
+	auto buffer = std::make_unique<char[]>(buffer_size);
+
+	UplinkUploadResult upload_result = uplink_upload_object(project, object_key.c_str(), objectName.c_str(), nullptr);
+
+	if (upload_result.error) {
+		print_error("upload failed: %s", upload_result.error);
+		uplink_free_upload_result(upload_result);
+		return;
+	}
+
+	if (!upload_result.upload->_handle) {
+		fzprintf(storjEvent::Error, "Missing upload handle");
+		uplink_free_upload_result(upload_result);
+		return;
+	}
+
+	UplinkUpload *upload = upload_result.upload;
+
+	size_t uploaded_total = 0;
+
+	while (uploaded_total < length) {
+
+		int r = f.read(buffer.get(), buffer_size);
+		if (r <= 0) {
+			fzprintf(storjEvent::Error, "Could not read from local file");
+			uplink_free_upload_result(upload_result);
+			return;
+		}
+		UplinkWriteResult result = uplink_upload_write(upload, buffer.get(), r);
+
+		if (result.error) {
+			print_error("upload failed: %s", result.error);
+			uplink_free_write_result(result);
+			uplink_free_upload_result(upload_result);
+			return;
+		}
+
+		if (!result.bytes_written) {
+			fzprintf(storjEvent::Error, "upload_write did not write anything");
+			uplink_free_write_result(result);
+			uplink_free_upload_result(upload_result);
+			return;
+		}
+		uploaded_total += result.bytes_written;
+
+		fzprintf(storjEvent::Transfer, "%u", result.bytes_written);
+		uplink_free_write_result(result);
+	}
+
+	UplinkError *commit_err = uplink_upload_commit(upload);
+	if (commit_err) {
+		print_error("finalizing upload failed: %s", commit_err);
+		uplink_free_error(commit_err);
+		uplink_free_upload_result(upload_result);
+		return;
+	}
+
+	uplink_free_upload_result(upload_result);
+
+	fzprintf(storjEvent::Done);
+}
+
+void deleteObject(UplinkProject *project, std::string bucketName, std::string objectKey)
+{
+	UplinkObjectResult object_result = uplink_delete_object(project, bucketName.c_str(), objectKey.c_str());
+	if (object_result.error) {
+		print_error("failed to create bucket: %s", object_result.error);
+		uplink_free_object_result(object_result);
+		return;
+	}
+
+	fzprintf(storjEvent::Status, "deleted object %s", objectKey);
+	uplink_free_object_result(object_result);
+	fzprintf(storjEvent::Done);
+}
+
+void createBucket(UplinkProject *project, std::string bucketName)
+{
+	UplinkBucketResult bucket_result = uplink_ensure_bucket(project, bucketName.c_str());
+	if (bucket_result.error) {
+		print_error("failed to create bucket: %s", bucket_result.error);
+		uplink_free_bucket_result(bucket_result);
+		return;
+	}
+
+	UplinkBucket *bucket = bucket_result.bucket;
+	fzprintf(storjEvent::Status, "created bucket %s", bucket->name);
+	uplink_free_bucket_result(bucket_result);
+
+	fzprintf(storjEvent::Done);
+}
+
+void deleteBucket(UplinkProject *project, std::string bucketName)
+{
+	UplinkBucketResult bucket_result = uplink_delete_bucket(project, bucketName.c_str());
+	if (bucket_result.error) {
+		print_error("Failed to remove bucket: %s", bucket_result.error);
+		uplink_free_bucket_result(bucket_result);
+		return;
+	}
+
+	if (bucket_result.bucket) {
+		UplinkBucket *bucket = bucket_result.bucket;
+		fzprintf(storjEvent::Status, "deleted bucket %s", bucket->name);
+	}
+	uplink_free_bucket_result(bucket_result);
+
+	fzprintf(storjEvent::Done);
+}
+
+std::pair<std::string, std::string> SplitPath(std::string_view path)
+{
+	std::pair<std::string, std::string> ret;
+
+	if (!path.empty()) {
+		size_t pos = path.find('/', 1);
+		if (pos != std::string::npos) {
+			ret.first = path.substr(1, pos - 1);
+			ret.second = path.substr(pos + 1);
 		}
 		else {
-			bool encrypted = false;
-
-			for (unsigned int i = 0; i < req->total_buckets; ++i) {
-				storj_bucket_meta_t &bucket = req->buckets[i];
-
-
-				if (!bucket.decrypted) {
-					encrypted = true;
-				}
-
-				std::string id = bucket.id;
-				std::string name = bucket.name;
-				std::string created;
-				if (bucket.created) {
-					created = bucket.created;
-				}
-				fz::replace_substrings(name, "\r", "");
-				fz::replace_substrings(id, "\r", "");
-				fz::replace_substrings(created, "\r", "");
-				fz::replace_substrings(name, "\n", "");
-				fz::replace_substrings(id, "\n", "");
-				fz::replace_substrings(created, "\n", "");
-
-				auto perms = "id:" + id;
-				if (encrypted) {
-					fz::replace_substrings(name, "/", "_");
-					perms += " nokey";
-				}
-
-				fzprintf(storjEvent::Listentry, "%s\n-1\n%s\n%s", name, perms, created);
-			}
-
-			if (encrypted) {
-				fzprintf(storjEvent::Status, "Warning: Wrong encryption key for at least one bucket");
-			}
-			fzprintf(storjEvent::Done);
-		}
-
-		json_object_put(req->response);
-		free(req);
-	}
-
-	free(work_req);
-}
-
-extern "C" void list_files_callback(uv_work_t *work_req, int status)
-{
-	if (status != 0) {
-		fzprintf(storjEvent::Error, "Request failed with outer status code %d", status);
-	}
-	else {
-		list_files_request_t *req = static_cast<list_files_request_t *>(work_req->data);
-
-		std::string const& prefix = *static_cast<std::string const*>(req->handle);
-
-		if (req->status_code != 200) {
-			fzprintf(storjEvent::Error, "Request failed with status code %d", req->status_code);
-		}
-		else {
-			std::map<std::string, std::pair<std::string, std::string>> dirs;
-
-			bool prefixIsValid = prefix.empty();
-			bool encrypted = false;
-			for (unsigned int i = 0; i < req->total_files; ++i) {
-				storj_file_meta_t &file = req->files[i];
-
-				if (!file.decrypted) {
-					encrypted = true;
-					break;
-				}
-
-				std::string name = file.filename;
-				std::string id = file.id;
-				uint64_t size = file.size;
-				std::string created;
-				if (file.created) {
-					created = file.created;
-				}
-				fz::replace_substrings(name, "\r", "");
-				fz::replace_substrings(id, "\r", "");
-				fz::replace_substrings(created, "\r", "");
-				fz::replace_substrings(name, "\n", "");
-				fz::replace_substrings(id, "\n", "");
-				fz::replace_substrings(created, "\n", "");
-
-				if (name.empty() || name == "." || name == "..") {
-					continue;
-				}
-
-				if (!prefix.empty()) {
-					if (name.substr(0, prefix.size()) != prefix) {
-						continue;
-					}
-					name = name.substr(prefix.size());
-					if (name.empty()) {
-						prefixIsValid = true;
-						fzprintf(storjEvent::Listentry, ".\n-1\n%s\n", id);
-						continue;
-					}
-				}
-
-				auto perms = "id:" + id;
-
-				auto pos = name.find('/');
-				if (pos != std::string::npos) {
-					bool actualDirEntry = pos + 1 == name.size();
-					name = name.substr(0, pos);
-					if (name.empty()) {
-						continue;
-					}
-
-					if (actualDirEntry) {
-						dirs[name] = std::make_pair(perms, created);
-					}
-					else {
-						dirs.insert(std::make_pair(name, std::make_pair(std::string(), std::string())));
-					}
-					continue;
-				}
-
-				prefixIsValid = true;
-				fzprintf(storjEvent::Listentry, "%s\n%d\n%s\n%s", name, size, perms, created);
-			}
-
-			if (encrypted) {
-				fzprintf(storjEvent::Error, "Wrong encryption key for this bucket");
-			}
-			else {
-				if (!dirs.empty()) {
-					prefixIsValid = true;
-				}
-
-				if (!prefixIsValid) {
-					fzprintf(storjEvent::Error, "Directory does not exist");
-				}
-				else {
-					for (auto const& dir : dirs) {
-						fzprintf(storjEvent::Listentry, "%s/\n-1\n%s\n%s", dir.first, dir.second.first, dir.second.second);
-					}
-					fzprintf(storjEvent::Done);
-				}
-			}
-		}
-
-		json_object_put(req->response);
-		free(req->path);
-		free(req);
-	}
-	free(work_req);
-}
-
-
-extern "C" void download_file_progress(double progress,
-								   uint64_t downloaded_bytes,
-								   uint64_t total_bytes,
-								   void *handle)
-{
-	uint64_t & lastProgress = *static_cast<uint64_t*>(handle);
-	if (downloaded_bytes > lastProgress) {
-		fzprintf(storjEvent::Transfer, "%u", downloaded_bytes - lastProgress);
-		lastProgress = downloaded_bytes;
-	}
-}
-
-extern "C" void download_file_complete(int status, FILE *fd, void *)
-{
-	if (status) {
-		fzprintf(storjEvent::Error, "Download failed with error %s (%d)", storj_strerror(status), status);
-	}
-	else {
-		fzprintf(storjEvent::Done);
-	}
-}
-
-extern "C" void upload_file_complete(int status, char* file_id, void *)
-{
-	if (status) {
-		fzprintf(storjEvent::Error, "Upload failed with error %s (%d)", storj_strerror(status), status);
-	}
-	else {
-		fzprintf(storjEvent::Done);
-	}
-	free(file_id);
-}
-
-extern "C" void log(char const* msg, int level, void*)
-{
-	std::string s(msg);
-	fz::replace_substrings(s, "\n", " ");
-	fz::trim(s);
-	fzprintf(storjEvent::Verbose, "%s", s);
-}
-
-extern "C" void generic_done(uv_work_t *work_req, int status)
-{
-	if (status) {
-		fzprintf(storjEvent::Error, "Command failed with error %s (%d)", storj_strerror(status), status);
-	}
-	else {
-		json_request_t *req = static_cast<json_request_t *>(work_req->data);
-
-		if (req->status_code < 200 || req->status_code > 299) {
-			fzprintf(storjEvent::Error, "Request failed with status code %d", req->status_code);
-		}
-		else {
-			fzprintf(storjEvent::Done);
+			ret.first = path.substr(1);
 		}
 	}
-}
-
-extern "C" void create_bucket_callback(uv_work_t *work_req, int status)
-{
-	create_bucket_request_t *req = static_cast<create_bucket_request_t *>(work_req->data);
-	if (status) {
-		fzprintf(storjEvent::Error, "Command failed with error %s (%d)", storj_strerror(status), status);
-	}
-	else {
-
-		if (req->status_code == 404) {
-			fzprintf(storjEvent::Error, "Cannot create bucket \"%s\": Name already exists", req->bucket->name);
-		}
-		else if (req->status_code != 201) {
-			fzprintf(storjEvent::Error, "Request failed with status code %d", req->status_code);
-		}
-		else {
-			fzprintf(storjEvent::Done);
-		}
-
-	}
-
-	if (req) {
-		json_object_put(req->response);
-		free(req);
-	}
-	free(work_req);
-}
-
-extern "C" void delete_bucket_callback(uv_work_t *work_req, int status)
-{
-	json_request_t *req = static_cast<json_request_t *>(work_req->data);
-
-	if (status) {
-		fzprintf(storjEvent::Error, "Command failed with error %s (%d)", storj_strerror(status), status);
-	}
-	else {
-		if (req->status_code != 200 && req->status_code != 204) {
-			fzprintf(storjEvent::Error, "Request failed with status code %d", req->status_code);
-		}
-		else {
-			fzprintf(storjEvent::Done);
-		}
-
-	}
-
-	if (req) {
-		json_object_put(req->response);
-		free(req->path);
-		free(req);
-	}
-	free(work_req);
+	return ret;
 }
 }
 
-#if defined(__MINGW32__)
-__declspec(dllexport) // This forces ld to not strip relocations so that ASLR can work on MSW.
-#endif
 int main()
 {
 	fzprintf(storjEvent::Reply, "fzStorj started, protocol_version=%d", FZSTORJ_PROTOCOL_VERSION);
 
-	std::string host;
-	unsigned short port = 443;
-	std::string user;
-	std::string pass;
-	std::string mnemonic;
-	std::string proxy;
+	std::string satelliteURL;
+	std::string apiKey;
+	std::string encryptionPassPhrase;
+	std::string serializedAccessGrantKey;
 
-	storj_env_t *env{};
+	UplinkProjectResult project_result{};
 
-	uint64_t timeout = STORJ_HTTP_TIMEOUT;
+	UplinkConfig config = {
+		"FileZilla",
+		0,
+		nullptr
+	};
 
-	auto init_env = [&](){
-		if (env) {
-			return;
+	auto openStorjProject = [&]() -> bool {
+		if (project_result.project) {
+			return true;
 		}
-		static storj_bridge_options_t options{};
-		options.host = host.c_str();
-		options.proto = "https";
-		options.port = port;
-		options.user = user.c_str();
-		options.pass = pass.c_str();
-
-		static storj_encrypt_options_t encrypt_options{};
-		encrypt_options.mnemonic = mnemonic.c_str();
-
-		static storj_http_options_t http_options{};
-		http_options.user_agent = "FileZilla/3";
-		http_options.low_speed_limit = STORJ_LOW_SPEED_LIMIT;
-		http_options.low_speed_time = STORJ_LOW_SPEED_TIME;
-		http_options.timeout = timeout;
-		if (!proxy.empty()) {
-			http_options.proxy_url = proxy.c_str();
+		UplinkAccessResult access_result;
+		if (!apiKey.empty()) {
+			access_result = uplink_config_request_access_with_passphrase(config, satelliteURL.c_str(), apiKey.c_str(), encryptionPassPhrase.c_str());
+			if (access_result.error) {
+				print_error("failed to parse access: %s", access_result.error);
+				uplink_free_access_result(access_result);
+				return false;
+			}
+		}
+		else {
+			access_result = uplink_parse_access(serializedAccessGrantKey.c_str());
+			if (access_result.error) {
+				print_error("failed to parse access: %s", access_result.error);
+				uplink_free_access_result(access_result);
+				return false;
+			}
 		}
 
-		static storj_log_options_t log_options{};
-		log_options.logger = log;
-		log_options.level = 4;
-		env = storj_init_env(&options, &encrypt_options, &http_options, &log_options);
-		if (!env) {
-			fzprintf(storjEvent::Error, "storj_init_env failed");
-			exit(1);
+		project_result = uplink_config_open_project(config, access_result.access);
+		uplink_free_access_result(access_result);
+		if (project_result.error) {
+			print_error("failed to open project: %s", project_result.error);
+			uplink_free_project_result(project_result);
+			project_result = UplinkProjectResult{};
+			return false;
 		}
+
+		return true;
 	};
 
 	int ret = 0;
@@ -441,292 +476,123 @@ int main()
 		}
 
 		if (command == "host") {
-			host = arg;
-			std::size_t sep = host.find(':');
-			if (sep != std::string::npos) {
-				port = fz::to_integral<unsigned short>(host.substr(pos + 1));
-				host = host.substr(0, pos);
-			}
+			serializedAccessGrantKey = satelliteURL = next_argument(arg);
 			fzprintf(storjEvent::Done);
 		}
 		else if (command == "user") {
-			user = arg;
+			apiKey = next_argument(arg);
 			fzprintf(storjEvent::Done);
 		}
 		else if (command == "pass") {
-			pass = arg;
+			encryptionPassPhrase = next_argument(arg);
 			fzprintf(storjEvent::Done);
-		}
-		else if (command == "genkey") {
-
-			char* buf = 0;
-			storj_mnemonic_generate(128, &buf);
-			if (buf) {
-				fzprintf(storjEvent::Done, "%s", buf);
-				free(buf);
-			}
-			else {
-				fzprintf(storjEvent::Error);
-			}
-		}
-		else if (command == "key" || command == "validatekey") {
-			mnemonic = arg;
-			if (storj_mnemonic_check(mnemonic.c_str())) {
-				if (command == "key") {
-					fzprintf(storjEvent::Done);
-				}
-				else {
-					fzprintf(storjEvent::Done, "");
-				}
-			}
-			else {
-				fzprintf(storjEvent::Error, "Invalid encryption key");
-			}
-		}
-		else if (command == "timeout") {
-			timeout = fz::to_integral<uint64_t>(arg);
-			fzprintf(storjEvent::Done);
-		}
-		else if (command == "proxy") {
-			proxy = arg;
-			fzprintf(storjEvent::Done);
-		}
-		else if (command == "list-buckets") {
-			init_env();
-			storj_bridge_get_buckets(env, 0, get_buckets_callback);
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
 		}
 		else if (command == "list") {
-			init_env();
 
-			if (arg.empty()) {
-				fzprintf(storjEvent::Error, "Bad arguments");
-				continue;
-			}
+			auto [bucket, prefix] = SplitPath(next_argument(arg));
 
-			std::string bucket, prefix;
-
-			size_t pos = arg.find(' ');
-			if (pos == std::string::npos) {
-				bucket = arg;
-			}
-			else {
-				bucket = arg.substr(0, pos);
-
-				prefix = arg.substr(pos + 1);
-
-				if (prefix.size() >= 2 && prefix.front() == '"' && prefix.back() == '"') {
-					prefix = fz::replaced_substrings(prefix.substr(1, prefix.size() - 2), "\"\"", "\"");
-				}
-
-				if (!prefix.empty() && prefix.back() != '/') {
-					fzprintf(storjEvent::Error, "Bad arguments");
+			if (bucket.empty()) {
+				if (!openStorjProject()) {
 					continue;
 				}
+				listBuckets(project_result.project);
 			}
+			else {
+				if (!prefix.empty() && prefix.back() != '/') {
+					prefix += '/';
+				}
 
-			storj_bridge_list_files(env, bucket.c_str(), &prefix, list_files_callback);
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
+				if (!openStorjProject()) {
+					continue;
+				}
+				listObjects(project_result.project, bucket, prefix);
 			}
 		}
 		else if (command == "get") {
-			size_t pos = arg.find(' ');
-			if (pos == std::string::npos) {
+			auto [bucket, key] = SplitPath(next_argument(arg));
+			std::string file = next_argument(arg);
+
+			if (file.empty() || bucket.empty() || key.empty() || key.back() == '/') {
 				fzprintf(storjEvent::Error, "Bad arguments");
 				continue;
 			}
-			std::string bucket = arg.substr(0, pos);
-			size_t pos2 = arg.find(' ', pos + 1);
-			if (pos == std::string::npos) {
-				fzprintf(storjEvent::Error, "Bad arguments");
-				continue;
-			}
-			auto id = arg.substr(pos + 1, pos2 - pos - 1);
-			auto file = arg.substr(pos2 + 1);
 
-			if (file.size() >= 3 && file.front() == '"' && file.back() == '"') {
-				file = fz::replaced_substrings(file.substr(1, file.size() - 2), "\"\"", "\"");
-			}
-
-			init_env();
-
-			FILE *fd = fopen(file.c_str(), "w+");
-
-			if (fd == NULL) {
-				int err = errno;
-				fzprintf(storjEvent::Error, "Could not open local file %s for writing: %d", file, err);
+			if (!openStorjProject()) {
 				continue;
 			}
 
-			storj_download_state_t *state = static_cast<storj_download_state_t*>(malloc(sizeof(storj_download_state_t)));
-
-			/*uv_signal_t sig;
-			uv_signal_init(env->loop, &sig);
-			uv_signal_start(&sig, signal_handler, SIGINT);
-			sig.data = state;*/
-
-			uint64_t lastProgress{};
-			int status = storj_bridge_resolve_file(env, state, bucket.c_str(),
-												   id.c_str(), fd, &lastProgress,
-												   download_file_progress,
-												   download_file_complete);
-			if (status) {
-				fclose(fd);
-				fzprintf(storjEvent::Error, "Could not download file, storj_bridge_resolve_file failed: %d", status);
-				continue;
-			}
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fclose(fd);
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
-			fclose(fd);
+			downloadObject(project_result.project, bucket, key, file);
 		}
 		else if (command == "put") {
-			std::string bucket = next_argument(arg);
 			std::string file = next_argument(arg);
-			std::string remote_name = next_argument(arg);
+			auto [bucket, key] = SplitPath(next_argument(arg));
 
-			if (bucket.empty() || file.empty() || remote_name.empty() || !arg.empty()) {
+			if (file.empty() || bucket.empty() || key.empty() || key.back() == '/') {
 				fzprintf(storjEvent::Error, "Bad arguments");
+				continue;
 			}
 
-			init_env();
+			if (file == "null" ) {
+				file.clear();
+			}
 
-			FILE *fd{};
-			if (file == "null") {
-#ifdef FZ_WINDOWS
-				char buf[MAX_PATH + 2];
-				int ret = GetTempPathA(MAX_PATH + 1, buf);
-				if (ret && ret <= MAX_PATH + 1) {
-					char buf2[MAX_PATH + 1];
-					ret = GetTempFileNameA(buf, "fzstorj", 0, buf2);
-					if (ret) {
-						fd = fopen(buf2, "r+D");
-						if (fd) {
-							fwrite(buf2, 1, 1, fd);
-							rewind(fd);
-						}
-					}
-				}
-#else
-				std::string tmpname = P_tmpdir;
-				tmpname += "/fzstorjXXXXXX";
-				char* buf = &tmpname[0];
-				int f = mkstemp(buf);
-				if (f != -1) {
-					unlink(buf);
-					write(f, buf, 1);
-					lseek(f, 0, SEEK_SET);
-					fd = fdopen(f, "r");
-				}
-#endif
+			std::string prefix;
+			std::string objectName;
+
+			size_t pos = key.rfind('/');
+			if (pos != std::string::npos) {
+				prefix = key.substr(0, pos);
+				objectName = key.substr(pos + 1);
 			}
 			else {
-				fd = fopen(file.c_str(), "r");
+				objectName = key;
 			}
 
-			if (fd == NULL) {
-				int err = errno;
-				fzprintf(storjEvent::Error, "Could not open local file %s for reading: %d", file, err);
+			if (!openStorjProject()) {
 				continue;
 			}
-
-
-			storj_upload_opts_t upload_opts;
-			upload_opts.prepare_frame_limit = 1;
-			upload_opts.push_frame_limit = 64;
-			upload_opts.push_shard_limit = 64;
-			upload_opts.bucket_id = bucket.c_str();
-			upload_opts.file_name = remote_name.c_str();
-			upload_opts.index = NULL;
-			upload_opts.rs = true;
-			upload_opts.fd = fd;
-
-			storj_upload_state_t *state = static_cast<storj_upload_state_t*>(malloc(sizeof(storj_upload_state_t)));
-
-			uint64_t lastProgress{};
-			int status = storj_bridge_store_file(env,
-												 state,
-												 &upload_opts,
-												 &lastProgress,
-												 download_file_progress,
-												 upload_file_complete);
-
-			if (status) {
-				fzprintf(storjEvent::Error, "Could not upload file, storj_bridge_store_file failed: %d", status);
-				continue;
-			}
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
+			uploadObject(project_result.project, bucket, prefix, file, objectName);
 		}
 		else if (command == "rm") {
-			auto args = fz::strtok(arg, ' ');
-			if (args.size() != 2) {
+			auto [bucket, key] = SplitPath(next_argument(arg));
+			if (bucket.empty() || key.empty()) {
 				fzprintf(storjEvent::Error, "Bad arguments");
 				continue;
 			}
-			init_env();
 
-			int status = storj_bridge_delete_file(env, args[0].c_str(), args[1].c_str(), nullptr, generic_done);
-
-			if (status) {
-				fzprintf(storjEvent::Error, "Could not delete file, storj_bridge_delete_file failed: %d", status);
+			if (!openStorjProject()) {
 				continue;
 			}
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
+
+			deleteObject(project_result.project, bucket, key);
 		}
 		else if (command == "mkbucket") {
-			std::string bucket = next_argument(arg);
-			if (bucket.empty() || !arg.empty()) {
+			std::string bucketName = next_argument(arg);
+			if (bucketName.empty()) {
 				fzprintf(storjEvent::Error, "Bad arguments");
 				continue;
 			}
-			init_env();
 
-			int status = storj_bridge_create_bucket(env, bucket.c_str(),
-												   NULL, create_bucket_callback);
-
-			if (status) {
-				fzprintf(storjEvent::Error, "Could not create bucket, storj_bridge_create_bucket failed: %d", status);
+			if (!openStorjProject()) {
 				continue;
 			}
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
+			createBucket(project_result.project, bucketName);
 		}
 		else if (command == "rmbucket") {
-			auto args = fz::strtok(arg, ' ');
-			if (args.size() != 1) {
+			std::string bucketName = next_argument(arg);
+			if (bucketName.empty()) {
 				fzprintf(storjEvent::Error, "Bad arguments");
 				continue;
 			}
-			init_env();
 
-			int status = storj_bridge_delete_bucket(env, args.front().c_str(),
-												   NULL, delete_bucket_callback);
-
-			if (status) {
-				fzprintf(storjEvent::Error, "Could not remove bucket, storj_bridge_delete_bucket failed: %d", status);
+			if (!openStorjProject()) {
 				continue;
 			}
-			if (uv_run(env->loop, UV_RUN_DEFAULT)) {
-				fzprintf(storjEvent::Error, "uv_run failed.");
-			}
+			deleteBucket(project_result.project, bucketName);
 		}
 		else {
 			fzprintf(storjEvent::Error, "No such command: %s", command);
 		}
-
-	}
-
-	if (env) {
-		storj_destroy_env(env);
 	}
 
 	return ret;

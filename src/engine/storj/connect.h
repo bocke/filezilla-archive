@@ -6,12 +6,9 @@
 enum connectStates
 {
 	connect_init,
-	connect_timeout,
-	connect_proxy,
 	connect_host,
 	connect_user,
-	connect_pass,
-	connect_key
+	connect_pass
 };
 
 class CStorjConnectOpData final : public COpData, public CStorjOpData

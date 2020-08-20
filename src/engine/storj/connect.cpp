@@ -7,6 +7,7 @@
 
 #include "../../include/engine_options.h"
 
+#include <libfilezilla/hash.hpp>
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
 
@@ -17,6 +18,13 @@ int CStorjConnectOpData::Send()
 	case connect_init:
 		{
 			log(logmsg::status, _("Connecting to %s..."), currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_));
+
+			// Since the encryption passphrase changes based on site content, add a disambiguation
+			auto const passphraseHash = fz::hex_encode<std::wstring>(fz::hmac_sha256(fz::to_utf8(controlSocket_.currentServer_.GetUser()), fz::to_utf8(controlSocket_.credentials_.GetPass())));
+			if (passphraseHash != controlSocket_.currentServer_.GetExtraParameter("passphrase_hash")) {
+				controlSocket_.currentServer_.SetExtraParameter("passphrase_hash", passphraseHash);
+			}
+			controlSocket_.engine_.AddNotification(std::make_unique<ServerChangeNotification>(controlSocket_.currentServer_));
 
 			auto executable = fz::to_native(engine_.GetOptions().get_string(OPTION_FZSTORJ_EXECUTABLE));
 			if (executable.empty()) {
@@ -39,65 +47,18 @@ int CStorjConnectOpData::Send()
 			}
 		}
 		return FZ_REPLY_WOULDBLOCK;
-	case connect_timeout:
-		return controlSocket_.SendCommand(fz::sprintf(L"timeout %d", engine_.GetOptions().get_int(OPTION_TIMEOUT)));
-	case connect_proxy:
-		{
-			fz::uri proxy_uri;
-			switch (engine_.GetOptions().get_int(OPTION_PROXY_TYPE))
-			{
-			case 0:
-				opState = connect_host;
-				return FZ_REPLY_CONTINUE;
-			case static_cast<int>(ProxyType::HTTP):
-				proxy_uri.scheme_ = "http";
-				break;
-			case static_cast<int>(ProxyType::SOCKS5):
-				proxy_uri.scheme_ = "socks5h";
-				break;
-			case static_cast<int>(ProxyType::SOCKS4):
-				proxy_uri.scheme_ = "socks4a";
-				break;
-			default:
-				log(logmsg::debug_warning, L"Unsupported proxy type");
-				return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
-			}
-
-			proxy_uri.host_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_HOST));
-			proxy_uri.port_ = engine_.GetOptions().get_int(OPTION_PROXY_PORT);
-			proxy_uri.user_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_USER));
-			proxy_uri.pass_ = fz::to_utf8(engine_.GetOptions().get_string(OPTION_PROXY_PASS));
-
-			auto cmd = L"proxy " + fz::to_wstring(proxy_uri.to_string());
-			proxy_uri.pass_.clear();
-			auto show = L"proxy " + fz::to_wstring(proxy_uri.to_string());
-			return controlSocket_.SendCommand(cmd, show);
-		}
 	case connect_host:
-		return controlSocket_.SendCommand(fz::sprintf(L"host %s", currentServer_.Format(ServerFormat::with_optional_port)));
+		return controlSocket_.SendCommand(fz::sprintf(L"host %s", currentServer_.Format(ServerFormat::with_port)));
 	case connect_user:
 		return controlSocket_.SendCommand(fz::sprintf(L"user %s", currentServer_.GetUser()));
 	case connect_pass:
 		{
 			std::wstring pass = controlSocket_.credentials_.GetPass();
-			size_t pos = pass.rfind('|');
-			if (pos == std::wstring::npos) {
-				log(logmsg::error, _("Password or encryption key is not set"));
+			if (pass.empty()) {
+				log(logmsg::error, _("Encryption passphrase is not set"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
-			pass = pass.substr(0, pos);
 			return controlSocket_.SendCommand(fz::sprintf(L"pass %s", pass), fz::sprintf(L"pass %s", std::wstring(pass.size(), '*')));
-		}
-	case connect_key:
-		{
-			std::wstring key = controlSocket_.credentials_.GetPass();
-			size_t pos = key.rfind('|');
-			if (pos == std::wstring::npos) {
-				log(logmsg::error, _("Password or encryption key is not set"));
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-			}
-			key = key.substr(pos + 1);
-			return controlSocket_.SendCommand(fz::sprintf(L"key %s", key), fz::sprintf(L"key %s", std::wstring(key.size(), '*')));
 		}
 	default:
 		log(logmsg::debug_warning, L"Unknown op state: %d", opState);
@@ -120,12 +81,6 @@ int CStorjConnectOpData::ParseResponse()
 			log(logmsg::error, _("fzstorj belongs to a different version of FileZilla"));
 			return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 		}
-		opState = connect_timeout;
-		break;
-	case connect_timeout:
-		opState = connect_host;
-		break;
-	case connect_proxy:
 		opState = connect_host;
 		break;
 	case connect_host:
@@ -135,10 +90,8 @@ int CStorjConnectOpData::ParseResponse()
 		opState = connect_pass;
 		break;
 	case connect_pass:
-		opState = connect_key;
-		break;
-	case connect_key:
 		return FZ_REPLY_OK;
+		break;
 	default:
 		log(logmsg::debug_warning, L"Unknown op state: %d", opState);
 		return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;

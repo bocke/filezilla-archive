@@ -117,7 +117,7 @@ void CStorjInputThread::processEvent(storjEvent eventType, std::wstring &error)
 		lines = 1;
 		break;
 	case storjEvent::Listentry:
-		lines = 4;
+		lines = 3;
 		break;
 	};
 

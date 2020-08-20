@@ -74,6 +74,7 @@ enum class ServerFormat
 {
 	host_only,
 	with_optional_port,
+	with_port,
 	with_user_and_optional_port,
 	url,
 	url_with_password

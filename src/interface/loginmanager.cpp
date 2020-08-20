@@ -91,11 +91,23 @@ bool CLoginManager::DisplayDialogForEncrypted(Site & site)
 		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));
 	}
 
-	inner->Add(new wxStaticText(&pwdDlg, -1, _("Host:")));
+	if (site.server.GetProtocol() == STORJ) {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("Satellite:")));
+	}
+	else {
+		inner->Add(new wxStaticText(&pwdDlg, -1, _("Host:")));
+	}
 	inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.Format(ServerFormat::with_optional_port))));
 
-	inner->Add(new wxStaticText(&pwdDlg, -1, _("User:")));
-	inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.server.GetUser())));
+	if (!site.server.GetUser().empty()) {
+		if (site.server.GetProtocol() == STORJ) {
+			inner->Add(new wxStaticText(&pwdDlg, -1, _("API Key:")));
+		}
+		else {
+			inner->Add(new wxStaticText(&pwdDlg, -1, _("User:")));
+		}
+		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(site.server.GetUser())));
+	}
 
 	inner = lay.createFlex(2);
 	main->Add(inner);

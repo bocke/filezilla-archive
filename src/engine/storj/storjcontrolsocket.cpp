@@ -10,9 +10,7 @@
 #include "file_transfer.h"
 #include "list.h"
 #include "mkd.h"
-#include "../pathcache.h"
 #include "../proxy.h"
-#include "resolve.h"
 #include "rmd.h"
 #include "../servercapabilities.h"
 #include "storjcontrolsocket.h"
@@ -68,16 +66,6 @@ void CStorjControlSocket::Delete(CServerPath const& path, std::vector<std::wstri
 	log(logmsg::debug_verbose, L"CStorjControlSocket::Delete");
 
 	Push(std::make_unique<CStorjDeleteOpData>(*this, path, std::move(files)));
-}
-
-void CStorjControlSocket::Resolve(CServerPath const& path, std::wstring const& file, std::wstring & bucket, std::wstring * fileId, bool ignore_missing_file)
-{
-	Push(std::make_unique<CStorjResolveOpData>(*this, path, file, bucket, fileId, ignore_missing_file));
-}
-
-void CStorjControlSocket::Resolve(CServerPath const& path, std::vector<std::wstring> const& files, std::wstring & bucket, std::vector<std::wstring> & fileIds)
-{
-	Push(std::make_unique<CStorjResolveManyOpData>(*this, path, files, bucket, fileIds));
 }
 
 void CStorjControlSocket::Mkdir(CServerPath const& path)
@@ -146,7 +134,7 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 			break;
 		}
 		else {
-			int res = static_cast<CStorjListOpData&>(*operations_.back()).ParseEntry(std::move(message.text[0]), message.text[1], std::move(message.text[2]), message.text[3]);
+			int res = static_cast<CStorjListOpData&>(*operations_.back()).ParseEntry(std::move(message.text[0]), message.text[1], message.text[3]);
 			if (res != FZ_REPLY_WOULDBLOCK) {
 				ResetOperation(res);
 			}
