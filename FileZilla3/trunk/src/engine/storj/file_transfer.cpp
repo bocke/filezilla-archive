@@ -8,7 +8,7 @@
 enum FileTransferStates
 {
 	filetransfer_init,
-	filetransfer_resolve,
+	filetransfer_checkfileexists,
 	filetransfer_waitfileexists,
 	filetransfer_delete,
 	filetransfer_transfer
@@ -18,6 +18,7 @@ int CStorjFileTransferOpData::Send()
 {
 	switch (opState) {
 	case filetransfer_init:
+	{
 		if (localFile_.empty()) {
 			if (!download_) {
 				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
@@ -48,30 +49,71 @@ int CStorjFileTransferOpData::Send()
 			localFileSize_ = size;
 		}
 
-		opState = filetransfer_resolve;
-
 		if (remotePath_.GetType() == DEFAULT) {
 			remotePath_.SetType(currentServer_.GetType());
 		}
 
-		controlSocket_.Resolve(remotePath_, remoteFile_, bucket_, &fileId_, !download_);
-		return FZ_REPLY_CONTINUE;
-	case filetransfer_waitfileexists:
-		if (!download_ && !fileId_.empty()) {
-			controlSocket_.Delete(remotePath_, std::vector<std::wstring>{remoteFile_});
-			opState = filetransfer_delete;
+		bool needs_listing = false;
+
+		// Get information about remote file
+		CDirentry entry;
+		bool dirDidExist;
+		bool matchedCase;
+		bool found = engine_.GetDirectoryCache().LookupFile(entry, currentServer_, remotePath_, remoteFile_, dirDidExist, matchedCase);
+		if (found) {
+			if (entry.is_unsure()) {
+				needs_listing = true;
+			}
+			else {
+				if (matchedCase) {
+					remoteFileSize_ = entry.size;
+					if (entry.has_date()) {
+						fileTime_ = entry.time;
+					}
+				}
+			}
 		}
 		else {
+			if (!dirDidExist) {
+				needs_listing = true;
+			}
+		}
+
+		if (needs_listing) {
+			controlSocket_.List(remotePath_, L"", LIST_FLAG_REFRESH);
+			return FZ_REPLY_CONTINUE;
+		}
+
+		opState = filetransfer_checkfileexists;
+		return FZ_REPLY_CONTINUE;
+	}
+	case filetransfer_checkfileexists:
+		{
+			int res = controlSocket_.CheckOverwriteFile();
+			if (res != FZ_REPLY_OK) {
+				opState = filetransfer_waitfileexists;
+				return res;
+			}
+
 			opState = filetransfer_transfer;
 		}
 		return FZ_REPLY_CONTINUE;
+
+	case filetransfer_waitfileexists:
+//		if (!download_ && !fileId_.empty()) {
+//			controlSocket_.Delete(remotePath_, std::vector<std::wstring>{remoteFile_});
+//			opState = filetransfer_delete;
+//		}
+//		else {
+			opState = filetransfer_transfer;
+//		}
+		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
 
-		if (!resume_) {
-			controlSocket_.CreateLocalDir(localFile_);
-		}
-
 		if (download_) {
+			if (!resume_) {
+				controlSocket_.CreateLocalDir(localFile_);
+			}
 			engine_.transfer_status_.Init(remoteFileSize_, 0, false);
 		}
 		else {
@@ -81,20 +123,11 @@ int CStorjFileTransferOpData::Send()
 		engine_.transfer_status_.SetStartTime();
 		transferInitiated_ = true;
 		if (download_) {
-			return controlSocket_.SendCommand(L"get " + bucket_ + L" " + fileId_ + L" " + controlSocket_.QuoteFilename(localFile_));
+			return controlSocket_.SendCommand(L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localFile_));
 		}
 		else {
-			std::wstring path = remotePath_.GetPath();
-			auto pos = path.find('/', 1);
-			if (pos == std::string::npos) {
-				path.clear();
-			}
-			else {
-				path = path.substr(pos + 1) + L"/";
-			}
-			return controlSocket_.SendCommand(L"put " + bucket_ + L" " + controlSocket_.QuoteFilename(localFile_) + L" " + controlSocket_.QuoteFilename(path + remoteFile_));
+			return controlSocket_.SendCommand(L"put " + controlSocket_.QuoteFilename(localFile_) + L" " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)));
 		}
-
 
 		return FZ_REPLY_WOULDBLOCK;
 	}
@@ -116,34 +149,24 @@ int CStorjFileTransferOpData::ParseResponse()
 int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
 	switch (opState) {
-	case filetransfer_resolve:
-
-		if (prevResult != FZ_REPLY_OK) {
-			return prevResult;
-		}
-		else {
-			// Get remote file info
+	case filetransfer_init:
+		if (prevResult == FZ_REPLY_OK) {
+			// Get information about remote file
 			CDirentry entry;
 			bool dirDidExist;
 			bool matchedCase;
 			bool found = engine_.GetDirectoryCache().LookupFile(entry, currentServer_, remotePath_, remoteFile_, dirDidExist, matchedCase);
 			if (found) {
-				if (matchedCase && !entry.is_unsure()) {
+				if (matchedCase) {
 					remoteFileSize_ = entry.size;
 					if (entry.has_date()) {
 						fileTime_ = entry.time;
 					}
 				}
 			}
-
-			int res = controlSocket_.CheckOverwriteFile();
-			if (res != FZ_REPLY_OK) {
-				opState = filetransfer_waitfileexists;
-				return res;
-			}
-
-			opState = filetransfer_transfer;
 		}
+
+		opState = filetransfer_checkfileexists;
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_delete:
 		opState = filetransfer_transfer;

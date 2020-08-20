@@ -7,10 +7,6 @@ namespace fz {
 class process;
 }
 
-namespace PrivCommand {
-auto const resolve = Command::private1;
-}
-
 class CStorjInputThread;
 
 struct storj_message;
@@ -26,8 +22,6 @@ public:
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
 							 std::wstring const& remoteFile, bool download,
 							 CFileTransferCommand::t_transferSettings const& transferSettings) override;
-	void Resolve(CServerPath const& path, std::wstring const& file, std::wstring & bucket, std::wstring * fileId = 0, bool ignore_missing_file = false);
-	void Resolve(CServerPath const& path, std::vector<std::wstring> const& files, std::wstring & bucket, std::vector<std::wstring> & fileIds);
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files) override;
 	virtual void Mkdir(const CServerPath& path) override;
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring()) override;
@@ -71,8 +65,6 @@ protected:
 	friend class CStorjListOpData;
 	friend class CStorjMkdirOpData;
 	friend class CStorjRemoveDirOpData;
-	friend class CStorjResolveOpData;
-	friend class CStorjResolveManyOpData;
 };
 
 typedef CProtocolOpData<CStorjControlSocket> CStorjOpData;

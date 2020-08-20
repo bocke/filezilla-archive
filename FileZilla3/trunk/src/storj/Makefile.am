@@ -3,9 +3,9 @@ bin_PROGRAMS = fzstorj
 fzstorj_SOURCES = \
 		fzstorj.cpp
 
-fzstorj_LDADD = $(LIBFILEZILLA_LIBS) $(LIBSTORJ_LIBS)
+fzstorj_LDADD = $(LIBFILEZILLA_LIBS) $(LIBUPLINK_LIBS)
 
-fzstorj_CPPFLAGS = $(LIBFILEZILLA_CFLAGS) $(LIBSTORJ_CFLAGS)
+fzstorj_CPPFLAGS = $(LIBFILEZILLA_CFLAGS) $(LIBUPLINK_CFLAGS)
 
 noinst_HEADERS = events.hpp
 

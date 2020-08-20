@@ -650,18 +650,18 @@ if test "$buildmain" = "yes"; then
     ])
 
   if test "$enable_storj" != "no"; then
-    PKG_CHECK_MODULES(LIBSTORJ, [libstorj >= 1.0],[
+    PKG_CHECK_MODULES(LIBUPLINK, [libuplink],[
       AC_DEFINE([ENABLE_STORJ], [1], [Define if building with Storj support.])
       enable_storj="yes"
     ], [
       if test "$enable_storj" = "yes"; then
-  	AC_MSG_ERROR([libstorj not found: $LIBSTORJ_PKG_ERRORS. You can download it from https://github.com/Storj/libstorj])
+  	AC_MSG_ERROR([libuplink not found: $LIBUPLINKC_PKG_ERRORS. You can download it from https://github.com/storj/uplink-c])
       else
         enable_storj="no"
       fi
     ])
-    AC_SUBST(LIBSTORJ_CFLAGS)
-    AC_SUBST(LIBSTORJ_LIBS)
+    AC_SUBST(LIBUPLINK_CFLAGS)
+    AC_SUBST(LIBUPLINK_LIBS)
   fi
 fi
 

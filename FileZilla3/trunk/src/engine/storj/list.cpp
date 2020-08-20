@@ -6,7 +6,6 @@
 enum listStates
 {
 	list_init = 0,
-	list_waitresolve,
 	list_waitlock,
 	list_list
 };
@@ -29,8 +28,16 @@ int CStorjListOpData::Send()
 			return FZ_REPLY_INTERNALERROR;
 		}
 
-		opState = list_waitresolve;
-		controlSocket_.Resolve(path_, std::wstring(), bucket_);
+		opState = list_waitlock;
+		if (!opLock_) {
+			opLock_ = controlSocket_.Lock(locking_reason::list, path_);
+			time_before_locking_ = fz::monotonic_clock::now();
+		}
+		if (opLock_.waiting()) {
+			return FZ_REPLY_WOULDBLOCK;
+		}
+
+		opState = list_list;
 		return FZ_REPLY_CONTINUE;
 	case list_waitlock:
 		if (!opLock_) {
@@ -53,21 +60,7 @@ int CStorjListOpData::Send()
 		opState = list_list;
 		return FZ_REPLY_CONTINUE;
 	case list_list:
-		if (bucket_.empty()) {
-			return controlSocket_.SendCommand(L"list-buckets");
-		}
-		else {
-			std::wstring path = path_.GetPath();
-			auto pos = path.find('/', 1);
-			if (pos == std::string::npos) {
-				path.clear();
-			}
-			else {
-				path = controlSocket_.QuoteFilename(path.substr(pos + 1) + L"/");
-			}
-
-			return controlSocket_.SendCommand(L"list " + bucket_ + L" " + path);
-		}
+		return controlSocket_.SendCommand(L"list " + controlSocket_.QuoteFilename(path_.GetPath()));
 	}
 
 	log(logmsg::debug_warning, L"Unknown opState in CStorjListOpData::Send()");
@@ -96,47 +89,16 @@ int CStorjListOpData::ParseResponse()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CStorjListOpData::SubcommandResult(int prevResult, COpData const&)
-{
-	if (prevResult != FZ_REPLY_OK) {
-		return prevResult;
-	}
-
-	switch (opState) {
-	case list_waitresolve:
-		opState = list_waitlock;
-		if (!opLock_) {
-			opLock_ = controlSocket_.Lock(locking_reason::list, path_);
-			time_before_locking_ = fz::monotonic_clock::now();
-		}
-		if (opLock_.waiting()) {
-			return FZ_REPLY_WOULDBLOCK;
-		}
-
-		opState = list_list;
-		return FZ_REPLY_CONTINUE;
-	}
-
-	log(logmsg::debug_warning, L"Unknown opState in CStorjListOpData::SubcommandResult()");
-	return FZ_REPLY_INTERNALERROR;
-}
-
-int CStorjListOpData::ParseEntry(std::wstring && name, std::wstring const& size, std::wstring && id, std::wstring const& created)
+int CStorjListOpData::ParseEntry(std::wstring && name, std::wstring const& size, std::wstring const& created)
 {
 	if (opState != list_list) {
 		log(logmsg::debug_warning, L"CStorjListOpData::ParseEntry called at improper time: %d", opState);
 		return FZ_REPLY_INTERNALERROR;
 	}
 
-	if (name == L".") {
-		pathId_ = id;
-		return FZ_REPLY_WOULDBLOCK;
-	}
-
 	CDirentry entry;
 	entry.name = name;
-	entry.ownerGroup.get() = id;
-	if (bucket_.empty()) {
+	if (!path_.SegmentCount() ) {
 		entry.flags = CDirentry::flag_dir;
 	}
 	else {
@@ -156,7 +118,10 @@ int CStorjListOpData::ParseEntry(std::wstring && name, std::wstring const& size,
 		entry.size = fz::to_integral<int64_t>(size, -1);
 	}
 
-	entry.time.set(created, fz::datetime::utc);
+	time_t t = fz::to_integral<time_t>(created);
+	if (t) {
+		entry.time = fz::datetime(t, fz::datetime::seconds);
+	}
 
 	if (!entry.name.empty()) {
 		entries_.emplace_back(std::move(entry));

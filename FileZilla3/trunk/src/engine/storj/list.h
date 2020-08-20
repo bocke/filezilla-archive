@@ -16,11 +16,8 @@ public:
 
 	virtual int Send() override;
 	virtual int ParseResponse() override;
-	virtual int SubcommandResult(int prevResult, COpData const& previousOperation) override;
 
-	int ParseEntry(std::wstring && name, std::wstring const& size, std::wstring && id, std::wstring const& created);
-
-	std::wstring GetPathId() const { return pathId_; }
+	int ParseEntry(std::wstring && name, std::wstring const& size, std::wstring const& created);
 
 private:
 	CServerPath path_;
@@ -29,9 +26,6 @@ private:
 	std::vector<fz::shared_value<CDirentry>> entries_;
 
 	fz::monotonic_clock time_before_locking_;
-
-	std::wstring bucket_;
-	std::wstring pathId_;
 };
 
 #endif

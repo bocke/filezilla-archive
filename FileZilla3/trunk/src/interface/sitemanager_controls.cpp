@@ -8,9 +8,6 @@
 #include "osx_sandbox_userdirs.h"
 #endif
 #include "sitemanager.h"
-#if ENABLE_STORJ
-#include "storj_key_interface.h"
-#endif
 #include "textctrlex.h"
 #include "xrc_helper.h"
 #include "wxext/spinctrlex.h"
@@ -105,7 +102,8 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	auto brow = new wxBoxSizer(wxHORIZONTAL);
 	lay.gbAdd(bag, brow, lay.valigng);
 	brow->Add(new wxChoice(&parent, XRCID("ID_ENCRYPTION")), 1);
-	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_SIGNUP"), _("Signup"), L"https://app.storj.io/#/signup"), lay.valign)->Show(false);
+	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_DOCS"), _("Docs"), L"https://github.com/storj/storj/wiki/Vanguard-Release-Setup-Instructions"), 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, lay.dlgUnits(2))->Show(false);
+	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_SIGNUP"), _("Signup"), L"https://tardigrade.io/signup/?partner=filezilla"), lay.valign)->Show(false);
 	brow->AddSpacer(0);
 
 	lay.gbNewRow(bag);
@@ -143,15 +141,6 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_KEYFILE")), lay.valigng)->Show(false);
 	auto keyfileBrowse = new wxButton(&parent, XRCID("ID_KEYFILE_BROWSE"), _("Browse..."));
 	row->Add(keyfileBrowse, lay.valign)->Show(false);
-
-	lay.gbNewRow(bag);
-	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_ENCRYPTIONKEY_DESC"), _("Encryption &key:")), lay.valign)->Show(false);
-	row = lay.createFlex(0, 1);
-	row->AddGrowableCol(0);
-	lay.gbAdd(bag, row, lay.valigng);
-	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_ENCRYPTIONKEY")), lay.valigng)->Show(false);
-	auto storjKeyGenerate = new wxButton(&parent, XRCID("ID_ENCRYPTIONKEY_GENERATE"), _("Generate..."));
-	row->Add(storjKeyGenerate, lay.valign)->Show(false);
 
 	lay.gbNewRow(bag);
 	lay.gbAdd(bag, new wxStaticText(&parent, XRCID("ID_EXTRA_CREDENTIALS_DESC"), L""), lay.valign)->Show(false);
@@ -221,26 +210,6 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 			}
 		}
 	});
-
-#if ENABLE_STORJ
-	storjKeyGenerate->Bind(wxEVT_BUTTON, [this](wxEvent const&) {
-		CStorjKeyInterface generator(&parent_);
-		std::wstring key = generator.GenerateKey();
-		if (!key.empty()) {
-			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString(key));
-			xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
-
-			wxDialogEx dlg;
-			if (dlg.Load(&parent_, "ID_STORJ_GENERATED_KEY")) {
-				dlg.WrapRecursive(&dlg, 2.5);
-				dlg.GetSizer()->Fit(&dlg);
-				dlg.GetSizer()->SetSizeHints(&dlg);
-				xrc_call(dlg, "ID_KEY", &wxTextCtrl::ChangeValue, wxString(key));
-				dlg.ShowModal();
-			}
-		}
-	});
-#endif
 }
 
 void GeneralSiteControls::SetSite(Site const& site)
@@ -255,7 +224,6 @@ void GeneralSiteControls::SetSite(Site const& site)
 		xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
 		xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, wxString());
 		xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::ChangeValue, wxString());
-		xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
 
 		xrc_call(parent_, "ID_LOGONTYPE", &wxChoice::SetStringSelection, GetNameFromLogonType(logonType_));
 	}
@@ -279,19 +247,10 @@ void GeneralSiteControls::SetSite(Site const& site)
 		xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::ChangeValue, site.credentials.account_);
 
 		std::wstring pass = site.credentials.GetPass();
-		std::wstring encryptionKey;
-		if (protocol == STORJ) {
-			size_t pos = pass.rfind('|');
-			if (pos != std::wstring::npos) {
-				encryptionKey = pass.substr(pos + 1);
-				pass = pass.substr(0, pos);
-			}
-		}
 
 		if (logonType_ != LogonType::anonymous && logonType_ != LogonType::interactive && (protocol != SFTP || logonType_ != LogonType::key)) {
 			if (site.credentials.encrypted_) {
 				xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, wxString());
-				xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, wxString());
 
 				// @translator: Keep this string as short as possible
 				xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, _("Leave empty to keep existing password."));
@@ -302,7 +261,6 @@ void GeneralSiteControls::SetSite(Site const& site)
 			else {
 				xrc_call(parent_, "ID_PASS", &wxTextCtrl::ChangeValue, pass);
 				xrc_call(parent_, "ID_PASS", &wxTextCtrl::SetHint, wxString());
-				xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::ChangeValue, encryptionKey);
 
 				auto it = extraParameters_[ParameterSection::credentials].begin();
 
@@ -352,6 +310,7 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 	xrc_call(parent_, "ID_ENCRYPTION_DESC", &wxStaticText::Show, group.first != protocolGroups().cend());
 	xrc_call(parent_, "ID_ENCRYPTION", &wxChoice::Show, group.first != protocolGroups().cend());
 
+	xrc_call(parent_, "ID_DOCS", &wxControl::Show, protocol == STORJ);
 	xrc_call(parent_, "ID_SIGNUP", &wxControl::Show, protocol == STORJ);
 
 	auto const supportedlogonTypes = GetSupportedLogonTypes(protocol);
@@ -383,16 +342,20 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Show, protocol == SFTP && type == LogonType::key);
 	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Show, protocol == SFTP && type == LogonType::key);
 
-	xrc_call(parent_, "ID_ENCRYPTIONKEY_DESC", &wxStaticText::Show, protocol == STORJ);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Show, protocol == STORJ);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Show, protocol == STORJ);
-
 	wxString hostLabel = _("&Host:");
 	wxString hostHint;
 	wxString userHint;
 	wxString userLabel = _("&User:");
 	wxString passLabel = _("Pass&word:");
 	switch (protocol) {
+	case STORJ:
+		// @translator: Keep short
+		hostLabel = _("S&atellite:");
+		// @translator: Keep short
+		userLabel = _("API &Key:");
+		// @translator: Keep short
+		passLabel = _("Encr&yption Passphrase:");
+		break;
 	case S3:
 		// @translator: Keep short
 		userLabel = _("&Access key ID:");
@@ -550,12 +513,6 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 		keyfileSizer->CalcMin();
 		keyfileSizer->Layout();
 	}
-
-	auto encryptionkeySizer = xrc_call(parent_, "ID_ENCRYPTIONKEY_DESC", &wxStaticText::GetContainingSizer);
-	if (encryptionkeySizer) {
-		encryptionkeySizer->CalcMin();
-		encryptionkeySizer->Layout();
-	}
 }
 
 bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
@@ -710,38 +667,6 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		site.credentials.keyFile_ = keyFile;
 	}
 
-	if (protocol == STORJ && logon_type == LogonType::normal) {
-		std::wstring encryptionKey = xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::GetValue).ToStdWstring();
-
-		bool encrypted = !xrc_call(parent_, "ID_PASS", &wxTextCtrl::GetHint).empty();
-		if (encrypted) {
-			if (pw.empty() != encryptionKey.empty()) {
-				if (!silent) {
-					wxMessageBoxEx(_("You cannot change password and encryption key individually if using a master password."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-					xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
-				}
-				return false;
-			}
-		}
-#if ENABLE_STORJ
-		if (!encryptionKey.empty() || !encrypted) {
-			CStorjKeyInterface validator(&parent_);
-			if (!validator.ValidateKey(encryptionKey, false)) {
-				if (!silent) {
-					wxMessageBoxEx(_("You have to enter a valid encryption key"), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
-					xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxWindow::SetFocus);
-				}
-				return false;
-			}
-		}
-#endif
-		if (!pw.empty() || !site.credentials.encrypted_) {
-			pw += '|';
-			pw += encryptionKey;
-		}
-	}
-
-
 	site.server.ClearExtraParameters();
 
 	std::vector<ParameterTraits> const& parameterTraits = ExtraServerParameterTraits(protocol);
@@ -892,8 +817,6 @@ void GeneralSiteControls::SetControlState()
 	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::account);
 	xrc_call(parent_, "ID_KEYFILE", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::key);
 	xrc_call(parent_, "ID_KEYFILE_BROWSE", &wxButton::Enable, !predefined_ && logonType_ == LogonType::key);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY", &wxTextCtrl::Enable, !predefined_ && logonType_ == LogonType::normal);
-	xrc_call(parent_, "ID_ENCRYPTIONKEY_GENERATE", &wxButton::Enable, !predefined_ && logonType_ == LogonType::normal);
 
 	for (int i = 0; i < ParameterSection::section_count; ++i) {
 		for (auto & param : extraParameters_[i]) {

@@ -116,7 +116,6 @@ libengine_a_SOURCES += \
 		storj/input_thread.cpp \
 		storj/list.cpp \
 		storj/mkd.cpp \
-		storj/resolve.cpp \
 		storj/rmd.cpp \
 		storj/storjcontrolsocket.cpp
 
@@ -128,7 +127,6 @@ noinst_HEADERS += \
 		storj/input_thread.h \
 		storj/list.h \
 		storj/mkd.h \
-		storj/resolve.h \
 		storj/rmd.h \
 		storj/storjcontrolsocket.h
 endif
