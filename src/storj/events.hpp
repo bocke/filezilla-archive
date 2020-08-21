@@ -20,7 +20,7 @@ enum class storjEvent {
 	count
 };
 
-#define FZSTORJ_PROTOCOL_VERSION 1
+#define FZSTORJ_PROTOCOL_VERSION 2
 
 #endif
 
