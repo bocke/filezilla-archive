@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.50.0-rc1
+
++ Update Storj/Tardigrade integration, now based on the uplink-c library
+- Fix layout issues in the Site Manager if switching protocol
+- Restored natural sort option for file list sorting
+
 3.49.1 (2020-07-15)
 
 - Fixed selection changes not being reflected in the Site Manager in some circumstances
