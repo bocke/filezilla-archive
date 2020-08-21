@@ -10,8 +10,7 @@ dist_resources_DATA = \
 xrcdir = $(pkgdatadir)/resources/xrc
 dist_xrc_DATA = \
 	xrc/dialogs.xrc \
-	xrc/netconfwizard.xrc \
-	xrc/storj.xrc
+	xrc/netconfwizard.xrc
 
 resources16dir = $(pkgdatadir)/resources/16x16
 dist_resources16_DATA = \
