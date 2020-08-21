@@ -77,7 +77,6 @@ void InitXrc(std::wstring const& file)
 	std::wstring dir = wxGetApp().GetResourceDir().GetPath() + L"xrc/";
 	if (file.empty()) {
 		LoadXrcFile(L"dialogs.xrc");
-		LoadXrcFile(L"storj.xrc");
 	}
 	else {
 		LoadXrcFile(file);
