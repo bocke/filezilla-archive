@@ -43,7 +43,9 @@ enum ServerProtocol
 
 	INSECURE_WEBDAV,
 
-	MAX_VALUE = INSECURE_WEBDAV
+	RACKSPACE,
+
+	MAX_VALUE = RACKSPACE
 };
 
 enum ServerType
