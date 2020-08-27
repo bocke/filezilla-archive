@@ -68,7 +68,7 @@ bool COptionsPageFtpProxy::CreateControls(wxWindow* parent)
 		flex->Add(row);
 		row->SetHGap(lay.gap * 3);
 		row->Add(new wxStaticText(box, nullID, _("%h - Host")), lay.valign);
-		row->Add(new wxStaticText(box, nullID, _("%h - Username")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("%u - Username")), lay.valign);
 		row->Add(new wxStaticText(box, nullID, _("%p - Password")), lay.valign);
 		flex->Add(new wxStaticText(box, nullID, _("%a - Account (Lines containing this will be omitted if not using Account logontype)")));
 		row = lay.createFlex(2);
