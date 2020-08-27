@@ -50,7 +50,7 @@ int CStorjConnectOpData::Send()
 	case connect_host:
 		return controlSocket_.SendCommand(fz::sprintf(L"host %s", currentServer_.Format(ServerFormat::with_port)));
 	case connect_user:
-		return controlSocket_.SendCommand(fz::sprintf(L"user %s", currentServer_.GetUser()));
+		return controlSocket_.SendCommand(fz::sprintf(L"key %s", currentServer_.GetUser()), fz::sprintf(L"key %s", std::wstring(currentServer_.GetUser().size(), '*')));
 	case connect_pass:
 		{
 			std::wstring pass = controlSocket_.credentials_.GetPass();

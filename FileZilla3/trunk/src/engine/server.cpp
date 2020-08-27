@@ -365,6 +365,11 @@ std::wstring CServer::Format(ServerFormat formatType, Credentials const& credent
 	}
 
 	auto user = GetUser();
+	if (m_protocol == STORJ) {
+		// FIXME: The API key is not a user name. Move it into credentials section in a future version.
+		// Hide it here, we shouldn't display the key like this.
+		user.clear();
+	}
 	if (credentials.logonType_ != LogonType::anonymous) {
 		// For now, only escape if formatting for URL.
 		// Open question: Do we need some form of escapement for presentation within the GUI,

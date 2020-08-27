@@ -73,6 +73,7 @@ filezilla_SOURCES = \
 		netconfwizard.cpp \
 		Options.cpp \
 		option_change_event_handler.cpp \
+		overlay.cpp \
 		power_management.cpp \
 		queue.cpp \
 		queue_storage.cpp \
@@ -201,6 +202,7 @@ noinst_HEADERS = \
 		netconfwizard.h \
 		Options.h \
 		option_change_event_handler.h \
+		overlay.h \
 		power_management.h \
 		queue.h \
 		queue_storage.h \
@@ -276,11 +278,9 @@ noinst_HEADERS = \
 
 if ENABLE_STORJ
 filezilla_SOURCES += \
-		overlay.cpp \
 		storj_key_interface.cpp
 
 noinst_HEADERS += \
-		 overlay.h \
 		 storj_key_interface.h
 endif
 
