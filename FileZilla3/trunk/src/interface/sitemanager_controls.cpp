@@ -102,7 +102,7 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	auto brow = new wxBoxSizer(wxHORIZONTAL);
 	lay.gbAdd(bag, brow, lay.valigng);
 	brow->Add(new wxChoice(&parent, XRCID("ID_ENCRYPTION")), 1);
-	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_DOCS"), _("Docs"), L"https://github.com/storj/storj/wiki/Vanguard-Release-Setup-Instructions"), 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, lay.dlgUnits(2))->Show(false);
+	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_DOCS"), _("Docs"), L"https://documentation.tardigrade.io/how-tos/set-up-filezilla-for-decentralized-file-transfer"), 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, lay.dlgUnits(2))->Show(false);
 	brow->Add(new wxHyperlinkCtrl(&parent, XRCID("ID_SIGNUP"), _("Signup"), L"https://tardigrade.io/signup/?partner=filezilla"), lay.valign)->Show(false);
 	brow->AddSpacer(0);
 
