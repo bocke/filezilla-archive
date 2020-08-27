@@ -162,7 +162,7 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 void CWelcomeDialog::InitFooter(wxString const& resources)
 {
 #if FZ_WINDOWS && FZ_MANUALUPDATECHECK
-	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_int(OPTION_DISABLE_UPDATE_FOOTER)) {
+	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
 		if (!resources.empty()) {
 			wxLogNull null;
 

@@ -247,8 +247,8 @@ void CUpdateDialog::InitFooter()
 		}
 	}
 
-	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_int(OPTION_DISABLE_UPDATE_FOOTER)) {
-		wxString const resources = updater_.GetResources();
+	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
+		wxString const resources = updater_.GetResources(resource_type::update_dialog);
 		if (!resources.empty()) {
 			wxLogNull null;
 
@@ -412,7 +412,7 @@ void CUpdateDialog::OnInstall(wxCommandEvent&)
 	if (f.empty()) {
 		return;
 	}
-	COptions::Get()->set(OPTION_GREETINGRESOURCES, updater_.GetResources());
+	COptions::Get()->set(OPTION_GREETINGRESOURCES, updater_.GetResources(resource_type::update_dialog));
 #ifdef __WXMSW__
 	std::vector<std::wstring> cmd_with_args;
 	cmd_with_args.push_back(f);

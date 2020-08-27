@@ -52,6 +52,11 @@
 #include "welcome_dialog.h"
 #include "window_state_manager.h"
 
+#if FZ_MANUALUPDATECHECK
+#include "overlay.h"
+#include <wx/hyperlink.h>
+#endif
+
 #ifdef __WXMSW__
 #include <wx/module.h>
 #endif
@@ -250,48 +255,99 @@ protected:
 	CMainFrame* m_pMainFrame;
 };
 
-
-/*#include "overlay.h"
-#include <wx/hyperlink.h>
-
+#if FZ_MANUALUPDATECHECK
 namespace {
-void ShowStorjOverlay(wxWindow* parent, wxWindow* anchor, wxPoint const& offset)
+void ShowOverlay(std::wstring const& data, wxTopLevelWindow* parent, wxWindow* anchor, wxPoint const& offset)
 {
+	if (data.empty() || CBuildInfo::GetBuildType() != _T("official") || COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
+//		return;
+	}
+
+	auto tokens = fz::strtok_view(data, ' ', false);
+	if (tokens.size() < 4) {
+		return;
+	}
+
+	if (tokens[0] != L"1") {
+		return;
+	}
+
+	int const id = fz::to_integral<int>(tokens[1]);
+	if (COptions::Get()->get_int(OPTION_SHOWN_OVERLAY) >= id) {
+		return;
+	}
+
+	if (fz::datetime(fz::to_integral<time_t>(tokens[2]), fz::datetime::seconds) < fz::datetime::now()) {
+		return;
+	}
+
+	auto linedata = fz::to_wstring_from_utf8(fz::base64_decode_s(tokens[3]));
+	auto lines = fz::strtok_view(linedata, '\n', false);
+
+	if (lines.empty()) {
+		return;
+	}
+
+	DialogLayout lay(parent);
+
 	auto p = new OverlayWindow(parent);
 
 	auto box = new wxBoxSizer(wxVERTICAL);
-	auto sizer = layout::createFlex(1);
-	box->Add(sizer, 0, wxALL, 7);
-
 	p->SetSizer(box);
+	
+	auto outer = lay.createFlex(1);
+	box->Add(outer, 0, wxALL, 7);
 
-	auto title = new wxStaticText(p, -1, _("Did you know about this new FileZilla feature?"));
+	auto sides = lay.createFlex(0, 1);
+	outer->Add(sides);
+	
+	auto right = lay.createFlex(1);
+	sides->Add(right, lay.valign);
+	sides->Add(new wxStaticBitmap(p, nullID, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))), lay.valign);
 
-	wxFont f = title->GetFont();
-	f.SetWeight(wxBOLD);
-	title->SetFont(f);
-	sizer->Add(title);
 
-	sizer->AddSpacer(0);
+	for (auto line : lines) {
+		if (line.empty()) {
+			right->AddSpacer(0);
+		}
+		else {
+			bool bold{};
+			if (line.front() == '+') {
+				line = line.substr(1);
+				bold = true;
+			}
+			wxWindow* ctrl{};
+			if (line.front() == '>') {
+				size_t pos = line.find(' ');
+				ctrl = new wxHyperlinkCtrl(p, nullID, std::wstring(line.substr((pos == std::wstring::npos) ? 1 : pos + 1)), std::wstring(line.substr(1, pos)));
+			}
+			else {
+				ctrl = new wxStaticText(p, nullID, std::wstring(line));
+			}
+			if (bold) {
+				wxFont f = ctrl->GetFont();
+				f.SetWeight(wxBOLD);
+				ctrl->SetFont(f);
+			}
+			right->Add(ctrl);
+		}
+	}
+	outer->AddSpacer(10);
 
-	sizer->Add(new wxStaticText(p, -1, _("You can use FileZilla to store your files securely in the Storj decentralized cloud.")));
-	sizer->Add(new wxHyperlinkCtrl(p, -1, _("Click to learn more"), L"https://wiki.filezilla-project.org/Storj"));
+	auto dismiss = new wxButton(p, nullID, L"Dismiss");
+	dismiss->Bind(wxEVT_BUTTON, [p, id](wxCommandEvent&) {
+		COptions::Get()->set(OPTION_SHOWN_OVERLAY, id);
+		p->Destroy();
+	});
 
-	sizer->AddSpacer(10);
-
-	//sizer->Add(new wxCheckBox(p, -1, L"Don't show this again"), 0, wxALIGN_RIGHT);
-
-	auto dismiss = new wxButton(p, -1, L"Dismiss");
-	dismiss->Bind(wxEVT_BUTTON, [p](wxCommandEvent&) { p->Destroy(); });
-	sizer->Add(dismiss, 0, wxALIGN_RIGHT);
-
-	wxGetApp().GetWrapEngine()->WrapRecursive(p, 3);
+	outer->Add(dismiss, 0, wxALIGN_RIGHT);
 
 	box->Fit(p);
 
 	p->SetAnchor(anchor, offset);
 }
-}*/
+}
+#endif
 
 CMainFrame::CMainFrame()
 	: COptionChangeEventHandler(this)
@@ -2772,6 +2828,7 @@ void CMainFrame::PostInitialize()
 		}
 		);
 		m_pUpdater->Init();
+		ShowOverlay(m_pUpdater->GetResources(resource_type::overlay), this, m_pTopSplitter, wxPoint(-40, 30));
 	}
 #endif
 
