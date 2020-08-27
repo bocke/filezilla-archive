@@ -676,7 +676,21 @@ void CUpdater::ParseData()
 
 		if (type == L"resources") {
 			if (UpdatableBuild()) {
-				version_information_.resources_ = tokens[1];
+				version_information_.resources_[resource_type::update_dialog] = tokens[1];
+			}
+			continue;
+		}
+		else if (type == "resource") {
+			if (tokens.size() >= 3) {
+				std::wstring resource;
+				for (size_t i = 2; i < tokens.size(); ++i) {
+					if (!resource.empty()) {
+						resource += ' ';
+					}
+					resource += tokens[i];
+				}
+				auto x = fz::to_integral<resource_type>(tokens[1]);
+				version_information_.resources_[fz::to_integral<resource_type>(tokens[1])] = std::move(resource);
 			}
 			continue;
 		}
@@ -997,4 +1011,15 @@ bool CUpdater::Busy() const
 {
 	return state_ == UpdaterState::checking || state_ == UpdaterState::newversion_downloading;
 }
+
+std::wstring CUpdater::GetResources(resource_type t) const
+{
+	std::wstring ret;
+	auto const it = version_information_.resources_.find(t);
+	if (it != version_information_.resources_.cend()) {
+		ret = it->second;
+	}
+	return ret;
+}
+
 #endif

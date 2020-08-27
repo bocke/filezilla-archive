@@ -12,7 +12,7 @@
 #include <functional>
 #include <list>
 
-struct build
+struct build final
 {
 	std::wstring url_;
 	std::wstring version_;
@@ -20,7 +20,13 @@ struct build
 	int64_t size_{-1};
 };
 
-struct version_information
+enum class resource_type : int
+{
+	update_dialog,
+	overlay
+};
+
+struct version_information final
 {
 	bool empty() const {
 		return available_.version_.empty() && !eol_;
@@ -36,7 +42,7 @@ struct version_information
 
 	std::wstring changelog_;
 
-	std::wstring resources_;
+	std::map<resource_type, std::wstring> resources_;
 
 	bool eol_{};
 };
@@ -75,7 +81,7 @@ public:
 	UpdaterState GetState() const { return state_; }
 	build AvailableBuild() const { return version_information_.available_; }
 	std::wstring GetChangelog() const { return version_information_.changelog_; }
-	std::wstring GetResources() const { return version_information_.resources_; }
+	std::wstring GetResources(resource_type t) const;
 
 	std::wstring DownloadedFile() const;
 
