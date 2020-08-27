@@ -260,7 +260,7 @@ namespace {
 void ShowOverlay(std::wstring const& data, wxTopLevelWindow* parent, wxWindow* anchor, wxPoint const& offset)
 {
 	if (data.empty() || CBuildInfo::GetBuildType() != _T("official") || COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
-//		return;
+		return;
 	}
 
 	auto tokens = fz::strtok_view(data, ' ', false);
@@ -332,7 +332,7 @@ void ShowOverlay(std::wstring const& data, wxTopLevelWindow* parent, wxWindow* a
 			right->Add(ctrl);
 		}
 	}
-	outer->AddSpacer(10);
+	outer->AddSpacer(0);
 
 	auto dismiss = new wxButton(p, nullID, L"Dismiss");
 	dismiss->Bind(wxEVT_BUTTON, [p, id](wxCommandEvent&) {
