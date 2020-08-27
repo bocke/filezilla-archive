@@ -55,6 +55,7 @@
 #if FZ_MANUALUPDATECHECK
 #include "overlay.h"
 #include <wx/hyperlink.h>
+#include <wx/mstream.h>
 #endif
 
 #ifdef __WXMSW__
@@ -303,7 +304,14 @@ void ShowOverlay(std::wstring const& data, wxTopLevelWindow* parent, wxWindow* a
 	
 	auto right = lay.createFlex(1);
 	sides->Add(right, lay.valign);
-	sides->Add(new wxStaticBitmap(p, nullID, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))), lay.valign);
+	if (tokens.size() > 4) {
+		auto raw = fz::base64_decode_s(tokens[4]);
+		wxMemoryInputStream s(raw.data(), raw.size());
+		wxImage img;
+		if (img.LoadFile(s, wxBITMAP_TYPE_ANY)) {
+			sides->Add(new wxStaticBitmap(p, nullID, wxBitmap(img)), lay.valign);
+		}
+	}
 
 
 	for (auto line : lines) {
