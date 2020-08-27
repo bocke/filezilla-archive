@@ -10,7 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
-3.50.0-rc1
+3.50.0 (2020-08-27)
+
+- Minor fixes to Tardigrade integration
+
+3.50.0-rc1 (2020-08-21)
 
 + Update Storj/Tardigrade integration, now based on the uplink-c library
 - Fix layout issues in the Site Manager if switching protocol
