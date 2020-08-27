@@ -37,7 +37,7 @@ static const t_protocolInfo protocolInfos[] = {
 	{ B2,              L"b2",        true, 443,  false, "Backblaze B2",                                                            L"https" },
 	{ BOX,             L"box",       true, 443,  false, "Box",                                                                     L"https" },
 	{ INSECURE_WEBDAV, L"webdav",    true,  80,  true,  fztranslate_mark("WebDAV using HTTP (insecure)"),                          L"http" },
-        { RACKSPACE,       L"rackspace", true, 443,  false, "Rackspace Cloud Storage",                                                 L"https" },
+	{ RACKSPACE,       L"rackspace", true, 443,  false, "Rackspace Cloud Storage",                                                 L"https" },
 	{ UNKNOWN,         L"",          false, 21,  false, "",                                                                        L"" }
 };
 
