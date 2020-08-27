@@ -479,7 +479,7 @@ int main()
 			serializedAccessGrantKey = satelliteURL = next_argument(arg);
 			fzprintf(storjEvent::Done);
 		}
-		else if (command == "user") {
+		else if (command == "key") {
 			apiKey = next_argument(arg);
 			fzprintf(storjEvent::Done);
 		}
