@@ -57,7 +57,7 @@ protected:
 class CFileZillaEnginePrivate final : public fz::event_handler
 {
 public:
-	CFileZillaEnginePrivate(CFileZillaEngineContext& engine_context, CFileZillaEngine& parent, EngineNotificationHandler& notificationHandler);
+	CFileZillaEnginePrivate(CFileZillaEngineContext& engine_context, CFileZillaEngine& parent, std::function<void(CFileZillaEngine*)> const& notification_cb);
 	virtual ~CFileZillaEnginePrivate();
 
 	int Execute(CCommand const& command);
@@ -156,7 +156,7 @@ protected:
 	// Used to synchronize access to the notification list
 	fz::mutex notification_mutex_{false};
 
-	EngineNotificationHandler& notification_handler_;
+	std::function<void(CFileZillaEngine*)> const notification_cb_;
 
 	unsigned int const m_engine_id;
 

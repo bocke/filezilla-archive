@@ -18,6 +18,7 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/signature.hpp>
 #include <libfilezilla/translate.hpp>
+#include <libfilezilla/glue/wxinvoker.hpp>
 
 #include <string>
 
@@ -327,7 +328,7 @@ int CUpdater::ContinueDownload()
 	}
 
 	if (!engine_) {
-		engine_ = new CFileZillaEngine(engine_context_, *this);
+		engine_ = new CFileZillaEngine(engine_context_, fz::make_invoker(*this, [this](CFileZillaEngine* engine){ OnEngineEvent(engine); }));
 	}
 
 	int res = engine_->Execute(*pending_commands_.front());
@@ -371,11 +372,6 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 }
 
 void CUpdater::OnEngineEvent(CFileZillaEngine* engine)
-{
-	CallAfter(&CUpdater::DoOnEngineEvent, engine);
-}
-
-void CUpdater::DoOnEngineEvent(CFileZillaEngine* engine)
 {
 	if (!engine_ || engine_ != engine) {
 		return;

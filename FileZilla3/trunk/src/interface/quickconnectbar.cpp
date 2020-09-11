@@ -105,8 +105,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 {
 	CState* pState = CContextManager::Get()->GetCurrentContext();
-	if (!pState || !pState->m_pEngine) {
-		wxMessageBoxEx(_("FTP Engine not initialized, can't connect"), _("FileZilla Error"), wxICON_EXCLAMATION);
+	if (!pState || !pState->engine_) {
 		return;
 	}
 

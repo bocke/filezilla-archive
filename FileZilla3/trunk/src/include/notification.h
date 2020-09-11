@@ -5,11 +5,10 @@
 // ---------------------
 
 // To inform the application about what's happening, the engine sends
-// some notifications to the application.
-// The handler needs to derive from EngineNotificationHandler and implement
-// the OnEngineEvent method which takes the engine as parameter.
-// Whenever you get a notification event,
-// CFileZillaEngine::GetNextNotification has to be called until it returns 0,
+// some notifications to the application through the notification callback
+// passed to the engine on construction.
+// Whenever the callback is called, CFileZillaEngine::GetNextNotification
+// has to be called until it returns 0 to re-arm the callback,
 // or you will lose important notifications or your memory will fill with
 // pending notifications.
 //
@@ -26,16 +25,6 @@
 
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_info.hpp>
-
-class CFileZillaEngine;
-
-class EngineNotificationHandler
-{
-public:
-	virtual ~EngineNotificationHandler() {}
-
-	virtual void OnEngineEvent(CFileZillaEngine* engine) = 0;
-};
 
 enum NotificationId
 {

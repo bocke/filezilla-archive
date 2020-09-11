@@ -38,11 +38,11 @@ unsigned int get_next_engine_id()
 }
 }
 
-CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& context, CFileZillaEngine& parent, EngineNotificationHandler& notificationHandler)
+CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& context, CFileZillaEngine& parent, std::function<void(CFileZillaEngine*)> const& notification_cb)
 	: event_handler(context.GetEventLoop())
 	, transfer_status_(*this)
 	, opLockManager_(context.GetOpLockManager())
-	, notification_handler_(notificationHandler)
+	, notification_cb_(notification_cb)
 	, m_engine_id(get_next_engine_id())
 	, options_(context.GetOptions())
 	, rate_limiter_(context.GetRateLimiter())
@@ -152,7 +152,7 @@ void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock& lock, std::unique
 	if (m_maySendNotificationEvent) {
 		m_maySendNotificationEvent = false;
 		lock.unlock();
-		notification_handler_.OnEngineEvent(&parent_);
+		notification_cb_(&parent_);
 	}
 }
 
@@ -202,7 +202,7 @@ void CFileZillaEnginePrivate::SendQueuedLogs(bool reset_flag)
 		m_maySendNotificationEvent = false;
 	}
 
-	notification_handler_.OnEngineEvent(&parent_);
+	notification_cb_(&parent_);
 }
 
 void CFileZillaEnginePrivate::ClearQueuedLogs(fz::scoped_lock&, bool reset_flag)

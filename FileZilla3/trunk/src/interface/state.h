@@ -160,7 +160,7 @@ public:
 	void RegisterHandler(CStateEventHandler* pHandler, t_statechange_notifications notification, CStateEventHandler* insertBefore = 0);
 	void UnregisterHandler(CStateEventHandler* pHandler, t_statechange_notifications notification);
 
-	CFileZillaEngine* m_pEngine{};
+	std::unique_ptr<CFileZillaEngine> engine_;
 	CCommandQueue* m_pCommandQueue{};
 	CComparisonManager* GetComparisonManager() { return m_pComparisonManager; }
 

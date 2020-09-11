@@ -33,7 +33,7 @@ class CState;
 class CToolBar;
 class CWindowStateManager;
 
-class CMainFrame final : public wxNavigationEnabled<wxFrame>, public COptionChangeEventHandler, public EngineNotificationHandler
+class CMainFrame final : public wxNavigationEnabled<wxFrame>, public COptionChangeEventHandler
 #if FZ_MANUALUPDATECHECK
 	, protected CUpdateHandler
 #endif
@@ -69,6 +69,8 @@ public:
 	bool ConnectToSite(Site & data, Bookmark const& bookmark, CState* pState = 0);
 
 	CFileZillaEngineContext& GetEngineContext() { return m_engineContext; }
+	void OnEngineEvent(CFileZillaEngine* engine);
+
 private:
 	void UpdateLayout();
 	void FixTabOrder();
@@ -116,9 +118,6 @@ private:
 	void SetupKeyboardAccelerators();
 
 	void OnOptionsChanged(watched_options const& options);
-
-	virtual void OnEngineEvent(CFileZillaEngine* engine); // Before thread jump
-	void DoOnEngineEvent(CFileZillaEngine* engine); // After thread jump
 
 	// Event handlers
 	DECLARE_EVENT_TABLE()

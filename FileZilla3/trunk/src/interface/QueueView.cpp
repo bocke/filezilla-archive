@@ -24,6 +24,8 @@
 #include "dragdropmanager.h"
 #include "drop_target_ex.h"
 
+#include <libfilezilla/glue/wxinvoker.hpp>
+
 #if WITH_LIBDBUS
 #include "../dbus/desktop_notification.h"
 #elif defined(__WXGTK__) || defined(__WXMSW__)
@@ -392,11 +394,6 @@ bool CQueueView::QueueFiles(const bool queueOnly, Site const& site, CLocalRecurs
 
 void CQueueView::OnEngineEvent(CFileZillaEngine* engine)
 {
-	CallAfter(&CQueueView::DoOnEngineEvent, engine);
-}
-
-void CQueueView::DoOnEngineEvent(CFileZillaEngine* engine)
-{
 	t_EngineData* const pEngineData = GetEngineData(engine);
 	if (!pEngineData) {
 		return;
@@ -573,7 +570,7 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 	// At this point the following holds:
 	// max_count is limited to 1, only connection to server is held by the browsing connection
 
-	pEngineData = GetEngineData(browsingStateOnSameServer->m_pEngine);
+	pEngineData = GetEngineData(browsingStateOnSameServer->engine_.get());
 	if (pEngineData) {
 		wxASSERT(pEngineData->transient);
 		return pEngineData->transient && !pEngineData->active;
@@ -582,7 +579,7 @@ bool CQueueView::CanStartTransfer(CServerItem const & server_item, t_EngineData 
 	pEngineData = new t_EngineData;
 	pEngineData->transient = true;
 	pEngineData->state = t_EngineData::waitprimary;
-	pEngineData->pEngine = browsingStateOnSameServer->m_pEngine;
+	pEngineData->pEngine = browsingStateOnSameServer->engine_.get();
 	m_engineData.push_back(pEngineData);
 	return true;
 }
@@ -1095,7 +1092,7 @@ void CQueueView::ResetEngine(t_EngineData& data, const ResetReason reason)
 		const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 		for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
 			CState* pState = *iter;
-			if (pState->m_pEngine != data.pEngine) {
+			if (pState->engine_.get() != data.pEngine) {
 				continue;
 			}
 			CCommandQueue* pCommandQueue = pState->m_pCommandQueue;
@@ -1159,7 +1156,7 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			CState* pState = 0;
 			const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 			for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
-				if ((*iter)->m_pEngine != engineData.pEngine) {
+				if ((*iter)->engine_.get() != engineData.pEngine) {
 					continue;
 				}
 				pState = *iter;
@@ -2283,7 +2280,7 @@ t_EngineData* CQueueView::GetIdleEngine(Site const& site, bool allowTransient)
 		const int newEngineCount = COptions::Get()->get_int(OPTION_NUMTRANSFERS);
 		if (newEngineCount > static_cast<int>(m_engineData.size()) - transient) {
 			pFirstIdle = new t_EngineData;
-			pFirstIdle->pEngine = new CFileZillaEngine(m_pMainFrame->GetEngineContext(), *this);
+			pFirstIdle->pEngine = new CFileZillaEngine(m_pMainFrame->GetEngineContext(), fz::make_invoker(*this, [this](CFileZillaEngine* engine) { OnEngineEvent(engine); }));
 
 			m_engineData.push_back(pFirstIdle);
 		}
@@ -3017,7 +3014,7 @@ void CQueueView::ReleaseExclusiveEngineLock(CFileZillaEngine* pEngine)
 	const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 	for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
 		CState* pState = *iter;
-		if (pState->m_pEngine != pEngine) {
+		if (pState->engine_.get() != pEngine) {
 			continue;
 		}
 		CCommandQueue *pCommandQueue = pState->m_pCommandQueue;

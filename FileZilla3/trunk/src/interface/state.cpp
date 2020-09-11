@@ -14,6 +14,7 @@
 
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/glue/wx.hpp>
+#include <libfilezilla/glue/wxinvoker.hpp>
 
 #include <algorithm>
 
@@ -235,7 +236,7 @@ CState::~CState()
 {
 	delete m_pComparisonManager;
 	delete m_pCommandQueue;
-	delete m_pEngine;
+	engine_.reset();
 	delete m_pLocalRecursiveOperation;
 	delete m_pRemoteRecursiveOperation;
 
@@ -549,10 +550,10 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 	if (!site) {
 		return false;
 	}
-	if (!m_pEngine) {
+	if (!engine_) {
 		return false;
 	}
-	if (m_pEngine->IsConnected() || m_pEngine->IsBusy() || !m_pCommandQueue->Idle()) {
+	if (engine_->IsConnected() || engine_->IsBusy() || !m_pCommandQueue->Idle()) {
 		m_pCommandQueue->Cancel();
 	}
 	m_pRemoteRecursiveOperation->StopRecursiveOperation();
@@ -570,7 +571,7 @@ bool CState::Connect(Site const& site, CServerPath const& path, bool compare)
 
 bool CState::Disconnect()
 {
-	if (!m_pEngine) {
+	if (!engine_) {
 		return false;
 	}
 
@@ -590,14 +591,14 @@ bool CState::Disconnect()
 
 bool CState::CreateEngine()
 {
-	wxASSERT(!m_pEngine);
-	if (m_pEngine) {
+	wxASSERT(!engine_);
+	if (engine_) {
 		return true;
 	}
 
-	m_pEngine = new CFileZillaEngine(m_mainFrame.GetEngineContext(), m_mainFrame);
+	engine_ = std::make_unique<CFileZillaEngine>(m_mainFrame.GetEngineContext(), fz::make_invoker(m_mainFrame, [frame = &m_mainFrame](CFileZillaEngine* engine){ frame->OnEngineEvent(engine); }));
 
-	m_pCommandQueue = new CCommandQueue(m_pEngine, &m_mainFrame, *this);
+	m_pCommandQueue = new CCommandQueue(engine_.get(), &m_mainFrame, *this);
 
 	return true;
 }
@@ -606,8 +607,7 @@ void CState::DestroyEngine()
 {
 	delete m_pCommandQueue;
 	m_pCommandQueue = 0;
-	delete m_pEngine;
-	m_pEngine = 0;
+	engine_.reset();
 }
 
 void CState::RegisterHandler(CStateEventHandler* pHandler, t_statechange_notifications notification, CStateEventHandler* insertBefore)
@@ -1041,7 +1041,7 @@ bool CState::DownloadDroppedFiles(const CRemoteDataObject* pRemoteDataObject, co
 
 bool CState::IsRemoteConnected() const
 {
-	if (!m_pEngine) {
+	if (!engine_) {
 		return false;
 	}
 

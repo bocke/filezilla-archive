@@ -1007,15 +1007,10 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 
 void CMainFrame::OnEngineEvent(CFileZillaEngine* engine)
 {
-	CallAfter(&CMainFrame::DoOnEngineEvent, engine);
-}
-
-void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
-{
 	const std::vector<CState*> *pStates = CContextManager::Get()->GetAllStates();
 	CState* pState = 0;
 	for (std::vector<CState*>::const_iterator iter = pStates->begin(); iter != pStates->end(); ++iter) {
-		if ((*iter)->m_pEngine != engine) {
+		if ((*iter)->engine_.get() != engine) {
 			continue;
 		}
 
@@ -1026,7 +1021,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 		return;
 	}
 
-	std::unique_ptr<CNotification> pNotification = pState->m_pEngine->GetNextNotification();
+	std::unique_ptr<CNotification> pNotification = pState->engine_->GetNextNotification();
 	while (pNotification) {
 		switch (pNotification->GetID())
 		{
@@ -1060,7 +1055,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 				auto pAsyncRequest = unique_static_cast<CAsyncRequestNotification>(std::move(pNotification));
 				if (pAsyncRequest->GetRequestID() == reqId_fileexists) {
 					if (m_pQueueView) {
-						m_pQueueView->ProcessNotification(pState->m_pEngine, std::move(pAsyncRequest));
+						m_pQueueView->ProcessNotification(pState->engine_.get(), std::move(pAsyncRequest));
 					}
 				}
 				else {
@@ -1068,7 +1063,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 						pState->SetSecurityInfo(static_cast<CCertificateNotification&>(*pAsyncRequest));
 					}
 					if (m_pAsyncRequestQueue) {
-						m_pAsyncRequestQueue->AddRequest(pState->m_pEngine, std::move(pAsyncRequest));
+						m_pAsyncRequestQueue->AddRequest(pState->engine_.get(), std::move(pAsyncRequest));
 					}
 				}
 			}
@@ -1081,7 +1076,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 			break;
 		case nId_transferstatus:
 			if (m_pQueueView) {
-				m_pQueueView->ProcessNotification(pState->m_pEngine, std::move(pNotification));
+				m_pQueueView->ProcessNotification(pState->engine_.get(), std::move(pNotification));
 			}
 			break;
 		case nId_sftp_encryption:
@@ -1105,7 +1100,7 @@ void CMainFrame::DoOnEngineEvent(CFileZillaEngine* engine)
 			break;
 		}
 
-		pNotification = pState->m_pEngine->GetNextNotification();
+		pNotification = pState->engine_.get()->GetNextNotification();
 	}
 }
 

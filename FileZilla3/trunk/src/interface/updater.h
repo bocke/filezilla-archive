@@ -66,7 +66,7 @@ public:
 };
 
 class CFileZillaEngineContext;
-class CUpdater final : public wxEvtHandler, private EngineNotificationHandler
+class CUpdater final : public wxEvtHandler
 {
 public:
 	CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context, std::function<void(CActiveNotification const&)> const& activityNotificationHandler);
@@ -126,9 +126,8 @@ protected:
 
 	void SetState(UpdaterState s);
 
-	virtual void OnEngineEvent(CFileZillaEngine* engine);
-	void DoOnEngineEvent(CFileZillaEngine* engine);
-
+	void OnEngineEvent(CFileZillaEngine* engine);
+	
 	DECLARE_EVENT_TABLE()
 	void OnTimer(wxTimerEvent& ev);
 
