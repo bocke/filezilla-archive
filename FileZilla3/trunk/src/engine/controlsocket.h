@@ -252,7 +252,7 @@ public:
 	CFileZillaEnginePrivate& GetEngine() { return engine_; }
 
 	// Only called from the engine, see there for description
-	void InvalidateCurrentWorkingDir(const CServerPath& path);
+	void InvalidateCurrentWorkingDir(CServerPath const& path);
 
 	virtual bool CanSendNextCommand() { return true; }
 	int SendNextCommand();
