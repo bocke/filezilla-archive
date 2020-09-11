@@ -295,7 +295,7 @@ void CCommandQueue::ProcessDirectoryListing(CDirectoryListingNotification const&
 	if (!listingNotification.GetPath().empty()) {
 		pListing = std::make_shared<CDirectoryListing>();
 		if (listingNotification.Failed() ||
-			m_state.m_pEngine->CacheLookup(listingNotification.GetPath(), *pListing) != FZ_REPLY_OK)
+			m_state.engine_->CacheLookup(listingNotification.GetPath(), *pListing) != FZ_REPLY_OK)
 		{
 			pListing = std::make_shared<CDirectoryListing>();
 			pListing->path = listingNotification.GetPath();

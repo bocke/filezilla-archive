@@ -106,7 +106,7 @@ private:
 	bool trigger_{};
 };
 
-class CQueueView final : public CQueueViewBase, public COptionChangeEventHandler, public CGlobalStateEventHandler, private EngineNotificationHandler
+class CQueueView final : public CQueueViewBase, public COptionChangeEventHandler, public CGlobalStateEventHandler
 {
 	friend class CQueueViewDropTarget;
 	friend class CQueueViewFailed;
@@ -286,8 +286,7 @@ protected:
 	// Unit is byte/s.
 	wxFileOffset GetCurrentSpeed(bool countDownload, bool countUpload);
 
-	virtual void OnEngineEvent(CFileZillaEngine* engine) override;
-	void DoOnEngineEvent(CFileZillaEngine* engine);
+	void OnEngineEvent(CFileZillaEngine* engine);
 
 	void OnAskPassword();
 

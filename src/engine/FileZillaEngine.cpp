@@ -3,8 +3,8 @@
 #include "engineprivate.h"
 #include "filezilla.h"
 
-CFileZillaEngine::CFileZillaEngine(CFileZillaEngineContext& engine_context, EngineNotificationHandler& notificationHandler)
-	: impl_(std::make_unique<CFileZillaEnginePrivate>(engine_context, *this, notificationHandler))
+CFileZillaEngine::CFileZillaEngine(CFileZillaEngineContext& engine_context, std::function<void(CFileZillaEngine*)> const& cb)
+	: impl_(std::make_unique<CFileZillaEnginePrivate>(engine_context, *this, cb))
 {
 }
 

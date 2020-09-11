@@ -420,7 +420,7 @@ wxTreeItemId CRemoteTreeView::MakeParent(CServerPath path, bool select)
 		if (!child) {
 			CDirectoryListing listing;
 
-			if (m_state.m_pEngine->CacheLookup(path, listing) == FZ_REPLY_OK) {
+			if (m_state.engine_->CacheLookup(path, listing) == FZ_REPLY_OK) {
 				child = AppendItem(parent, *iter, 0, 2, path.HasParent() ? 0 : new CItemData(path));
 				SetItemImages(child, false);
 			}
@@ -556,7 +556,7 @@ void CRemoteTreeView::DisplayItem(wxTreeItemId parent, const CDirectoryListing& 
 
 		CDirectoryListing subListing;
 
-		if (m_state.m_pEngine->CacheLookup(subdir, subListing) == FZ_REPLY_OK) {
+		if (m_state.engine_->CacheLookup(subdir, subListing) == FZ_REPLY_OK) {
 			wxTreeItemId child = AppendItem(parent, name, 0, 2, 0);
 			SetItemImages(child, false);
 
@@ -620,7 +620,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 			childPath.AddSegment(*iter);
 
 			CDirectoryListing subListing;
-			if (m_state.m_pEngine->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
+			if (m_state.engine_->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
 				if (!GetLastChild(child) && HasSubdirs(subListing, filter)) {
 					AppendItem(child, _T(""), -1, -1);
 				}
@@ -650,7 +650,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 			childPath.AddSegment(*iter);
 
 			CDirectoryListing subListing;
-			if (m_state.m_pEngine->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
+			if (m_state.engine_->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
 				last = InsertItem(parent, last, *iter, 0, 2, 0);
 				if (last) {
 					SetItemImages(last, false);
@@ -687,7 +687,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 		childPath.AddSegment(*iter);
 
 		CDirectoryListing subListing;
-		if (m_state.m_pEngine->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
+		if (m_state.engine_->CacheLookup(childPath, subListing) == FZ_REPLY_OK) {
 			last = InsertItem(parent, last, *iter, 0, 2, 0);
 			if (last) {
 				SetItemImages(last, false);
@@ -997,7 +997,7 @@ void CRemoteTreeView::OnMenuChmod(wxCommandEvent&)
 		CDirectoryListing listing;
 
 		// ... and it needs to be cached
-		cached = m_state.m_pEngine->CacheLookup(parentPath, listing) == FZ_REPLY_OK;
+		cached = m_state.engine_->CacheLookup(parentPath, listing) == FZ_REPLY_OK;
 		if (cached) {
 			for (size_t i = 0; i < listing.size(); ++i) {
 				auto const& entry = listing[i];
@@ -1371,7 +1371,7 @@ bool CRemoteTreeView::ListExpand(wxTreeItemId item)
 	}
 
 	CDirectoryListing listing;
-	if (m_state.m_pEngine->CacheLookup(path, listing) == FZ_REPLY_OK) {
+	if (m_state.engine_->CacheLookup(path, listing) == FZ_REPLY_OK) {
 		RefreshItem(item, listing, false);
 	}
 	else {
@@ -1433,7 +1433,7 @@ void CRemoteTreeView::ApplyFilters(bool resort)
 		}
 
 		CDirectoryListing listing;
-		if (m_state.m_pEngine->CacheLookup(parent.path, listing) == FZ_REPLY_OK)
+		if (m_state.engine_->CacheLookup(parent.path, listing) == FZ_REPLY_OK)
 			RefreshItem(parent.item, listing, false);
 		else if (filter.HasActiveFilters()) {
 			for (wxTreeItemId child = GetFirstChild(parent.item, cookie); child; child = GetNextSibling(child)) {

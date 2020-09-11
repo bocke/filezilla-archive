@@ -521,6 +521,6 @@ bool CAsyncRequestQueue::SendReply(t_queueEntry& entry)
 void CAsyncRequestQueue::OnStateChange(CState* pState, t_statechange_notifications, std::wstring const&, const void*)
 {
 	if (pState) {
-		ClearPending(pState->m_pEngine);
+		ClearPending(pState->engine_.get());
 	}
 }

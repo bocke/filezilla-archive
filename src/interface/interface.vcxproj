@@ -191,6 +191,7 @@
     <ClCompile Include="netconfwizard.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="option_change_event_handler.cpp" />
+    <ClCompile Include="overlay.cpp" />
     <ClCompile Include="recursive_operation.cpp" />
     <ClCompile Include="recursive_operation_status.cpp" />
     <ClCompile Include="serverdata.cpp" />
@@ -318,6 +319,7 @@
     <ClInclude Include="netconfwizard.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="option_change_event_handler.h" />
+    <ClInclude Include="overlay.h" />
     <ClInclude Include="recursive_operation.h" />
     <ClInclude Include="recursive_operation_status.h" />
     <ClInclude Include="serverdata.h" />

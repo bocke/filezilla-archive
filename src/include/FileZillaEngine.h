@@ -4,16 +4,17 @@
 #include "commands.h"
 #include "notification.h"
 
+#include <functional>
+
 class CAsyncRequestNotification;
 class CFileZillaEngineContext;
 class CFileZillaEnginePrivate;
 class CNotification;
-class EngineNotificationHandler;
 
 class CFileZillaEngine final
 {
 public:
-	CFileZillaEngine(CFileZillaEngineContext& engine_context, EngineNotificationHandler& notificationHandler);
+	CFileZillaEngine(CFileZillaEngineContext& engine_context, std::function<void(CFileZillaEngine*)> const& notification_cb);
 	~CFileZillaEngine();
 
 	CFileZillaEngine(CFileZillaEngine const&) = delete;
