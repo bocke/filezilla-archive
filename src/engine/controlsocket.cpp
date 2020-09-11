@@ -16,7 +16,6 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/rate_limited_layer.hpp>
 
-#include <assert.h>
 #include <string.h>
 
 #ifndef FZ_WINDOWS
@@ -640,13 +639,12 @@ void CControlSocket::OnObtainLock()
 	}
 }
 
-void CControlSocket::InvalidateCurrentWorkingDir(const CServerPath& path)
+void CControlSocket::InvalidateCurrentWorkingDir(CServerPath const& path)
 {
-	assert(!path.empty());
-	if (currentPath_.empty()) {
+	if (path.empty() || currentPath_.empty()) {
 		return;
 	}
-
+	
 	if (path.IsParentOf(currentPath_, false, true)) {
 		if (!operations_.empty()) {
 			m_invalidateCurrentPath = true;
@@ -914,7 +912,9 @@ void CRealControlSocket::ResetSocket()
 
 bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNotification)
 {
-	assert(pFileExistsNotification);
+	if (!pFileExistsNotification) {
+		return false;
+	}
 
 	if (operations_.empty() || operations_.back()->opId != Command::transfer) {
 		log(logmsg::debug_info, L"SetFileExistsAction: No or invalid operation in progress, ignoring request reply %f", pFileExistsNotification->GetRequestID());
