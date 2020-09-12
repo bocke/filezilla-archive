@@ -685,7 +685,6 @@ void CUpdater::ParseData()
 					}
 					resource += tokens[i];
 				}
-				auto x = fz::to_integral<resource_type>(tokens[1]);
 				version_information_.resources_[fz::to_integral<resource_type>(tokens[1])] = std::move(resource);
 			}
 			continue;
