@@ -1,6 +1,8 @@
 #include "filezilla.h"
 #include "buildinfo.h"
 
+#include "../include/version.h"
+
 #include <libfilezilla/format.hpp>
 
 #include <sqlite3.h>
@@ -29,11 +31,6 @@ std::wstring GetDependencyName(gui_lib_dependency d)
 	}
 }
 
-
-std::wstring CBuildInfo::GetVersion()
-{
-	return fz::to_wstring(std::string(PACKAGE_VERSION));
-}
 
 std::wstring CBuildInfo::GetBuildDateString()
 {
@@ -205,11 +202,11 @@ std::wstring CBuildInfo::GetBuildSystem()
 
 bool CBuildInfo::IsUnstable()
 {
-	if (GetVersion().find(L"beta") != std::wstring::npos) {
+	if (GetFileZillaVersion().find(L"beta") != std::wstring::npos) {
 		return true;
 	}
 
-	if (GetVersion().find(L"rc") != std::wstring::npos) {
+	if (GetFileZillaVersion().find(L"rc") != std::wstring::npos) {
 		return true;
 	}
 

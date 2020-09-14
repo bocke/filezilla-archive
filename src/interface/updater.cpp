@@ -13,6 +13,8 @@
 #include <wx/msw/registry.h>
 #endif
 
+#include "../include/version.h"
+
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/hash.hpp>
 #include <libfilezilla/local_filesys.hpp>
@@ -194,7 +196,7 @@ fz::uri CUpdater::GetUrl()
 		host = "unknown";
 	}
 	qs["platform"] = host;
-	qs["version"] = fz::to_utf8(CBuildInfo::GetVersion());
+	qs["version"] = fz::to_utf8(GetFileZillaVersion());
 
 #if defined(__WXMSW__) || defined(__WXMAC__)
 	// Makes not much sense to submit OS version on Linux, *BSD and the likes, too many flavours.
@@ -243,7 +245,7 @@ fz::uri CUpdater::GetUrl()
 	}
 
 	std::wstring const lastVersion = COptions::Get()->get_string(OPTION_UPDATECHECK_LASTVERSION);
-	if (lastVersion != CBuildInfo::GetVersion()) {
+	if (lastVersion != GetFileZillaVersion()) {
 		qs["initial"] = "1";
 	}
 	else {
@@ -518,7 +520,7 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 		}
 	}
 	else if (state_ == UpdaterState::checking) {
-		COptions::Get()->set(OPTION_UPDATECHECK_LASTVERSION, CBuildInfo::GetVersion());
+		COptions::Get()->set(OPTION_UPDATECHECK_LASTVERSION, GetFileZillaVersion());
 		s = ProcessFinishedData(true);
 	}
 	else {
@@ -631,7 +633,7 @@ void CUpdater::ProcessData(CDataNotification& dataNotification)
 
 void CUpdater::ParseData()
 {
-	int64_t const ownVersionNumber = CBuildInfo::ConvertToVersionNumber(CBuildInfo::GetVersion().c_str());
+	int64_t const ownVersionNumber = CBuildInfo::ConvertToVersionNumber(GetFileZillaVersion().c_str());
 	version_information_ = version_information();
 
 	std::wstring raw_version_information = raw_version_information_;
@@ -695,9 +697,9 @@ void CUpdater::ParseData()
 			if (host.empty()) {
 				host = "unknown";
 			}
-			fz::to_utf8(CBuildInfo::GetVersion());
+			fz::to_utf8(GetFileZillaVersion());
 
-			std::string data = host + '|' + fz::to_utf8(CBuildInfo::GetVersion()) + '|' + fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
+			std::string data = host + '|' + fz::to_utf8(GetFileZillaVersion()) + '|' + fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
 
 			bool valid_signature{};
 			for (size_t i = 1; i < tokens.size(); ++i) {

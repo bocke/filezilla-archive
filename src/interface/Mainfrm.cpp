@@ -51,6 +51,7 @@
 #include "viewheader.h"
 #include "welcome_dialog.h"
 #include "window_state_manager.h"
+#include "../include/version.h"
 
 #if FZ_MANUALUPDATECHECK
 #include "overlay.h"
@@ -835,7 +836,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		else {
 			url += _T("bugreport");
 		}
-		wxString version = CBuildInfo::GetVersion();
+		wxString version = GetFileZillaVersion();
 		if (version != _T("custom build")) {
 			url += _T("&version=");
 			// We need to urlencode version number

@@ -4,7 +4,7 @@
 #include "Options.h"
 #include "themeprovider.h"
 
-#include "../include/misc.h"
+#include "../include/version.h"
 
 #include <wx/hyperlink.h>
 #include <wx/clipbrd.h>
@@ -27,7 +27,7 @@ bool CAboutDialog::Create(wxWindow* parent)
 	auto topRight = lay.createFlex(1);
 	top->Add(topRight);
 
-	std::wstring version = L"FileZilla " + CBuildInfo::GetVersion();
+	std::wstring version = L"FileZilla " + GetFileZillaVersion();
 	if (CBuildInfo::GetBuildType() == L"nightly") {
 		version += L"-nightly";
 	}
@@ -147,7 +147,7 @@ void CAboutDialog::OnCopy()
 	wxString text = _T("FileZilla Client\n");
 	text += _T("----------------\n\n");
 
-	text += _T("Version:          ") + CBuildInfo::GetVersion();
+	text += _T("Version:          ") + GetFileZillaVersion();
 	if (CBuildInfo::GetBuildType() == _T("nightly")) {
 		text += _T("-nightly");
 	}

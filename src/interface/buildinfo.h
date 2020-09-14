@@ -17,7 +17,6 @@ public:
 
 public:
 
-	static std::wstring GetVersion();
 	static int64_t ConvertToVersionNumber(wchar_t const* version);
 	static std::wstring GetBuildDateString();
 	static std::wstring GetBuildTimeString();

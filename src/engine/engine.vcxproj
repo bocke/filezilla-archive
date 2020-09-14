@@ -194,12 +194,14 @@
     <ClCompile Include="storj\mkd.cpp" />
     <ClCompile Include="storj\rmd.cpp" />
     <ClCompile Include="storj\storjcontrolsocket.cpp" />
+    <ClCompile Include="version.cpp" />
     <ClCompile Include="xmlutils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="..\include\commands.h" />
     <ClInclude Include="..\include\engine_options.h" />
+    <ClInclude Include="..\include\version.h" />
     <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
     <ClInclude Include="..\include\directorylisting.h" />

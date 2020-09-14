@@ -60,6 +60,7 @@ libengine_a_SOURCES = \
 		sftp/rmd.cpp \
 		sftp/sftpcontrolsocket.cpp \
 		sizeformatting_base.cpp \
+		version.cpp \
 		xmlutils.cpp
 
 noinst_HEADERS = \

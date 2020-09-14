@@ -12,6 +12,7 @@
 #include "msgbox.h"
 #include "themeprovider.h"
 #include "wxfilesystem_blob_handler.h"
+#include "../include/version.h"
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/translate.hpp>
 
@@ -720,7 +721,7 @@ int CFileZillaApp::ProcessCommandLine()
 		}
 
 		if (m_pCommandLine->HasSwitch(CCommandLine::version)) {
-			wxString out = wxString::Format(_T("FileZilla %s"), CBuildInfo::GetVersion());
+			wxString out = wxString::Format(_T("FileZilla %s"), GetFileZillaVersion());
 			if (!CBuildInfo::GetBuildType().empty()) {
 				out += _T(" ") + CBuildInfo::GetBuildType() + _T(" build");
 			}
