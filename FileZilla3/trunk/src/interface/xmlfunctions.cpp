@@ -3,6 +3,7 @@
 #include "xmlfunctions.h"
 #include "Options.h"
 
+#include "../include/version.h"
 #include "../include/xmlutils.h"
 
 #include <wx/ffile.h>
@@ -125,7 +126,7 @@ void CXmlFile::UpdateMetadata()
 		return;
 	}
 
-	SetTextAttribute(m_element, "version", CBuildInfo::GetVersion());
+	SetTextAttribute(m_element, "version", GetFileZillaVersion());
 
 	std::string const platform =
 #ifdef FZ_WINDOWS
@@ -621,5 +622,5 @@ bool CXmlFile::IsFromFutureVersion() const
 		return false;
 	}
 	std::wstring const version = GetTextAttribute(m_element, "version");
-	return CBuildInfo::ConvertToVersionNumber(CBuildInfo::GetVersion().c_str()) < CBuildInfo::ConvertToVersionNumber(version.c_str());
+	return CBuildInfo::ConvertToVersionNumber(GetFileZillaVersion().c_str()) < CBuildInfo::ConvertToVersionNumber(version.c_str());
 }

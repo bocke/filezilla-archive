@@ -4,6 +4,7 @@
 #include "Options.h"
 #include "themeprovider.h"
 #include "xrc_helper.h"
+#include "../include/version.h"
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/statline.h>
@@ -22,7 +23,7 @@ void CWelcomeDialog::RunDelayed(wxWindow* parent)
 
 bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 {
-	const wxString ownVersion = CBuildInfo::GetVersion();
+	const wxString ownVersion = GetFileZillaVersion();
 	wxString greetingVersion = COptions::Get()->get_string(OPTION_GREETINGVERSION);
 
 	wxString const resources = COptions::Get()->get_string(OPTION_GREETINGRESOURCES);
@@ -63,7 +64,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 	auto headerLeft = lay.createFlex(1);
 	header->Add(headerLeft, lay.valign)->SetProportion(1);
 
-	auto heading = new wxStaticText(this, -1, _T("FileZilla ") + CBuildInfo::GetVersion());
+	auto heading = new wxStaticText(this, -1, _T("FileZilla ") + GetFileZillaVersion());
 	heading->SetFont(heading->GetFont().Bold());
 	headerLeft->Add(heading);
 	headerLeft->Add(new wxStaticText(this, -1, _("The free open source FTP solution")));
@@ -82,7 +83,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 		auto news = new wxStaticText(this, -1, _("What's new"));
 		news->SetFont(news->GetFont().Bold());
 		main->Add(news);
-		main->Add(new wxHyperlinkCtrl(this, -1, wxString::Format(_("New features and improvements in %s"), CBuildInfo::GetVersion()), wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion), 0, wxLEFT, lay.indent);
+		main->Add(new wxHyperlinkCtrl(this, -1, wxString::Format(_("New features and improvements in %s"), GetFileZillaVersion()), wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion), 0, wxLEFT, lay.indent);
 	}
 
 	main->AddSpacer(0);

@@ -19,5 +19,6 @@ noinst_HEADERS = \
 	serverpath.h \
 	setup.h \
 	sizeformatting_base.h \
+	version.h \
 	xmlutils.h \
 	xml_string_writer.h

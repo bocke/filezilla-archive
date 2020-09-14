@@ -3,15 +3,6 @@
 
 #include <libfilezilla/event_handler.hpp>
 
-enum class lib_dependency
-{
-	gnutls,
-	count
-};
-
-std::wstring GetDependencyName(lib_dependency d);
-std::wstring GetDependencyVersion(lib_dependency d);
-
 std::string ListTlsCiphers(std::string const& priority);
 
 template<typename Derived, typename Base>
