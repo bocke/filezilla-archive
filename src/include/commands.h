@@ -293,7 +293,7 @@ class CChmodCommand final : public CCommandHelper<CChmodCommand, Command::chmod>
 {
 public:
 	// The permission string should be given in a format understandable by the server.
-	// Most likely it's the defaut octal representation used by the unix chmod command,
+	// Most likely it's the default octal representation used by the unix chmod command,
 	// i.e. chmod 755 foo.bar
 	CChmodCommand(CServerPath const& path, std::wstring const& file, std::wstring const& permission);
 
