@@ -127,7 +127,7 @@ protected:
 	void SetState(UpdaterState s);
 
 	void OnEngineEvent(CFileZillaEngine* engine);
-	
+
 	DECLARE_EVENT_TABLE()
 	void OnTimer(wxTimerEvent& ev);
 
