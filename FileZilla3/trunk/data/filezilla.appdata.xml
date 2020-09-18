@@ -3,7 +3,7 @@
 <!-- Copyright 2016 Tim Kosse <tim.kosse@filezilla-project.org> -->
 <component type="desktop">
   <id>org.filezilla-project.FileZilla</id>
-  <launchable type="desktop">filezilla.desktop</launchable>
+  <launchable type="desktop-id">filezilla.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
   <name>FileZilla</name>
