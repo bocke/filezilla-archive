@@ -750,7 +750,7 @@ checkmodifications_loopbegin:
 				UploadFile(CEditHandler::fileType(i), iter, remove);
 				goto checkmodifications_loopbegin;
 			}
-			else if (remove) {
+			else if (remove && res != wxID_CANCEL) {
 				if (i == static_cast<int>(remote)) {
 					if (fz::local_filesys::get_file_info(fz::to_native(iter->localFile), is_link, 0, &mtime, 0) != fz::local_filesys::file || wxRemoveFile(iter->localFile)) {
 						m_fileDataList[i].erase(iter);
