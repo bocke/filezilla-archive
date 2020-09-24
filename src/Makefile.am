@@ -31,7 +31,7 @@ if MACAPPBUNDLE
 noinst_DATA = dylibs.copied
 
 dylibs.copied: $(top_builddir)/FileZilla.app/Contents/MacOS/*
-	"$(top_srcdir)/data/dylibcopy.sh" "$(top_builddir)/FileZilla.app"
+	"$(top_srcdir)/data/dylibcopy.sh" "$(top_builddir)/FileZilla.app" "$(top_builddir)/src/engine"
 	@touch dylibs.copied
 
 CLEANFILES = dylibs.copied

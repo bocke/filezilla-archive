@@ -3,6 +3,7 @@
 set -e
 
 bundle="$1"
+searchdir="$2"
 
 if [ ! -d "$bundle" ]; then
   echo "$bundle is not an application bundle"
@@ -42,7 +43,14 @@ process_dylib()
 
   if [ ! -f "${frameworks}/$name" ] && [ ! -f "${frameworks}/$name.processed" ]; then
     touch "${frameworks}/$name.processed"
-    if [ -f "$dylib" ]; then
+
+    if [ -f "$searchdir/.libs/$name" ]; then
+      echo "Found dependency $name"
+      cp "$searchdir/.libs/$name" "${frameworks}/$name"
+    elif [ -f "$searchdir/$name" ]; then
+      echo "Found dependency $name"
+      cp "$searchdir/$name" "${frameworks}/$name"
+    elif [ -f "$dylib" ]; then
       echo "Found dependency $name"
       cp "$dylib" "${frameworks}/$name"
     else
