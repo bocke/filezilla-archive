@@ -38,6 +38,16 @@ process_dll()
     (
       IFS=':'
       for path in $searchpath; do
+        if [ -f "$path/.libs/$1" ]; then
+          unset IFS
+          echo "Found $1"
+          cp "$path/.libs/$1" "dlls/$1"
+          process_file "dlls/$1"
+
+          echo "File dlls\\$1" >> dll_install.nsh
+          echo "Delete \$INSTDIR\\$1" >> dll_uninstall.nsh
+          break
+        fi
         if [ -f "$path/$1" ]; then
           unset IFS
           echo "Found $1"
