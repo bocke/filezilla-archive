@@ -8,7 +8,7 @@
 
 #include <vector>
 
-class CServerPathData final
+class FZC_PUBLIC_SYMBOL CServerPathData final
 {
 public:
 	std::vector<std::wstring> m_segments;
@@ -17,7 +17,7 @@ public:
 	bool operator==(const CServerPathData& cmp) const;
 };
 
-class CServerPath final
+class FZC_PUBLIC_SYMBOL CServerPath final
 {
 public:
 	CServerPath();
@@ -78,10 +78,10 @@ public:
 
 	static CServerPath GetChanged(CServerPath const& oldPath, CServerPath const& newPath, std::wstring const& newSubdir);
 private:
-	bool IsSeparator(wchar_t c) const;
+	bool FZC_PRIVATE_SYMBOL IsSeparator(wchar_t c) const;
 
-	bool DoSetSafePath(std::wstring const& path);
-	bool DoChangePath(std::wstring &subdir, bool isFile);
+	bool FZC_PRIVATE_SYMBOL DoSetSafePath(std::wstring const& path);
+	bool FZC_PRIVATE_SYMBOL DoChangePath(std::wstring &subdir, bool isFile);
 
 	ServerType m_type;
 
@@ -89,11 +89,9 @@ private:
 	typedef tSegmentList::iterator tSegmentIter;
 	typedef tSegmentList::const_iterator tConstSegmentIter;
 
-	bool Segmentize(std::wstring const& str, tSegmentList& segments);
-	bool SegmentizeAddSegment(std::wstring & segment, tSegmentList& segments, bool& append);
-	bool ExtractFile(std::wstring& dir, std::wstring& file);
-
-	static void EscapeSeparators(ServerType type, std::wstring& subdir);
+	bool FZC_PRIVATE_SYMBOL Segmentize(std::wstring const& str, tSegmentList& segments);
+	bool FZC_PRIVATE_SYMBOL SegmentizeAddSegment(std::wstring & segment, tSegmentList& segments, bool& append);
+	bool FZC_PRIVATE_SYMBOL ExtractFile(std::wstring& dir, std::wstring& file);
 
 	fz::shared_optional<CServerPathData> m_data;
 };

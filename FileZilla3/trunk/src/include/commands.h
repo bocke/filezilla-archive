@@ -68,7 +68,7 @@ enum class Command
 // Actual commands //
 // --------------- //
 
-class CCommand
+class FZC_PUBLIC_SYMBOL CCommand
 {
 public:
 	CCommand() = default;
@@ -85,7 +85,7 @@ protected:
 };
 
 template<typename Derived, Command id>
-class CCommandHelper : public CCommand
+class FZC_PUBLIC_SYMBOL CCommandHelper : public CCommand
 {
 public:
 	virtual Command GetId() const final { return id; }
@@ -101,11 +101,11 @@ protected:
 };
 
 template<Command id>
-class CBasicCommand final : public CCommandHelper<CBasicCommand<id>, id>
+class FZC_PUBLIC_SYMBOL CBasicCommand final : public CCommandHelper<CBasicCommand<id>, id>
 {
 };
 
-class CConnectCommand final : public CCommandHelper<CConnectCommand, Command::connect>
+class FZC_PUBLIC_SYMBOL CConnectCommand final : public CCommandHelper<CConnectCommand, Command::connect>
 {
 public:
 	explicit CConnectCommand(CServer const& server, ServerHandle const& handle, Credentials const& credentials, bool retry_conncting = true);
@@ -130,7 +130,7 @@ typedef CBasicCommand<Command::disconnect> CDisconnectCommand;
 #define LIST_FLAG_FALLBACK_CURRENT 4
 #define LIST_FLAG_LINK 8
 #define LIST_FLAG_CLEARCACHE 16
-class CListCommand final : public CCommandHelper<CListCommand, Command::list>
+class FZC_PUBLIC_SYMBOL CListCommand final : public CCommandHelper<CListCommand, Command::list>
 {
 	// Without a given directory, the current directory will be listed.
 	// Directories can either be given as absolute path or as
@@ -166,7 +166,7 @@ protected:
 	int const m_flags;
 };
 
-class CFileTransferCommand final : public CCommandHelper<CFileTransferCommand, Command::transfer>
+class FZC_PUBLIC_SYMBOL CFileTransferCommand final : public CCommandHelper<CFileTransferCommand, Command::transfer>
 {
 public:
 	class t_transferSettings final
@@ -196,7 +196,7 @@ protected:
 	t_transferSettings const m_transferSettings;
 };
 
-class CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
+class FZC_PUBLIC_SYMBOL CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
 {
 public:
 	// Reply body is delivered through nId_data notifications
@@ -211,7 +211,7 @@ public:
 	std::string const body_;
 };
 
-class CRawCommand final : public CCommandHelper<CRawCommand, Command::raw>
+class FZC_PUBLIC_SYMBOL CRawCommand final : public CCommandHelper<CRawCommand, Command::raw>
 {
 public:
 	explicit CRawCommand(std::wstring const& command);
@@ -224,7 +224,7 @@ protected:
 	std::wstring m_command;
 };
 
-class CDeleteCommand final : public CCommandHelper<CDeleteCommand, Command::del>
+class FZC_PUBLIC_SYMBOL CDeleteCommand final : public CCommandHelper<CDeleteCommand, Command::del>
 {
 public:
 	CDeleteCommand(CServerPath const& path, std::vector<std::wstring> && files);
@@ -239,7 +239,7 @@ protected:
 	std::vector<std::wstring> files_;
 };
 
-class CRemoveDirCommand final : public CCommandHelper<CRemoveDirCommand, Command::removedir>
+class FZC_PUBLIC_SYMBOL CRemoveDirCommand final : public CCommandHelper<CRemoveDirCommand, Command::removedir>
 {
 public:
 	// Directories can either be given as absolute path or as
@@ -256,7 +256,7 @@ protected:
 	std::wstring const m_subDir;
 };
 
-class CMkdirCommand final : public CCommandHelper<CMkdirCommand, Command::mkdir>
+class FZC_PUBLIC_SYMBOL CMkdirCommand final : public CCommandHelper<CMkdirCommand, Command::mkdir>
 {
 public:
 	explicit CMkdirCommand(CServerPath const& path);
@@ -269,7 +269,7 @@ protected:
 	CServerPath const m_path;
 };
 
-class CRenameCommand final : public CCommandHelper<CRenameCommand, Command::rename>
+class FZC_PUBLIC_SYMBOL CRenameCommand final : public CCommandHelper<CRenameCommand, Command::rename>
 {
 public:
 	CRenameCommand(CServerPath const& fromPath, std::wstring const& fromFile,
@@ -289,7 +289,7 @@ protected:
 	std::wstring const m_toFile;
 };
 
-class CChmodCommand final : public CCommandHelper<CChmodCommand, Command::chmod>
+class FZC_PUBLIC_SYMBOL CChmodCommand final : public CCommandHelper<CChmodCommand, Command::chmod>
 {
 public:
 	// The permission string should be given in a format understandable by the server.

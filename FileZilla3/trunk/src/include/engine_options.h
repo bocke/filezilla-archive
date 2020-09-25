@@ -82,7 +82,7 @@ enum engineOptions : unsigned int
 	OPTIONS_ENGINE_NUM
 };
 
-unsigned int register_engine_options();
+unsigned int FZC_PUBLIC_SYMBOL register_engine_options();
 
 inline optionsIndex mapOption(engineOptions opt)
 {

@@ -290,7 +290,7 @@ if USE_RESOURCEFILE
 RESOURCEFILE = resources/filezilla.o
 endif
 
-filezilla_DEPENDENCIES += ../engine/libengine.a
+filezilla_DEPENDENCIES += ../engine/libfzclient-private.la
 
 filezilla_CPPFLAGS = -I$(top_builddir)/config
 filezilla_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
@@ -298,7 +298,7 @@ filezilla_CPPFLAGS += $(WX_CPPFLAGS)
 filezilla_CXXFLAGS = $(WX_CXXFLAGS_ONLY)
 filezilla_CFLAGS = $(WX_CFLAGS_ONLY)
 
-filezilla_LDFLAGS = ../engine/libengine.a $(LIBFILEZILLA_LIBS)
+filezilla_LDFLAGS = ../engine/libfzclient-private.la $(LIBFILEZILLA_LIBS)
 filezilla_LDFLAGS += $(PUGIXML_LIBS)
 
 if HAVE_DBUS
@@ -308,7 +308,6 @@ endif
 
 filezilla_LDFLAGS += $(WX_LIBS)
 filezilla_LDFLAGS += $(RESOURCEFILE)
-filezilla_LDFLAGS += $(IDN_LIB)
 
 filezilla_CPPFLAGS += $(LIBSQLITE3_CFLAGS)
 filezilla_LDFLAGS += $(LIBSQLITE3_LIBS)
@@ -347,7 +346,11 @@ $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla$(EXEEXT): filezilla
 	mkdir -p $(top_builddir)/FileZilla.app/Contents/SharedSupport/resources
 	mkdir -p $(top_builddir)/FileZilla.app/Contents/Resources
 	$(MAKE) -C resources mac-copy-resources
-	cp -f filezilla $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla
+	if test -f ".libs/filezilla"; then \
+	  cp -f .libs/filezilla $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla; \
+	else \
+	  cp -f filezilla $(top_builddir)/FileZilla.app/Contents/MacOS/filezilla; \
+	fi
 	cp -f $(top_srcdir)/COPYING $(top_builddir)/FileZilla.app/Contents/SharedSupport/COPYING
 	mkdir -p $(top_builddir)/FileZilla.app/Contents/docs
 	cp -f $(top_srcdir)/docs/fzdefaults.xml.example $(top_builddir)/FileZilla.app/Contents/docs/fzdefaults.xml.example

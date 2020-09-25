@@ -53,7 +53,7 @@ namespace listingEncoding
 }
 
 
-class CDirectoryListingParser final
+class FZC_PUBLIC_SYMBOL CDirectoryListingParser final
 {
 public:
 	CDirectoryListingParser(CControlSocket* pControlSocket, const CServer& server, listingEncoding::type encoding = listingEncoding::unknown);

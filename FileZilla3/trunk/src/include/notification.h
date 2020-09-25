@@ -55,7 +55,7 @@ enum RequestId
 	                          // to use a plaintext connection.
 };
 
-class CNotification
+class FZC_PUBLIC_SYMBOL CNotification
 {
 public:
 	virtual ~CNotification() = default;
@@ -68,7 +68,7 @@ protected:
 };
 
 template<NotificationId id>
-class CNotificationHelper : public CNotification
+class FZC_PUBLIC_SYMBOL CNotificationHelper : public CNotification
 {
 public:
 	virtual NotificationId GetID() const final { return id; }
@@ -79,7 +79,7 @@ protected:
 	CNotificationHelper<id>& operator=(CNotificationHelper<id> const&) = default;
 };
 
-class CLogmsgNotification final : public CNotificationHelper<nId_logmsg>
+class FZC_PUBLIC_SYMBOL CLogmsgNotification final : public CNotificationHelper<nId_logmsg>
 {
 public:
 	explicit CLogmsgNotification(logmsg::type t)
@@ -101,7 +101,7 @@ public:
 
 // If CFileZillaEngine does return with FZ_REPLY_WOULDBLOCK, you will receive
 // a nId_operation notification once the operation ends.
-class COperationNotification final : public CNotificationHelper<nId_operation>
+class FZC_PUBLIC_SYMBOL COperationNotification final : public CNotificationHelper<nId_operation>
 {
 public:
 	COperationNotification() = default;
@@ -121,7 +121,7 @@ public:
 // Primary notifications are those resulting from a CListCommand, other ones
 // can happen spontanously through other actions.
 class CDirectoryListing;
-class CDirectoryListingNotification final : public CNotificationHelper<nId_listing>
+class FZC_PUBLIC_SYMBOL CDirectoryListingNotification final : public CNotificationHelper<nId_listing>
 {
 public:
 	explicit CDirectoryListingNotification(CServerPath const& path, bool const primary, bool const failed = false);
@@ -135,7 +135,7 @@ protected:
 	CServerPath m_path;
 };
 
-class CAsyncRequestNotification : public CNotificationHelper<nId_asyncrequest>
+class FZC_PUBLIC_SYMBOL CAsyncRequestNotification : public CNotificationHelper<nId_asyncrequest>
 {
 public:
 	virtual RequestId GetRequestID() const = 0;
@@ -147,7 +147,7 @@ protected:
 	CAsyncRequestNotification& operator=(CAsyncRequestNotification const&) = default;
 };
 
-class CFileExistsNotification final : public CAsyncRequestNotification
+class FZC_PUBLIC_SYMBOL CFileExistsNotification final : public CAsyncRequestNotification
 {
 public:
 	virtual RequestId GetRequestID() const;
@@ -191,7 +191,7 @@ public:
 	std::wstring newName;
 };
 
-class CInteractiveLoginNotification final : public CAsyncRequestNotification
+class FZC_PUBLIC_SYMBOL CInteractiveLoginNotification final : public CAsyncRequestNotification
 {
 public:
 	enum type {
@@ -225,7 +225,7 @@ protected:
 };
 
 // Indicate network action.
-class CActiveNotification final : public CNotificationHelper<nId_active>
+class FZC_PUBLIC_SYMBOL CActiveNotification final : public CNotificationHelper<nId_active>
 {
 public:
 	explicit CActiveNotification(int direction);
@@ -235,7 +235,7 @@ protected:
 	const int m_direction;
 };
 
-class CTransferStatus final
+class FZC_PUBLIC_SYMBOL CTransferStatus final
 {
 public:
 	CTransferStatus() {}
@@ -265,7 +265,7 @@ public:
 	bool list{};
 };
 
-class CTransferStatusNotification final : public CNotificationHelper<nId_transferstatus>
+class FZC_PUBLIC_SYMBOL CTransferStatusNotification final : public CNotificationHelper<nId_transferstatus>
 {
 public:
 	CTransferStatusNotification() {}
@@ -277,7 +277,7 @@ protected:
 	CTransferStatus const status_;
 };
 
-class CSftpEncryptionDetails
+class FZC_PUBLIC_SYMBOL CSftpEncryptionDetails
 {
 public:
 	virtual ~CSftpEncryptionDetails() = default;
@@ -296,7 +296,7 @@ public:
 
 // Notification about new or changed hostkeys, only used by SSH/SFTP transfers.
 // GetRequestID() returns either reqId_hostkey or reqId_hostkeyChanged
-class CHostKeyNotification final : public CAsyncRequestNotification, public CSftpEncryptionDetails
+class FZC_PUBLIC_SYMBOL CHostKeyNotification final : public CAsyncRequestNotification, public CSftpEncryptionDetails
 {
 public:
 	CHostKeyNotification(std::wstring const& host, int port, CSftpEncryptionDetails const& details, bool changed = false);
@@ -320,7 +320,7 @@ protected:
 	const bool m_changed;
 };
 
-class CDataNotification final : public CNotificationHelper<nId_data>
+class FZC_PUBLIC_SYMBOL CDataNotification final : public CNotificationHelper<nId_data>
 {
 public:
 	CDataNotification(char* pData, size_t len);
@@ -339,7 +339,7 @@ protected:
 	size_t m_len;
 };
 
-class CCertificateNotification final : public CAsyncRequestNotification
+class FZC_PUBLIC_SYMBOL CCertificateNotification final : public CAsyncRequestNotification
 {
 public:
 	CCertificateNotification(fz::tls_session_info && info);
@@ -348,21 +348,19 @@ public:
 	fz::tls_session_info info_;
 
 	bool trusted_{};
-
-private:
 };
 
-class CSftpEncryptionNotification final : public CNotificationHelper<nId_sftp_encryption>, public CSftpEncryptionDetails
+class FZC_PUBLIC_SYMBOL CSftpEncryptionNotification final : public CNotificationHelper<nId_sftp_encryption>, public CSftpEncryptionDetails
 {
 };
 
-class CLocalDirCreatedNotification final : public CNotificationHelper<nId_local_dir_created>
+class FZC_PUBLIC_SYMBOL CLocalDirCreatedNotification final : public CNotificationHelper<nId_local_dir_created>
 {
 public:
 	CLocalPath dir;
 };
 
-class CInsecureConnectionNotification final : public CAsyncRequestNotification
+class FZC_PUBLIC_SYMBOL CInsecureConnectionNotification final : public CAsyncRequestNotification
 {
 public:
 	CInsecureConnectionNotification(CServer const& server);
@@ -372,7 +370,7 @@ public:
 	bool allow_{};
 };
 
-class ServerChangeNotification final : public CNotificationHelper<nId_serverchange>
+class FZC_PUBLIC_SYMBOL ServerChangeNotification final : public CNotificationHelper<nId_serverchange>
 {
 public:
 	ServerChangeNotification() = default;

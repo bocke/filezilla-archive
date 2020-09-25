@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_LOCAL_PATH_HEADER
 #define FILEZILLA_ENGINE_LOCAL_PATH_HEADER
 
+#include "visibility.h"
+
 #include <libfilezilla/shared.hpp>
 
 // This class encapsulates local paths.
@@ -8,7 +10,7 @@
 // UNC paths.
 // On all other systems it uses /foo/bar/baz/
 
-class CLocalPath final
+class FZC_PUBLIC_SYMBOL CLocalPath final
 {
 public:
 	CLocalPath() = default;

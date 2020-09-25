@@ -9,7 +9,7 @@
 
 #include <unordered_map>
 
-class CDirentry
+class FZC_PUBLIC_SYMBOL CDirentry
 {
 public:
 	std::wstring name;
@@ -69,7 +69,7 @@ public:
 	bool operator==(const CDirentry &op) const;
 };
 
-class CDirectoryListing final
+class FZC_PUBLIC_SYMBOL CDirectoryListing final
 {
 public:
 	typedef CDirentry value_type;
@@ -151,6 +151,6 @@ protected:
 };
 
 // Checks if listing2 is a subset of listing1. Compares only filenames.
-bool CheckInclusion(CDirectoryListing const& listing1, CDirectoryListing const& listing2);
+bool FZC_PUBLIC_SYMBOL CheckInclusion(CDirectoryListing const& listing1, CDirectoryListing const& listing2);
 
 #endif

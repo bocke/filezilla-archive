@@ -35,6 +35,9 @@
 // #define PUGIXML_FUNCTION __fastcall // to set calling conventions to all public functions to fastcall
 // In absence of PUGIXML_CLASS/PUGIXML_FUNCTION definitions PUGIXML_API is used instead
 
+#include "../include/visibility.h"
+#define PUGIXML_API FZC_PUBLIC_SYMBOL
+
 // Tune these constants to adjust memory-related behavior
 // #define PUGIXML_MEMORY_PAGE_SIZE 32768
 // #define PUGIXML_MEMORY_OUTPUT_STACK 10240

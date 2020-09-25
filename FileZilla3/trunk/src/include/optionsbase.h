@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_OPTIONSBASE_HEADER
 #define FILEZILLA_ENGINE_OPTIONSBASE_HEADER
 
+#include "visibility.h"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -62,7 +64,7 @@ inline option_flags& operator|=(option_flags& lhs, option_flags rhs)
 	return lhs;
 }
 
-struct option_def final
+struct FZC_PUBLIC_SYMBOL option_def final
 {
 	option_def(std::string_view name, std::wstring_view def, option_flags flags = option_flags::normal, size_t max_len = 10000000);
 	option_def(std::string_view name, std::wstring_view def, option_flags flags, option_type t, size_t max_len = 10000000, bool (*validator)(std::wstring& v) = nullptr);
@@ -90,16 +92,16 @@ private:
 	void* validator_{};
 };
 
-struct option_registrator
+struct FZC_PUBLIC_SYMBOL option_registrator
 {
 	option_registrator(unsigned int (*f)())
 	{
 		f();
 	}
 };
-unsigned int register_options(std::initializer_list<option_def> options);
+unsigned int FZC_PUBLIC_SYMBOL register_options(std::initializer_list<option_def> options);
 
-struct watched_options final
+struct FZC_PUBLIC_SYMBOL watched_options final
 {
 	explicit operator bool() const {
 		return any();
@@ -135,7 +137,7 @@ typedef fz::simple_event<options_changed_event_type, watched_options> options_ch
 typedef void (*watcher_notifier)(void* handler, watched_options&& options);
 std::tuple<void*, watcher_notifier> get_option_watcher_notifier(fz::event_handler* handler);
 
-class COptionsBase
+class FZC_PUBLIC_SYMBOL COptionsBase
 {
 public:
 	virtual ~COptionsBase() noexcept = default;

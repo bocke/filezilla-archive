@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_ENGINE_CONTEXT_HEADER
 #define FILEZILLA_ENGINE_CONTEXT_HEADER
 
+#include "visibility.h"
+
 #include <memory>
 
 class CDirectoryCache;
@@ -16,7 +18,7 @@ class tls_system_trust_store;
 }
 
 
-class CustomEncodingConverterBase
+class FZC_PUBLIC_SYMBOL CustomEncodingConverterBase
 {
 public:
 	virtual ~CustomEncodingConverterBase() = default;
@@ -26,7 +28,7 @@ public:
 };
 
 // There can be multiple engines, but there can be at most one context
-class CFileZillaEngineContext final
+class FZC_PUBLIC_SYMBOL CFileZillaEngineContext final
 {
 public:
 	CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter);

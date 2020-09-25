@@ -1,9 +1,11 @@
 #ifndef FILEZILLA_ENGINE_MISC_HEADER
 #define FILEZILLA_ENGINE_MISC_HEADER
 
+#include "visibility.h"
+
 #include <libfilezilla/event_handler.hpp>
 
-std::string ListTlsCiphers(std::string const& priority);
+std::string FZC_PUBLIC_SYMBOL ListTlsCiphers(std::string const& priority);
 
 template<typename Derived, typename Base>
 std::unique_ptr<Derived>
@@ -14,17 +16,17 @@ unique_static_cast(std::unique_ptr<Base>&& p)
 }
 
 #if FZ_WINDOWS
-DWORD GetSystemErrorCode();
-fz::native_string GetSystemErrorDescription(DWORD err);
+DWORD FZC_PUBLIC_SYMBOL GetSystemErrorCode();
+fz::native_string FZC_PUBLIC_SYMBOL GetSystemErrorDescription(DWORD err);
 #else
-int GetSystemErrorCode();
-fz::native_string GetSystemErrorDescription(int err);
+int FZC_PUBLIC_SYMBOL GetSystemErrorCode();
+fz::native_string FZC_PUBLIC_SYMBOL GetSystemErrorDescription(int err);
 #endif
 
 namespace fz {
 
 // Poor-man's tolower. Consider to eventually use libicu or similar
-std::wstring str_tolower(std::wstring const& source);
+std::wstring FZC_PUBLIC_SYMBOL str_tolower(std::wstring const& source);
 }
 
 #endif

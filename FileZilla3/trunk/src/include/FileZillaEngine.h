@@ -11,7 +11,7 @@ class CFileZillaEngineContext;
 class CFileZillaEnginePrivate;
 class CNotification;
 
-class CFileZillaEngine final
+class FZC_PUBLIC_SYMBOL CFileZillaEngine final
 {
 public:
 	CFileZillaEngine(CFileZillaEngineContext& engine_context, std::function<void(CFileZillaEngine*)> const& notification_cb);
