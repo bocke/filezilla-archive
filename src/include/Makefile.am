@@ -20,5 +20,6 @@ noinst_HEADERS = \
 	setup.h \
 	sizeformatting_base.h \
 	version.h \
+	visibility.h \
 	xmlutils.h \
 	xml_string_writer.h

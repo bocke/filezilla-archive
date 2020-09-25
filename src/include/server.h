@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "visibility.h"
+
 enum ServerProtocol
 {
 	// Never change any existing values or user's saved sites will become
@@ -119,7 +121,7 @@ CaseSensitivity GetCaseSensitivity(ServerProtocol protocol);
 
 class Credentials;
 class CServerPath;
-class CServer final
+class FZC_PUBLIC_SYMBOL CServer final
 {
 public:
 
@@ -239,10 +241,10 @@ enum class LogonType
 
 	count
 };
-std::wstring GetNameFromLogonType(LogonType type);
-LogonType GetLogonTypeFromName(std::wstring const& name);
+std::wstring FZC_PUBLIC_SYMBOL GetNameFromLogonType(LogonType type);
+LogonType FZC_PUBLIC_SYMBOL GetLogonTypeFromName(std::wstring const& name);
 
-std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol);
+std::vector<LogonType> FZC_PUBLIC_SYMBOL GetSupportedLogonTypes(ServerProtocol protocol);
 
 
 namespace ParameterSection {
@@ -272,13 +274,13 @@ struct ParameterTraits
 	std::wstring hint_;
 };
 
-std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol protocol);
+std::vector<ParameterTraits> FZC_PUBLIC_SYMBOL const& ExtraServerParameterTraits(ServerProtocol protocol);
 
-std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol);
+std::tuple<std::wstring, std::wstring> FZC_PUBLIC_SYMBOL GetDefaultHost(ServerProtocol protocol);
 
-bool ProtocolHasUser(ServerProtocol protocol);
+bool FZC_PUBLIC_SYMBOL ProtocolHasUser(ServerProtocol protocol);
 
-class Credentials
+class FZC_PUBLIC_SYMBOL Credentials
 {
 public:
 	virtual ~Credentials() = default;
@@ -309,7 +311,7 @@ protected:
 	std::map<std::string, std::wstring, std::less<>> extraParameters_;
 };
 
-struct ServerHandleData {
+struct FZC_PUBLIC_SYMBOL ServerHandleData {
 protected:
 	ServerHandleData() = default;
 	virtual ~ServerHandleData() = default;

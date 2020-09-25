@@ -1,11 +1,13 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-noinst_LIBRARIES = libengine.a
+lib_LTLIBRARIES = libfzclient-private.la
 
-libengine_a_CPPFLAGS = -I$(top_builddir)/config
-libengine_a_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzclient_private_la_CPPFLAGS = -I$(top_builddir)/config
+libfzclient_private_la_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzclient_private_la_CPPFLAGS += -DBUILDING_FILEZILLA
 
-libengine_a_SOURCES = \
+
+libfzclient_private_la_SOURCES = \
 		commands.cpp \
 		controlsocket.cpp \
 		directorycache.cpp \
@@ -110,7 +112,7 @@ noinst_HEADERS = \
 		sftp/sftpcontrolsocket.h
 
 if ENABLE_STORJ
-libengine_a_SOURCES += \
+libfzclient_private_la_SOURCES += \
 		storj/connect.cpp \
 		storj/delete.cpp \
 		storj/file_transfer.cpp \
@@ -132,6 +134,15 @@ noinst_HEADERS += \
 		storj/storjcontrolsocket.h
 endif
 
+if !HAVE_LIBPUGIXML
+libfzclient_private_la_SOURCES += ../pugixml/pugixml.cpp
+endif
+
+libfzclient_private_la_CXXFLAGS = -fvisibility=hidden
+libfzclient_private_la_LDFLAGS = -no-undefined -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_MICRO)
+libfzclient_private_la_LDFLAGS += $(LIBFILEZILLA_LIBS)
+libfzclient_private_la_LDFLAGS += $(IDN_LIB)
+
 dist_noinst_DATA = engine.vcxproj
 
 CLEANFILES = filezilla.h.gch
@@ -144,7 +155,7 @@ BUILT_SOURCES = filezilla.h.gch
 -include ./$(DEPDIR)/filezilla.Po
 
 filezilla.h.gch: filezilla.h
-	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libengine_a_CPPFLAGS) $(CPPFLAGS) $(libengine_a_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/filezilla.Tpo" -c -o $@ $<; \
+	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libfzclient_private_la_CPPFLAGS) $(CPPFLAGS) $(libfzclient_private_la_CXXFLAGS) $(CXXFLAGS) -MT $@ -MD -MP -MF "$(DEPDIR)/filezilla.Tpo" -c -o $@ $<; \
 	then mv -f "$(DEPDIR)/filezilla.Tpo" "$(DEPDIR)/filezilla.Po"; else rm -f "$(DEPDIR)/filezilla.Tpo"; exit 1; fi
 
 endif

@@ -40,7 +40,7 @@ option_def::option_def(std::string_view name, int def, option_flags flags, int m
 {}
 
 template<>
-option_def::option_def(std::string_view name, bool def, option_flags flags)
+FZC_PUBLIC_SYMBOL option_def::option_def(std::string_view name, bool def, option_flags flags)
 	: name_(name)
 	, default_(fz::to_wstring(def))
 	, type_(option_type::boolean)

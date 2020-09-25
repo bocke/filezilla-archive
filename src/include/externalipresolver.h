@@ -1,13 +1,15 @@
 #ifndef FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 #define FILEZILLA_ENGINE_EXTERNALIPRESOLVER_HEADER
 
+#include "visibility.h"
+
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/socket.hpp>
 
 struct external_ip_resolve_event_type;
 typedef fz::simple_event<external_ip_resolve_event_type> CExternalIPResolveEvent;
 
-class CExternalIPResolver final : public fz::event_handler
+class FZC_PUBLIC_SYMBOL  CExternalIPResolver final : public fz::event_handler
 {
 public:
 	CExternalIPResolver(fz::thread_pool & pool, fz::event_handler & handler);

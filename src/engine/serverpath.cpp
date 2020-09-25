@@ -132,6 +132,17 @@ bool CServerPath::SetPath(std::wstring &newPath, bool isFile)
 	return true;
 }
 
+namespace {
+void EscapeSeparators(ServerType type, std::wstring& subdir)
+{
+	if (traits[type].separatorEscape) {
+		for (wchar_t const* p = traits[type].separators; *p; ++p) {
+			fz::replace_substrings(subdir, std::wstring(1, *p), std::wstring(1, traits[type].separatorEscape) + traits[type].separators[0]);
+		}
+	}
+}
+}
+
 std::wstring CServerPath::GetPath() const
 {
 	if (empty()) {
@@ -1167,15 +1178,6 @@ bool CServerPath::ExtractFile(std::wstring& dir, std::wstring& file)
 	dir = dir.substr(0, pos + 1);
 
 	return true;
-}
-
-void CServerPath::EscapeSeparators(ServerType type, std::wstring& subdir)
-{
-	if (traits[type].separatorEscape) {
-		for (wchar_t const* p = traits[type].separators; *p; ++p) {
-			fz::replace_substrings(subdir, std::wstring(1, *p), std::wstring(1, traits[type].separatorEscape) + traits[type].separators[0]);
-		}
-	}
 }
 
 size_t CServerPath::SegmentCount() const
