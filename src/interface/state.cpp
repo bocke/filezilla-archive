@@ -848,7 +848,7 @@ void DoHandleDroppedFiles(CState & state, CMainFrame & mainFrame, T const& files
 	memcpy(to, static_cast<wchar_t const*>(path.GetPath().c_str()), (path.GetPath().size() + 1) * sizeof(wchar_t));
 	to[path.GetPath().size() + 1] = 0; // End of list
 
-	SHFILEOPSTRUCT op = { 0 };
+	SHFILEOPSTRUCT op{};
 	op.pFrom = from;
 	op.pTo = to;
 	op.wFunc = copy ? FO_COPY : FO_MOVE;

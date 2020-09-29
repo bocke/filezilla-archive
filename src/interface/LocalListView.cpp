@@ -1715,7 +1715,7 @@ void CLocalListView::StartComparison()
 	}
 }
 
-bool CLocalListView::get_next_file(std::wstring_view & name, std::wstring & path, bool& dir, int64_t& size, fz::datetime& date)
+bool CLocalListView::get_next_file(std::wstring_view & name, std::wstring &, bool& dir, int64_t& size, fz::datetime& date)
 {
 	if (++m_comparisonIndex >= (int)m_originalIndexMapping.size()) {
 		return false;
