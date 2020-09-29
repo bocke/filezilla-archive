@@ -102,6 +102,7 @@ bool OpenInFileManager(std::wstring const& dir)
 	return ret;
 }
 
+#ifndef FZ_WINDOWS
 namespace {
 bool PathExpand(std::wstring& cmd)
 {
@@ -146,6 +147,7 @@ bool PathExpand(std::wstring& cmd)
 	return true;
 }
 }
+#endif
 
 std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 {
@@ -180,7 +182,7 @@ std::vector<std::wstring> GetSystemAssociation(std::wstring const& file)
 	if (ret.empty()) {
 		ret = query(nullptr);
 	}
-	
+
 	std::vector<std::wstring> raw;
 	std::swap(ret, raw);
 	if (!raw.empty()) {

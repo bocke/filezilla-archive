@@ -1824,7 +1824,7 @@ void CSearchDialog::SaveConditions()
 	file.Save(true);
 }
 
-void CSearchDialog::OnChangeSearchMode(wxCommandEvent& ev)
+void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)
 {
 	wxString const strPath = xrc_call(*this, "ID_PATH", &wxTextCtrl::GetValue);
 

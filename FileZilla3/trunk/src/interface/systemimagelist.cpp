@@ -133,6 +133,8 @@ int CSystemImageList::GetIconIndex(iconType type, std::wstring const& fileName, 
 	}
 
 #ifdef __WXMSW__
+	(void)symlink;
+
 	if (fileName.empty()) {
 		physical = false;
 	}
