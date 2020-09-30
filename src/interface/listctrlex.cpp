@@ -20,8 +20,8 @@
 #include "themeprovider.h"
 #endif
 
-DECLARE_EVENT_TYPE(fzEVT_POSTSCROLL, -1)
-DEFINE_EVENT_TYPE(fzEVT_POSTSCROLL)
+wxDECLARE_EVENT(fzEVT_POSTSCROLL, wxCommandEvent);
+wxDEFINE_EVENT(fzEVT_POSTSCROLL, wxCommandEvent);
 
 BEGIN_EVENT_TABLE(wxListCtrlEx, wxListCtrlExBase)
 EVT_COMMAND(wxID_ANY, fzEVT_POSTSCROLL, wxListCtrlEx::OnPostScrollEvent)

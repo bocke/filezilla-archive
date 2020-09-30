@@ -20,8 +20,8 @@
 // startup, use a background thread to obtain the labels.
 #ifdef FZ_WINDOWS
 
-DECLARE_EVENT_TYPE(fzEVT_VOLUMEENUMERATED, -1)
-DECLARE_EVENT_TYPE(fzEVT_VOLUMESENUMERATED, -1)
+wxDECLARE_EVENT(fzEVT_VOLUMEENUMERATED, wxCommandEvent);
+wxDECLARE_EVENT(fzEVT_VOLUMESENUMERATED, wxCommandEvent);
 
 class CVolumeDescriptionEnumeratorThread final
 {

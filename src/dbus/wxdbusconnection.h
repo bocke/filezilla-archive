@@ -99,11 +99,9 @@ void MainFrame::OnSignal(wxDBusConnectionEvent& event)
   method call arrives on the bus. Process this event only if you use asynchronous method calls.
 */
 
-BEGIN_DECLARE_EVENT_TYPES()
-	DECLARE_EVENT_TYPE(wxEVT_DBUS_NOTIFICATION, wxID_ANY)
-	DECLARE_EVENT_TYPE(wxEVT_DBUS_SIGNAL,wxID_ANY)
-	DECLARE_EVENT_TYPE(wxEVT_DBUS_ASYNC_RESPONSE, wxID_ANY)
-END_DECLARE_EVENT_TYPES()
+wxDECLARE_EVENT(wxEVT_DBUS_NOTIFICATION, wxDBusConnectionEvent);
+wxDECLARE_EVENT(wxEVT_DBUS_SIGNAL, wxDBusConnectionEvent);
+wxDECLARE_EVENT(wxEVT_DBUS_ASYNC_RESPONSE, wxDBusConnectionEvent);
 
 #define EVT_DBUS_NOTIFICATION(id, fn) DECLARE_EVENT_TABLE_ENTRY(wxEVT_DBUS_NOTIFICATION, id, -1, (wxObjectEventFunction) (wxEventFunction)  (wxDBusConnectionEventFunction) & fn, (wxObject *) NULL ),
 

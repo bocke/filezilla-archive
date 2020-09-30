@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-DEFINE_EVENT_TYPE(fzEVT_GRANTEXCLUSIVEENGINEACCESS)
+wxDEFINE_EVENT(fzEVT_GRANTEXCLUSIVEENGINEACCESS, wxCommandEvent);
 
 int CCommandQueue::m_requestIdCounter = 0;
 

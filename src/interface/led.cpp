@@ -5,7 +5,7 @@
 
 #include <wx/dcclient.h>
 
-DEFINE_EVENT_TYPE(fzEVT_UPDATE_LED_TOOLTIP)
+wxDEFINE_EVENT(fzEVT_UPDATE_LED_TOOLTIP, wxCommandEvent);
 
 BEGIN_EVENT_TABLE(CLed, wxWindow)
 	EVT_PAINT(CLed::OnPaint)

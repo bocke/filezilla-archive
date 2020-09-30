@@ -4,7 +4,7 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 
-DECLARE_EVENT_TYPE(fzEVT_UPDATE_LED_TOOLTIP, -1)
+wxDECLARE_EVENT(fzEVT_UPDATE_LED_TOOLTIP, wxCommandEvent);
 
 class CLed final : public wxWindow
 {
