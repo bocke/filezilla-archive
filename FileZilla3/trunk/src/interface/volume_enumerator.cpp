@@ -5,8 +5,8 @@
 
 #include <wx/msw/registry.h>
 
-DEFINE_EVENT_TYPE(fzEVT_VOLUMEENUMERATED)
-DEFINE_EVENT_TYPE(fzEVT_VOLUMESENUMERATED)
+wxDEFINE_EVENT(fzEVT_VOLUMEENUMERATED, wxCommandEvent);
+wxDEFINE_EVENT(fzEVT_VOLUMESENUMERATED, wxCommandEvent);
 
 CVolumeDescriptionEnumeratorThread::CVolumeDescriptionEnumeratorThread(wxEvtHandler* pEvtHandler, fz::thread_pool & pool)
 	: m_pEvtHandler(pEvtHandler)

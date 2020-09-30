@@ -73,8 +73,8 @@
 #include <map>
 
 #ifdef __WXGTK__
-DECLARE_EVENT_TYPE(fzEVT_TASKBAR_CLICK_DELAYED, -1)
-DEFINE_EVENT_TYPE(fzEVT_TASKBAR_CLICK_DELAYED)
+wxDECLARE_EVENT(fzEVT_TASKBAR_CLICK_DELAYED, wxCommandEvent);
+wxDEFINE_EVENT(fzEVT_TASKBAR_CLICK_DELAYED, wxCommandEvent);
 #endif
 
 static int tab_hotkey_ids[10];

@@ -480,7 +480,7 @@ bool wxDBusError::IsSet()
 	return (bool) dbus_error_is_set(&m_error);
 }
 
-DEFINE_EVENT_TYPE(wxEVT_DBUS_NOTIFICATION)
-DEFINE_EVENT_TYPE(wxEVT_DBUS_SIGNAL)
-DEFINE_EVENT_TYPE(wxEVT_DBUS_ASYNC_RESPONSE)
+wxDEFINE_EVENT(wxEVT_DBUS_NOTIFICATION, wxDBusConnectionEvent);
+wxDEFINE_EVENT(wxEVT_DBUS_SIGNAL, wxDBusConnectionEvent);
+wxDEFINE_EVENT(wxEVT_DBUS_ASYNC_RESPONSE, wxDBusConnectionEvent);
 IMPLEMENT_DYNAMIC_CLASS(wxDBusConnectionEvent, wxNotifyEvent)

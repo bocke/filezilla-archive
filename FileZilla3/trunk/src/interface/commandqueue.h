@@ -6,7 +6,9 @@ class CNotification;
 class CState;
 class CMainFrame;
 
-DECLARE_EVENT_TYPE(fzEVT_GRANTEXCLUSIVEENGINEACCESS, -1)
+#include <wx/event.h>
+
+wxDECLARE_EVENT(fzEVT_GRANTEXCLUSIVEENGINEACCESS, wxCommandEvent);
 
 class CCommandQueue final
 {
