@@ -44,8 +44,7 @@ protected:
 	virtual void List(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), int flags = 0) override;
 	void ChangeDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), bool link_discovery = false);
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-							 std::wstring const& remoteFile, bool download,
-							 CFileTransferCommand::t_transferSettings const& transferSettings) override;
+							 std::wstring const& remoteFile, transfer_flags const& flags) override;
 	virtual void RawCommand(std::wstring const& command) override;
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files) override;
 	virtual void RemoveDir(CServerPath const& path, std::wstring const& subDir) override;

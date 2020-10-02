@@ -6,8 +6,8 @@
 class CSftpFileTransferOpData final : public CFileTransferOpData, public CSftpOpData
 {
 public:
-	CSftpFileTransferOpData(CSftpControlSocket & controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-		: CFileTransferOpData(L"CSftpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
+	CSftpFileTransferOpData(CSftpControlSocket & controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
+		: CFileTransferOpData(L"CSftpFileTransferOpData", local_file, remote_file, remote_path, flags)
 		, CSftpOpData(controlSocket)
 	{}
 

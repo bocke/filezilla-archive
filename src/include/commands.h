@@ -166,34 +166,78 @@ protected:
 	int const m_flags;
 };
 
+enum class transfer_flags : unsigned short
+{
+	none = 0,
+
+	interface_reserved_mask = 0x08u, // The engine will never touch these
+	
+	download = 0x10,
+	fsync = 0x20,
+
+	// Free bits in the middle
+
+	protocol_reserved_mask = 0xfe00,
+	protocol_reserved_max = 0x8000
+};
+
+inline bool operator&(transfer_flags lhs, transfer_flags rhs)
+{
+	return (static_cast<std::underlying_type_t<transfer_flags>>(lhs) & static_cast<std::underlying_type_t<transfer_flags>>(rhs)) != 0;
+}
+
+inline transfer_flags operator|(transfer_flags lhs, transfer_flags rhs)
+{
+	return static_cast<transfer_flags>(static_cast<std::underlying_type_t<transfer_flags>>(lhs) | static_cast<std::underlying_type_t<transfer_flags>>(rhs));
+}
+
+inline transfer_flags& operator|=(transfer_flags& lhs, transfer_flags rhs)
+{
+	lhs = static_cast<transfer_flags>(static_cast<std::underlying_type_t<transfer_flags>>(lhs) | static_cast<std::underlying_type_t<transfer_flags>>(rhs));
+	return lhs;
+}
+
+inline transfer_flags operator-(transfer_flags lhs, transfer_flags rhs)
+{
+	return static_cast<transfer_flags>(static_cast<std::underlying_type_t<transfer_flags>>(lhs) & ~static_cast<std::underlying_type_t<transfer_flags>>(rhs));
+}
+
+inline transfer_flags& operator-=(transfer_flags& lhs, transfer_flags rhs)
+{
+	lhs = static_cast<transfer_flags>(static_cast<std::underlying_type_t<transfer_flags>>(lhs) & ~static_cast<std::underlying_type_t<transfer_flags>>(rhs));
+	return lhs;
+}
+
+inline bool operator!(transfer_flags flags)
+{
+	return static_cast<std::underlying_type_t<transfer_flags>>(flags) == 0;
+}
+
+namespace ftp_transfer_flags
+{
+	auto constexpr ascii = transfer_flags::protocol_reserved_max;
+};
+
 class FZC_PUBLIC_SYMBOL CFileTransferCommand final : public CCommandHelper<CFileTransferCommand, Command::transfer>
 {
 public:
-	class t_transferSettings final
-	{
-	public:
-		bool binary{true};
-		bool fsync{};
-	};
-
 	// For uploads, set download to false.
 	// For downloads, localFile can be left empty if supported by protocol.
 	// Check for nId_data notification.
 	// FIXME: localFile empty iff protocol is HTTP.
-	CFileTransferCommand(std::wstring const& localFile, CServerPath const& remotePath, std::wstring const& remoteFile, bool download, t_transferSettings const& m_transferSettings);
+	CFileTransferCommand(std::wstring const& localFile, CServerPath const& remotePath, std::wstring const& remoteFile, transfer_flags const& flags);
 
 	std::wstring GetLocalFile() const;
 	CServerPath GetRemotePath() const;
 	std::wstring GetRemoteFile() const;
-	bool Download() const;
-	const t_transferSettings& GetTransferSettings() const { return m_transferSettings; }
+	bool Download() const { return flags_ & transfer_flags::download; }
+	transfer_flags const& GetFlags() const { return flags_; }
 
 protected:
 	std::wstring const m_localFile;
 	CServerPath const m_remotePath;
 	std::wstring const m_remoteFile;
-	bool const m_download;
-	t_transferSettings const m_transferSettings;
+	transfer_flags const flags_;
 };
 
 class FZC_PUBLIC_SYMBOL CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>

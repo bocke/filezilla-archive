@@ -116,7 +116,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 			if (!status.empty() && !status.madeProgress) {
 				if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
 					auto & data = static_cast<CSftpFileTransferOpData &>(*operations_.back());
-					if (data.download_) {
+					if (data.download()) {
 						if (value > 0) {
 							engine_.transfer_status_.SetMadeProgress();
 						}
@@ -426,7 +426,7 @@ void CSftpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& 
 	pData->link_discovery_ = link_discovery;
 
 	if (!operations_.empty() && operations_.back()->opId == Command::transfer &&
-		!static_cast<CSftpFileTransferOpData&>(*operations_.back()).download_)
+		!static_cast<CSftpFileTransferOpData&>(*operations_.back()).download())
 	{
 		pData->tryMkdOnFail_ = true;
 		assert(subDir.empty());
@@ -475,10 +475,9 @@ void CSftpControlSocket::ProcessReply(int result, std::wstring const& reply)
 	}
 }
 void CSftpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-									std::wstring const& remoteFile, bool download,
-									CFileTransferCommand::t_transferSettings const& transferSettings)
+									std::wstring const& remoteFile, transfer_flags const& flags)
 {
-	auto pData = std::make_unique<CSftpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, transferSettings);
+	auto pData = std::make_unique<CSftpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
 	Push(std::move(pData));
 }
 

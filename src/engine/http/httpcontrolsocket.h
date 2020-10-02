@@ -251,8 +251,7 @@ public:
 protected:
 	virtual void Connect(CServer const& server, Credentials const& credentials) override;
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-		std::wstring const& remoteFile, bool download,
-		CFileTransferCommand::t_transferSettings const& transferSettings) override;
+		std::wstring const& remoteFile, transfer_flags const& flags) override;
 
 	void Request(std::shared_ptr<HttpRequestResponseInterface> const& request);
 	void Request(std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests);

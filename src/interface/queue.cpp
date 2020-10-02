@@ -233,22 +233,17 @@ int CQueueItem::GetItemIndex() const
 	return index + pParent->GetItemIndex();
 }
 
-CFileItem::CFileItem(CServerItem* parent, bool queued, bool download,
+CFileItem::CFileItem(CServerItem* parent, transfer_flags const& flags,
 					 std::wstring const& sourceFile, std::wstring const& targetFile,
 					 CLocalPath const& localPath, CServerPath const& remotePath, int64_t size)
 	: CQueueItem(parent)
+	, flags_(flags)
 	, m_sourceFile(sourceFile)
 	, m_targetFile(targetFile.empty() ? fz::sparse_optional<std::wstring>() : fz::sparse_optional<std::wstring>(targetFile))
 	, m_localPath(localPath)
 	, m_remotePath(remotePath)
 	, m_size(size)
 {
-	if (download) {
-		flags |= flag_download;
-	}
-	if (queued) {
-		flags |= flag_queued;
-	}
 }
 
 CFileItem::~CFileItem()
@@ -283,12 +278,12 @@ void CFileItem::SetActive(const bool active)
 	if (active && !IsActive()) {
 		wxASSERT(!GetChildrenCount(false));
 		AddChild(new CStatusItem);
-		flags |= flag_active;
+		flags_ |= queue_flags::active;
 	}
 	else if (!active && IsActive()) {
 		CQueueItem* pItem = GetChild(0, false);
 		RemoveChild(pItem);
-		flags &= ~flag_active;
+		flags_ -= queue_flags::active;
 	}
 }
 
@@ -303,7 +298,7 @@ void CFileItem::SaveItem(pugi::xml_node& element) const
 	AddTextElement(file, "LocalFile", m_localPath.GetPath() + GetLocalFile());
 	AddTextElement(file, "RemoteFile", GetRemoteFile());
 	AddTextElement(file, "RemotePath", m_remotePath.GetSafePath());
-	AddTextElementUtf8(file, "Download", Download() ? "1" : "0");
+	AddTextElement(file, "Flags", static_cast<int64_t>(flags_ - queue_flags::mask));
 	if (m_size != -1) {
 		AddTextElement(file, "Size", m_size);
 	}
@@ -313,7 +308,6 @@ void CFileItem::SaveItem(pugi::xml_node& element) const
 	if (m_priority != QueuePriority::normal) {
 		AddTextElement(file, "Priority", static_cast<int>(m_priority));
 	}
-	AddTextElementUtf8(file, "DataType", Ascii() ? "0" : "1");
 	if (m_defaultFileExistsAction != CFileExistsNotification::unknown) {
 		AddTextElement(file, "OverwriteAction", m_defaultFileExistsAction);
 	}
@@ -367,12 +361,12 @@ wxString const& CFileItem::GetStatusMessage() const
 }
 
 CFolderItem::CFolderItem(CServerItem* parent, bool queued, CLocalPath const& localPath)
-	: CFileItem(parent, queued, true, std::wstring(), std::wstring(), localPath, CServerPath(), -1)
+	: CFileItem(parent, transfer_flags::download | (queued ? queue_flags::queued : transfer_flags{}), std::wstring(), std::wstring(), localPath, CServerPath(), -1)
 {
 }
 
 CFolderItem::CFolderItem(CServerItem* parent, bool queued, CServerPath const& remotePath, std::wstring const& remoteFile)
-	: CFileItem(parent, queued, false, std::wstring(), remoteFile, CLocalPath(), remotePath, -1)
+	: CFileItem(parent, queued ? queue_flags::queued : transfer_flags{}, std::wstring(), remoteFile, CLocalPath(), remotePath, -1)
 {
 }
 
@@ -387,16 +381,16 @@ void CFolderItem::SaveItem(pugi::xml_node& element) const
 		AddTextElement(file, "RemoteFile", GetRemoteFile());
 		AddTextElement(file, "RemotePath", m_remotePath.GetSafePath());
 	}
-	AddTextElementUtf8(file, "Download", Download() ? "1" : "0");
+	AddTextElement(file, "Flags", static_cast<int64_t>(flags_ - queue_flags::mask));
 }
 
-void CFolderItem::SetActive(const bool active)
+void CFolderItem::SetActive(bool const active)
 {
 	if (active) {
-		flags |= flag_active;
+		flags_ |= queue_flags::active;
 	}
 	else {
-		flags &= ~flag_active;
+		flags_ -= queue_flags::active;
 	}
 }
 

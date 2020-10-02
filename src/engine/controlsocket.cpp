@@ -196,7 +196,7 @@ int CControlSocket::ResetOperation(int nErrorCode)
 		case Command::transfer:
 			{
 				auto & data = static_cast<CFileTransferOpData &>(*oldOperation);
-				if (!data.download_ && data.transferInitiated_) {
+				if (!data.download() && data.transferInitiated_) {
 					if (!currentServer_) {
 						log(logmsg::debug_warning, L"currentServer_ is empty");
 					}
@@ -362,7 +362,7 @@ int CControlSocket::CheckOverwriteFile()
 
 	auto & data = static_cast<CFileTransferOpData &>(*operations_.back());
 
-	if (data.download_) {
+	if (data.download()) {
 		if (fz::local_filesys::get_file_type(fz::to_native(data.localFile_), true) != fz::local_filesys::file) {
 			return FZ_REPLY_OK;
 		}
@@ -384,7 +384,7 @@ int CControlSocket::CheckOverwriteFile()
 	if (found && !matchedCase)
 		found = false;
 
-	if (!data.download_) {
+	if (!data.download()) {
 		if (!found && data.remoteFileSize_ < 0 && data.fileTime_.empty()) {
 			return FZ_REPLY_OK;
 		}
@@ -392,19 +392,22 @@ int CControlSocket::CheckOverwriteFile()
 
 	auto notification = std::make_unique<CFileExistsNotification>();
 
-	notification->download = data.download_;
+	notification->download = data.download();
 	notification->localFile = data.localFile_;
 	notification->remoteFile = data.remoteFile_;
 	notification->remotePath = data.remotePath_;
 	notification->localSize = data.localFileSize_;
 	notification->remoteSize = data.remoteFileSize_;
 	notification->remoteTime = data.fileTime_;
-	notification->ascii = !data.transferSettings_.binary;
 
-	if (data.download_ && notification->localSize >= 0) {
+	if (currentServer_.HasFeature(ProtocolFeature::DataTypeConcept)) {
+		notification->ascii = data.flags_ & ftp_transfer_flags::ascii;
+	}
+
+	if (data.download() && notification->localSize >= 0) {
 		notification->canResume = true;
 	}
-	else if (!data.download_ && notification->remoteSize >= 0) {
+	else if (!data.download() && notification->remoteSize >= 0) {
 		notification->canResume = true;
 	}
 	else {
@@ -439,11 +442,10 @@ void SleepOpData::operator()(fz::event_base const&)
 	controlSocket_.ResetOperation(FZ_REPLY_OK);
 }
 
-CFileTransferOpData::CFileTransferOpData(wchar_t const* name, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
+CFileTransferOpData::CFileTransferOpData(wchar_t const* name, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
 	: COpData(Command::transfer, name)
 	, localFile_(local_file), remoteFile_(remote_file), remotePath_(remote_path)
-	, download_(is_download)
-	, transferSettings_(settings)
+	, flags_(flags)
 {
 }
 
@@ -939,7 +941,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 			SendNextCommand();
 		}
 		else {
-			if (data.download_) {
+			if (data.download()) {
 				std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
 				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
@@ -956,7 +958,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 			SendNextCommand();
 		}
 		else {
-			if (data.download_) {
+			if (data.download()) {
 				std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
 				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
@@ -982,7 +984,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 			SendNextCommand();
 		}
 		else {
-			if (data.download_) {
+			if (data.download()) {
 				auto const filename = data.remotePath_.FormatFilename(data.remoteFile_);
 				log(logmsg::status, _("Skipping download of %s"), filename);
 			}
@@ -993,16 +995,16 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		}
 		break;
 	case CFileExistsNotification::resume:
-		if (data.download_ && data.localFileSize_ >= 0) {
+		if (data.download() && data.localFileSize_ >= 0) {
 			data.resume_ = true;
 		}
-		else if (!data.download_ && data.remoteFileSize_ >= 0) {
+		else if (!data.download() && data.remoteFileSize_ >= 0) {
 			data.resume_ = true;
 		}
 		SendNextCommand();
 		break;
 	case CFileExistsNotification::rename:
-		if (data.download_) {
+		if (data.download()) {
 			{
 				std::wstring tmp;
 				CLocalPath l(data.localFile_, &tmp);
@@ -1060,7 +1062,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		}
 		break;
 	case CFileExistsNotification::skip:
-		if (data.download_) {
+		if (data.download()) {
 			std::wstring filename = data.remotePath_.FormatFilename(data.remoteFile_);
 			log(logmsg::status, _("Skipping download of %s"), filename);
 		}

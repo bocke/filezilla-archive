@@ -346,7 +346,7 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 				}
 			}
 		}
-		if (nErrorCode != FZ_REPLY_OK && data.download_ && !data.fileDidExist_) {
+		if (nErrorCode != FZ_REPLY_OK && data.download() && !data.fileDidExist_) {
 			data.ioThread_.reset();
 			int64_t size;
 			bool isLink;
@@ -407,7 +407,7 @@ void CFtpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& s
 	pData->link_discovery_ = link_discovery;
 
 	if (!operations_.empty() && operations_.back()->opId == Command::transfer &&
-		!static_cast<CFtpFileTransferOpData &>(*operations_.back()).download_)
+		!static_cast<CFtpFileTransferOpData &>(*operations_.back()).download())
 	{
 		pData->tryMkdOnFail_ = true;
 		assert(subDir.empty());
@@ -417,12 +417,11 @@ void CFtpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& s
 }
 
 void CFtpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-									std::wstring const& remoteFile, bool download,
-									CFileTransferCommand::t_transferSettings const& transferSettings)
+									std::wstring const& remoteFile, transfer_flags const& flags)
 {
 	log(logmsg::debug_verbose, L"CFtpControlSocket::FileTransfer()");
 
-	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, transferSettings);
+	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
 	Push(std::move(pData));
 }
 

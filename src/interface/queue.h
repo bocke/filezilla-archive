@@ -145,10 +145,19 @@ protected:
 
 struct t_EngineData;
 
+namespace queue_flags
+{
+	auto constexpr queued = static_cast<transfer_flags>(0x01);
+	auto constexpr active = static_cast<transfer_flags>(0x02);
+	auto constexpr made_progess = static_cast<transfer_flags>(0x04);
+	auto constexpr remove = static_cast<transfer_flags>(0x08);
+	auto constexpr mask = static_cast<transfer_flags>(0x0f);
+}
+
 class CFileItem : public CQueueItem
 {
 public:
-	CFileItem(CServerItem* parent, bool queued, bool download,
+	CFileItem(CServerItem* parent, transfer_flags const& flags,
 		std::wstring const& sourceFile, std::wstring const& targetFile,
 		CLocalPath const& localPath, CServerPath const& remotePath, int64_t size);
 
@@ -166,33 +175,35 @@ public:
 	CServerPath const& GetRemotePath() const { return m_remotePath; }
 	int64_t GetSize() const { return m_size; }
 	void SetSize(int64_t size) { m_size = size; }
-	inline bool Download() const { return flags & flag_download; }
+	inline bool Download() const { return flags_ & transfer_flags::download; }
 
-	inline bool queued() const { return (flags & flag_queued) != 0; }
+	inline transfer_flags flags() const { return flags_; }
+
+	inline bool queued() const { return flags_ & queue_flags::queued; }
 	inline void set_queued(bool q)
 	{
 		if (q) {
-			flags |= flag_queued;
+			flags_ |= queue_flags::queued;
 		}
 		else {
-			flags &= ~flag_queued;
+			flags_ -= queue_flags::queued;
 		}
 	}
 
-	inline bool pending_remove() const { return (flags & flag_remove) != 0; }
+	inline bool pending_remove() const { return flags_ & queue_flags::remove; }
 	inline void set_pending_remove(bool remove)
 	{
 		if (remove) {
-			flags |= flag_remove;
+			flags_ |= queue_flags::remove;
 		}
 		else {
-			flags &= ~flag_remove;
+			flags_ -= queue_flags::remove;
 		}
 	}
 
 	virtual QueueItemType GetType() const override { return QueueItemType::File; }
 
-	bool IsActive() const { return (flags & flag_active) != 0; }
+	bool IsActive() const { return flags_ & queue_flags::active; }
 	virtual void SetActive(bool active);
 
 	virtual void SaveItem(pugi::xml_node& element) const override;
@@ -230,42 +241,22 @@ public:
 	QueuePriority m_priority{QueuePriority::normal};
 
 protected:
-	enum : unsigned char
-	{
-		flag_download = 0x01,
-		flag_active = 0x02,
-		flag_made_progress = 0x04,
-		flag_queued = 0x08,
-		flag_remove = 0x10,
-		flag_ascii = 0x20
-	};
-	unsigned char flags{};
+
+	transfer_flags flags_;
 	Status m_status{};
 
 public:
 	t_EngineData* m_pEngineData{};
 
 
-	inline bool made_progress() const { return (flags & flag_made_progress) != 0; }
+	inline bool made_progress() const { return flags_ & queue_flags::made_progess; }
 	inline void set_made_progress(bool made_progress)
 	{
 		if (made_progress) {
-			flags |= flag_made_progress;
+			flags_ |= queue_flags::made_progess;
 		}
 		else {
-			flags &= ~flag_made_progress;
-		}
-	}
-
-	bool Ascii() const { return (flags & flag_ascii) != 0; }
-
-	void SetAscii(bool ascii)
-	{
-		if (ascii) {
-			flags |= flag_ascii;
-		}
-		else {
-			flags &= ~flag_ascii;
+			flags_ -= queue_flags::made_progess;
 		}
 	}
 
