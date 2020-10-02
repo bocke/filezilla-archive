@@ -251,6 +251,7 @@
     <ClCompile Include="toolbar.cpp" />
     <ClCompile Include="treectrlex.cpp" />
     <ClCompile Include="updater.cpp" />
+    <ClCompile Include="updater_cert.cpp" />
     <ClCompile Include="update_dialog.cpp" />
     <ClCompile Include="verifycertdialog.cpp" />
     <ClCompile Include="verifyhostkeydialog.cpp" />
@@ -379,6 +380,7 @@
     <ClInclude Include="toolbar.h" />
     <ClInclude Include="treectrlex.h" />
     <ClInclude Include="updater.h" />
+    <ClInclude Include="updater_cert.h" />
     <ClInclude Include="update_dialog.h" />
     <ClInclude Include="verifycertdialog.h" />
     <ClInclude Include="verifyhostkeydialog.h" />
