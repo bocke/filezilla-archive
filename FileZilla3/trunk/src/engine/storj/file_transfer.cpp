@@ -20,7 +20,7 @@ int CStorjFileTransferOpData::Send()
 	case filetransfer_init:
 	{
 		if (localFile_.empty()) {
-			if (!download_) {
+			if (!download()) {
 				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
 			}
 			else {
@@ -29,13 +29,13 @@ int CStorjFileTransferOpData::Send()
 		}
 
 		if (!remotePath_.SegmentCount()) {
-			if (!download_) {
+			if (!download()) {
 				log(logmsg::error, _("You cannot upload files into the root directory."));
 			}
 			return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
 		}
 
-		if (download_) {
+		if (download()) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
@@ -100,7 +100,7 @@ int CStorjFileTransferOpData::Send()
 		return FZ_REPLY_CONTINUE;
 
 	case filetransfer_waitfileexists:
-//		if (!download_ && !fileId_.empty()) {
+//		if (!download() && !fileId_.empty()) {
 //			controlSocket_.Delete(remotePath_, std::vector<std::wstring>{remoteFile_});
 //			opState = filetransfer_delete;
 //		}
@@ -110,7 +110,7 @@ int CStorjFileTransferOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
 
-		if (download_) {
+		if (download()) {
 			if (!resume_) {
 				controlSocket_.CreateLocalDir(localFile_);
 			}
@@ -122,7 +122,7 @@ int CStorjFileTransferOpData::Send()
 
 		engine_.transfer_status_.SetStartTime();
 		transferInitiated_ = true;
-		if (download_) {
+		if (download()) {
 			return controlSocket_.SendCommand(L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localFile_));
 		}
 		else {

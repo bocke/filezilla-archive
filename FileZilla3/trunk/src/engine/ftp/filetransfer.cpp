@@ -12,11 +12,11 @@
 
 #include <assert.h>
 
-CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-	: CFileTransferOpData(L"CFtpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
+CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
+	: CFileTransferOpData(L"CFtpFileTransferOpData", local_file, remote_file, remote_path, flags)
 	, CFtpOpData(controlSocket)
 {
-	binary = settings.binary;
+	binary = !(flags & ftp_transfer_flags::ascii);
 }
 
 int CFtpFileTransferOpData::Send()
@@ -26,7 +26,7 @@ int CFtpFileTransferOpData::Send()
 	{
 	case filetransfer_init:
 		if (localFile_.empty()) {
-			if (!download_) {
+			if (!download()) {
 				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
 			}
 			else {
@@ -34,7 +34,7 @@ int CFtpFileTransferOpData::Send()
 			}
 		}
 
-		if (download_) {
+		if (download()) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
@@ -73,7 +73,7 @@ int CFtpFileTransferOpData::Send()
 
 		{
 			auto pFile = std::make_unique<fz::file>();
-			if (download_) {
+			if (download()) {
 				int64_t startOffset = 0;
 
 				// Potentially racy
@@ -199,7 +199,7 @@ int CFtpFileTransferOpData::Send()
 				engine_.transfer_status_.Init(len, startOffset, false);
 			}
 			ioThread_ = std::make_unique<CIOThread>();
-			if (!ioThread_->Create(engine_.GetThreadPool(), std::move(pFile), !download_, binary)) {
+			if (!ioThread_->Create(engine_.GetThreadPool(), std::move(pFile), !download(), binary)) {
 				// CIOThread will delete pFile
 				ioThread_.reset();
 				log(logmsg::error, _("Could not spawn IO thread"));
@@ -207,11 +207,11 @@ int CFtpFileTransferOpData::Send()
 			}
 		}
 
-		controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download_ ? TransferMode::download : TransferMode::upload);
-		controlSocket_.m_pTransferSocket->m_binaryMode = transferSettings_.binary;
+		controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
+		controlSocket_.m_pTransferSocket->m_binaryMode = binary;
 		controlSocket_.m_pTransferSocket->SetIOThread(ioThread_.get());
 
-		if (download_) {
+		if (download()) {
 			cmd = L"RETR ";
 		}
 		else if (resume_) {
@@ -257,7 +257,7 @@ int CFtpFileTransferOpData::TestResumeCapability()
 {
 	log(logmsg::debug_verbose, L"CFtpFileTransferOpData::TestResumeCapability()");
 
-	if (!download_) {
+	if (!download()) {
 		return FZ_REPLY_CONTINUE;
 	}
 
@@ -391,7 +391,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_waitlist;
 				}
-				else if (download_ && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) && CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes) {
+				else if (download() && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) && CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes) {
 					opState = filetransfer_mdtm;
 				}
 				else {
@@ -409,7 +409,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 							fileTime_ = entry.time;
 						}
 
-						if (download_ &&
+						if (download() &&
 							!entry.has_time() &&
 							engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 							CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
@@ -451,7 +451,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_size;
 				}
-				else if (download_ &&
+				else if (download() &&
 					engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 					CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
 				{
@@ -468,7 +468,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 						fileTime_ = entry.time;
 					}
 
-					if (download_ &&
+					if (download() &&
 						!entry.has_time() &&
 						engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 						CServerCapabilities::GetCapability(currentServer_, mdtm_command) == yes)
@@ -497,7 +497,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 	}
 	else if (opState == filetransfer_waittransfer) {
 		if (prevResult == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
-			if (!download_ &&
+			if (!download() &&
 				CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
 			{
 				fz::datetime mtime = fz::local_filesys::get_modification_time(fz::to_native(localFile_));
@@ -507,7 +507,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					return FZ_REPLY_CONTINUE;
 				}
 			}
-			else if (download_ && !fileTime_.empty()) {
+			else if (download() && !fileTime_.empty()) {
 				ioThread_.reset();
 				if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_)) {
 					log(logmsg::debug_warning, L"Could not set modification time");

@@ -279,15 +279,26 @@ bool CQueueView::QueueFile(bool const queueOnly, bool const download,
 		wxASSERT(edit == CEditHandler::none);
 	}
 	else {
-		fileItem = new CFileItem(pServerItem, queueOnly, download, sourceFile, targetFile, localPath, remotePath, size);
+		transfer_flags flags{};
+		if (download) {
+			flags |= transfer_flags::download;
+		}
+		if (queueOnly) {
+			flags |= queue_flags::queued;
+		}
 		if (site.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
 			if (download) {
-				fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType()));
+				if (CAutoAsciiFiles::TransferRemoteAsAscii(sourceFile, remotePath.GetType())) {
+					flags |= ftp_transfer_flags::ascii;
+				}
 			}
 			else {
-				fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(sourceFile, remotePath.GetType()));
+				if (CAutoAsciiFiles::TransferLocalAsAscii(sourceFile, remotePath.GetType())) {
+					flags |= ftp_transfer_flags::ascii;
+				}
 			}
 		}
+		fileItem = new CFileItem(pServerItem, flags, sourceFile, targetFile, localPath, remotePath, size);
 		fileItem->m_edit = edit;
 		if (edit != CEditHandler::none) {
 			fileItem->m_onetime_action = CFileExistsNotification::overwrite;
@@ -347,12 +358,16 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 			localFile = StripVMSRevision(localFile);
 		}
 
-		CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, true,
+		transfer_flags flags = transfer_flags::download;
+		if (queueOnly) {
+			flags |= queue_flags::queued;
+		}
+		if (hasDataTypeConcept && CAutoAsciiFiles::TransferRemoteAsAscii(fileInfo.name, dataObject.GetServerPath().GetType())) {
+			flags |= ftp_transfer_flags::ascii;
+		}
+		CFileItem* fileItem = new CFileItem(pServerItem, flags,
 			fileInfo.name, (fileInfo.name != localFile) ? localFile : std::wstring(),
 			localPath, dataObject.GetServerPath(), fileInfo.size);
-		if (hasDataTypeConcept) {
-			fileItem->SetAscii(CAutoAsciiFiles::TransferRemoteAsAscii(fileInfo.name, dataObject.GetServerPath().GetType()));
-		}
 
 		InsertItem(pServerItem, fileItem);
 	}
@@ -376,12 +391,16 @@ bool CQueueView::QueueFiles(const bool queueOnly, Site const& site, CLocalRecurs
 		bool const hasDataTypeConcept = site.server.HasFeature(ProtocolFeature::DataTypeConcept);
 
 		for (auto const& file : files) {
-			CFileItem* fileItem = new CFileItem(pServerItem, queueOnly, false,
+			transfer_flags flags{};
+			if (queueOnly) {
+				flags |= queue_flags::queued;
+			}
+			if (hasDataTypeConcept && CAutoAsciiFiles::TransferLocalAsAscii(file.name, listing.remotePath.GetType())) {
+				flags |= ftp_transfer_flags::ascii;
+			}
+			CFileItem* fileItem = new CFileItem(pServerItem, flags,
 				file.name, std::wstring(),
 				listing.localPath, listing.remotePath, file.size);
-			if (hasDataTypeConcept) {
-				fileItem->SetAscii(CAutoAsciiFiles::TransferLocalAsAscii(file.name, listing.remotePath.GetType()));
-			}
 
 			InsertItem(pServerItem, fileItem);
 		}
@@ -449,7 +468,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 								{
 								case CFileExistsNotification::resume:
 									if (fileExistsNotification.canResume &&
-										!pFileItem->Ascii())
+										!fileExistsNotification.ascii)
 									{
 										fileExistsNotification.overwriteAction = CFileExistsNotification::resume;
 									}
@@ -1242,10 +1261,8 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			fileItem->SetStatusMessage(CFileItem::Status::transferring);
 			RefreshItem(engineData.pItem);
 
-			CFileTransferCommand::t_transferSettings transferSettings;
-			transferSettings.binary = !fileItem->Ascii();
 			int res = engineData.pEngine->Execute(CFileTransferCommand(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), fileItem->GetRemotePath(),
-												fileItem->GetRemoteFile(), fileItem->Download(), transferSettings));
+												fileItem->GetRemoteFile(), fileItem->flags()));
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
 			if (res == FZ_REPLY_WOULDBLOCK) {
 				return;
@@ -1665,16 +1682,20 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 				std::wstring localFile = GetTextElement(file, "LocalFile");
 				std::wstring remoteFile = GetTextElement(file, "RemoteFile");
 				std::wstring safeRemotePath = GetTextElement(file, "RemotePath");
-				bool download = GetTextElementInt(file, "Download") != 0;
+				
+				transfer_flags flags = queue_flags::queued | static_cast<transfer_flags>(GetTextElementInt(file, "Flags"));
+				bool const old_download = GetTextElementInt(file, "Download") != 0;
+				if (old_download) {
+					flags |= transfer_flags::download;
+				}
 				int64_t size = GetTextElementInt(file, "Size", -1);
 				unsigned char errorCount = static_cast<unsigned char>(GetTextElementInt(file, "ErrorCount"));
 				unsigned int priority = GetTextElementInt(file, "Priority", static_cast<unsigned int>(QueuePriority::normal));
 
-				int dataType = GetTextElementInt(file, "DataType", -1);
-				if (dataType == -1) {
-					dataType = GetTextElementInt(file, "TransferMode", 1);
+				int old_dataType = GetTextElementInt(file, "DataType", -1);
+				if (!old_dataType && site.server.HasFeature(ProtocolFeature::DataTypeConcept)) {
+					flags |= ftp_transfer_flags::ascii;
 				}
-				bool binary = dataType != 0;
 				int overwrite_action = GetTextElementInt(file, "OverwriteAction", CFileExistsNotification::unknown);
 
 				CServerPath remotePath;
@@ -1697,11 +1718,10 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 						previousRemotePath = remotePath;
 					}
 
-					CFileItem* fileItem = new CFileItem(pServerItem, true, download,
-						download ? remoteFile : localFileName,
-						(remoteFile != localFileName) ? (download ? localFileName : remoteFile) : std::wstring(),
+					CFileItem* fileItem = new CFileItem(pServerItem, flags,
+						(flags & transfer_flags::download) ? remoteFile : localFileName,
+						(remoteFile != localFileName) ? ((flags & transfer_flags::download) ? localFileName : remoteFile) : std::wstring(),
 						previousLocalPath, previousRemotePath, size);
-					fileItem->SetAscii(!binary);
 					fileItem->SetPriorityRaw(QueuePriority(priority));
 					fileItem->m_errorCount = errorCount;
 					InsertItem(pServerItem, fileItem);
@@ -1714,8 +1734,12 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 			for (auto folder = xServer.child("Folder"); folder; folder = folder.next_sibling("Folder")) {
 				CFolderItem* folderItem;
 
-				bool download = GetTextElementInt(folder, "Download") != 0;
-				if (download) {
+				transfer_flags flags = queue_flags::queued | static_cast<transfer_flags>(GetTextElementInt(folder, "Flags"));
+				bool const old_download = GetTextElementInt(folder, "Download") != 0;
+				if (old_download) {
+					flags |= transfer_flags::download;
+				}
+				if (flags & transfer_flags::download) {
 					std::wstring localFile = GetTextElement(folder, "LocalFile");
 					CLocalPath localPath(localFile);
 					if (localPath.empty()) {

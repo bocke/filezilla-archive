@@ -24,7 +24,7 @@ int CSftpFileTransferOpData::Send()
 	if (opState == filetransfer_init) {
 
 		if (localFile_.empty()) {
-			if (!download_) {
+			if (!download()) {
 				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
 			}
 			else {
@@ -32,7 +32,7 @@ int CSftpFileTransferOpData::Send()
 			}
 		}
 
-		if (download_) {
+		if (download()) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
@@ -64,7 +64,7 @@ int CSftpFileTransferOpData::Send()
 			cmd = "re";
 			logstr = L"re";
 		}
-		if (download_) {
+		if (download()) {
 			if (!resume_) {
 				controlSocket_.CreateLocalDir(localFile_);
 			}
@@ -115,7 +115,7 @@ int CSftpFileTransferOpData::Send()
 	}
 	else if (opState == filetransfer_chmtime) {
 		assert(!fileTime_.empty());
-		if (download_) {
+		if (download()) {
 			log(logmsg::debug_info, L"  filetransfer_chmtime during download");
 			return FZ_REPLY_INTERNALERROR;
 		}
@@ -138,7 +138,7 @@ int CSftpFileTransferOpData::ParseResponse()
 {
 	if (opState == filetransfer_transfer) {
 		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
-			if (download_) {
+			if (download()) {
 				if (!fileTime_.empty()) {
 					if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_))
 						log(logmsg::debug_warning, L"Could not set modification time");
@@ -183,7 +183,7 @@ int CSftpFileTransferOpData::ParseResponse()
 		return FZ_REPLY_CONTINUE;
 	}
 	else if (opState == filetransfer_chmtime) {
-		if (download_) {
+		if (download()) {
 			log(logmsg::debug_info, L"  filetransfer_chmtime during download");
 			return FZ_REPLY_INTERNALERROR;
 		}
@@ -208,7 +208,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_waitlist;
 				}
-				else if (download_ && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
+				else if (download() && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 					opState = filetransfer_mtime;
 				}
 				else {
@@ -226,7 +226,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 							fileTime_ = entry.time;
 						}
 
-						if (download_ && !entry.has_time() &&
+						if (download() && !entry.has_time() &&
 							engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 						{
 							opState = filetransfer_mtime;
@@ -266,7 +266,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_mtime;
 				}
-				else if (download_ &&
+				else if (download() &&
 					engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 				{
 					opState = filetransfer_mtime;
@@ -282,7 +282,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 						fileTime_ = entry.time;
 					}
 
-					if (download_ && !entry.has_time() &&
+					if (download() && !entry.has_time() &&
 						engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
 					{
 						opState = filetransfer_mtime;

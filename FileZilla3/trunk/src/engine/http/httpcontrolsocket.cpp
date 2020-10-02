@@ -279,16 +279,15 @@ void CHttpControlSocket::OnConnect()
 }
 
 void CHttpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-									std::wstring const& remoteFile, bool download,
-									CFileTransferCommand::t_transferSettings const& settings)
+									std::wstring const& remoteFile, transfer_flags const& flags)
 {
 	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");
 
-	if (download) {
+	if (flags & transfer_flags::download) {
 		log(logmsg::status, _("Downloading %s"), remotePath.FormatFilename(remoteFile));
 	}
 
-	Push(std::make_unique<CHttpFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, settings));
+	Push(std::make_unique<CHttpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags));
 }
 
 void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)

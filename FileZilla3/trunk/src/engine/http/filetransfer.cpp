@@ -15,8 +15,8 @@ enum filetransferStates
 	filetransfer_waittransfer
 };
 
-CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings)
-	: CFileTransferOpData(L"CHttpFileTransferOpData", is_download, local_file, remote_file, remote_path, settings)
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
+	: CFileTransferOpData(L"CHttpFileTransferOpData", local_file, remote_file, remote_path, flags)
 	, CHttpOpData(controlSocket)
 {
 	rr_.request_.uri_ = fz::uri(fz::to_utf8(currentServer_.Format(ServerFormat::url)) + fz::percent_encode(fz::to_utf8(remotePath_.FormatFilename(remoteFile_)), true));
@@ -25,7 +25,7 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 }
 
 CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body)
-	: CFileTransferOpData(L"CHttpFileTransferOpData", true, std::wstring(), std::wstring(), CServerPath(), CFileTransferCommand::t_transferSettings())
+	: CFileTransferOpData(L"CHttpFileTransferOpData", std::wstring(), std::wstring(), CServerPath(), transfer_flags::download)
 	, CHttpOpData(controlSocket)
 {
 	rr_.request_.uri_ = uri;
@@ -38,7 +38,7 @@ int CHttpFileTransferOpData::Send()
 {
 	switch (opState) {
 	case filetransfer_init:
-		if (!download_) {
+		if (!download()) {
 			return FZ_REPLY_NOTSUPPORTED;
 		}
 
@@ -89,7 +89,7 @@ int CHttpFileTransferOpData::OpenFile()
 {
 	log(logmsg::debug_verbose, L"CHttpFileTransferOpData::OpenFile");
 	if (file_.opened()) {
-		if (transferSettings_.fsync) {
+		if (flags_ & transfer_flags::fsync) {
 			file_.fsync();
 		}
 		file_.close();
@@ -98,14 +98,14 @@ int CHttpFileTransferOpData::OpenFile()
 	controlSocket_.CreateLocalDir(localFile_);
 
 	if (!file_.open(fz::to_native(localFile_),
-		download_ ? fz::file::writing : fz::file::reading,
+		download() ? fz::file::writing : fz::file::reading,
 		fz::file::existing))
 	{
 		log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
 		return FZ_REPLY_ERROR;
 	}
 
-	assert(download_);
+	assert(download());
 	int64_t end = file_.seek(0, fz::file::end);
 	if (end < 0) {
 		log(logmsg::error, _("Could not seek to the end of the file"));
@@ -239,7 +239,7 @@ int CHttpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 
 	if (opState == filetransfer_waittransfer) {
 		if (file_.opened()) {
-			if (transferSettings_.fsync) {
+			if (flags_ & transfer_flags::fsync) {
 				file_.fsync();
 			}
 		}

@@ -56,11 +56,9 @@ bool CListCommand::valid() const
 }
 
 CFileTransferCommand::CFileTransferCommand(std::wstring const& localFile, CServerPath const& remotePath,
-										   std::wstring const& remoteFile, bool download,
-										   CFileTransferCommand::t_transferSettings const& transferSettings)
+										   std::wstring const& remoteFile, transfer_flags const& flags)
 	: m_localFile(localFile), m_remotePath(remotePath), m_remoteFile(remoteFile)
-	, m_download(download)
-	, m_transferSettings(transferSettings)
+	, flags_(flags)
 {
 }
 
@@ -77,11 +75,6 @@ CServerPath CFileTransferCommand::GetRemotePath() const
 std::wstring CFileTransferCommand::GetRemoteFile() const
 {
 	return m_remoteFile;
-}
-
-bool CFileTransferCommand::Download() const
-{
-	return m_download;
 }
 
 CRawCommand::CRawCommand(std::wstring const& command)

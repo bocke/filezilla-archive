@@ -122,12 +122,13 @@ private:
 class CFileTransferOpData : public COpData
 {
 public:
-	CFileTransferOpData(wchar_t const* name, bool is_download, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, CFileTransferCommand::t_transferSettings const& settings);
+	CFileTransferOpData(wchar_t const* name, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags);
+
+	bool download() const { return flags_ & transfer_flags::download; }
 
 	// Transfer data
 	std::wstring localFile_, remoteFile_;
 	CServerPath remotePath_;
-	bool const download_;
 
 	fz::datetime fileTime_;
 	int64_t localFileSize_{-1};
@@ -136,7 +137,7 @@ public:
 	bool tryAbsolutePath_{};
 	bool resume_{};
 
-	CFileTransferCommand::t_transferSettings transferSettings_;
+	transfer_flags flags_;
 
 	// Set to true when sending the command which
 	// starts the actual transfer
@@ -210,8 +211,7 @@ public:
 	virtual void List(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), int flags = 0);
 
 	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-							 std::wstring const& remoteFile, bool download,
-							 CFileTransferCommand::t_transferSettings const& transferSettings) = 0;
+							 std::wstring const& remoteFile, transfer_flags const& flags) = 0;
 	virtual void RawCommand(std::wstring const& command = std::wstring());
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files);
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring());

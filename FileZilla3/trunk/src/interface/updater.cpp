@@ -323,9 +323,7 @@ bool CUpdater::CreateConnectCommand(std::wstring const& url)
 
 bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const& local_file)
 {
-	CFileTransferCommand::t_transferSettings transferSettings;
-	transferSettings.fsync = true;
-
+	
 	Site s;
 	CServerPath path;
 	std::wstring error;
@@ -335,7 +333,8 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 	std::wstring file = path.GetLastSegment();
 	path = path.GetParent();
 
-	pending_commands_.emplace_back(new CFileTransferCommand(local_file, path, file, true, transferSettings));
+	transfer_flags const flags = transfer_flags::download | transfer_flags::fsync;
+	pending_commands_.emplace_back(new CFileTransferCommand(local_file, path, file, flags));
 	return true;
 }
 

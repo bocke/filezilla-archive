@@ -89,11 +89,10 @@ namespace file_table_column_names
 		target_file,
 		local_path,
 		remote_path,
-		download,
 		size,
 		error_count,
 		priority,
-		ascii_file,
+		flags,
 		default_exists_action
 	};
 }
@@ -105,11 +104,10 @@ _column file_table_columns[] = {
 	{ "target_file", Column_type::text, 0 },
 	{ "local_path", Column_type::integer, 0 },
 	{ "remote_path", Column_type::integer, 0 },
-	{ "download", Column_type::integer, not_null },
 	{ "size", Column_type::integer, 0 },
 	{ "error_count", Column_type::integer, 0 },
 	{ "priority", Column_type::integer, 0 },
-	{ "ascii_file", Column_type::integer, 0 },
+	{ "flags", Column_type::integer, 0 },
 	{ "default_exists_action", Column_type::integer, 0 }
 };
 
@@ -295,7 +293,7 @@ bool CQueueStorage::Impl::MigrateSchema()
 	bool ret = sqlite3_exec(db_, "PRAGMA user_version", int_callback, &version, 0) == SQLITE_OK;
 
 	if (ret) {
-		if (version > 5) {
+		if (version > 6) {
 			ret = false;
 		}
 		else if (version > 0) {
@@ -309,9 +307,22 @@ bool CQueueStorage::Impl::MigrateSchema()
 			if (ret && version < 5) {
 				ret = sqlite3_exec(db_, "ALTER TABLE servers ADD COLUMN site_path TEXT DEFAULT NULL", 0, 0, 0) == SQLITE_OK;
 			}
+			if (ret && version < 6) {
+				std::string query("CREATE TABLE IF NOT EXISTS files2 ");
+				query += CreateColumnDefs(file_table_columns, sizeof(file_table_columns) / sizeof(_column));
+				ret = sqlite3_exec(db_, query.c_str(), 0, 0, 0) == SQLITE_OK;
+				ret &= sqlite3_exec(db_, "CREATE INDEX IF NOT EXISTS server_index ON files2 (server)", 0, 0, 0) == SQLITE_OK;
+				query = fz::sprintf(
+					"INSERT INTO files2 (id, server, source_file, target_file, local_path, remote_path, size, error_count, priority, default_exists_action, flags) "
+					"SELECT id, server, source_file, target_file, local_path, remote_path, size, error_count, priority, default_exists_action, download * %d + ascii_file * %d FROM files"
+					, transfer_flags::download, ftp_transfer_flags::ascii);
+				ret &= sqlite3_exec(db_, query.c_str(), 0, 0, 0) == SQLITE_OK;
+				ret &= sqlite3_exec(db_, "DROP TABLE files", 0, 0, 0) == SQLITE_OK;
+				ret &= sqlite3_exec(db_, "ALTER TABLE files2 RENAME TO files", 0, 0, 0) == SQLITE_OK;
+			}
 		}
-		if (ret && version != 5) {
-			ret = sqlite3_exec(db_, "PRAGMA user_version = 5", 0, 0, 0) == SQLITE_OK;
+		if (ret && version != 6) {
+			ret = sqlite3_exec(db_, "PRAGMA user_version = 6", 0, 0, 0) == SQLITE_OK;
 		}
 	}
 
@@ -807,7 +818,6 @@ bool CQueueStorage::Impl::SaveFile(CFileItem const& file)
 	Bind(insertFileQuery_, file_table_column_names::local_path, localPathId);
 	Bind(insertFileQuery_, file_table_column_names::remote_path, remotePathId);
 
-	Bind(insertFileQuery_, file_table_column_names::download, file.Download() ? 1 : 0);
 	if (file.GetSize() != -1) {
 		Bind(insertFileQuery_, file_table_column_names::size, file.GetSize());
 	}
@@ -821,7 +831,7 @@ bool CQueueStorage::Impl::SaveFile(CFileItem const& file)
 		BindNull(insertFileQuery_, file_table_column_names::error_count);
 	}
 	Bind(insertFileQuery_, file_table_column_names::priority, static_cast<int>(file.GetPriority()));
-	Bind(insertFileQuery_, file_table_column_names::ascii_file, file.Ascii() ? 1 : 0);
+	Bind(insertFileQuery_, file_table_column_names::flags, static_cast<int64_t>(file.flags() - queue_flags::mask));
 
 	if (file.m_defaultFileExistsAction != CFileExistsNotification::unknown) {
 		Bind(insertFileQuery_, file_table_column_names::default_exists_action, file.m_defaultFileExistsAction);
@@ -860,7 +870,6 @@ bool CQueueStorage::Impl::SaveDirectory(CFolderItem const& directory)
 	Bind(insertFileQuery_, file_table_column_names::local_path, localPathId);
 	Bind(insertFileQuery_, file_table_column_names::remote_path, remotePathId);
 
-	Bind(insertFileQuery_, file_table_column_names::download, directory.Download() ? 1 : 0);
 	BindNull(insertFileQuery_, file_table_column_names::size);
 	if (directory.m_errorCount) {
 		Bind(insertFileQuery_, file_table_column_names::error_count, directory.m_errorCount);
@@ -869,7 +878,7 @@ bool CQueueStorage::Impl::SaveDirectory(CFolderItem const& directory)
 		BindNull(insertFileQuery_, file_table_column_names::error_count);
 	}
 	Bind(insertFileQuery_, file_table_column_names::priority, static_cast<int>(directory.GetPriority()));
-	BindNull(insertFileQuery_, file_table_column_names::ascii_file);
+	Bind(insertFileQuery_, file_table_column_names::flags, static_cast<int>(directory.flags() - queue_flags::mask));
 
 	BindNull(insertFileQuery_, file_table_column_names::default_exists_action);
 
@@ -1077,7 +1086,8 @@ int64_t CQueueStorage::Impl::ParseFileFromRow(CFileItem** pItem)
 	CLocalPath const localPath(GetLocalPath(localPathId));
 	CServerPath const remotePath(GetRemotePath(remotePathId));
 
-	bool download = GetColumnInt(selectFilesQuery_, file_table_column_names::download) != 0;
+	auto flags = static_cast<transfer_flags>(GetColumnInt(selectFilesQuery_, file_table_column_names::flags));
+	bool const download = flags & transfer_flags::download;
 
 	if (localPathId == -1 || remotePathId == -1) {
 		// QueueItemType::Folder
@@ -1099,7 +1109,6 @@ int64_t CQueueStorage::Impl::ParseFileFromRow(CFileItem** pItem)
 		unsigned char errorCount = static_cast<unsigned char>(GetColumnInt(selectFilesQuery_, file_table_column_names::error_count));
 		int priority = GetColumnInt(selectFilesQuery_, file_table_column_names::priority, static_cast<int>(QueuePriority::normal));
 
-		bool ascii = GetColumnInt(selectFilesQuery_, file_table_column_names::ascii_file) != 0;
 		int overwrite_action = GetColumnInt(selectFilesQuery_, file_table_column_names::default_exists_action, CFileExistsNotification::unknown);
 
 		if (sourceFile.empty() || localPath.empty() ||
@@ -1110,9 +1119,8 @@ int64_t CQueueStorage::Impl::ParseFileFromRow(CFileItem** pItem)
 			return INVALID_DATA;
 		}
 
-		CFileItem* fileItem = new CFileItem(0, true, download, sourceFile, targetFile, localPath, remotePath, size);
+		CFileItem* fileItem = new CFileItem(0, flags | queue_flags::queued, sourceFile, targetFile, localPath, remotePath, size);
 		*pItem = fileItem;
-		fileItem->SetAscii(ascii);
 		fileItem->SetPriorityRaw(QueuePriority(priority));
 		fileItem->m_errorCount = errorCount;
 

@@ -2809,6 +2809,6 @@ void CRemoteListView::OnMenuNewfile(wxCommandEvent&)
 		return;
 	}
 
-	CFileTransferCommand *cmd = new CFileTransferCommand(emptyfile, m_pDirectoryListing->path, newFileName, false, CFileTransferCommand::t_transferSettings());
+	CFileTransferCommand *cmd = new CFileTransferCommand(emptyfile, m_pDirectoryListing->path, newFileName, transfer_flags());
 	m_state.m_pCommandQueue->ProcessCommand(cmd);
 }

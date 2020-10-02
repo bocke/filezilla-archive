@@ -50,10 +50,9 @@ void CStorjControlSocket::List(CServerPath const& path, std::wstring const& subD
 }
 
 void CStorjControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
-						 std::wstring const& remoteFile, bool download,
-						 CFileTransferCommand::t_transferSettings const& transferSettings)
+						 std::wstring const& remoteFile, transfer_flags const& flags)
 {
-	auto pData = std::make_unique<CStorjFileTransferOpData>(*this, download, localFile, remoteFile, remotePath, transferSettings);
+	auto pData = std::make_unique<CStorjFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
 	Push(std::move(pData));
 }
 
@@ -147,12 +146,12 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 			if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
 				auto & data = static_cast<CStorjFileTransferOpData &>(*operations_.back());
 
-				SetActive(data.download_ ? CFileZillaEngine::recv : CFileZillaEngine::send);
+				SetActive(data.download() ? CFileZillaEngine::recv : CFileZillaEngine::send);
 
 				bool tmp;
 				CTransferStatus status = engine_.transfer_status_.Get(tmp);
 				if (!status.empty() && !status.madeProgress) {
-					if (data.download_) {
+					if (data.download()) {
 						if (value > 0) {
 							engine_.transfer_status_.SetMadeProgress();
 						}
