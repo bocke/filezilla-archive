@@ -234,7 +234,6 @@ public:
 	wxString const& GetStatusMessage() const;
 	void SetStatusMessage(Status status);
 
-	unsigned char m_errorCount{};
 	CEditHandler::fileType m_edit{CEditHandler::none};
 	CFileExistsNotification::OverwriteAction m_defaultFileExistsAction{CFileExistsNotification::unknown};
 	CFileExistsNotification::OverwriteAction m_onetime_action{CFileExistsNotification::unknown};
@@ -246,6 +245,7 @@ protected:
 	Status m_status{};
 
 public:
+	unsigned char m_errorCount{};
 	t_EngineData* m_pEngineData{};
 
 
