@@ -83,8 +83,6 @@ private:
 	bool FZC_PRIVATE_SYMBOL DoSetSafePath(std::wstring const& path);
 	bool FZC_PRIVATE_SYMBOL DoChangePath(std::wstring &subdir, bool isFile);
 
-	ServerType m_type;
-
 	typedef std::vector<std::wstring> tSegmentList;
 	typedef tSegmentList::iterator tSegmentIter;
 	typedef tSegmentList::const_iterator tConstSegmentIter;
@@ -94,6 +92,7 @@ private:
 	bool FZC_PRIVATE_SYMBOL ExtractFile(std::wstring& dir, std::wstring& file);
 
 	fz::shared_optional<CServerPathData> m_data;
+	ServerType m_type;
 };
 
 #endif

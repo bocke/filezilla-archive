@@ -40,14 +40,15 @@ public:
 
 	int opState{};
 	Command const opId;
-	bool topLevelOperation_{}; // If set to true, if this command finishes, any other commands on the stack do not get a SubCommandResult
 
-	bool waitForAsyncRequest{};
 	OpLock opLock_;
 
 	wchar_t const* const name_;
 
 	logmsg::type sendLogLevel_{logmsg::debug_verbose};
+
+	bool topLevelOperation_{}; // If set to true, if this command finishes, any other commands on the stack do not get a SubCommandResult
+	bool waitForAsyncRequest{};
 };
 
 template<typename T>
@@ -126,14 +127,6 @@ public:
 
 	bool download() const { return flags_ & transfer_flags::download; }
 
-	// Transfer data
-	std::wstring localFile_, remoteFile_;
-	CServerPath remotePath_;
-
-	fz::datetime fileTime_;
-	int64_t localFileSize_{-1};
-	int64_t remoteFileSize_{-1};
-
 	bool tryAbsolutePath_{};
 	bool resume_{};
 
@@ -142,6 +135,13 @@ public:
 	// Set to true when sending the command which
 	// starts the actual transfer
 	bool transferInitiated_{};
+
+	std::wstring localFile_, remoteFile_;
+	CServerPath remotePath_;
+
+	fz::datetime fileTime_;
+	int64_t localFileSize_{-1};
+	int64_t remoteFileSize_{-1};
 };
 
 class CMkdirOpData : public COpData
@@ -166,12 +166,13 @@ public:
 	{
 	}
 
+	bool tryMkdOnFail_{};
+	bool link_discovery_{};
+
 	CServerPath path_;
 	std::wstring subDir_;
-	bool tryMkdOnFail_{};
 	CServerPath target_;
 
-	bool link_discovery_{};
 };
 
 enum class TransferEndReason

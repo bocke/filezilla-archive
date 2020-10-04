@@ -29,7 +29,6 @@ public:
 		flag_link = 2,
 		flag_unsure = 4 // May be set on cached items if any changes were made to the file
 	};
-	int flags{};
 
 	inline bool is_dir() const
 	{
@@ -64,6 +63,8 @@ public:
 	fz::sparse_optional<std::wstring> target; // Set to linktarget it link is true
 
 	fz::datetime time;
+
+	int flags{};
 
 	std::wstring dump() const;
 	bool operator==(const CDirentry &op) const;
@@ -101,6 +102,14 @@ public:
 	CServerPath path;
 	fz::monotonic_clock m_firstListTime;
 
+	// Lowest bit indicates a file got added
+	// Next bit indicates a file got removed
+	// 3rd bit indicates a file got changed.
+	// 4th bit is set if an update cannot be applied to
+	// one of the other categories.
+	//
+	// These bits should help the user interface to choose an appropriate sorting
+	// algorithm for modified listings
 	enum
 	{
 		unsure_file_added = 0x01,
@@ -120,15 +129,6 @@ public:
 		listing_has_perms = 0x400,
 		listing_has_usergroup = 0x800
 	};
-	// Lowest bit indicates a file got added
-	// Next bit indicates a file got removed
-	// 3rd bit indicates a file got changed.
-	// 4th bit is set if an update cannot be applied to
-	// one of the other categories.
-	//
-	// These bits should help the user interface to choose an appropriate sorting
-	// algorithm for modified listings
-	int m_flags{};
 
 	int get_unsure_flags() const { return m_flags & unsure_mask; }
 	bool failed() const { return (m_flags & listing_failed) != 0; }
@@ -148,6 +148,9 @@ protected:
 
 	mutable fz::shared_optional<std::unordered_multimap<std::wstring, size_t>> m_searchmap_case;
 	mutable fz::shared_optional<std::unordered_multimap<std::wstring, size_t>> m_searchmap_nocase;
+
+public:
+	int m_flags{};
 };
 
 // Checks if listing2 is a subset of listing1. Compares only filenames.

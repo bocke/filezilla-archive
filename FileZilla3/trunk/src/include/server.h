@@ -215,16 +215,16 @@ protected:
 	ServerProtocol m_protocol{UNKNOWN};
 	ServerType m_type{DEFAULT};
 	std::wstring m_host;
-	unsigned int m_port{21};
 	std::wstring m_user;
+	unsigned int m_port{21};
 	int m_timezoneOffset{};
 	PasvMode m_pasvMode{MODE_DEFAULT};
 	int m_maximumMultipleConnections{};
+	bool m_bypassProxy{};
 	CharsetEncoding m_encodingType{ENCODING_AUTO};
 	std::wstring m_customEncoding;
 
 	std::vector<std::wstring> m_postLoginCommands;
-	bool m_bypassProxy{};
 
 	std::map<std::string, std::wstring, std::less<>> extraParameters_;
 };
