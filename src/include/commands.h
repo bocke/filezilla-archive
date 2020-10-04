@@ -216,7 +216,7 @@ inline bool operator!(transfer_flags flags)
 namespace ftp_transfer_flags
 {
 	auto constexpr ascii = transfer_flags::protocol_reserved_max;
-};
+}
 
 class FZC_PUBLIC_SYMBOL CFileTransferCommand final : public CCommandHelper<CFileTransferCommand, Command::transfer>
 {
