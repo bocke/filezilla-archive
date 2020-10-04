@@ -67,8 +67,8 @@ private:
 
 	struct lock_info
 	{
-		locking_reason reason{};
 		CServerPath path;
+		locking_reason reason{};
 		bool inclusive{};
 		bool waiting{};
 		bool released{};

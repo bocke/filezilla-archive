@@ -49,8 +49,8 @@ CServerPath::CServerPath()
 }
 
 CServerPath::CServerPath(CServerPath const& path, std::wstring subdir)
-	: m_type(path.m_type)
-	, m_data(path.m_data)
+	: m_data(path.m_data)
+	, m_type(path.m_type)
 {
 	if (subdir.empty()) {
 		return;
