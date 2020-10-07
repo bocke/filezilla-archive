@@ -70,7 +70,7 @@ bool COptionsPageDateFormatting::CreateControls(wxWindow* parent)
 		inner->Add(row, 0, wxLEFT, lay.indent);
 		impl_->time_format_ = new wxTextCtrlEx(box, nullID);
 		row->Add(impl_->time_format_, lay.valign);
-		row->Add(new wxStaticText(box, nullID, _("(example: %Y-%m-%d)")), lay.valign);
+		row->Add(new wxStaticText(box, nullID, _("(example: %H-%M-%S)")), lay.valign);
 	}
 
 	auto link = new wxHyperlinkCtrl(this, nullID, _("Show details about custom date and time formats"), L"https://wiki.filezilla-project.org/Date_and_Time_formatting");
