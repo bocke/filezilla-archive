@@ -297,7 +297,6 @@ void CertStore::SetTrusted(fz::tls_session_info const& info, bool permanent, boo
 	sessionInsecureHosts_.erase(std::make_tuple(cert.host, cert.port));
 
 	if (!permanent) {
-		t_certData cert;
 		sessionTrustedCerts_.emplace_back(std::move(cert));
 
 		return;
