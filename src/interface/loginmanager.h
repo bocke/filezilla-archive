@@ -23,8 +23,8 @@ public:
 	void RememberPassword(Site & site, std::wstring const& challenge = std::wstring());
 
 	bool AskDecryptor(fz::public_key const& pub, bool allowForgotten, bool allowCancel);
-	fz::private_key GetDecryptor(fz::public_key const& pub);
-	void Remember(fz::private_key const& key);
+	fz::private_key GetDecryptor(fz::public_key const& pub, bool * forgotten = nullptr);
+	void Remember(fz::private_key const& key, std::string_view const& pass = std::string_view());
 
 protected:
 	bool DisplayDialogForEncrypted(Site & site);
@@ -47,6 +47,7 @@ protected:
 	std::list<t_passwordcache> m_passwordCache;
 
 	std::map<fz::public_key, fz::private_key> decryptors_;
+	std::vector<std::string> decryptorPasswords_;
 };
 
 #endif
