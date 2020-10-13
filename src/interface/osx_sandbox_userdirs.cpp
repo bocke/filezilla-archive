@@ -288,7 +288,7 @@ void OSXSandboxUserdirsDialog::Run(wxWindow* parent, bool initial)
 	main->AddGrowableCol(0);
 	main->AddGrowableRow(2);
 
-	main->Add(new wxStaticText(this, -1, _("You need to grant FileZilla acess to the directories you want to download files into or to upload files from.")));
+	main->Add(new wxStaticText(this, -1, _("You need to grant FileZilla access to the directories you want to download files into or to upload files from.")));
 	main->Add(new wxStaticText(this, -1, _("Please add the local directories you want to use FileZilla with.")));
 
 	impl_->dirs_ = new wxListBox(this, -1);
@@ -296,7 +296,7 @@ void OSXSandboxUserdirsDialog::Run(wxWindow* parent, bool initial)
 
 	auto * row = lay.createGrid(2);
 	main->Add(row, lay.halign);
-	
+
 	auto add = new wxButton(this, -1, _("&Add directory..."));
 	row->Add(add, lay.valign);
 	auto remove = new wxButton(this, -1, _("&Remove selected"));
