@@ -28,9 +28,9 @@ bool CLoginManager::GetPassword(Site & site, bool silent)
 	}
 
 	if (site.credentials.encrypted_) {
-		auto priv = decryptors_.find(site.credentials.encrypted_);
-		if (priv != decryptors_.end() && priv->second) {
-			return site.credentials.Unprotect(priv->second);
+		auto priv = GetDecryptor(site.credentials.encrypted_);
+		if (priv) {
+			return site.credentials.Unprotect(priv);
 		}
 
 		if (!silent) {
@@ -365,7 +365,9 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 		return false;
 	}
 
-	if (decryptors_.find(pub) != decryptors_.cend()) {
+	bool forgotten{};
+	auto priv = GetDecryptor(pub, &forgotten);
+	if (priv || (allowForgotten && forgotten)) {
 		return true;
 	}
 
@@ -434,6 +436,7 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 				continue;
 			}
 			decryptors_[pub] = key;
+			decryptorPasswords_.push_back(pass);
 		}
 		break;
 	}
@@ -441,17 +444,37 @@ bool CLoginManager::AskDecryptor(fz::public_key const& pub, bool allowForgotten,
 	return true;
 }
 
-fz::private_key CLoginManager::GetDecryptor(fz::public_key const& pub)
+fz::private_key CLoginManager::GetDecryptor(fz::public_key const& pub, bool * forgotten)
 {
 	auto it = decryptors_.find(pub);
 	if (it != decryptors_.cend()) {
+		if (!it->second && forgotten) {
+			*forgotten = true;
+		}
 		return it->second;
+	}
+
+	for (auto const& pw : decryptorPasswords_) {
+		auto priv = fz::private_key::from_password(pw, pub.salt_);
+		if (priv && priv.pubkey() == pub) {
+			decryptors_[pub] = priv;
+			return priv;
+		}
 	}
 
 	return fz::private_key();
 }
 
-void CLoginManager::Remember(const fz::private_key &key)
+void CLoginManager::Remember(const fz::private_key &key, std::string_view const& pass)
 {
 	decryptors_[key.pubkey()] = key;
+
+	if (!pass.empty()) {
+		for (auto const& pw : decryptorPasswords_) {
+			if (pw == pass) {
+				return;
+			}
+		}
+		decryptorPasswords_.emplace_back(pass);
+	}
 }
