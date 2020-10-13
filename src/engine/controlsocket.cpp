@@ -444,8 +444,8 @@ void SleepOpData::operator()(fz::event_base const&)
 
 CFileTransferOpData::CFileTransferOpData(wchar_t const* name, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
 	: COpData(Command::transfer, name)
-	, localFile_(local_file), remoteFile_(remote_file), remotePath_(remote_path)
 	, flags_(flags)
+	, localFile_(local_file), remoteFile_(remote_file), remotePath_(remote_path)
 {
 }
 

@@ -827,6 +827,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 	case AZURE_BLOB:
 	case SWIFT:
 	case B2:
+	case RACKSPACE:
 		return {LogonType::normal, LogonType::ask};
 	case WEBDAV:
 	case INSECURE_WEBDAV:
