@@ -10,6 +10,14 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.51.0-rc1 (2020-10-13)
+
+- Refactored how the queue stores transfer flags
+- Refactored internals to be more modular
+- Linux: Disable receive buffer tuning if it results in unexpected consequences
+- Distinguish between Cancel and No in the file changed dialog
+- Small fixes to changing or disabling a master password
+
 3.50.0 (2020-08-27)
 
 - Minor fixes to Tardigrade integration
