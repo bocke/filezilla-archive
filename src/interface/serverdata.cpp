@@ -454,10 +454,11 @@ bool ProtectedCredentials::DoUnprotect(fz::private_key const& key)
 		}
 		pw = pw.substr(0, pos);
 	}
-	password_ = fz::to_wstring_from_utf8(pw);
-	if (password_.empty() && !pw.empty()) {
+	std::wstring wpw = fz::to_wstring_from_utf8(pw);
+	if (wpw.empty() && !pw.empty()) {
 		return false;
 	}
+	password_ = wpw;
 	encrypted_ = fz::public_key();
 	return true;
 
