@@ -1,5 +1,6 @@
 #include "filezilla.h"
 #include "listingcomparison.h"
+#include "filelistctrl.h"
 #include "filter.h"
 #include "Options.h"
 #include "state.h"
@@ -97,13 +98,14 @@ bool CComparisonManager::CompareListings()
 	int64_t localSize, remoteSize;
 	fz::datetime localDate, remoteDate;
 
-	const int dirSortMode = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
+	int const dirSortMode = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
+	auto const nameSortMode = static_cast<NameSortMode>(COptions::Get()->get_int(OPTION_FILELIST_NAMESORT));
 
 	bool gotLocal = m_pLeft->get_next_file(localFile, localPath, localDir, localSize, localDate);
 	bool gotRemote = m_pRight->get_next_file(remoteFile, remotePath, remoteDir, remoteSize, remoteDate);
 
 	while (gotLocal && gotRemote) {
-		int cmp = CompareFiles(dirSortMode, localPath, localFile, remotePath, remoteFile, localDir, remoteDir);
+		int cmp = CompareFiles(dirSortMode, nameSortMode, localPath, localFile, remotePath, remoteFile, localDir, remoteDir);
 		if (!cmp) {
 			if (!m_comparisonMode) {
 				const CComparableListing::t_fileEntryFlags flag = (localDir || localSize == remoteSize) ? CComparableListing::normal : CComparableListing::different;
@@ -183,7 +185,7 @@ bool CComparisonManager::CompareListings()
 	return true;
 }
 
-int CComparisonManager::CompareFiles(const int dirSortMode, std::wstring_view const& local_path, std::wstring_view const& local, std::wstring_view const& remote_path, std::wstring_view const& remote, bool localDir, bool remoteDir)
+int CComparisonManager::CompareFiles(int const dirSortMode, NameSortMode const nameSortMode, std::wstring_view const& local_path, std::wstring_view const& local, std::wstring_view const& remote_path, std::wstring_view const& remote, bool localDir, bool remoteDir)
 {
 	switch (dirSortMode)
 	{
@@ -202,19 +204,12 @@ int CComparisonManager::CompareFiles(const int dirSortMode, std::wstring_view co
 		break;
 	}
 
-#ifdef __WXMSW__
-	auto cmp = fz::stricmp(local, remote);
+	auto const f = CFileListCtrlSortBase::GetCmpFunction(nameSortMode);
+	auto cmp = f(local, remote);
 	if (!cmp) {
-		return fz::stricmp(local_path, remote_path);
+		return f(local_path, remote_path);
 	}
 	return cmp;
-#else
-	auto cmp = local.compare(remote);
-	if (!cmp) {
-		return local_path.compare(remote_path);
-	}
-	return cmp;
-#endif
 }
 
 CComparisonManager::CComparisonManager(CState& state)

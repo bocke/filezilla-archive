@@ -766,7 +766,7 @@ bool CLocalListView::IsItemValid(unsigned int item) const
 std::unique_ptr<CFileListCtrlSortBase> CLocalListView::GetSortComparisonObject()
 {
 	CFileListCtrlSortBase::DirSortMode dirSortMode = GetDirSortMode();
-	CFileListCtrlSortBase::NameSortMode nameSortMode = GetNameSortMode();
+	NameSortMode nameSortMode = GetNameSortMode();
 
 	if (!m_sortDirection) {
 		if (m_sortColumn == 1) {

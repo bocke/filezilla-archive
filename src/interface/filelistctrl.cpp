@@ -444,22 +444,22 @@ template<class CFileData> CFileListCtrlSortBase::DirSortMode CFileListCtrl<CFile
 	return dirSortMode;
 }
 
-template<class CFileData> CFileListCtrlSortBase::NameSortMode CFileListCtrl<CFileData>::GetNameSortMode()
+template<class CFileData> NameSortMode CFileListCtrl<CFileData>::GetNameSortMode()
 {
 	const int nameSortOption = COptions::Get()->get_int(OPTION_FILELIST_NAMESORT);
 
-	CFileListCtrlSortBase::NameSortMode nameSortMode;
+	NameSortMode nameSortMode;
 	switch (nameSortOption)
 	{
 	case 0:
 	default:
-		nameSortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
+		nameSortMode = NameSortMode::case_insensitive;
 		break;
 	case 1:
-		nameSortMode = CFileListCtrlSortBase::namesort_casesensitive;
+		nameSortMode = NameSortMode::case_sensitive;
 		break;
 	case 2:
-		nameSortMode = CFileListCtrlSortBase::namesort_natural;
+		nameSortMode = NameSortMode::natural;
 		break;
 	}
 

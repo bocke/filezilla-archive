@@ -2566,7 +2566,7 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 std::unique_ptr<CFileListCtrlSortBase> CRemoteListView::GetSortComparisonObject()
 {
 	CFileListCtrlSort<CDirectoryListing>::DirSortMode dirSortMode = GetDirSortMode();
-	CFileListCtrlSort<CDirectoryListing>::NameSortMode nameSortMode = GetNameSortMode();
+	NameSortMode nameSortMode = GetNameSortMode();
 
 	CDirectoryListing const& directoryListing = *m_pDirectoryListing;
 	if (!m_sortDirection) {
