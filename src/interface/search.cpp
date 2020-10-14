@@ -819,6 +819,7 @@ void CSearchDialog::Run()
 void CSearchDialog::OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2)
 {
 	if (!searching_) {
+		SetCtrlState();
 		return;
 	}
 
@@ -1169,7 +1170,14 @@ void CSearchDialog::Stop()
 
 void CSearchDialog::SetCtrlState()
 {
-	xrc_call(*this, "ID_START", &wxButton::Enable, !searching_);
+	bool can_start = !searching_;
+	if (mode_ != search_mode::local && !m_state.IsRemoteIdle()) {
+		can_start = false;
+	}
+	if (mode_ != search_mode::remote && !m_state.IsLocalIdle()) {
+		can_start = false;
+	}
+	xrc_call(*this, "ID_START", &wxButton::Enable, can_start);
 	xrc_call(*this, "ID_STOP", &wxButton::Enable, searching_);
 	xrc_call(*this, "ID_LOCAL_SEARCH", &wxRadioButton::Enable, !searching_);
 	xrc_call(*this, "ID_REMOTE_SEARCH", &wxRadioButton::Enable, !searching_ && m_state.IsRemoteConnected());
