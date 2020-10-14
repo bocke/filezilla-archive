@@ -844,6 +844,7 @@ void CSearchDialog::OnStateChange(t_statechange_notifications notification, std:
 				if (!m_state.IsLocalIdle()) {
 					return;
 				}
+				m_pComparisonManager->CompareListings();
 			}
 		}
 		searching_ = false;
