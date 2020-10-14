@@ -697,18 +697,18 @@ std::wstring CLocalTreeView::GetDirFromItem(wxTreeItemId item)
 
 void CLocalTreeView::UpdateSortMode()
 {
-	CFileListCtrlSortBase::NameSortMode sortMode;
+	NameSortMode sortMode;
 	switch (COptions::Get()->get_int(OPTION_FILELIST_NAMESORT))
 	{
 	case 0:
 	default:
-		sortMode = CFileListCtrlSortBase::namesort_caseinsensitive;
+		sortMode = NameSortMode::case_insensitive;
 		break;
 	case 1:
-		sortMode = CFileListCtrlSortBase::namesort_casesensitive;
+		sortMode = NameSortMode::case_sensitive;
 		break;
 	case 2:
-		sortMode = CFileListCtrlSortBase::namesort_natural;
+		sortMode = NameSortMode::natural;
 		break;
 	}
 	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(sortMode);

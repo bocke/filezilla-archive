@@ -13,9 +13,9 @@ IMPLEMENT_CLASS(wxTreeCtrlEx, wxNavigationEnabled<wxTreeCtrl>)
 wxTreeCtrlEx::wxTreeCtrlEx()
 {
 #ifdef __WXMSW__
-	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_caseinsensitive);
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(NameSortMode::case_insensitive);
 #else
-	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_casesensitive);
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(NameSortMode::case_sensitive);
 #endif
 }
 
@@ -25,9 +25,9 @@ wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 			   long style /*=wxTR_HAS_BUTTONS|wxTR_LINES_AT_ROOT*/)
 {
 #ifdef __WXMSW__
-	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_caseinsensitive);
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(NameSortMode::case_insensitive);
 #else
-	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(CFileListCtrlSortBase::namesort_casesensitive);
+	sortFunction_ = CFileListCtrlSortBase::GetCmpFunction(NameSortMode::case_sensitive);
 #endif
 
 	Create(parent, id, pos, size, style);

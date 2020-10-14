@@ -41,19 +41,19 @@ public:
 };
 
 template<>
-inline int DoCmpName(CRemoteSearchFileData const& data1, CRemoteSearchFileData const& data2, CFileListCtrlSortBase::NameSortMode const nameSortMode)
+inline int DoCmpName(CRemoteSearchFileData const& data1, CRemoteSearchFileData const& data2, NameSortMode const nameSortMode)
 {
 	int res;
 	switch (nameSortMode)
 	{
-	case CFileListCtrlSortBase::namesort_casesensitive:
+	case NameSortMode::case_sensitive:
 		res = CFileListCtrlSortBase::CmpCase(data1.name, data2.name);
 		break;
 	default:
-	case CFileListCtrlSortBase::namesort_caseinsensitive:
+	case NameSortMode::case_insensitive:
 		res = CFileListCtrlSortBase::CmpNoCase(data1.name, data2.name);
 		break;
-	case CFileListCtrlSortBase::namesort_natural:
+	case NameSortMode::natural:
 		res = CFileListCtrlSortBase::CmpNatural(data1.name, data2.name);
 		break;
 	}
@@ -71,19 +71,19 @@ inline int DoCmpName(CRemoteSearchFileData const& data1, CRemoteSearchFileData c
 }
 
 template<>
-inline int DoCmpName(CLocalSearchFileData const& data1, CLocalSearchFileData const& data2, CFileListCtrlSortBase::NameSortMode const nameSortMode)
+inline int DoCmpName(CLocalSearchFileData const& data1, CLocalSearchFileData const& data2, NameSortMode const nameSortMode)
 {
 	int res;
 	switch (nameSortMode)
 	{
-	case CFileListCtrlSortBase::namesort_casesensitive:
+	case NameSortMode::case_sensitive:
 		res = CFileListCtrlSortBase::CmpCase(data1.name, data2.name);
 		break;
 	default:
-	case CFileListCtrlSortBase::namesort_caseinsensitive:
+	case NameSortMode::case_insensitive:
 		res = CFileListCtrlSortBase::CmpNoCase(data1.name, data2.name);
 		break;
-	case CFileListCtrlSortBase::namesort_natural:
+	case NameSortMode::natural:
 		res = CFileListCtrlSortBase::CmpNatural(data1.name, data2.name);
 		break;
 	}
@@ -226,7 +226,7 @@ int64_t CSearchDialogFileList::ItemGetSize(int index) const
 std::unique_ptr<CFileListCtrlSortBase> CSearchDialogFileList::GetSortComparisonObject()
 {
 	CFileListCtrlSortBase::DirSortMode dirSortMode = GetDirSortMode();
-	CFileListCtrlSortBase::NameSortMode nameSortMode = GetNameSortMode();
+	NameSortMode nameSortMode = GetNameSortMode();
 
 	if (mode_ == CSearchDialog::search_mode::local) {
 		if (!m_sortDirection) {

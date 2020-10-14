@@ -3,6 +3,13 @@
 
 #include <wx/listctrl.h>
 
+enum class NameSortMode
+{
+	case_insensitive,
+	case_sensitive,
+	natural
+};
+
 class CComparisonManager;
 class CComparableListing
 {
@@ -67,7 +74,7 @@ public:
 	void SetHideIdentical(bool hideIdentical) { m_hideIdentical = hideIdentical; }
 
 protected:
-	int CompareFiles(const int dirSortMode, std::wstring_view const& local_path, std::wstring_view const& local, std::wstring_view const& remote_path, std::wstring_view const& remote, bool localDir, bool remoteDir);
+	int CompareFiles(int const dirSortMode, NameSortMode const nameSortMode, std::wstring_view const& local_path, std::wstring_view const& local, std::wstring_view const& remote_path, std::wstring_view const& remote, bool localDir, bool remoteDir);
 
 	CState& m_state;
 
