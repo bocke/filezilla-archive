@@ -395,17 +395,18 @@ void ProtectedCredentials::Protect(fz::public_key const& key)
 		return;
 	}
 
-	if (encrypted_ == key) {
-		return;
-	}
-	else {
+	if (encrypted_) {
+		if (encrypted_ == key) {
+			// Nothing to do.
+			return;
+		}
+
 		// Different key used. Try decrypting it
 		auto priv = CLoginManager::Get().GetDecryptor(key);
-		if (priv) {
-			if (!Unprotect(priv, true)) {
-				return;
-			}
+		if (!priv || !Unprotect(priv, true)) {
+			return;
 		}
+		// It succeeded, continue encrypting it with new key.
 	}
 	
 	auto plain = fz::to_utf8(password_);
@@ -419,6 +420,7 @@ void ProtectedCredentials::Protect(fz::public_key const& key)
 		// Something went wrong
 		logonType_ = LogonType::ask;
 		password_.clear();
+		encrypted_ = fz::public_key();
 	}
 	else {
 		password_ = fz::to_wstring_from_utf8(fz::base64_encode(std::string(encrypted.begin(), encrypted.end()), fz::base64_type::standard, false));
