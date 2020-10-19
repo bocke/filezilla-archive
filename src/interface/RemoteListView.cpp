@@ -1302,7 +1302,7 @@ void CRemoteListView::TransferSelectedFiles(const CLocalPath& local_parent, bool
 	if (!root.empty()) {
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), m_pDirectoryListing->path, !queue_only);
+		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
 	}
 }
 
@@ -1533,9 +1533,7 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 
 		if (!root.empty()) {
 			pRecursiveOperation->AddRecursionRoot(std::move(root));
-
-			pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete,
-														 filter.GetActiveFilters(), m_pDirectoryListing->path);
+			pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters());
 		}
 	}
 }
@@ -1846,8 +1844,7 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 		pRecursiveOperation->SetChmodData(std::move(chmodData));
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod,
-													 filter.GetActiveFilters(), m_pDirectoryListing->path);
+		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters());
 
 		// Refresh listing. This gets done implicitely by the recursive operation, so
 		// only it if not recursing.

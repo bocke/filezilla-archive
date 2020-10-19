@@ -1033,7 +1033,7 @@ bool CState::DownloadDroppedFiles(const CRemoteDataObject* pRemoteDataObject, co
 		m_pRemoteRecursiveOperation->AddRecursionRoot(std::move(root));
 
 		CFilterManager filter;
-		m_pRemoteRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), pRemoteDataObject->GetServerPath(), !queueOnly);
+		m_pRemoteRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
 	}
 
 	return true;

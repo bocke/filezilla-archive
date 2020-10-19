@@ -56,10 +56,6 @@ protected:
 	search_mode mode_{};
 	bool searching_{};
 
-	CServerPath m_original_dir;
-
-	bool searched_remote_{};
-
 	void Stop();
 
 	DECLARE_EVENT_TABLE()
