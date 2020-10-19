@@ -1055,20 +1055,8 @@ void CRemoteTreeView::OnMenuChmod(wxCommandEvent&)
 		chmodDialog.reset();
 		pRecursiveOperation->SetChmodData(std::move(chmodData));
 
-		CServerPath currentPath;
-		const wxTreeItemId selected = GetSelection();
-		if (selected) {
-			currentPath = GetPathFromItem(selected);
-		}
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters(), currentPath);
-	}
-	else {
-		const wxTreeItemId selected = GetSelection();
-		if (selected) {
-			CServerPath currentPath = GetPathFromItem(selected);
-			m_state.ChangeRemoteDir(currentPath);
-		}
+		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters());
 	}
 }
 
@@ -1102,15 +1090,9 @@ void CRemoteTreeView::OnMenuDownload(wxCommandEvent& event)
 	CRemoteRecursiveOperation* pRecursiveOperation = m_state.GetRemoteRecursiveOperation();
 	pRecursiveOperation->AddRecursionRoot(std::move(root));
 
-	CServerPath currentPath;
-	const wxTreeItemId selected = GetSelection();
-	if (selected) {
-		currentPath = GetPathFromItem(selected);
-	}
-
 	const bool addOnly = event.GetId() == XRCID("ID_ADDTOQUEUE");
 	CFilterManager filter;
-	pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), currentPath, !addOnly);
+	pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !addOnly);
 }
 
 void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
@@ -1173,7 +1155,7 @@ void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
 			m_state.ChangeRemoteDir(startDir);
 		}
 
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters(), currentPath);
+		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters());
 	}
 }
 

@@ -68,11 +68,10 @@ void CRemoteRecursiveOperation::AddRecursionRoot(recursion_root && root)
 	}
 }
 
-void CRemoteRecursiveOperation::StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, CServerPath const& finalDir, bool immediate)
+void CRemoteRecursiveOperation::StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate)
 {
 	wxCHECK_RET(m_operationMode == recursive_none, _T("StartRecursiveOperation called with m_operationMode != recursive_none"));
 	wxCHECK_RET(m_state.IsRemoteConnected(), _T("StartRecursiveOperation while disconnected"));
-	wxCHECK_RET(!finalDir.empty(), _T("Empty final dir in recursive operation"));
 
 	if (mode == recursive_chmod && !chmodData_) {
 		return;
@@ -127,16 +126,6 @@ bool CRemoteRecursiveOperation::NextOperation()
 		}
 
 		recursion_roots_.pop_front();
-	}
-
-	if (m_operationMode == recursive_delete && !m_finalDir.empty()) {
-		// After a deletion we cannot refresh if inside the deleted directories. Navigate user out if it
-		auto curPath = m_state.GetRemotePath();
-		if (!curPath.empty() && (curPath == m_finalDir || m_finalDir.IsParentOf(curPath, false))) {
-			StopRecursiveOperation();
-			m_state.ChangeRemoteDir(m_finalDir, std::wstring(), LIST_FLAG_REFRESH);
-			return false;
-		}
 	}
 
 	StopRecursiveOperation();

@@ -58,7 +58,7 @@ public:
 	virtual ~CRemoteRecursiveOperation();
 
 	void AddRecursionRoot(recursion_root && root);
-	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, CServerPath const& finalDir, bool immediate = true);
+	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate = true);
 
 	// Needed for recursive_chmod
 	void SetChmodData(std::unique_ptr<ChmodData> && chmodData);
@@ -79,8 +79,6 @@ protected:
 	bool BelowRecursionRoot(const CServerPath& path, recursion_root::new_dir &dir);
 
 	std::deque<recursion_root> recursion_roots_;
-
-	CServerPath m_finalDir;
 
 	// Needed for recursive_chmod
 	std::unique_ptr<ChmodData> chmodData_;
