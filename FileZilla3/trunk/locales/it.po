@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Filezilla italian translation v. 23.09.2020\n"
+"Project-Id-Version: Filezilla italian translation v. 14.10.2020\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2020-10-13 15:54+0200\n"
-"PO-Revision-Date: 2020-09-23 15:36+0200\n"
+"POT-Creation-Date: 2020-10-20 12:24+0200\n"
+"PO-Revision-Date: 2020-10-14 21:28+0200\n"
 "Last-Translator: bovirus <bovirus@gmail.com>\n"
 "Language-Team: bovirus - Andrea Sanavia - Vincenzo Reale - Riccardo Vianello "
 "<bovirus@gmail.com>\n"
@@ -45,8 +45,8 @@ msgid_plural "%d directories"
 msgstr[0] "%d cartella"
 msgstr[1] "%d cartelle"
 
-#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1279
-#: ../src/interface/search.cpp:1680
+#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1276
+#: ../src/interface/search.cpp:1678
 #, c-format
 msgid "%d directory with its contents"
 msgid_plural "%d directories with their contents"
@@ -55,8 +55,8 @@ msgstr[1] "%d cartelle con il loro contenuto"
 
 #: ../src/interface/filelist_statusbar.cpp:57
 #: ../src/interface/filelist_statusbar.cpp:82
-#: ../src/interface/RemoteListView.cpp:1431 ../src/interface/search.cpp:1278
-#: ../src/interface/search.cpp:1679
+#: ../src/interface/RemoteListView.cpp:1431 ../src/interface/search.cpp:1275
+#: ../src/interface/search.cpp:1677
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
@@ -466,7 +466,7 @@ msgstr "&Scarica"
 msgid "&Download to:"
 msgstr "&Download in:"
 
-#: ../src/interface/search.cpp:1228
+#: ../src/interface/search.cpp:1225
 msgid "&Download..."
 msgstr "&Download..."
 
@@ -1072,7 +1072,7 @@ msgstr "&Upload"
 msgid "&Upload to:"
 msgstr "&Invia in:"
 
-#: ../src/interface/search.cpp:1220
+#: ../src/interface/search.cpp:1217
 msgid "&Upload..."
 msgstr "&Invia..."
 
@@ -1125,7 +1125,7 @@ msgstr "&Versione %s"
 msgid "&View"
 msgstr "&Visualizza"
 
-#: ../src/interface/RemoteListView.cpp:1069 ../src/interface/search.cpp:1229
+#: ../src/interface/RemoteListView.cpp:1069 ../src/interface/search.cpp:1226
 msgid "&View/Edit"
 msgstr "&Visualizza / modifica"
 
@@ -1221,7 +1221,7 @@ msgstr "(app-compat impostato a %d.%d)"
 
 #: ../src/interface/settings/optionspage_dateformatting.cpp:73
 msgid "(example: %H-%M-%S)"
-msgstr ""
+msgstr "(esempio: %H-%M-%S)"
 
 #: ../src/interface/settings/optionspage_dateformatting.cpp:58
 msgid "(example: %Y-%m-%d)"
@@ -1860,12 +1860,12 @@ msgid "C&omparative search"
 msgstr "Ricerca c&omparativa"
 
 #: ../src/interface/RemoteListView.cpp:1080
-#: ../src/interface/RemoteTreeView.cpp:932 ../src/interface/search.cpp:1236
+#: ../src/interface/RemoteTreeView.cpp:932 ../src/interface/search.cpp:1233
 msgid "C&opy URL(s) to clipboard"
 msgstr "C&opia URL negli Appunti"
 
 #: ../src/interface/RemoteListView.cpp:1081
-#: ../src/interface/RemoteTreeView.cpp:933 ../src/interface/search.cpp:1233
+#: ../src/interface/RemoteTreeView.cpp:933 ../src/interface/search.cpp:1230
 msgid "C&opy URL(s) with password to clipboard"
 msgstr "C&opia le URL con le password negli Appunti"
 
@@ -1967,7 +1967,7 @@ msgstr ""
 "Impossibile chiudere la scheda mentrè in uso.\n"
 "Vuoi annullare l'operazione attuale e chiudere la scheda?"
 
-#: ../src/interface/listingcomparison.cpp:74
+#: ../src/interface/listingcomparison.cpp:75
 msgid ""
 "Cannot compare directories, different filters for local and remote "
 "directories are enabled"
@@ -1980,8 +1980,8 @@ msgid "Cannot create new filter"
 msgstr "Non è possibile creare un nuovo filtro"
 
 #: ../src/interface/edithandler.cpp:1114 ../src/interface/edithandler.cpp:1340
-#: ../src/interface/LocalListView.cpp:1931 ../src/interface/search.cpp:1623
-#: ../src/interface/search.cpp:2018
+#: ../src/interface/LocalListView.cpp:1931 ../src/interface/search.cpp:1621
+#: ../src/interface/search.cpp:2026
 msgid "Cannot edit file"
 msgstr "Non è possibile modificare il file"
 
@@ -2014,7 +2014,7 @@ msgstr "Non è possibile caricare la barra strumenti dal file risorse"
 msgid "Cannot rename entry"
 msgstr "Non è possibile rinominare la voce"
 
-#: ../src/interface/RemoteListView.cpp:1673
+#: ../src/interface/RemoteListView.cpp:1671
 msgid "Cannot rename file"
 msgstr "Non è possibile rinominare il file"
 
@@ -2369,15 +2369,15 @@ msgstr "Configura l'intervallo di porte"
 msgid "Configuring FileZilla and your network"
 msgstr "Configurazione di FileZilla e della rete"
 
-#: ../src/interface/search.cpp:1684
+#: ../src/interface/search.cpp:1682
 msgid "Confirm deletion"
 msgstr "Conferma cancellazione"
 
 #: ../src/interface/edithandler.cpp:1126 ../src/interface/file_utils.h:60
 #: ../src/interface/LocalListView.cpp:1896
 #: ../src/interface/RemoteListView.cpp:1436
-#: ../src/interface/RemoteTreeView.cpp:1131 ../src/interface/search.cpp:1635
-#: ../src/interface/search.cpp:1982
+#: ../src/interface/RemoteTreeView.cpp:1113 ../src/interface/search.cpp:1633
+#: ../src/interface/search.cpp:1990
 msgid "Confirmation needed"
 msgstr "Richiedi conferma"
 
@@ -2505,7 +2505,7 @@ msgstr[1] "Timeout connessione dopo %d secondi di inattività"
 msgid "Connection timed out."
 msgstr "Tempo scaduto per la connessione."
 
-#: ../src/interface/search.cpp:1069
+#: ../src/interface/search.cpp:1061
 msgid "Connection to server lost."
 msgstr "Connessione al server persa."
 
@@ -2588,8 +2588,8 @@ msgstr "Impossibile convertire comando alla codifica del server"
 msgid "Could not convert private key"
 msgstr "Impossibile convertire la chiave privata"
 
-#: ../src/interface/RemoteListView.cpp:2681
-#: ../src/interface/RemoteTreeView.cpp:1495 ../src/interface/search.cpp:1913
+#: ../src/interface/RemoteListView.cpp:2678
+#: ../src/interface/RemoteTreeView.cpp:1477 ../src/interface/search.cpp:1921
 msgid "Could not copy URLs"
 msgstr "Impossibile copiare gli URL"
 
@@ -2626,7 +2626,7 @@ msgstr "Impossibile creare segnalibro scopo sicurezza da URL:"
 msgid "Could not create temporary file name."
 msgstr "Impossibile creare nome file temporaneo."
 
-#: ../src/interface/RemoteListView.cpp:2322
+#: ../src/interface/RemoteListView.cpp:2319
 #: ../src/interface/RemoteTreeView.cpp:903
 msgid ""
 "Could not determine the target of the Drag&Drop operation.\n"
@@ -2679,7 +2679,7 @@ msgstr "Impossibile ottenere percorso dall'URL"
 msgid "Could not get reply from fzputtygen."
 msgstr "Impossibile ricevere da fzputtyget."
 
-#: ../src/interface/edithandler.cpp:1114 ../src/interface/search.cpp:1623
+#: ../src/interface/edithandler.cpp:1114 ../src/interface/search.cpp:1621
 msgid "Could not get temporary directory to download file into."
 msgstr "Impossibile creare la cartella temporanea per il download del file."
 
@@ -2757,8 +2757,8 @@ msgid "Could not open '%s'"
 msgstr "Impossibile aprire '%s'"
 
 #: ../src/interface/aboutdialog.cpp:227
-#: ../src/interface/RemoteListView.cpp:2681
-#: ../src/interface/RemoteTreeView.cpp:1495 ../src/interface/search.cpp:1913
+#: ../src/interface/RemoteListView.cpp:2678
+#: ../src/interface/RemoteTreeView.cpp:1477 ../src/interface/search.cpp:1921
 msgid "Could not open clipboard"
 msgstr "Impossibile aprire gli Appunti"
 
@@ -2947,11 +2947,11 @@ msgstr "Crea la &cartella e entra in essa"
 #: ../src/interface/LocalListView.cpp:994
 #: ../src/interface/LocalTreeView.cpp:1239
 #: ../src/interface/RemoteListView.cpp:1334
-#: ../src/interface/RemoteTreeView.cpp:1330
+#: ../src/interface/RemoteTreeView.cpp:1312
 msgid "Create directory"
 msgstr "Nuova cartella"
 
-#: ../src/interface/RemoteListView.cpp:2770
+#: ../src/interface/RemoteListView.cpp:2767
 msgid "Create empty file"
 msgstr "Crea un file vuoto"
 
@@ -3063,8 +3063,8 @@ msgid "D&efault"
 msgstr "Pred&efinita"
 
 #: ../src/interface/RemoteListView.cpp:1078
-#: ../src/interface/RemoteTreeView.cpp:930 ../src/interface/search.cpp:1223
-#: ../src/interface/search.cpp:1230
+#: ../src/interface/RemoteTreeView.cpp:930 ../src/interface/search.cpp:1220
+#: ../src/interface/search.cpp:1227
 msgid "D&elete"
 msgstr "&Elimina"
 
@@ -3265,7 +3265,7 @@ msgstr "Permessi accesso cartella"
 msgid "Directory comparison"
 msgstr "Comparazione cartelle"
 
-#: ../src/interface/listingcomparison.cpp:74
+#: ../src/interface/listingcomparison.cpp:75
 msgid "Directory comparison failed"
 msgstr "Comparazione cartella non riuscita"
 
@@ -3283,7 +3283,7 @@ msgstr "&Filtri elenco cartelle..."
 msgid "Directory listing aborted by user"
 msgstr "Lettura cartella annullata dall'utente"
 
-#: ../src/interface/RemoteListView.cpp:2149
+#: ../src/interface/RemoteListView.cpp:2146
 msgid "Directory listing failed"
 msgstr "Lettura cartella non riuscita"
 
@@ -3426,7 +3426,7 @@ msgid "Download limit: none"
 msgstr "Limite download: nessuno"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:941
-#: ../src/interface/search.cpp:1330 ../src/interface/search.cpp:1335
+#: ../src/interface/search.cpp:1328 ../src/interface/search.cpp:1333
 msgid "Download search results"
 msgstr "Download risultati ricerca"
 
@@ -3524,7 +3524,7 @@ msgid ""
 msgstr ""
 "Modifica il file nell'editor predefinito e carica le modifiche sul server."
 
-#: ../src/interface/search.cpp:1611
+#: ../src/interface/search.cpp:1609
 msgid "Editing directories is not supported"
 msgstr "La modifica delle cartelle non è supportata"
 
@@ -3533,7 +3533,7 @@ msgstr "La modifica delle cartelle non è supportata"
 msgid "Editing failed"
 msgstr "Modifica non riuscita"
 
-#: ../src/interface/search.cpp:1611
+#: ../src/interface/search.cpp:1609
 msgid "Editing search results"
 msgstr "Modifica risultati ricerca"
 
@@ -3555,7 +3555,7 @@ msgstr "Email:"
 msgid "Empty command"
 msgstr "Comando vuoto"
 
-#: ../src/interface/RemoteListView.cpp:2152
+#: ../src/interface/RemoteListView.cpp:2149
 msgid "Empty directory listing"
 msgstr "Elenco cartella vuoto"
 
@@ -3745,8 +3745,8 @@ msgstr "Errore caricamento della coda"
 #: ../src/interface/filter.cpp:1034 ../src/interface/Options.cpp:195
 #: ../src/interface/osx_sandbox_userdirs.cpp:66
 #: ../src/interface/osx_sandbox_userdirs.cpp:137
-#: ../src/interface/QueueView.cpp:1567 ../src/interface/search.cpp:1769
-#: ../src/interface/search.cpp:1803 ../src/interface/sitemanager.cpp:41
+#: ../src/interface/QueueView.cpp:1567 ../src/interface/search.cpp:1777
+#: ../src/interface/search.cpp:1811 ../src/interface/sitemanager.cpp:41
 #: ../src/interface/sitemanager.cpp:472 ../src/interface/sitemanager.cpp:532
 #: ../src/interface/sitemanager.cpp:641 ../src/interface/sitemanager.cpp:729
 #: ../src/interface/sitemanager.cpp:835 ../src/interface/sitemanager.cpp:941
@@ -4091,7 +4091,7 @@ msgstr "Il file non contiene dati importabili."
 msgid "File editing"
 msgstr "Modifica file"
 
-#: ../src/interface/RemoteListView.cpp:1685
+#: ../src/interface/RemoteListView.cpp:1683
 msgid "File exists"
 msgstr "Il file esiste"
 
@@ -4112,7 +4112,7 @@ msgstr "Elenchi file"
 msgid "File not found"
 msgstr "File non trovato"
 
-#: ../src/interface/search.cpp:636 ../src/interface/search.cpp:1036
+#: ../src/interface/search.cpp:636 ../src/interface/search.cpp:1028
 #: ../src/interface/toolbar.cpp:59
 msgid "File search"
 msgstr "Ricerca file"
@@ -4195,7 +4195,7 @@ msgstr "Nome file"
 msgid "Filename cannot be constructed for directory %s and filename %s"
 msgstr "Il nome file non può essere costruito per la cartella %s e il file %s"
 
-#: ../src/interface/RemoteListView.cpp:1673
+#: ../src/interface/RemoteListView.cpp:1671
 msgid "Filename invalid"
 msgstr "Nome file non valido"
 
@@ -4925,7 +4925,7 @@ msgstr "Espressione regolare non valida"
 msgid "Invalid response code"
 msgstr "Codice di risposta non valido"
 
-#: ../src/interface/search.cpp:1036
+#: ../src/interface/search.cpp:1028
 #, c-format
 msgid "Invalid search conditions: %s"
 msgstr "Condizioni non valide di ricerca: %s"
@@ -5070,7 +5070,7 @@ msgstr "P&orta più bassa disponibile:"
 msgid "Local"
 msgstr "Locale"
 
-#: ../src/interface/search.cpp:1186
+#: ../src/interface/search.cpp:1183
 msgid "Local &directory:"
 msgstr "Cartella &locale:"
 
@@ -5095,7 +5095,7 @@ msgstr "Il file locale è una cartella invece di essere un file normale."
 msgid "Local file is not a valid filename."
 msgstr "Il file locale non ha un nome file valido."
 
-#: ../src/interface/search.cpp:1048 ../src/interface/search.cpp:1054
+#: ../src/interface/search.cpp:1040 ../src/interface/search.cpp:1046
 msgid "Local file search"
 msgstr "Ricerca file locale"
 
@@ -5350,11 +5350,11 @@ msgstr "Ordinamento naturale"
 msgid "Need to enter filter name"
 msgstr "Devi inserire il nome file"
 
-#: ../src/interface/search.cpp:1048
+#: ../src/interface/search.cpp:1040
 msgid "Need to enter valid local path"
 msgstr "Devi inserire un percorso locale valido"
 
-#: ../src/interface/search.cpp:1076
+#: ../src/interface/search.cpp:1068
 msgid "Need to enter valid remote path"
 msgstr "È necessario inserire un percorso remoto valido"
 
@@ -5404,7 +5404,7 @@ msgstr "Nuovo preferito"
 
 #: ../src/interface/LocalTreeView.cpp:1243
 #: ../src/interface/RemoteListView.cpp:1347
-#: ../src/interface/RemoteTreeView.cpp:1344
+#: ../src/interface/RemoteTreeView.cpp:1326
 msgid "New directory"
 msgstr "Nuova cartella"
 
@@ -5538,7 +5538,7 @@ msgstr "Non tutti gli elementi possono essere richiesti per il trasferimento."
 msgid "Not connected"
 msgstr "Non connesso"
 
-#: ../src/interface/RemoteListView.cpp:2146
+#: ../src/interface/RemoteListView.cpp:2143
 msgid "Not connected to any server"
 msgstr "Nessun server collegato"
 
@@ -5582,7 +5582,7 @@ msgstr "Numero di punti decimali:"
 msgid "Number of retries has to be between 0 and 99."
 msgstr "Il numero di nuovi tentativi deve essere compreso tra 0 e 99."
 
-#: ../src/interface/search.cpp:1221
+#: ../src/interface/search.cpp:1218
 msgid "O&pen"
 msgstr "A&pri"
 
@@ -5682,8 +5682,8 @@ msgstr "Aperto come:"
 
 #: ../src/interface/edithandler.cpp:367 ../src/interface/edithandler.cpp:1334
 #: ../src/interface/LocalListView.cpp:1926
-#: ../src/interface/LocalListView.cpp:1938 ../src/interface/search.cpp:2013
-#: ../src/interface/search.cpp:2024
+#: ../src/interface/LocalListView.cpp:1938 ../src/interface/search.cpp:2021
+#: ../src/interface/search.cpp:2032
 msgid "Opening failed"
 msgstr "Apertura non riuscita"
 
@@ -6046,11 +6046,11 @@ msgstr ""
 #: ../src/interface/LocalListView.cpp:994
 #: ../src/interface/LocalTreeView.cpp:1239
 #: ../src/interface/RemoteListView.cpp:1334
-#: ../src/interface/RemoteTreeView.cpp:1330
+#: ../src/interface/RemoteTreeView.cpp:1312
 msgid "Please enter the name of the directory which should be created:"
 msgstr "Inserisci il nome della cartella che deve essere creata:"
 
-#: ../src/interface/RemoteListView.cpp:2770
+#: ../src/interface/RemoteListView.cpp:2767
 msgid "Please enter the name of the file which should be created:"
 msgstr "Insersci il nome del file che deve essere creato:"
 
@@ -6466,7 +6466,7 @@ msgstr "Lettura fallita dal file locale"
 msgid "Really cancel current operation?"
 msgstr "Vuoi annullare l'operazione attiva?"
 
-#: ../src/interface/RemoteListView.cpp:1428 ../src/interface/search.cpp:1676
+#: ../src/interface/RemoteListView.cpp:1428 ../src/interface/search.cpp:1674
 #, c-format
 msgid "Really delete %d directory with its contents from the server?"
 msgid_plural ""
@@ -6474,19 +6474,19 @@ msgid_plural ""
 msgstr[0] "Eliminare %d cartelle e il loro contenuto nel server?"
 msgstr[1] "Vuoi eliminare %d cartelle e il loro contenuto nel server?"
 
-#: ../src/interface/RemoteListView.cpp:1425 ../src/interface/search.cpp:1673
+#: ../src/interface/RemoteListView.cpp:1425 ../src/interface/search.cpp:1671
 #, c-format
 msgid "Really delete %d file from the server?"
 msgid_plural "Really delete %d files from the server?"
 msgstr[0] "Eliminare %d file nel server?"
 msgstr[1] "Vuoi eliminare %d file nel server?"
 
-#: ../src/interface/RemoteListView.cpp:1433 ../src/interface/search.cpp:1681
+#: ../src/interface/RemoteListView.cpp:1433 ../src/interface/search.cpp:1679
 #, c-format
 msgid "Really delete %s and %s from the server?"
 msgstr "Vuoi eliminare %s e %s nel server?"
 
-#: ../src/interface/RemoteTreeView.cpp:1131
+#: ../src/interface/RemoteTreeView.cpp:1113
 msgid "Really delete all selected files and/or directories from the server?"
 msgstr "Vuoi eliminare tutti i file e/o cartelle selezionati nel server?"
 
@@ -6600,7 +6600,7 @@ msgstr "Remoto"
 msgid "Remote file"
 msgstr "File remoto"
 
-#: ../src/interface/search.cpp:1069 ../src/interface/search.cpp:1076
+#: ../src/interface/search.cpp:1061 ../src/interface/search.cpp:1068
 msgid "Remote file search"
 msgstr "Ricerca file remota"
 
@@ -6881,7 +6881,7 @@ msgid "Search &conditions:"
 msgstr "Cerca &condizioni:"
 
 #: ../src/interface/search.cpp:659 ../src/interface/search.cpp:664
-#: ../src/interface/search.cpp:1189
+#: ../src/interface/search.cpp:1186
 msgid "Search &directory:"
 msgstr "Cerca &cartella:"
 
@@ -7001,7 +7001,7 @@ msgstr "Seleziona il nome per il file convertito della chiave"
 msgid "Select how these files should be opened."
 msgstr "Seleziona come questi file devono essere aperti."
 
-#: ../src/interface/search.cpp:1318
+#: ../src/interface/search.cpp:1315
 msgid "Select target download directory"
 msgstr "Seleziona cartella per il download"
 
@@ -7017,7 +7017,7 @@ msgstr "Seleziona le categorie da esportare:"
 msgid "Select the private data you would like to delete."
 msgstr "Seleziona gli elementi privati da eliminare."
 
-#: ../src/interface/search.cpp:1275
+#: ../src/interface/search.cpp:1272
 #, c-format
 msgid "Selected %d directory with its contents for transfer."
 msgid_plural "Selected %d directories with their contents for transfer."
@@ -7031,7 +7031,7 @@ msgid_plural "Selected %d directories."
 msgstr[0] "Selezionata %d cartella."
 msgstr[1] "Selezionate %d cartelle."
 
-#: ../src/interface/search.cpp:1272
+#: ../src/interface/search.cpp:1269
 #, c-format
 msgid "Selected %d file for transfer."
 msgid_plural "Selected %d files for transfer."
@@ -7052,7 +7052,7 @@ msgid_plural "Selected %d files. Total size: At least %s"
 msgstr[0] "Selezionato %d file. Dimensione totale: almeno %s"
 msgstr[1] "Selezionati %d file. Dimensione totale: almeno %s"
 
-#: ../src/interface/search.cpp:1280
+#: ../src/interface/search.cpp:1277
 #, c-format
 msgid "Selected %s and %s for transfer."
 msgstr "Selezionati %s e %s per il trasferimento."
@@ -7325,7 +7325,7 @@ msgstr "Visualizza dettagli"
 msgid "Show details about custom date and time formats"
 msgstr "Visualizza dettagli su formati personalizzati data e ora"
 
-#: ../src/interface/search.cpp:1222
+#: ../src/interface/search.cpp:1219
 msgid "Show in file &manager"
 msgstr "Visualizza nel Gestore file"
 
@@ -7687,11 +7687,11 @@ msgstr "Il file destinazione esiste già"
 msgid "Target file:"
 msgstr "File destinazione:"
 
-#: ../src/interface/RemoteListView.cpp:2788
+#: ../src/interface/RemoteListView.cpp:2785
 msgid "Target filename already exists!"
 msgstr "Il file destinazione esiste già!"
 
-#: ../src/interface/RemoteListView.cpp:1685
+#: ../src/interface/RemoteListView.cpp:1683
 msgid "Target filename already exists, really continue?"
 msgstr ""
 "Il file destinazione esiste già.\n"
@@ -7821,7 +7821,7 @@ msgstr ""
 "Inserisci un nuovo nome:"
 
 #: ../src/interface/edithandler.cpp:1339
-#: ../src/interface/LocalListView.cpp:1930 ../src/interface/search.cpp:2017
+#: ../src/interface/LocalListView.cpp:1930 ../src/interface/search.cpp:2025
 #, c-format
 msgid ""
 "The file '%s' cannot be opened:\n"
@@ -7855,7 +7855,7 @@ msgid "The file '%s' could not be loaded."
 msgstr "Impossibile caricare il file '%s'."
 
 #: ../src/interface/edithandler.cpp:1334
-#: ../src/interface/LocalListView.cpp:1926 ../src/interface/search.cpp:2013
+#: ../src/interface/LocalListView.cpp:1926 ../src/interface/search.cpp:2021
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -7865,7 +7865,7 @@ msgstr ""
 "Nessun programma è stato associato sul vostro sistema con questo file."
 
 #: ../src/interface/edithandler.cpp:367 ../src/interface/LocalListView.cpp:1938
-#: ../src/interface/search.cpp:2024
+#: ../src/interface/search.cpp:2032
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -8492,7 +8492,7 @@ msgid "Upload limit: none"
 msgstr "Limite upload: nessuno"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:1042
-#: ../src/interface/search.cpp:1344
+#: ../src/interface/search.cpp:1342
 msgid "Upload search results"
 msgstr "Carica risultati ricerca"
 
@@ -8874,7 +8874,7 @@ msgstr "Non hai i permessi per visualizzare questa cartella"
 msgid "You have selected at least one symbolic link."
 msgstr "È necessario selezionare almeno un collegamento simbolico."
 
-#: ../src/interface/edithandler.cpp:1127 ../src/interface/search.cpp:1636
+#: ../src/interface/edithandler.cpp:1127 ../src/interface/search.cpp:1634
 msgid ""
 "You have selected more than 10 files for editing, do you really want to "
 "continue?"
@@ -8882,7 +8882,7 @@ msgstr ""
 "Sono stati selezionati più di 10 file per le modifiche.\n"
 "Vuoi continuare?"
 
-#: ../src/interface/LocalListView.cpp:1897 ../src/interface/search.cpp:1983
+#: ../src/interface/LocalListView.cpp:1897 ../src/interface/search.cpp:1991
 msgid ""
 "You have selected more than 10 files or directories to open, do you really "
 "want to continue?"
@@ -8898,11 +8898,11 @@ msgstr "Inserisci un nome host."
 msgid "You have to enter a key file path"
 msgstr "Devi inserire il percorso del file chiave"
 
-#: ../src/interface/search.cpp:1330
+#: ../src/interface/search.cpp:1328
 msgid "You have to enter a local directory."
 msgstr "Inserisci il nome di una cartella locale."
 
-#: ../src/interface/search.cpp:1344
+#: ../src/interface/search.cpp:1342
 msgid "You have to enter a remote directory."
 msgstr "Devi indicare una cartella remota."
 
@@ -8915,7 +8915,7 @@ msgstr "Devi inserire un resolver."
 msgid "You have to enter a valid IPv4 address."
 msgstr "Devi inserire un indirizzo IP v4 valido."
 
-#: ../src/interface/search.cpp:1335
+#: ../src/interface/search.cpp:1333
 msgid "You have to enter a writable local directory."
 msgstr "Inserisci il nome di una cartella locale scrivibile."
 
@@ -8994,6 +8994,8 @@ msgid ""
 "You need to grant FileZilla access to the directories you want to download "
 "files into or to upload files from."
 msgstr ""
+"Devi concedere a FileZilla l'accesso alle cartelle in cui desideri salvare i "
+"file scaricati o da cui vuoi caricare i file."
 
 #: ../src/interface/manual_transfer.cpp:358
 msgid "You need to specify a local file."
