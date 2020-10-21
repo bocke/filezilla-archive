@@ -5,10 +5,6 @@
 
 #include <memory>
 
-struct impl
-{
-};
-
 class COptionsPageConnection final : public COptionsPage
 {
 public:
