@@ -30,7 +30,6 @@ enum NotificationId
 {
 	nId_logmsg,				// notification about new messages for the message log
 	nId_operation,			// operation reply codes
-	nId_connection,			// connection information: connects, disconnects, timeouts etc..
 	nId_transferstatus,		// transfer information: bytes transferred, transfer speed and such
 	nId_listing,			// directory listings
 	nId_asyncrequest,		// asynchronous request
