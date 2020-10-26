@@ -2,41 +2,94 @@
 #include "asksavepassworddialog.h"
 #include "Options.h"
 #include "filezillaapp.h"
-#include "xrc_helper.h"
 #include "sitemanager.h"
+#include "textctrlex.h"
 #include <libfilezilla/util.hpp>
+
+struct CAskSavePasswordDialog::impl
+{
+	wxRadioButton* nosave_{};
+	wxRadioButton* save_{};
+	wxRadioButton* usemaster_{};
+	wxTextCtrlEx* pw_{};
+	wxTextCtrlEx* repeat_{};
+};
+
+CAskSavePasswordDialog::CAskSavePasswordDialog()
+	: impl_(std::make_unique<impl>())
+{
+}
+
+CAskSavePasswordDialog::~CAskSavePasswordDialog() = default;
 
 bool CAskSavePasswordDialog::Create(wxWindow*)
 {
-	if (!Load(nullptr, _T("ID_ASK_SAVE_PASSWORD"))) {
+	if (!wxDialogEx::Create(nullptr, nullID, _("Remember passwords?"))) {
 		return false;
 	}
 
-	wxGetApp().GetWrapEngine()->WrapRecursive(this, 2, "");
+	auto & lay = layout();
+	auto main = lay.createMain(this, 1);
+
+	main->Add(new wxStaticText(this, nullID, _("Would you like FileZilla to remember passwords?")));
+
+	main->Add(new wxStaticText(this, nullID, _("When allowing FileZilla to remember passwords, you can reconnect without having to re-enter the password after restarting FileZilla.")));
+
+	impl_->save_ = new wxRadioButton(this, nullID, _("Sav&e passwords"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	impl_->nosave_ = new wxRadioButton(this, nullID, _("D&o not save passwords"));
+	impl_->usemaster_ = new wxRadioButton(this, nullID, _("Sa&ve passwords protected by a master password"));
+	main->Add(impl_->save_);
+	main->Add(impl_->nosave_);
+	main->Add(impl_->usemaster_);
+
+	auto inner = lay.createFlex(2);
+	main->Add(inner, 0, wxLEFT|wxGROW, lay.indent);
+
+	inner->AddGrowableCol(1);
+	inner->Add(new wxStaticText(this, nullID, _("&Master password:")), lay.valign);
+	impl_->pw_ = new wxTextCtrlEx(this, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	inner->Add(impl_->pw_, lay.valigng);
+	inner->Add(new wxStaticText(this, nullID, _("&Repeat password:")), lay.valign);
+	impl_->repeat_ = new wxTextCtrlEx(this, nullID, wxString(), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+	inner->Add(impl_->repeat_, lay.valigng);
+	
+	main->Add(new wxStaticText(this, nullID, _("A lost master password cannot be recovered! Please thoroughly memorize your password.")), 0, wxLEFT, lay.indent);
+	
+	auto buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
+
+	WrapRecursive(this, 2.0, nullptr);
 
 	auto onChange = [this](wxEvent const&) {
-		bool checked = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
-		xrc_call(*this, "ID_MASTERPASSWORD", &wxControl::Enable, checked);
-		xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxControl::Enable, checked);
-
+		bool const checked = impl_->usemaster_->GetValue();
+		impl_->pw_->Enable(checked);
+		impl_->repeat_->Enable(checked);
 	};
 	onChange(wxCommandEvent());
 
-	XRCCTRL(*this, "ID_PASSWORDS_SAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
-	XRCCTRL(*this, "ID_PASSWORDS_NOSAVE", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
-	XRCCTRL(*this, "ID_PASSWORDS_USEMASTERPASSWORD", wxEvtHandler)->Bind(wxEVT_RADIOBUTTON, onChange);
+	impl_->save_->Bind(wxEVT_RADIOBUTTON, onChange);
+	impl_->nosave_->Bind(wxEVT_RADIOBUTTON, onChange);
+	impl_->usemaster_->Bind(wxEVT_RADIOBUTTON, onChange);
 
-	XRCCTRL(*this, "wxID_OK", wxButton)->Bind(wxEVT_BUTTON, &CAskSavePasswordDialog::OnOk, this);
+	ok->Bind(wxEVT_BUTTON, &CAskSavePasswordDialog::OnOk, this);
 
 	return true;
 }
 
 void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 {
-	bool useMaster = xrc_call(*this, "ID_PASSWORDS_USEMASTERPASSWORD", &wxRadioButton::GetValue);
+	bool const useMaster = impl_->usemaster_->GetValue();
 	if (useMaster) {
-		std::wstring pw = xrc_call(*this, "ID_MASTERPASSWORD", &wxTextCtrl::GetValue).ToStdWstring();
-		std::wstring repeat = xrc_call(*this, "ID_MASTERPASSWORD_REPEAT", &wxTextCtrl::GetValue).ToStdWstring();
+		std::wstring pw = impl_->pw_->GetValue().ToStdWstring();
+		std::wstring repeat = impl_->repeat_->GetValue().ToStdWstring();
 		if (pw != repeat) {
 			wxMessageBoxEx(_("The entered passwords are not the same."), _("Invalid input"));
 			return;
@@ -59,10 +112,11 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 		}
 	}
 	else {
-		bool save = xrc_call(*this, "ID_PASSWORDS_SAVE", &wxRadioButton::GetValue);
+		bool const save = impl_->save_->GetValue();
 		COptions::Get()->set(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
 		COptions::Get()->set(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
 	}
+
 	event.Skip();
 }
 
