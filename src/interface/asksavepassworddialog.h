@@ -6,11 +6,17 @@
 class CAskSavePasswordDialog final : public wxDialogEx
 {
 public:
+	CAskSavePasswordDialog();
+	~CAskSavePasswordDialog();
+
 	static bool Run(wxWindow* parent);
 private:
 	bool Create(wxWindow* parent);
 
 	void OnOk(wxCommandEvent& event);
+
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif

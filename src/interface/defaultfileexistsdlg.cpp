@@ -22,7 +22,7 @@ CDefaultFileExistsDlg::~CDefaultFileExistsDlg()
 
 bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue, bool local, bool remote)
 {
-	if (!Create(parent, -1, _("Default file exists action"))) {
+	if (!Create(parent, nullID, _("Default file exists action"))) {
 		return false;
 	}
 
@@ -30,10 +30,10 @@ bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue, bool local, b
 	auto main = lay.createMain(this, 1);
 
 	if (fromQueue) {
-		main->Add(new wxStaticText(this, -1, _("Select default file exists action only for the currently selected files in the queue.")));
+		main->Add(new wxStaticText(this, nullID, _("Select default file exists action only for the currently selected files in the queue.")));
 	}
 	else {
-		main->Add(new wxStaticText(this, -1, _("Select default file exists action if the target file already exists. This selection is valid only for the current session.")));
+		main->Add(new wxStaticText(this, nullID, _("Select default file exists action if the target file already exists. This selection is valid only for the current session.")));
 	}
 
 	{
@@ -52,20 +52,20 @@ bool CDefaultFileExistsDlg::Load(wxWindow *parent, bool fromQueue, bool local, b
 			c->AppendString(_("Skip file"));
 		};
 		if (local) {
-			inner->Add(new wxStaticText(box, -1, _("&Downloads:")), lay.valign);
-			impl_->downloadAction_ = new wxChoice(box, -1);
+			inner->Add(new wxStaticText(box, nullID, _("&Downloads:")), lay.valign);
+			impl_->downloadAction_ = new wxChoice(box, nullID);
 			inner->Add(impl_->downloadAction_, lay.valigng);
 			actions(impl_->downloadAction_);
 		}
 		if (remote) {
-			inner->Add(new wxStaticText(box, -1, _("&Uploads:")), lay.valign);
-			impl_->uploadAction_ = new wxChoice(box, -1);
+			inner->Add(new wxStaticText(box, nullID, _("&Uploads:")), lay.valign);
+			impl_->uploadAction_ = new wxChoice(box, nullID);
 			inner->Add(impl_->uploadAction_, lay.valigng);
 			actions(impl_->uploadAction_);
 		}
 	}
 
-	main->Add(new wxStaticText(this, -1, _("If using 'overwrite if newer', your system time has to be synchronized with the server. If the time differs (e.g. different timezone), specify a time offset in the site manager.")));
+	main->Add(new wxStaticText(this, nullID, _("If using 'overwrite if newer', your system time has to be synchronized with the server. If the time differs (e.g. different timezone), specify a time offset in the site manager.")));
 
 	auto buttons = lay.createButtonSizer(this, main, true);
 
