@@ -3,6 +3,8 @@
 
 #include "server.h"
 #include "serverpath.h"
+#include "reader.h"
+#include "writer.h"
 
 #include <libfilezilla/uri.hpp>
 
@@ -233,6 +235,8 @@ public:
 	bool Download() const { return flags_ & transfer_flags::download; }
 	transfer_flags const& GetFlags() const { return flags_; }
 
+	writer_factory_holder output_;
+	reader_factory_holder input_;
 protected:
 	std::wstring const m_localFile;
 	CServerPath const m_remotePath;

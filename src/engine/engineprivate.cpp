@@ -372,7 +372,7 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 
 int CFileZillaEnginePrivate::FileTransfer(CFileTransferCommand const& command)
 {
-	controlSocket_->FileTransfer(command.GetLocalFile(), command.GetRemotePath(), command.GetRemoteFile(), command.GetFlags());
+	controlSocket_->FileTransfer(command.GetLocalFile(), command.input_, command.output_, command.GetRemotePath(), command.GetRemoteFile(), command.GetFlags());
 	return FZ_REPLY_CONTINUE;
 }
 

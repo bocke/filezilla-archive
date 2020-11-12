@@ -3,14 +3,6 @@
 
 #include "sftpcontrolsocket.h"
 
-enum connectStates
-{
-	connect_init,
-	connect_proxy,
-	connect_keys,
-	connect_open
-};
-
 class CSftpConnectOpData final : public COpData, public CSftpOpData
 {
 public:

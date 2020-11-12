@@ -1,6 +1,7 @@
 # these are the headers for your project
 
 noinst_HEADERS = \
+	aui.h \
 	commands.h \
 	directorylisting.h \
 	engine_context.h \
@@ -14,6 +15,7 @@ noinst_HEADERS = \
 	misc.h \
 	notification.h \
 	optionsbase.h \
+	reader.h \
 	s3sse.h \
 	server.h \
 	serverpath.h \
@@ -21,5 +23,6 @@ noinst_HEADERS = \
 	sizeformatting_base.h \
 	version.h \
 	visibility.h \
+	writer.h \
 	xmlutils.h \
 	xml_string_writer.h

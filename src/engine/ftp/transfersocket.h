@@ -1,7 +1,6 @@
 #ifndef FILEZILLA_ENGINE_FTP_TRANSFERSOCKET_HEADER
 #define FILEZILLA_ENGINE_FTP_TRANSFERSOCKET_HEADER
 
-#include "../iothread.h"
 #include "../controlsocket.h"
 
 class CFileZillaEnginePrivate;
@@ -15,8 +14,6 @@ enum class TransferMode
 	download,
 	resumetest
 };
-
-class CIOThread;
 
 namespace fz {
 class tls_layer;
@@ -39,7 +36,8 @@ public:
 
 	TransferEndReason GetTransferEndreason() const { return m_transferEndReason; }
 
-	void SetIOThread(CIOThread* ioThread) { ioThread_ = ioThread; }
+	void set_reader(std::unique_ptr<reader_base> && reader) { reader_ = std::move(reader); }
+	void set_writer(std::unique_ptr<writer_base> && writer) { writer_ = std::move(writer); }
 
 protected:
 	bool CheckGetNextWriteBuffer();
@@ -67,7 +65,8 @@ protected:
 	void SetSocketBufferSizes(fz::socket_base & socket);
 
 	virtual void operator()(fz::event_base const& ev);
-	void OnIOThreadEvent();
+	void OnInput(reader_base* reader);
+	void OnWrite(writer_base* reader);
 
 	// Will be set only while creating active mode connections
 	std::unique_ptr<fz::listen_socket> socketServer_;
@@ -80,9 +79,6 @@ protected:
 
 	TransferMode const m_transferMode;
 
-	char *m_pTransferBuffer{};
-	int m_transferBufferLen{};
-
 	bool m_postponedReceive{};
 	bool m_postponedSend{};
 	void TriggerPostponedEvents();
@@ -94,13 +90,15 @@ protected:
 
 	fz::socket_layer* active_layer_{};
 
-
 	// Needed for the madeProgress field in CTransferStatus
 	// Initially 0, 2 if made progress
 	// On uploads, 1 after first WSAE_WOULDBLOCK
 	int m_madeProgress{};
 
-	CIOThread* ioThread_{};
+	std::unique_ptr<reader_base> reader_;
+	std::unique_ptr<writer_base> writer_;
+	fz::nonowning_buffer buffer_;
+	size_t resumetest_{};
 };
 
 #endif

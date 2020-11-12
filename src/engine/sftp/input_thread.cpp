@@ -140,6 +140,7 @@ void CSftpInputThread::processEvent(sftpEvent eventType, std::wstring & error)
 	case sftpEvent::Send:
 	case sftpEvent::UsedQuotaRecv:
 	case sftpEvent::UsedQuotaSend:
+	case sftpEvent::io_size:
 		break;
 	case sftpEvent::Reply:
 	case sftpEvent::Done:
@@ -159,6 +160,9 @@ void CSftpInputThread::processEvent(sftpEvent eventType, std::wstring & error)
 	case sftpEvent::MacClientToServer:
 	case sftpEvent::MacServerToClient:
 	case sftpEvent::Hostkey:
+	case sftpEvent::io_open:
+	case sftpEvent::io_finalize:
+	case sftpEvent::io_nextbuf:
 		lines = 1;
 		break;
 	case sftpEvent::AskHostkey:

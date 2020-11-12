@@ -6,6 +6,7 @@
 #include "../../include/engine_options.h"
 
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/process.hpp>
 
 #include <assert.h>
 
@@ -18,6 +19,12 @@ enum filetransferStates
 	filetransfer_transfer,
 	filetransfer_chmtime
 };
+
+CSftpFileTransferOpData::~CSftpFileTransferOpData()
+{
+	remove_handler();
+	reader_.reset();
+}
 
 int CSftpFileTransferOpData::Send()
 {
@@ -312,4 +319,149 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 	}
 
 	return FZ_REPLY_CONTINUE;
+}
+
+void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
+{
+	if (reader_ || writer_) {
+		controlSocket_.AddToStream("-0\n");
+		return;
+	}
+
+	if (download()) {
+		if (resume_) {
+			offset = writer_factory_.size();
+			if (offset == writer_base::npos) {
+				controlSocket_.AddToStream("-1\n");
+				return;
+			}
+		}
+		else {
+			offset = 0;
+		}
+		writer_ = writer_factory_.open(offset, *this, true);
+		if (!writer_) {
+			controlSocket_.AddToStream("--\n");
+		}
+		else {
+			auto const info = writer_->shared_memory_info();
+
+			HANDLE target;
+			if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
+				log(logmsg::debug_warning, L"DuplicateHandle failed");
+				controlSocket_.ResetOperation(FZ_REPLY_ERROR);
+				return;
+			}
+
+			controlSocket_.AddToStream(fz::sprintf("-%u %u %u", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
+			base_address_ = std::get<1>(info);
+		}
+	}
+	else {
+		reader_ = reader_factory_.open(offset, *this, true);
+		if (!reader_) {
+			controlSocket_.AddToStream("--\n");
+		}
+		else {
+			auto const info = reader_->shared_memory_info();
+
+			HANDLE target;
+			if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
+				log(logmsg::debug_warning, L"DuplicateHandle failed");
+				controlSocket_.ResetOperation(FZ_REPLY_ERROR);
+				return;
+			}
+
+			controlSocket_.AddToStream(fz::sprintf("-%u %u\n", reinterpret_cast<uintptr_t>(target), std::get<2>(info)));
+			base_address_ = std::get<1>(info);
+		}
+	}
+}
+
+void CSftpFileTransferOpData::OnNextBufferRequested(uint64_t processed)
+{
+	if (reader_) {
+		auto r = reader_->read();
+		if (r == aio_result::wait) {
+			return;
+		}
+		if (r.type_ == aio_result::error) {
+			controlSocket_.AddToStream("--1\n");
+			return;
+		}
+		controlSocket_.AddToStream(fz::sprintf("-%d %d\n", r.buffer_.get() - base_address_, r.buffer_.size()));
+	}
+	else if (writer_) {
+		buffer_.resize(processed);
+		auto r = writer_->get_write_buffer(buffer_);
+		if (r == aio_result::wait) {
+			return;
+		}
+		if (r.type_ == aio_result::error) {
+			controlSocket_.AddToStream("--1\n");
+			return;
+		}
+		buffer_ = r.buffer_;
+		controlSocket_.AddToStream(fz::sprintf("-%d %d\n", buffer_.get() - base_address_, buffer_.capacity()));
+	}
+	else {
+		controlSocket_.AddToStream("--1\n");
+		return;
+	}
+}
+
+void CSftpFileTransferOpData::OnFinalizeRequested(uint64_t lastWrite)
+{
+	finalizing_ = true;
+	buffer_.resize(lastWrite);
+	auto res = writer_->finalize(buffer_);
+	if (res == aio_result::wait) {
+		return;
+	}
+	else if (res == aio_result::ok) {
+		controlSocket_.AddToStream(fz::sprintf("-1\n"));
+	}
+	else {
+		controlSocket_.AddToStream(fz::sprintf("-0\n"));
+	}
+}
+
+void CSftpFileTransferOpData::OnSizeRequested()
+{
+	uint64_t size = writer_base::npos;
+	if (reader_) {
+		size = reader_->size();
+	}
+	else if (writer_) {
+		size = writer_->size();
+	}
+	if (size == writer_base::npos) {
+		controlSocket_.AddToStream("--1\n");
+	}
+	else {
+		controlSocket_.AddToStream(fz::sprintf("-%d\n", size));
+	}
+}
+
+void CSftpFileTransferOpData::operator()(fz::event_base const& ev)
+{
+	fz::dispatch<read_ready_event, write_ready_event>(ev, this,
+		&CSftpFileTransferOpData::OnReaderEvent,
+		&CSftpFileTransferOpData::OnWriterEvent
+	);
+}
+
+void CSftpFileTransferOpData::OnReaderEvent(reader_base*)
+{
+	OnNextBufferRequested(0);
+}
+
+void CSftpFileTransferOpData::OnWriterEvent(writer_base*)
+{
+	if (finalizing_) {
+		OnFinalizeRequested(0);
+	}
+	else {
+		OnNextBufferRequested(0);
+	}
 }

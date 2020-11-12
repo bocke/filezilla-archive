@@ -8,6 +8,7 @@ libfzclient_private_la_CPPFLAGS += -DBUILDING_FILEZILLA
 
 
 libfzclient_private_la_SOURCES = \
+		aui.cpp \
 		commands.cpp \
 		controlsocket.cpp \
 		directorycache.cpp \
@@ -46,6 +47,7 @@ libfzclient_private_la_SOURCES = \
 		optionsbase.cpp \
 		pathcache.cpp \
 		proxy.cpp \
+		reader.cpp \
 		rtt.cpp \
 		server.cpp \
 		servercapabilities.cpp \
@@ -63,6 +65,7 @@ libfzclient_private_la_SOURCES = \
 		sftp/sftpcontrolsocket.cpp \
 		sizeformatting_base.cpp \
 		version.cpp \
+		writer.cpp \
 		xmlutils.cpp
 
 noinst_HEADERS = \

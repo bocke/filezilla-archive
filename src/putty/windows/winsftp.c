@@ -11,6 +11,7 @@
 #include "psftp.h"
 #include "ssh.h"
 #include "winsecur.h"
+#include "fzsftp.h"
 
 int filexfer_get_userpass_input(Seat *seat, prompts_t *p, bufchain *input)
 {
@@ -99,14 +100,76 @@ static inline uint64_t uint64_from_words(uint32_t hi, uint32_t lo)
     (t) = (unsigned long) uli.QuadPart; \
 } while(0)
 
-struct RFile {
-    HANDLE h;
+enum read_state
+{
+    ok,
+    error,
+    eof
 };
 
-RFile *open_existing_file(const char *name, uint64_t *size,
+struct RFile {
+#if 1
+    HANDLE mapping_;
+    uint8_t * memory_;
+    size_t memory_size_;
+    int state;
+    uint8_t* buffer_;
+    int remaining_;
+#else
+    HANDLE h;
+#endif
+};
+
+static uintptr_t next_int(char const** s)
+{
+    uintptr_t ret = 0;
+    while (s && *s && **s && **s != ' ') {
+        ret *= 10;
+        ret += **s - '0';
+        ++(*s);
+    }
+    while (s && *s && **s && **s == ' ') {
+        ++(*s);
+    }
+    return ret;
+}
+
+RFile *open_existing_file(const char *name, uint64_t offset,
                           unsigned long *mtime, unsigned long *atime,
                           long *perms)
 {
+#if 1
+    fzprintf(sftp_io_open, "%"PRIu64, offset);
+    char * s = priority_read();
+
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    HANDLE mapping = (HANDLE)next_int(&p);
+    size_t memory_size = next_int(&p);
+
+    sfree(s);
+
+    uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    if (!memory) {
+        CloseHandle(mapping);
+        return NULL;
+    }
+
+    RFile *ret;
+    ret = snew(RFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_  = NULL;
+    ret->state = ok;
+
+    return ret;
+#else
     HANDLE h;
     RFile *ret;
 
@@ -142,29 +205,112 @@ RFile *open_existing_file(const char *name, uint64_t *size,
         *perms = -1;
 
     return ret;
+#endif
 }
 
 int read_from_file(RFile *f, void *buffer, int length)
 {
+#if 1
+    if (f->state == ok && !f->remaining_) {
+        fznotify1(sftp_io_nextbuf, 0);
+        char const* s = priority_read();
+        if (s[1] == '-') {
+            f->state = error;
+            return -1;
+        }
+        else if (s[1] == 0) {
+            f->state = eof;
+        }
+        else {
+            char const* p = s + 1;
+            f->buffer_ = f->memory_ + next_int(&p);
+            f->remaining_ = (int)next_int(&p);
+        }
+        sfree(s);
+    }
+    if (f->state == eof) {
+        return 0;
+    }
+    else if (f->state == error) {
+        return -1;
+    }
+
+    if (length > f->remaining_) {
+        length = f->remaining_;
+    }
+    memcpy(buffer, f->buffer_, length);
+    f->remaining_ -= length;
+    f->buffer_ += length;
+    return length;
+#else
     DWORD read;
     if (!ReadFile(f->h, buffer, length, &read, NULL))
         return -1;                     /* error */
     else
         return read;
+#endif
 }
 
 void close_rfile(RFile *f)
 {
+    if (!f) {
+        return;
+    }
+#if 0
     CloseHandle(f->h);
+#endif
     sfree(f);
 }
 
 struct WFile {
+#if 1
+    HANDLE mapping_;
+    uint8_t * memory_;
+    size_t memory_size_;
+    int state;
+    uint8_t* buffer_;
+    int remaining_;
+    int size_;
+#else
     HANDLE h;
+#endif
 };
 
 WFile *open_new_file(const char *name, long perms)
 {
+#if 1
+    fznotify1(sftp_io_open, 0);
+    char * s = priority_read();
+
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    HANDLE mapping = (HANDLE)next_int(&p);
+    size_t memory_size = next_int(&p);
+
+    sfree(s);
+
+    uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    if (!memory) {
+        CloseHandle(mapping);
+        return NULL;
+    }
+
+    WFile *ret;
+    ret = snew(WFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_  = NULL;
+    ret->state = ok;
+    ret->size_ = 0;
+
+    return ret;
+#else
     HANDLE h;
     WFile *ret;
 
@@ -182,10 +328,47 @@ WFile *open_new_file(const char *name, long perms)
     ret->h = h;
 
     return ret;
+#endif
 }
 
 WFile *open_existing_wfile(const char *name, uint64_t *size)
 {
+#if 1
+    fzprintf(sftp_io_open, "%"PRIu64, (uint64_t)-1);
+    char * s = priority_read();
+
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    HANDLE mapping = (HANDLE)next_int(&p);
+    size_t memory_size = next_int(&p);
+    if (size) {
+        *size = next_int(&p);
+    }
+
+    sfree(s);
+
+    uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    if (!memory) {
+        CloseHandle(mapping);
+        return NULL;
+    }
+
+    WFile *ret;
+    ret = snew(WFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_  = NULL;
+    ret->state = ok;
+    ret->size_ = 0;
+
+    return ret;
+#else
     HANDLE h;
     WFile *ret;
 
@@ -209,28 +392,88 @@ WFile *open_existing_wfile(const char *name, uint64_t *size)
     }
 
     return ret;
+#endif
 }
 
 int write_to_file(WFile *f, void *buffer, int length)
 {
+#if 1
+    if (f->state == ok && !f->remaining_) {
+        fznotify1(sftp_io_nextbuf, f->size_ - f->remaining_);
+        char const* s = priority_read();
+        if (s[1] == '-') {
+            f->state = error;
+            return -1;
+        }
+        else if (s[1] == 0) {
+            f->state = eof;
+        }
+        else {
+            char const* p = s + 1;
+            f->buffer_ = f->memory_ + next_int(&p);
+            f->remaining_ = (int)next_int(&p);
+            f->size_ = f->remaining_;
+        }
+        sfree(s);
+    }
+    if (f->state == eof) {
+        return 0;
+    }
+    else if (f->state == error) {
+        return -1;
+    }
+
+    if (length > f->remaining_) {
+        length = f->remaining_;
+    }
+    memcpy(f->buffer_, buffer, length);
+    f->remaining_ -= length;
+    f->buffer_ += length;
+    return length;
+#else
     DWORD written;
     if (!WriteFile(f->h, buffer, length, &written, NULL))
         return -1;                     /* error */
     else
         return written;
+#endif
+}
+
+int finalize_wfile(WFile *f)
+{
+#if 1
+    if (f->state == eof) {
+        return 1;
+    }
+    if (f->state != ok) {
+        return 0;
+    }
+    fznotify1(sftp_io_finalize, f->size_ - f->remaining_);
+    char const* s = priority_read();
+    if (s[1] != '1') {
+        f->state = error;
+        return 0;
+    }
+    f->state = eof;
+#endif
+    return 1;
 }
 
 void set_file_times(WFile *f, unsigned long mtime, unsigned long atime)
 {
+#if TODO
     FILETIME actime, wrtime;
     TIME_POSIX_TO_WIN(atime, actime);
     TIME_POSIX_TO_WIN(mtime, wrtime);
     SetFileTime(f->h, NULL, &actime, &wrtime);
+#endif
 }
 
 void close_wfile(WFile *f)
 {
+#if 0
     CloseHandle(f->h);
+#endif
     sfree(f);
 }
 
@@ -238,6 +481,7 @@ void close_wfile(WFile *f)
    FROM_START, FROM_CURRENT, or FROM_END */
 int seek_file(WFile *f, uint64_t offset, int whence)
 {
+#if TODO
     DWORD movemethod;
 
     switch (whence) {
@@ -263,14 +507,19 @@ int seek_file(WFile *f, uint64_t offset, int whence)
         return -1;
     else
         return 0;
+#endif
+    return -1;
 }
 
 uint64_t get_file_posn(WFile *f)
 {
+#if TODO
     LONG lo, hi = 0;
 
     lo = SetFilePointer(f->h, 0L, &hi, FILE_CURRENT);
     return uint64_from_words(hi, lo);
+#endif
+    return 0;
 }
 
 int file_type(const char *name)

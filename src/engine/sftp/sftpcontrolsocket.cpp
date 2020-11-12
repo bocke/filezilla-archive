@@ -254,6 +254,30 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 			}
 		}
 		break;
+	case sftpEvent::io_nextbuf:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CSftpFileTransferOpData&>(*operations_.back());
+			data.OnNextBufferRequested(fz::to_integral<uint64_t>(message.text[0]));
+		}
+		break;
+	case sftpEvent::io_open:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CSftpFileTransferOpData&>(*operations_.back());
+			data.OnOpenRequested(fz::to_integral<uint64_t>(message.text[0]));
+		}
+		break;
+	case sftpEvent::io_size:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CSftpFileTransferOpData&>(*operations_.back());
+			data.OnSizeRequested();
+		}
+		break;
+	case sftpEvent::io_finalize:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CSftpFileTransferOpData&>(*operations_.back());
+			data.OnFinalizeRequested(fz::to_integral<uint64_t>(message.text[0]));
+		}
+		break;
 	default:
 		log(logmsg::debug_warning, L"Message type %d not handled", message.type);
 		break;
@@ -474,17 +498,18 @@ void CSftpControlSocket::ProcessReply(int result, std::wstring const& reply)
 		}
 	}
 }
-void CSftpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
+void CSftpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
 									std::wstring const& remoteFile, transfer_flags const& flags)
 {
 	auto pData = std::make_unique<CSftpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
+	pData->reader_factory_ = reader;
+	pData->writer_factory_ = writer;
 	Push(std::move(pData));
 }
 
 int CSftpControlSocket::DoClose(int nErrorCode)
 {
 	remove_bucket();
-
 	if (process_) {
 		process_->kill();
 	}
@@ -505,6 +530,11 @@ int CSftpControlSocket::DoClose(int nErrorCode)
 		event_loop_.filter_events(threadEventsFilter);
 	}
 	process_.reset();
+
+	if (mapping_ != INVALID_HANDLE_VALUE) {
+		CloseHandle(mapping_);
+		mapping_ = INVALID_HANDLE_VALUE;
+	}
 
 	m_sftpEncryptionDetails = CSftpEncryptionNotification();
 

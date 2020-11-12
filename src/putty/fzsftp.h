@@ -1,6 +1,8 @@
 #ifndef FILEZILLA_PUTTY_FZSFTP_HEADER
 #define FILEZILLA_PUTTY_FZSFTP_HEADER
 
+char* priority_read();
+
 int ProcessQuotaCmd(const char* line);
 int RequestQuota(int i, int bytes);
 void UpdateQuota(int i, int bytes);
