@@ -72,27 +72,14 @@ int CFtpFileTransferOpData::Send()
 		}
 
 		{
-			auto pFile = std::make_unique<fz::file>();
+			int64_t startOffset{};
 			if (download()) {
-				int64_t startOffset = 0;
-
 				// Potentially racy
-				bool didExist = fz::local_filesys::get_file_type(fz::to_native(localFile_)) != fz::local_filesys::unknown;
+				bool didExist = writer_factory_.size() != writer_base::npos;
+				fileDidExist_ = didExist;
 
 				if (resume_) {
-					if (!pFile->open(fz::to_native(localFile_), fz::file::writing, fz::file::existing)) {
-						log(logmsg::error, _("Failed to open \"%s\" for appending/writing"), localFile_);
-						return FZ_REPLY_ERROR;
-					}
-
-					fileDidExist_ = didExist;
-
-					startOffset = pFile->seek(0, fz::file::end);
-
-					if (startOffset == -1) {
-						log(logmsg::error, _("Could not seek to the end of the file"));
-						return FZ_REPLY_ERROR;
-					}
+					startOffset = didExist ? writer_factory_.size() : 0;
 					localFileSize_ = startOffset;
 
 					// Check resume capabilities
@@ -104,21 +91,15 @@ int CFtpFileTransferOpData::Send()
 					}
 				}
 				else {
-					controlSocket_.CreateLocalDir(localFile_);
-
-					if (!pFile->open(fz::to_native(localFile_), fz::file::writing, fz::file::empty)) {
-						log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
-						return FZ_REPLY_ERROR;
-					}
-
-					fileDidExist_ = didExist;
 					localFileSize_ = 0;
 				}
 
 				resumeOffset = resume_ ? localFileSize_ : 0;
+				startOffset = resumeOffset;
 
 				engine_.transfer_status_.Init(remoteFileSize_, startOffset, false);
 
+				/* TODO
 				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
 					// Try to preallocate the file in order to reduce fragmentation
 					int64_t sizeToPreallocate = remoteFileSize_ - startOffset;
@@ -138,24 +119,12 @@ int CFtpFileTransferOpData::Send()
 						}
 					}
 				}
+				*/
 			}
 			else {
-				if (!pFile->open(fz::to_native(localFile_), fz::file::reading)) {
-					log(logmsg::error, _("Failed to open \"%s\" for reading"), localFile_);
-					return FZ_REPLY_ERROR;
-				}
-
-				int64_t startOffset;
 				if (resume_) {
 					if (remoteFileSize_ > 0) {
 						startOffset = remoteFileSize_;
-
-						if (localFileSize_ < 0) {
-							auto s = pFile->size();
-							if (s >= 0) {
-								localFileSize_ = s;
-							}
-						}
 
 						if (startOffset == localFileSize_ && binary) {
 							log(logmsg::debug_info, L"No need to resume, remote file size matches local file size.");
@@ -171,11 +140,6 @@ int CFtpFileTransferOpData::Send()
 								}
 							}
 							return FZ_REPLY_OK;
-						}
-
-						if (pFile->seek(startOffset, fz::file::begin) == -1) {
-							log(logmsg::error, _("Could not seek to offset %d within file"), startOffset);
-							return FZ_REPLY_ERROR;
 						}
 					}
 					else {
@@ -195,21 +159,30 @@ int CFtpFileTransferOpData::Send()
 					resumeOffset = 0;
 				}
 
-				auto len = pFile->size();
-				engine_.transfer_status_.Init(len, startOffset, false);
+				engine_.transfer_status_.Init(reader_factory_.size(), startOffset, false);
 			}
-			ioThread_ = std::make_unique<CIOThread>();
-			if (!ioThread_->Create(engine_.GetThreadPool(), std::move(pFile), !download(), binary)) {
-				// CIOThread will delete pFile
-				ioThread_.reset();
-				log(logmsg::error, _("Could not spawn IO thread"));
-				return FZ_REPLY_ERROR;
+
+			controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
+			controlSocket_.m_pTransferSocket->m_binaryMode = binary;
+			if (download()) {
+				auto writer = writer_factory_.open(startOffset, *controlSocket_.m_pTransferSocket.get(), false);
+				if (!writer) {
+					// TODO: Handle different errors
+					log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
+					return FZ_REPLY_ERROR;
+				}
+				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
+			}
+			else {
+				auto reader = reader_factory_.open(startOffset, *controlSocket_.m_pTransferSocket.get(), false);
+				if (!reader) {
+					// TODO: Handle different errors
+					log(logmsg::error, _("Failed to open \"%s\" for reading"), localFile_);
+					return FZ_REPLY_ERROR;
+				}
+				controlSocket_.m_pTransferSocket->set_reader(std::move(reader));
 			}
 		}
-
-		controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
-		controlSocket_.m_pTransferSocket->m_binaryMode = binary;
-		controlSocket_.m_pTransferSocket->SetIOThread(ioThread_.get());
 
 		if (download()) {
 			cmd = L"RETR ";
@@ -508,7 +481,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				}
 			}
 			else if (download() && !fileTime_.empty()) {
-				ioThread_.reset();
+				// TODO: reset socket if exists
 				if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_)) {
 					log(logmsg::debug_warning, L"Could not set modification time");
 				}

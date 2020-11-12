@@ -3,8 +3,6 @@
 
 #include "ftpcontrolsocket.h"
 
-#include "../iothread.h"
-
 enum filetransferStates
 {
 	filetransfer_init = 0,
@@ -30,7 +28,6 @@ public:
 
 	int TestResumeCapability();
 
-	std::unique_ptr<CIOThread> ioThread_;
 	bool fileDidExist_{true};
 };
 

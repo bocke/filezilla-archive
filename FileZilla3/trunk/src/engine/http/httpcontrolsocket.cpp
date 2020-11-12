@@ -278,7 +278,7 @@ void CHttpControlSocket::OnConnect()
 	}
 }
 
-void CHttpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
+void CHttpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
 									std::wstring const& remoteFile, transfer_flags const& flags)
 {
 	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");

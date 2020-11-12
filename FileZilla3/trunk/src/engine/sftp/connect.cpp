@@ -10,6 +10,15 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>
 
+
+enum connectStates
+{
+	connect_init,
+	connect_proxy,
+	connect_keys,
+	connect_open
+};
+
 int CSftpConnectOpData::Send()
 {
 	switch (opState)

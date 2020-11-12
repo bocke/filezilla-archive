@@ -136,7 +136,10 @@ public:
 	// starts the actual transfer
 	bool transferInitiated_{};
 
-	std::wstring localFile_, remoteFile_;
+	std::wstring localFile_;
+	reader_factory_holder reader_factory_;
+	writer_factory_holder writer_factory_;
+	std::wstring remoteFile_;
 	CServerPath remotePath_;
 
 	fz::datetime fileTime_;
@@ -211,7 +214,7 @@ public:
 	virtual void Connect(CServer const& server, Credentials const& credentials) = 0;
 	virtual void List(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), int flags = 0);
 
-	virtual void FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
+	virtual void FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
 							 std::wstring const& remoteFile, transfer_flags const& flags) = 0;
 	virtual void RawCommand(std::wstring const& command = std::wstring());
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files);

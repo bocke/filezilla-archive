@@ -19,7 +19,7 @@
 #include "ssh.h"
 #include "sftp.h"
 
-const char *const appname = "PSFTP";
+const char *const appname = "FZSFTP";
 
 /*
  * Since SFTP is a request-response oriented protocol, it requires
@@ -301,8 +301,9 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
         return 0;
     }
 
+    offset = 0;
     if (restart) {
-        file = open_existing_wfile(outfname, NULL);
+        file = open_existing_wfile(outfname, &offset);
     } else {
         file = open_new_file(outfname, GET_PERMISSIONS(attrs, -1));
     }
@@ -315,24 +316,6 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
         fxp_close_recv(pktin, req);
 
         return 2;
-    }
-
-    if (restart) {
-        if (seek_file(file, 0 , FROM_END) == -1) {
-            close_wfile(file);
-            fzprintf(sftpError, "reget: cannot restart %s - file too large",
-                   outfname);
-            req = fxp_close_send(fh);
-            pktin = sftp_wait_for_reply(req);
-            fxp_close_recv(pktin, req);
-
-            return 0;
-        }
-
-        offset = get_file_posn(file);
-        fzprintf(sftpInfo, "reget: restarting at file position %"PRIu64, offset);
-    } else {
-        offset = 0;
     }
 
     fzprintf(sftpInfo, "remote:%s => local:%s", fname, outfname);
@@ -398,6 +381,13 @@ int sftp_get_file(char *fname, char *outfname, bool restart)
 
     xfer_cleanup(xfer);
 
+    if (ret == 1) {
+        if (!finalize_wfile(file)) {
+            fzprintf(sftpError, "error while writing local file");
+            ret = 0;
+        }
+    }
+
     close_wfile(file);
 
     req = fxp_close_send(fh);
@@ -417,19 +407,14 @@ int sftp_put_file(char *fname, char *outfname, int restart)
     struct fxp_xfer *xfer;
     struct sftp_packet *pktin;
     struct sftp_request *req;
-    uint64_t offset;
-    RFile *file;
+    uint64_t offset = 0;
+    RFile *file = 0;
     bool err = false, eof;
     struct fxp_attrs attrs;
     long permissions;
 
-    file = open_existing_file(fname, NULL, NULL, NULL, &permissions);
-    if (!file) {
-        fzprintf(sftpError, "local: unable to open %s", fname);
-        return 2;
-    }
     attrs.flags = 0;
-    PUT_PERMISSIONS(attrs, permissions);
+//FIXME    PUT_PERMISSIONS(attrs, permissions);
     if (restart) {
         req = fxp_open_send(outfname, SSH_FXF_WRITE, &attrs);
     } else {
@@ -441,7 +426,6 @@ int sftp_put_file(char *fname, char *outfname, int restart)
     fh = fxp_open_recv(pktin, req);
 
     if (!fh) {
-        close_rfile(file);
         fzprintf(sftpError, "%s: open for write: %s", outfname, fxp_error());
         return 0;
     }
@@ -466,12 +450,16 @@ int sftp_put_file(char *fname, char *outfname, int restart)
         }
         offset = attrs.size;
         fzprintf(sftpInfo, "reput: restarting at file position %"PRIu64, offset);
-        if (seek_file((WFile *)file, offset, FROM_START) != 0)
-            seek_file((WFile *)file, 0, FROM_END);    /* *shrug* */
     } else {
         offset = 0;
     }
 
+    file = open_existing_file(fname, offset, NULL, NULL, &permissions);
+    if (!file) {
+        fzprintf(sftpError, "local: unable to open %s", fname);
+        err = true;
+        goto cleanup;
+    }
     fzprintf(sftpInfo, "local:%s => remote:%s\n", fname, outfname);
 
     /*

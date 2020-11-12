@@ -18,9 +18,10 @@ char *input_buf = 0;
 int input_buflen = 0, input_bufsize = 0;
 #endif
 
-static int ReadQuotas(int i)
+char* priority_read()
 {
 #ifdef _WINDOWS
+    char* ret = 0;
     HANDLE hin;
     DWORD savemode, newmode;
 
@@ -31,62 +32,69 @@ static int ReadQuotas(int i)
     newmode &= ~ENABLE_ECHO_INPUT;
     SetConsoleMode(hin, newmode);
 
-    while (bytesAvailable[i] == 0)
-    {
+    char buffer[256];
+
+    while (!ret) {
         DWORD read;
         BOOL r;
-        char buffer[21];
 
-        r = ReadFile(hin, buffer, 20, &read, 0);
+        r = ReadFile(hin, buffer, 255, &read, 0);
         if (!r || read == 0) {
-                fzprintf(sftpError, "ReadFile failed in ReadQuotas");
+                fzprintf(sftpError, "ReadFile failed in priority_read");
                 cleanup_exit(1);
+        }
+        while (read && (buffer[read - 1] == '\r' || buffer[read - 1] == '\n')) {
+            --read;
         }
         buffer[read] = 0;
 
-        if (buffer[0] != '-')
-        {
-                if (input_pushback != 0) {
-                        fzprintf(sftpError, "input_pushback not null!");
-                        cleanup_exit(1);
-                }
-            else {
-                int pos = strcspn(buffer, "\n") + 1;
-                input_pushback = snewn(pos + 1, char);
-                strncpy(input_pushback, buffer, pos);
-                input_pushback[pos] = 0;
-            }
-        }
-        else
-            ProcessQuotaCmd(buffer);
-    }
-
-    SetConsoleMode(hin, savemode);
-#else
-    char* line;
-    while (bytesAvailable[i] == 0)
-    {
-        int error = 0;
-        line = read_input_line(1, &error);
-        if (line == NULL || error) {
-            fzprintf(sftpError, "read_input_line failed in ReadQuotas");
-            cleanup_exit(1);
-        }
-
-        if (line[0] != '-')
-        {
+        if (buffer[0] != '-') {
             if (input_pushback != 0) {
                 fzprintf(sftpError, "input_pushback not null!");
                 cleanup_exit(1);
             }
-            else
-                input_pushback = strndup(line, strcspn(line, "\n") + 1);
+            else {
+                input_pushback = dupstr(buffer);
+            }
         }
-        else
-            ProcessQuotaCmd(line);
-        sfree(line);
+        else {
+            ret = dupstr(buffer);
+        }
+    }
+
+    SetConsoleMode(hin, savemode);
+#else
+    while (!ret) {
+        int error = 0;
+        char* line = read_input_line(1, &error);
+        if (line == NULL || error) {
+            fzprintf(sftpError, "read_input_line failed in priority_read");
+            cleanup_exit(1);
+        }
+
+        if (line[0] != '-') {
+            if (input_pushback != 0) {
+                sfree(line);
+                fzprintf(sftpError, "input_pushback not null!");
+                cleanup_exit(1);
+            }
+            else {
+                input_pushback = line;
+            }
+        }
+        ret = line;
     }
 #endif //_WINDOWS
+    return ret;
+}
+
+static int ReadQuotas(int i)
+{
+    char* line = priority_read();
+    
+    ProcessQuotaCmd(line);
+    sfree(line);
+
     return 1;
 }
 
@@ -115,11 +123,7 @@ int RequestQuota(int i, int bytes)
     }
     if (bytesAvailable[i] == 0)
     {
-        bytesAvailable[i] = 0;
         fznotify(sftpUsedQuotaRecv + i);
-    }
-    if (bytesAvailable[i] == 0)
-    {
         ReadQuotas(i);
     }
 

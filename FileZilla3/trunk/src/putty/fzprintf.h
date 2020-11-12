@@ -1,4 +1,4 @@
-#define FZSFTP_PROTOCOL_VERSION 9
+#define FZSFTP_PROTOCOL_VERSION 10
 
 typedef enum
 {
@@ -7,7 +7,7 @@ typedef enum
     sftpDone,
     sftpError,
     sftpVerbose,
-	sftpInfo,
+    sftpInfo,
     sftpStatus,
     sftpRecv, /* socket */
     sftpSend, /* socket */
@@ -28,7 +28,11 @@ typedef enum
     sftpCipherServerToClient,
     sftpMacClientToServer,
     sftpMacServerToClient,
-    sftpHostkey
+    sftpHostkey,
+    sftp_io_size,
+    sftp_io_open,
+    sftp_io_nextbuf,
+    sftp_io_finalize,
 } sftpEventTypes;
 
 extern bool pending_reply;

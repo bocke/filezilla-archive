@@ -5,7 +5,7 @@
 
 #include <string>
 
-#define FZSFTP_PROTOCOL_VERSION 9
+#define FZSFTP_PROTOCOL_VERSION 10
 
 enum class sftpEvent {
 	Unknown = -1,
@@ -35,6 +35,10 @@ enum class sftpEvent {
 	MacClientToServer,
 	MacServerToClient,
 	Hostkey,
+	io_size,
+	io_open,
+	io_nextbuf,
+	io_finalize,
 
 	count
 };

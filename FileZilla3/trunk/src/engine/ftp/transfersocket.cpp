@@ -1,7 +1,6 @@
 #include "../filezilla.h"
 #include "../directorylistingparser.h"
 #include "../engineprivate.h"
-#include "../iothread.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"
 
@@ -31,15 +30,9 @@ CTransferSocket::~CTransferSocket()
 		m_transferEndReason = TransferEndReason::successful;
 	}
 	ResetSocket();
-
-	if (m_transferMode == TransferMode::upload || m_transferMode == TransferMode::download) {
-		if (ioThread_) {
-			if (m_transferMode == TransferMode::download) {
-				FinalizeWrite();
-			}
-			ioThread_->SetEventHandler(nullptr);
-		}
-	}
+	
+	reader_.reset();
+	writer_.reset();
 }
 
 void CTransferSocket::ResetSocket()
@@ -52,6 +45,7 @@ void CTransferSocket::ResetSocket()
 	proxy_layer_.reset();
 	ratelimit_layer_.reset();
 	socket_.reset();
+	buffer_.reset();
 }
 
 std::wstring CTransferSocket::SetupActiveTransfer(std::string const& ip)
@@ -262,7 +256,8 @@ void CTransferSocket::OnReceive()
 					return;
 				}
 
-				numread = active_layer_->read(m_pTransferBuffer, m_transferBufferLen, error);
+				size_t to_read = buffer_.capacity() - buffer_.size();
+				numread = active_layer_->read(buffer_.get(to_read), static_cast<unsigned int>(to_read), error);
 				if (numread <= 0) {
 					break;
 				}
@@ -274,8 +269,7 @@ void CTransferSocket::OnReceive()
 				}
 				engine_.transfer_status_.Update(numread);
 
-				m_pTransferBuffer += numread;
-				m_transferBufferLen -= numread;
+				buffer_.add(static_cast<size_t>(numread));
 			}
 
 			if (numread < 0) {
@@ -294,9 +288,9 @@ void CTransferSocket::OnReceive()
 		}
 		else if (m_transferMode == TransferMode::resumetest) {
 			for (;;) {
-				char buffer[2];
+				char tmp[2];
 				int error;
-				int numread = active_layer_->read(buffer, 2, error);
+				int numread = active_layer_->read(tmp, 2, error);
 				if (numread < 0) {
 					if (error != EAGAIN) {
 						controlSocket_.log(logmsg::error, L"Could not read from transfer socket: %s", fz::socket_error_description(error));
@@ -306,19 +300,19 @@ void CTransferSocket::OnReceive()
 				}
 
 				if (!numread) {
-					if (m_transferBufferLen == 1) {
+					if (resumetest_ == 1) {
 						TransferEnd(TransferEndReason::successful);
 					}
 					else {
-						controlSocket_.log(logmsg::debug_warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
+						controlSocket_.log(logmsg::debug_warning, L"Server incorrectly sent %d bytes", resumetest_);
 						TransferEnd(TransferEndReason::failed_resumetest);
 					}
 					return;
 				}
-				m_transferBufferLen += numread;
+				resumetest_ += numread;
 
-				if (m_transferBufferLen > 1) {
-					controlSocket_.log(logmsg::debug_warning, L"Server incorrectly sent %d bytes", m_transferBufferLen);
+				if (resumetest_ > 1) {
+					controlSocket_.log(logmsg::debug_warning, L"Server incorrectly sent %d bytes", resumetest_);
 					TransferEnd(TransferEndReason::failed_resumetest);
 					return;
 				}
@@ -378,7 +372,7 @@ void CTransferSocket::OnSend()
 			return;
 		}
 
-		written = active_layer_->write(m_pTransferBuffer, m_transferBufferLen, error);
+		written = active_layer_->write(buffer_.get(), static_cast<int>(buffer_.size()), error);
 		if (written <= 0) {
 			break;
 		}
@@ -391,8 +385,7 @@ void CTransferSocket::OnSend()
 		}
 		engine_.transfer_status_.Update(written);
 
-		m_pTransferBuffer += written;
-		m_transferBufferLen -= written;
+		buffer_.consume(written);
 	}
 
 	if (written < 0) {
@@ -515,11 +508,6 @@ void CTransferSocket::SetActive()
 	if (m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
-	if (m_transferMode == TransferMode::download || m_transferMode == TransferMode::upload) {
-		if (ioThread_) {
-			ioThread_->SetEventHandler(this);
-		}
-	}
 
 	m_bActive = true;
 	if (!socket_) {
@@ -613,25 +601,19 @@ std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer()
 
 bool CTransferSocket::CheckGetNextWriteBuffer()
 {
-	if (!m_transferBufferLen) {
-		int res = ioThread_->GetNextWriteBuffer(&m_pTransferBuffer);
-
-		if (res == IO_Again) {
+	if (buffer_.size() >= buffer_.capacity()) {
+		auto res = writer_->get_write_buffer(buffer_);
+		if (res == aio_result::wait) {
 			return false;
 		}
-		else if (res == IO_Error) {
-			std::wstring error = ioThread_->GetError();
-			if (error.empty()) {
-				controlSocket_.log(logmsg::error, _("Can't write data to file."));
-			}
-			else {
-				controlSocket_.log(logmsg::error, _("Can't write data to file: %s"), error);
-			}
+		else if (res == aio_result::error) {
+			// TODO: Error
+			controlSocket_.log(logmsg::error, _("Can't write to file"));
 			TransferEnd(TransferEndReason::transfer_failure_critical);
 			return false;
 		}
 
-		m_transferBufferLen = BUFFERSIZE;
+		buffer_ = res.buffer_;
 	}
 
 	return true;
@@ -639,32 +621,45 @@ bool CTransferSocket::CheckGetNextWriteBuffer()
 
 bool CTransferSocket::CheckGetNextReadBuffer()
 {
-	if (!m_transferBufferLen) {
-		int res = ioThread_->GetNextReadBuffer(&m_pTransferBuffer);
-		if (res == IO_Again) {
+	if (buffer_.empty()) {
+		read_result res = reader_->read();
+		if (res == aio_result::wait) {
 			return false;
 		}
-		else if (res == IO_Error) {
+		else if (res == aio_result::error) {
+			// TODO: Error
 			controlSocket_.log(logmsg::error, _("Can't read from file"));
-			TransferEnd(TransferEndReason::transfer_failure);
+			TransferEnd(TransferEndReason::transfer_failure_critical);
 			return false;
 		}
-		else if (res == IO_Success) {
-			int res = active_layer_->shutdown();
-			if (res && res != EAGAIN) {
+
+		buffer_ = res.buffer_;
+		if (buffer_.empty()) {
+			int r = active_layer_->shutdown();
+			if (r && r != EAGAIN) {
 				TransferEnd(TransferEndReason::transfer_failure);
 				return false;
 			}
 			TransferEnd(TransferEndReason::successful);
 			return false;
 		}
-		m_transferBufferLen = res;
 	}
 
 	return true;
 }
 
-void CTransferSocket::OnIOThreadEvent()
+void CTransferSocket::OnInput(reader_base*)
+{
+	if (!m_bActive || m_transferEndReason != TransferEndReason::none) {
+		return;
+	}
+
+	if (m_transferMode == TransferMode::upload) {
+		OnSend();
+	}
+}
+
+void CTransferSocket::OnWrite(writer_base*)
 {
 	if (!m_bActive || m_transferEndReason != TransferEndReason::none) {
 		return;
@@ -673,33 +668,27 @@ void CTransferSocket::OnIOThreadEvent()
 	if (m_transferMode == TransferMode::download) {
 		OnReceive();
 	}
-	else if (m_transferMode == TransferMode::upload) {
-		OnSend();
-	}
 }
 
 void CTransferSocket::FinalizeWrite()
 {
-	bool res = ioThread_->Finalize(BUFFERSIZE - m_transferBufferLen);
-	m_transferBufferLen = BUFFERSIZE;
-
 	if (m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
 
-	if (res) {
+	auto res = writer_->finalize(buffer_);
+	if (res == aio_result::wait) {
+		return;
+	}
+
+	if (res == aio_result::ok) {
 		TransferEnd(TransferEndReason::successful);
 	}
 	else {
-		std::wstring error = ioThread_->GetError();
-		if (error.empty()) {
-			controlSocket_.log(logmsg::error, _("Can't write data to file."));
-		}
-		else {
-			controlSocket_.log(logmsg::error, _("Can't write data to file: %s"), error);
-		}
+		// TODO: Better error
 		TransferEnd(TransferEndReason::transfer_failure_critical);
 	}
+
 }
 
 void CTransferSocket::TriggerPostponedEvents()
@@ -734,9 +723,10 @@ void CTransferSocket::SetSocketBufferSizes(fz::socket_base& socket)
 
 void CTransferSocket::operator()(fz::event_base const& ev)
 {
-	fz::dispatch<fz::socket_event, CIOThreadEvent, fz::timer_event>(ev, this,
+	fz::dispatch<fz::socket_event, read_ready_event, write_ready_event, fz::timer_event>(ev, this,
 		&CTransferSocket::OnSocketEvent,
-		&CTransferSocket::OnIOThreadEvent,
+		&CTransferSocket::OnInput,
+		&CTransferSocket::OnWrite,
 		&CTransferSocket::OnTimer);
 }
 

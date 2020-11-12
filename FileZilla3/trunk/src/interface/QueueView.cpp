@@ -1261,8 +1261,16 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			fileItem->SetStatusMessage(CFileItem::Status::transferring);
 			RefreshItem(engineData.pItem);
 
-			int res = engineData.pEngine->Execute(CFileTransferCommand(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), fileItem->GetRemotePath(),
-												fileItem->GetRemoteFile(), fileItem->flags()));
+			auto cmd = CFileTransferCommand(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), fileItem->GetRemotePath(),
+												fileItem->GetRemoteFile(), fileItem->flags());
+			if (!fileItem->Download()) {
+				cmd.input_ = std::make_unique<file_reader_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), m_pMainFrame->GetEngineContext().GetThreadPool());
+			}
+			else {
+				cmd.output_ = std::make_unique<file_writer_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), m_pMainFrame->GetEngineContext().GetThreadPool());
+			}
+
+			int res = engineData.pEngine->Execute(cmd);
 			wxASSERT((res & FZ_REPLY_BUSY) != FZ_REPLY_BUSY);
 			if (res == FZ_REPLY_WOULDBLOCK) {
 				return;

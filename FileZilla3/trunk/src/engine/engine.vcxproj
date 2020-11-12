@@ -128,6 +128,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="aio.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="controlsocket.cpp" />
     <ClCompile Include="directorycache.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="proxy.cpp">
       <PrecompiledHeader />
     </ClCompile>
+    <ClCompile Include="reader.cpp" />
     <ClCompile Include="rtt.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="servercapabilities.cpp" />
@@ -195,13 +197,17 @@
     <ClCompile Include="storj\rmd.cpp" />
     <ClCompile Include="storj\storjcontrolsocket.cpp" />
     <ClCompile Include="version.cpp" />
+    <ClCompile Include="writer.cpp" />
     <ClCompile Include="xmlutils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\aio.h" />
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="..\include\commands.h" />
     <ClInclude Include="..\include\engine_options.h" />
+    <ClInclude Include="..\include\reader.h" />
     <ClInclude Include="..\include\version.h" />
+    <ClInclude Include="..\include\writer.h" />
     <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
     <ClInclude Include="..\include\directorylisting.h" />

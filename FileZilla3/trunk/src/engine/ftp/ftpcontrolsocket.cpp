@@ -347,7 +347,7 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 			}
 		}
 		if (nErrorCode != FZ_REPLY_OK && data.download() && !data.fileDidExist_) {
-			data.ioThread_.reset();
+			// TODO: destroy socket if exists
 			int64_t size;
 			bool isLink;
 			if (fz::local_filesys::get_file_info(fz::to_native(data.localFile_), isLink, &size, nullptr, nullptr) == fz::local_filesys::file && size == 0) {
@@ -416,12 +416,14 @@ void CFtpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& s
 	Push(std::move(pData));
 }
 
-void CFtpControlSocket::FileTransfer(std::wstring const& localFile, CServerPath const& remotePath,
+void CFtpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
 									std::wstring const& remoteFile, transfer_flags const& flags)
 {
 	log(logmsg::debug_verbose, L"CFtpControlSocket::FileTransfer()");
 
 	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
+	pData->reader_factory_ = reader;
+	pData->writer_factory_ = writer;
 	Push(std::move(pData));
 }
 
