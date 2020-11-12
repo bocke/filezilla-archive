@@ -8,7 +8,7 @@ libfzclient_private_la_CPPFLAGS += -DBUILDING_FILEZILLA
 
 
 libfzclient_private_la_SOURCES = \
-		aui.cpp \
+		aio.cpp \
 		commands.cpp \
 		controlsocket.cpp \
 		directorycache.cpp \
