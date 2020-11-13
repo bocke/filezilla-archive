@@ -29,6 +29,10 @@
 
 #include <assert.h>
 
+#ifndef FZ_WINDOWS
+#include <unistd.h>
+#endif
+
 struct SftpRateAvailableEventType;
 typedef fz::simple_event<SftpRateAvailableEventType, fz::direction::type> SftpRateAvailableEvent;
 
@@ -531,10 +535,12 @@ int CSftpControlSocket::DoClose(int nErrorCode)
 	}
 	process_.reset();
 
-	if (mapping_ != INVALID_HANDLE_VALUE) {
-		CloseHandle(mapping_);
-		mapping_ = INVALID_HANDLE_VALUE;
+#ifndef FZ_WINDOWS
+	if (shm_fd_ != -1) {
+		close(shm_fd_);
+		shm_fd_ = -1;
 	}
+#endif
 
 	m_sftpEncryptionDetails = CSftpEncryptionNotification();
 

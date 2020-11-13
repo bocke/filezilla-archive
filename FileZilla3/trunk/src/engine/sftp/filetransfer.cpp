@@ -328,6 +328,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		return;
 	}
 
+	decltype(std::declval<aio_base>().shared_memory_info()) info;
 	if (download()) {
 		if (resume_) {
 			offset = writer_factory_.size();
@@ -342,41 +343,34 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		writer_ = writer_factory_.open(offset, *this, true);
 		if (!writer_) {
 			controlSocket_.AddToStream("--\n");
+			return;
 		}
-		else {
-			auto const info = writer_->shared_memory_info();
-
-			HANDLE target;
-			if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
-				log(logmsg::debug_warning, L"DuplicateHandle failed");
-				controlSocket_.ResetOperation(FZ_REPLY_ERROR);
-				return;
-			}
-
-			controlSocket_.AddToStream(fz::sprintf("-%u %u %u", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
-			base_address_ = std::get<1>(info);
-		}
+		info = writer_->shared_memory_info();
 	}
 	else {
 		reader_ = reader_factory_.open(offset, *this, true);
 		if (!reader_) {
 			controlSocket_.AddToStream("--\n");
+			return;
 		}
 		else {
-			auto const info = reader_->shared_memory_info();
-
-			HANDLE target;
-			if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
-				log(logmsg::debug_warning, L"DuplicateHandle failed");
-				controlSocket_.ResetOperation(FZ_REPLY_ERROR);
-				return;
-			}
-
-			controlSocket_.AddToStream(fz::sprintf("-%u %u\n", reinterpret_cast<uintptr_t>(target), std::get<2>(info)));
-			base_address_ = std::get<1>(info);
+			info = reader_->shared_memory_info();
 		}
 	}
+#ifdef FZ_WINDOWS
+	HANDLE target;
+	if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
+		log(logmsg::debug_warning, L"DuplicateHandle failed");
+		controlSocket_.ResetOperation(FZ_REPLY_ERROR);
+		return;
+	}
+	controlSocket_.AddToStream(fz::sprintf("-%u %u %u", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
+#else
+	controlSocket_.AddToStream(fz::sprintf("-%d %u %u", std::get<0>(info), std::get<2>(info), offset));
+#endif
+	base_address_ = std::get<1>(info);
 }
+
 
 void CSftpFileTransferOpData::OnNextBufferRequested(uint64_t processed)
 {

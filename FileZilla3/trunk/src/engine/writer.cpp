@@ -1,4 +1,4 @@
-#include "writer.h"
+#include "../include/writer.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
@@ -173,7 +173,7 @@ aio_result file_writer::open(uint64_t offset, fz::thread_pool & pool, fz::event_
 
 	// TODO: Create local dir
 	handler_ = &handler;
-	if (!file_.open(name_, fz::file::writing, offset ? fz::file::existing : fz::file::empty)) {
+	if (!file_.open(fz::to_native(name_), fz::file::writing, offset ? fz::file::existing : fz::file::empty)) {
 		return aio_result::error;
 	}
 

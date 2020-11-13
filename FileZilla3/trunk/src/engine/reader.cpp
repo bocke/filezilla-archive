@@ -1,18 +1,18 @@
-#include "reader.h"
+#include "../include/reader.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
 reader_factory_holder::reader_factory_holder(reader_factory_holder const& op)
 {
 	if (op.impl_) {
-		impl_ = std::move(op.impl_->clone());
+		impl_ = op.impl_->clone();
 	}
 }
 
 reader_factory_holder& reader_factory_holder::operator=(reader_factory_holder const& op)
 {
 	if (this != &op && op.impl_) {
-		impl_ = std::move(op.impl_->clone());
+		impl_ = op.impl_->clone();
 	}
 	return *this;
 }
@@ -172,7 +172,7 @@ aio_result file_reader::open(uint64_t offset, fz::thread_pool & pool, fz::event_
 	}
 
 	handler_ = &handler;
-	if (!file_.open(name_, fz::file::reading, fz::file::existing)) {
+	if (!file_.open(fz::to_native(name_), fz::file::reading, fz::file::existing)) {
 		return aio_result::error;
 	}
 
