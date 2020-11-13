@@ -64,6 +64,7 @@ char* priority_read()
 
     SetConsoleMode(hin, savemode);
 #else
+    char* ret = 0;
     while (!ret) {
         int error = 0;
         char* line = read_input_line(1, &error);
@@ -114,21 +115,21 @@ int RequestQuota(int i, int bytes)
     }
 #endif
 
-    if (bytesAvailable[i] < -100)
+    if (bytesAvailable[i] < -100) {
         bytesAvailable[i] = 0;
-    else if (bytesAvailable[i] < 0)
-    {
+    }
+    else if (bytesAvailable[i] < 0) {
         bytesAvailable[i]--;
         return bytes;
     }
-    if (bytesAvailable[i] == 0)
-    {
+    if (bytesAvailable[i] == 0) {
         fznotify(sftpUsedQuotaRecv + i);
         ReadQuotas(i);
     }
 
-    if (bytesAvailable[i] < 0 || bytesAvailable[i] > bytes)
+    if (bytesAvailable[i] < 0 || bytesAvailable[i] > bytes) {
         return bytes;
+    }
 
     return bytesAvailable[i];
 }

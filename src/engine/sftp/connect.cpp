@@ -10,6 +10,9 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>
 
+#ifndef FZ_WINDOWS
+#include <sys/mman.h>
+#endif
 
 enum connectStates
 {
@@ -57,8 +60,23 @@ int CSftpConnectOpData::Send()
 				args.push_back(fzT("-C"));
 			}
 			engine_.GetRateLimiter().add(&controlSocket_);
+#ifndef FZ_WINDOWS
+			if (controlSocket_.shm_fd_ == -1) {
+				controlSocket_.shm_fd_ = memfd_create("fzsftp", MFD_CLOEXEC);
+				if (controlSocket_.shm_fd_ == -1) {
+					log(logmsg::debug_warning, L"Could not create shm_fd_");
+					return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+				}
+			}
+#endif
 			controlSocket_.process_ = std::make_unique<fz::process>();
+#ifndef FZ_WINDOWS
+			std::vector<int> fds;
+			fds.push_back(controlSocket_.shm_fd_);
+			if (!controlSocket_.process_->spawn(executable, args, fds)) {
+#else
 			if (!controlSocket_.process_->spawn(executable, args)) {
+#endif
 				log(logmsg::debug_warning, L"Could not create process");
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}

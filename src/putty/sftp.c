@@ -253,7 +253,7 @@ static int fxp_got_status(struct sftp_packet *pktin)
 
 static void fxp_internal_error(const char *msg)
 {
-	sfree(fxp_error_message);
+    sfree(fxp_error_message);
     fxp_error_message = dupstr(msg);
     fxp_errtype = -1;
 }
@@ -1204,7 +1204,7 @@ int xfer_upload_gotpkt(struct fxp_xfer *xfer, struct sftp_packet *pktin)
     xfer->req_totalsize -= rr->len;
     xfer->sent_interval += rr->len;
     if (fz_timer_check(&xfer->send_timer)) {
-	/* The data we sent is the data we earlier read from file */
+        /* The data we sent is the data we earlier read from file */
         fzprintf(sftpTransfer, "%d", xfer->sent_interval);
         xfer->sent_interval = 0;
     }

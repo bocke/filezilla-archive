@@ -7,6 +7,7 @@
 #include <libfilezilla/mutex.hpp>
 
 #include <array>
+#include <tuple>
 
 enum class aio_result
 {
@@ -24,7 +25,11 @@ public:
 	static constexpr size_t buffer_size_{256*1024};
 	static constexpr size_t buffer_count{8};
 
+#if FZ_WINDOWS
 	std::tuple<HANDLE, uint8_t const*, size_t> shared_memory_info() const;
+#else
+	std::tuple<int, uint8_t const*, size_t> shared_memory_info() const;
+#endif
 
 protected:
 	mutable fz::mutex mtx_{false};
@@ -37,7 +42,11 @@ protected:
 	bool processing_{};
 
 private:
+#if FZ_WINDOWS
 	HANDLE mapping_{INVALID_HANDLE_VALUE};
+#else
+	int mapping_{-1};
+#endif
 	size_t memory_size_{};
 	uint8_t* memory_{};
 
