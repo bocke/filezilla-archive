@@ -16,10 +16,12 @@
 #ifndef HAVE_NO_SYS_SELECT_H
 #include <sys/select.h>
 #endif
+#include <sys/mman.h>
 
 #include "putty.h"
 #include "ssh.h"
 #include "psftp.h"
+#include "fzsftp.h"
 
 #if HAVE_GLOB_H
 #include <glob.h>
@@ -121,14 +123,61 @@ char *psftp_getcwd(void)
     }
 }
 
-struct RFile {
-    int fd;
+enum read_state
+{
+    ok,
+    error,
+    eof
 };
 
-RFile *open_existing_file(const char *name, uint64_t *size,
+struct RFile {
+#if 1
+    int mapping_;
+    uint8_t * memory_;
+    size_t memory_size_;
+    int state;
+    uint8_t * buffer_;
+    int remaining_;
+#else
+    int fd;
+#endif
+};
+
+RFile *open_existing_file(const char *name, uint64_t offset,
                           unsigned long *mtime, unsigned long *atime,
                           long *perms)
 {
+#if 1
+    fzprintf(sftp_io_open, "%"PRIu64, offset);
+    char * s = priority_read();
+
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    int mapping = next_int(&p);
+    size_t memory_size = next_int(&p);
+
+    sfree(s);
+
+    uint8_t* memory = mmap(NULL, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0);
+    if (!memory) {
+        return NULL;
+    }
+
+    RFile *ret;
+    ret = snew(RFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_  = NULL;
+    ret->state = ok;
+
+    return ret;
+#else
     int fd;
     RFile *ret;
 
@@ -163,26 +212,109 @@ RFile *open_existing_file(const char *name, uint64_t *size,
     }
 
     return ret;
+#endif
 }
 
 int read_from_file(RFile *f, void *buffer, int length)
 {
+#if 1
+    if (f->state == ok && !f->remaining_) {
+        fznotify1(sftp_io_nextbuf, 0);
+        char const* s = priority_read();
+        if (s[1] == '-') {
+            f->state = error;
+            return -1;
+        }
+        else if (s[1] == 0) {
+            f->state = eof;
+        }
+        else {
+            char const* p = s + 1;
+            f->buffer_ = f->memory_ + next_int(&p);
+            f->remaining_ = (int)next_int(&p);
+        }
+        sfree(s);
+    }
+    if (f->state == eof) {
+        return 0;
+    }
+    else if (f->state == error) {
+        return -1;
+    }
+
+    if (length > f->remaining_) {
+        length = f->remaining_;
+    }
+    memcpy(buffer, f->buffer_, length);
+    f->remaining_ -= length;
+    f->buffer_ += length;
+    return length;
+#else
     return read(f->fd, buffer, length);
+#endif
 }
 
 void close_rfile(RFile *f)
 {
+    if (!f) {
+        return;
+    }
+#if 1
+    munmap(f->memory_, f->memory_size_);
+#else
     close(f->fd);
+#endif
     sfree(f);
 }
 
 struct WFile {
+#if 1
+    int mapping_;
+    uint8_t * memory_;
+    size_t memory_size_;
+    int state;
+    uint8_t * buffer_;
+    int remaining_;
+    int size_;
+#else
     int fd;
     char *name;
+#endif
 };
 
 WFile *open_new_file(const char *name, long perms)
 {
+#if 1
+    fznotify1(sftp_io_open, 0);
+    char * s = priority_read();
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    int mapping = next_int(&p);
+    size_t memory_size = next_int(&p);
+
+    sfree(s);
+
+    uint8_t* memory = mmap(0, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0);
+    if (!memory) {
+        return NULL;
+    }
+
+    WFile *ret;
+    ret = snew(WFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_  = NULL;
+    ret->state = ok;
+    ret->size_ = 0;
+
+    return ret;
+#else
     int fd;
     WFile *ret;
 
@@ -196,11 +328,46 @@ WFile *open_new_file(const char *name, long perms)
     ret->name = dupstr(name);
 
     return ret;
+#endif
 }
 
 
 WFile *open_existing_wfile(const char *name, uint64_t *size)
 {
+#if 1
+    fzprintf(sftp_io_open, "%"PRIu64, (uint64_t)-1);
+    char * s = priority_read();
+    if (s[1] == '-') {
+        return NULL;
+    }
+
+    char * p = s + 1;
+
+    int mapping = next_int(&p);
+    size_t memory_size = next_int(&p);
+    if (size) {
+        *size = next_int(&p);
+    }
+
+    sfree(s);
+
+    uint8_t* memory = mmap(0, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0);
+    if (!memory) {
+        return NULL;
+    }
+
+    WFile *ret;
+    ret = snew(WFile);
+    ret->mapping_ = mapping;
+    ret->memory_ = memory;
+    ret->memory_size_ = memory_size;
+    ret->remaining_ = 0;
+    ret->buffer_ = NULL;
+    ret->state = ok;
+    ret->size_ = 0;
+
+    return ret;
+#else
     int fd;
     WFile *ret;
 
@@ -223,10 +390,45 @@ WFile *open_existing_wfile(const char *name, uint64_t *size)
     }
 
     return ret;
+#endif
 }
 
 int write_to_file(WFile *f, void *buffer, int length)
 {
+#if 1
+    if (f->state == ok && !f->remaining_) {
+        fznotify1(sftp_io_nextbuf, f->size_ - f->remaining_);
+        char * s = priority_read();
+        if (s[1] == '-') {
+            f->state = error;
+            return -1;
+        }
+        else if (s[1] == 0) {
+            f->state = eof;
+        }
+        else {
+            char * p = s + 1;
+            f->buffer_ = f->memory_ + next_int(&p);
+            f->remaining_ = (int)next_int(&p);
+            f->size_ = f->remaining_;
+        }
+        sfree(s);
+    }
+    if (f->state == eof) {
+        return 0;
+    }
+    else if (f->state == error) {
+        return -1;
+    }
+
+    if (length > f->remaining_) {
+        length = f->remaining_;
+    }
+    memcpy(f->buffer_, buffer, length);
+    f->remaining_ -= length;
+    f->buffer_ += length;
+    return length;
+#else
     char *p = (char *)buffer;
     int so_far = 0;
 
@@ -246,23 +448,53 @@ int write_to_file(WFile *f, void *buffer, int length)
     }
 
     return so_far;
+#endif
+}
+
+int finalize_wfile(WFile *f)
+{
+#if 1
+    if (f->state == eof) {
+        return 1;
+    }
+    if (f->state != ok) {
+        return 0;
+    }
+    fznotify1(sftp_io_finalize, f->size_ - f->remaining_);
+    char const* s = priority_read();
+    if (s[1] != '1') {
+        f->state = error;
+        return 0;
+    }
+    f->state = eof;
+#endif
+    return 1;
 }
 
 void set_file_times(WFile *f, unsigned long mtime, unsigned long atime)
 {
+#if TODO
     struct utimbuf ut;
 
     ut.actime = atime;
     ut.modtime = mtime;
 
     utime(f->name, &ut);
+#endif
 }
 
 /* Closes and frees the WFile */
 void close_wfile(WFile *f)
 {
+    if (!f) {
+        return;
+    }
+#if 1
+    munmap(f->memory_, f->memory_size_);
+#else
     close(f->fd);
     sfree(f->name);
+#endif
     sfree(f);
 }
 
@@ -270,6 +502,7 @@ void close_wfile(WFile *f)
    FROM_START, FROM_CURRENT, or FROM_END */
 int seek_file(WFile *f, uint64_t offset, int whence)
 {
+#if TODO
     int lseek_whence;
 
     switch (whence) {
@@ -287,11 +520,18 @@ int seek_file(WFile *f, uint64_t offset, int whence)
     }
 
     return lseek(f->fd, offset, lseek_whence) >= 0 ? 0 : -1;
+#else
+    return -1;
+#endif
 }
 
 uint64_t get_file_posn(WFile *f)
 {
+#if TODO
     return lseek(f->fd, (off_t) 0, SEEK_CUR);
+#else
+    return (uint64_t)-1;
+#endif
 }
 
 int file_type(const char *name)

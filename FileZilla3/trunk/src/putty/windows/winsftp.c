@@ -120,20 +120,6 @@ struct RFile {
 #endif
 };
 
-static uintptr_t next_int(char const** s)
-{
-    uintptr_t ret = 0;
-    while (s && *s && **s && **s != ' ') {
-        ret *= 10;
-        ret += **s - '0';
-        ++(*s);
-    }
-    while (s && *s && **s && **s == ' ') {
-        ++(*s);
-    }
-    return ret;
-}
-
 RFile *open_existing_file(const char *name, uint64_t offset,
                           unsigned long *mtime, unsigned long *atime,
                           long *perms)

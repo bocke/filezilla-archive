@@ -328,6 +328,11 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		return;
 	}
 
+#ifdef FZ_WINDOWS
+	aio_base::shm_flag shm = true;
+#else
+	aio_base::shm_flag shm = controlSocket_.shm_fd_;
+#endif
 	decltype(std::declval<aio_base>().shared_memory_info()) info;
 	if (download()) {
 		if (resume_) {
@@ -340,7 +345,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		else {
 			offset = 0;
 		}
-		writer_ = writer_factory_.open(offset, *this, true);
+		writer_ = writer_factory_.open(offset, *this, shm);
 		if (!writer_) {
 			controlSocket_.AddToStream("--\n");
 			return;
@@ -348,7 +353,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		info = writer_->shared_memory_info();
 	}
 	else {
-		reader_ = reader_factory_.open(offset, *this, true);
+		reader_ = reader_factory_.open(offset, *this, shm);
 		if (!reader_) {
 			controlSocket_.AddToStream("--\n");
 			return;
@@ -364,9 +369,9 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		controlSocket_.ResetOperation(FZ_REPLY_ERROR);
 		return;
 	}
-	controlSocket_.AddToStream(fz::sprintf("-%u %u %u", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
+	controlSocket_.AddToStream(fz::sprintf("-%u %u %u\n", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
 #else
-	controlSocket_.AddToStream(fz::sprintf("-%d %u %u", std::get<0>(info), std::get<2>(info), offset));
+	controlSocket_.AddToStream(fz::sprintf("-%d %u %u\n", std::get<0>(info), std::get<2>(info), offset));
 #endif
 	base_address_ = std::get<1>(info);
 }

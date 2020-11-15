@@ -24,8 +24,9 @@ public:
 
 	virtual std::unique_ptr<reader_factory> clone() = 0;
 
-	// If use_shared_memory is true, the buffers are allocated in shared memory suitable for communication with child processes.
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory) = 0;
+	// If shm_flag is valid, the buffers are allocated in shared memory suitable for communication with child processes
+	// On Windows pass a bool, otherwise a valid file descriptor obtained by memfd_create or shm_open.
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
 
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
@@ -50,9 +51,9 @@ public:
 	reader_factory_holder& operator=(reader_factory_holder && op) noexcept;
 	reader_factory_holder& operator=(std::unique_ptr<reader_factory> && factory);
 
-	std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory)
+	std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
 	{
-		return impl_ ? impl_->open(offset, handler, use_shared_memory) : nullptr;
+		return impl_ ? impl_->open(offset, handler, shm) : nullptr;
 	}
 
 	uint64_t size() const
@@ -71,7 +72,7 @@ class FZC_PUBLIC_SYMBOL file_reader_factory final : public reader_factory
 public:
 	file_reader_factory(std::wstring const& file, fz::thread_pool & pool);
 	
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory) override;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) override;
 	virtual std::unique_ptr<reader_factory> clone() override;
 
 	virtual uint64_t size() const override;
@@ -131,7 +132,7 @@ protected:
 
 private:
 	friend class file_reader_factory;
-	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, bool use_shared_memory);
+	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, shm_flag shm);
 
 	void entry();
 

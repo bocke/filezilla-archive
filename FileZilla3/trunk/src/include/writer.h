@@ -26,7 +26,7 @@ public:
 
 	virtual std::unique_ptr<writer_factory> clone() = 0;
 
-	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory) = 0;
+	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 protected:
 	writer_factory() = default;
@@ -49,9 +49,9 @@ public:
 	writer_factory_holder& operator=(writer_factory_holder && op) noexcept;
 	writer_factory_holder& operator=(std::unique_ptr<writer_factory> && factory);
 
-	std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory)
+	std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
 	{
-		return impl_ ? impl_->open(offset, handler, use_shared_memory) : nullptr;
+		return impl_ ? impl_->open(offset, handler, shm) : nullptr;
 	}
 
 	uint64_t size() const
@@ -70,7 +70,7 @@ class FZC_PUBLIC_SYMBOL file_writer_factory final : public writer_factory
 public:
 	file_writer_factory(std::wstring const& file, fz::thread_pool & pool);
 	
-	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory) override;
+	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) override;
 	virtual std::unique_ptr<writer_factory> clone() override;
 
 	virtual uint64_t size() const override;
@@ -136,7 +136,7 @@ protected:
 
 private:
 	friend class file_writer_factory;
-	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, bool use_shared_memory);
+	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, shm_flag shm);
 
 	void entry();
 

@@ -249,11 +249,15 @@ char* read_input_line(int force, int* error)
             return NULL;
         }
 
-        if (input_buf[input_buflen++] == '\n') {
+        if (input_buf[input_buflen] == '\n') {
             /* we have a full line */
             char* buf = input_buf;
+            buf[input_buflen] = 0;
             clear_input_buffers(0);
             return buf;
+        }
+        else {
+            ++input_buflen;
         }
     } while(force);
 
@@ -358,4 +362,18 @@ int fz_timer_check(_fztimer *timer)
 int CurrentSpeedLimit(int direction)
 {
     return limit[direction];
+}
+
+uintptr_t next_int(char ** s)
+{
+    uintptr_t ret = 0;
+    while (s && *s && **s && **s != ' ') {
+        ret *= 10;
+        ret += **s - '0';
+        ++(*s);
+    }
+    while (s && *s && **s && **s == ' ') {
+        ++(*s);
+    }
+    return ret;
 }
