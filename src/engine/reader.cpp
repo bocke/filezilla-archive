@@ -74,11 +74,11 @@ uint64_t file_reader_factory::size() const
 	return *size_;
 }
 
-std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory)
+std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
 {
 	auto ret = std::make_unique<file_reader>(file_);
 
-	if (ret->open(offset, *pool_, handler, use_shared_memory) != aio_result::ok) {
+	if (ret->open(offset, *pool_, handler, shm) != aio_result::ok) {
 		ret.reset();
 	}
 
@@ -165,9 +165,9 @@ void file_reader::close()
 	reader_base::close();
 }
 
-aio_result file_reader::open(uint64_t offset, fz::thread_pool & pool, fz::event_handler & handler, bool use_shared_memory)
+aio_result file_reader::open(uint64_t offset, fz::thread_pool & pool, fz::event_handler & handler, shm_flag shm)
 {
-	if (!allocate_memory(use_shared_memory)) {
+	if (!allocate_memory(shm)) {
 		return aio_result::error;
 	}
 

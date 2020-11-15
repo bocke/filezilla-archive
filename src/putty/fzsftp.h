@@ -28,4 +28,6 @@ typedef struct
 void fz_timer_init(_fztimer *timer);
 int fz_timer_check(_fztimer *timer);
 
+uintptr_t next_int(char ** s);
+
 #endif

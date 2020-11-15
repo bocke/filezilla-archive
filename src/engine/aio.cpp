@@ -34,7 +34,7 @@ aio_base::~aio_base()
 	}
 }
 
-bool aio_base::allocate_memory(bool use_shared_memory)
+bool aio_base::allocate_memory(shm_flag shm)
 {
 	if (memory_) {
 		return true;
@@ -43,8 +43,8 @@ bool aio_base::allocate_memory(bool use_shared_memory)
 	// Since different threads/processes operate on different buffers at the same time, use
 	// seperate them with a padding page to prevent false sharing due to automatic prefetching.
 	memory_size_ = (buffer_size_ + get_page_size()) * buffer_count + get_page_size();
-	if (use_shared_memory) {
 #if FZ_WINDOWS
+	if (shm) {
 		HANDLE mapping = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, static_cast<DWORD>(memory_size_), nullptr);
 		if (!mapping || mapping == INVALID_HANDLE_VALUE) {
 			return false;
@@ -55,13 +55,15 @@ bool aio_base::allocate_memory(bool use_shared_memory)
 		}
 		mapping_ = mapping;
 #else
-		if (mapping_ == -1) {
+	if (shm >= 0) {
+		if (ftruncate(shm, memory_size_) != 0) {
 			return false;
 		}
-		memory_ = static_cast<uint8_t*>(mmap(nullptr, memory_size_, PROT_READ|PROT_WRITE, MAP_SHARED, mapping_, 0));
+		memory_ = static_cast<uint8_t*>(mmap(nullptr, memory_size_, PROT_READ|PROT_WRITE, MAP_SHARED, shm, 0));
 		if (!memory_) {
 			return false;
 		}
+		mapping_ = shm;
 #endif
 	}
 	else {
@@ -74,11 +76,7 @@ bool aio_base::allocate_memory(bool use_shared_memory)
 	return true;
 }
 
-#if FZ_WINDOWS
-std::tuple<HANDLE, uint8_t const*, size_t> aio_base::shared_memory_info() const
-#else
-std::tuple<int, uint8_t const*, size_t> aio_base::shared_memory_info() const
-#endif
+std::tuple<aio_base::shm_handle, uint8_t const*, size_t> aio_base::shared_memory_info() const
 {
 	return std::make_tuple(mapping_, memory_, memory_size_);
 }

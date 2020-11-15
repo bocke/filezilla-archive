@@ -5,14 +5,14 @@
 writer_factory_holder::writer_factory_holder(writer_factory_holder const& op)
 {
 	if (op.impl_) {
-		impl_ = std::move(op.impl_->clone());
+		impl_ = op.impl_->clone();
 	}
 }
 
 writer_factory_holder& writer_factory_holder::operator=(writer_factory_holder const& op)
 {
 	if (this != &op && op.impl_) {
-		impl_ = std::move(op.impl_->clone());
+		impl_ = op.impl_->clone();
 	}
 	return *this;
 }
@@ -74,11 +74,11 @@ uint64_t file_writer_factory::size() const
 	return *size_;
 }
 
-std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, fz::event_handler & handler, bool use_shared_memory)
+std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
 {
 	auto ret = std::make_unique<file_writer>(file_);
 
-	if (ret->open(offset, *pool_, handler, use_shared_memory) != aio_result::ok) {
+	if (ret->open(offset, *pool_, handler, shm) != aio_result::ok) {
 		ret.reset();
 	}
 
@@ -165,9 +165,9 @@ void file_writer::close()
 	writer_base::close();
 }
 
-aio_result file_writer::open(uint64_t offset, fz::thread_pool & pool, fz::event_handler & handler, bool use_shared_memory)
+aio_result file_writer::open(uint64_t offset, fz::thread_pool & pool, fz::event_handler & handler, shm_flag shm)
 {
-	if (!allocate_memory(use_shared_memory)) {
+	if (!allocate_memory(shm)) {
 		return aio_result::error;
 	}
 
