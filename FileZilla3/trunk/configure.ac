@@ -140,6 +140,8 @@ cd "$OLD_DIR"
 
 if test "$buildmain" = "yes"; then
 
+  CHECK_MEMFD_CREATE
+
   # Require pkg-config
   # ------------------
   PKG_PROG_PKG_CONFIG
