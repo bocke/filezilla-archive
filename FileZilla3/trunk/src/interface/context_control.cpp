@@ -94,7 +94,7 @@ bool CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, C
 
 		// See if we can reuse an existing context
 		for (size_t i = 0; i < m_context_controls.size(); i++) {
-			if (m_context_controls[i].used()) {
+			if (m_context_controls[i].used() || !m_context_controls[i].pState) {
 				continue;
 			}
 
@@ -166,7 +166,7 @@ void CContextControl::CreateContextControls(CState& state)
 
 	if (!m_context_controls.empty()) {
 
-		auto & currentControls = m_context_controls[m_current_context_controls];
+		auto & currentControls = m_context_controls[m_current_context_controls != -1 ? m_current_context_controls : 0];
 
 		if (currentControls.pViewSplitter) {
 			paneSizes[0] = currentControls.pViewSplitter->GetSize();
@@ -179,8 +179,12 @@ void CContextControl::CreateContextControls(CState& state)
 		}
 
 		splitterPositions = currentControls.GetSplitterPositions();
-		currentControls.pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
-		currentControls.pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+		if (currentControls.pLocalListView) {
+			currentControls.pLocalListView->SaveColumnSettings(OPTION_LOCALFILELIST_COLUMN_WIDTHS, OPTION_LOCALFILELIST_COLUMN_SHOWN, OPTION_LOCALFILELIST_COLUMN_ORDER);
+		}
+		if (currentControls.pRemoteListView) {
+			currentControls.pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
+		}
 		
 		if (!m_tabs) {
 			m_tabs = new wxAuiNotebookEx();
