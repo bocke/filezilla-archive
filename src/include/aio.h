@@ -27,7 +27,7 @@ public:
 
 #if FZ_WINDOWS
 	typedef HANDLE shm_handle;
-	static shm_handle constexpr shm_handle_default{INVALID_HANDLE_VALUE};
+	static shm_handle const shm_handle_default;
 
 	typedef bool shm_flag;
 	static shm_flag constexpr shm_flag_none{false};

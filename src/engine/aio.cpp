@@ -17,6 +17,10 @@ size_t get_page_size()
 }
 }
 
+#if FZ_WINDOWS
+aio_base::shm_handle const aio_base::shm_handle_default{INVALID_HANDLE_VALUE};
+#endif
+
 aio_base::~aio_base()
 {
 #if FZ_WINDOWS
