@@ -215,13 +215,16 @@ void CContextControl::CreateContextControls(CState& state)
 
 	context_controls.pState = &state;
 	context_controls.pViewSplitter = new CSplitterWindowEx(parent, -1, initial_position, paneSizes[0], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pViewSplitter->SetMinSize(wxDefaultSize);
 	context_controls.pViewSplitter->SetMinimumPaneSize(50, 100);
 	context_controls.pViewSplitter->SetSashGravity(0.5);
 
 	context_controls.pLocalSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, paneSizes[1], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pLocalSplitter->SetMinSize(wxDefaultSize);
 	context_controls.pLocalSplitter->SetMinimumPaneSize(50, 100);
 
 	context_controls.pRemoteSplitter = new CSplitterWindowEx(context_controls.pViewSplitter, -1, wxDefaultPosition, paneSizes[2], wxSP_NOBORDER  | wxSP_LIVE_UPDATE);
+	context_controls.pRemoteSplitter->SetMinSize(wxDefaultSize);
 	context_controls.pRemoteSplitter->SetMinimumPaneSize(50, 100);
 
 	context_controls.pLocalTreeViewPanel = new CView(context_controls.pLocalSplitter);
@@ -721,6 +724,11 @@ void CContextControl::RestoreTabs()
 
 	pugi::xml_node tabs = xml.child("Tabs");
 	if (tabs) {
+#ifdef __WXMSW__
+		// Some reparenting is being done when creating tabs. Reparenting of frozen windows isn't working
+		// on OS X.
+		wxWindowUpdateLocker lock(this);
+#endif
 		for (auto tab = tabs.child("Tab"); tab; tab = tab.next_sibling("Tab")) {
 
 			if (tab.attribute("selected").as_int()) {
