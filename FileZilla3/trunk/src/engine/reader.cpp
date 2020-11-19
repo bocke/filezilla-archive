@@ -1,5 +1,7 @@
 #include "../include/reader.h"
 
+#include "engineprivate.h"
+
 #include <libfilezilla/local_filesys.hpp>
 
 reader_factory_holder::reader_factory_holder(reader_factory_holder const& op)
@@ -48,9 +50,8 @@ reader_factory_holder& reader_factory_holder::operator=(std::unique_ptr<reader_f
 	return *this;
 }
 
-file_reader_factory::file_reader_factory(std::wstring const& file, fz::thread_pool & pool)
+file_reader_factory::file_reader_factory(std::wstring const& file)
 	: file_(file)
-	, pool_(&pool)
 {
 }
 
@@ -66,7 +67,7 @@ uint64_t file_reader_factory::size() const
 	}
 	auto s = fz::local_filesys::get_size(fz::to_native(file_));
 	if (s < 0) {
-		size_ = npos;
+		size_ = aio_base::nosize;
 	}
 	else {
 		size_ = static_cast<uint64_t>(s);
@@ -74,11 +75,11 @@ uint64_t file_reader_factory::size() const
 	return *size_;
 }
 
-std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
+std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
 {
-	auto ret = std::make_unique<file_reader>(file_);
+	auto ret = std::make_unique<file_reader>(file_, engine, handler);
 
-	if (ret->open(offset, *pool_, handler, shm) != aio_result::ok) {
+	if (ret->open(offset, shm) != aio_result::ok) {
 		ret.reset();
 	}
 
@@ -105,12 +106,15 @@ void remove_reader_events(fz::event_handler * handler, reader_base const* reader
 }
 }
 
+reader_base::reader_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler)
+	: aio_base(name, engine, handler)
+{}
+
 void reader_base::close()
 {
 	ready_count_ = 0;
 	
-	remove_reader_events(handler_, this);
-	handler_ = nullptr;
+	remove_reader_events(&handler_, this);
 }
 
 read_result reader_base::read()
@@ -142,8 +146,8 @@ read_result reader_base::read()
 }
 
 
-file_reader::file_reader(std::wstring const& name)
-	: name_(name)
+file_reader::file_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler)
+	: reader_base(name, engine, handler)
 {
 }
 
@@ -165,13 +169,12 @@ void file_reader::close()
 	reader_base::close();
 }
 
-aio_result file_reader::open(uint64_t offset, fz::thread_pool & pool, fz::event_handler & handler, shm_flag shm)
+aio_result file_reader::open(uint64_t offset, shm_flag shm)
 {
 	if (!allocate_memory(shm)) {
 		return aio_result::error;
 	}
 
-	handler_ = &handler;
 	if (!file_.open(fz::to_native(name_), fz::file::reading, fz::file::existing)) {
 		return aio_result::error;
 	}
@@ -183,7 +186,7 @@ aio_result file_reader::open(uint64_t offset, fz::thread_pool & pool, fz::event_
 		}
 	}
 
-	thread_ = pool.spawn([this]() { entry(); });
+	thread_ = engine_.GetThreadPool().spawn([this]() { entry(); });
 	if (!thread_) {
 		return aio_result::error;
 	}
@@ -221,7 +224,7 @@ void file_reader::entry()
 
 		if (handler_waiting_) {
 			handler_waiting_ = false;
-			handler_->send_event<read_ready_event>(this);
+			handler_.send_event<read_ready_event>(this);
 		}
 
 		if (read <= 0) {
@@ -243,7 +246,7 @@ uint64_t file_reader::size() const
 	}
 	auto s = file_.size();
 	if (s < 0) {
-		size_ = npos;
+		size_ = nosize;
 	}
 	else {
 		size_ = static_cast<uint64_t>(s);

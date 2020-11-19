@@ -236,7 +236,7 @@ void CHttpControlSocket::OnReceive()
 		return;
 	}
 
-	int res = static_cast<CHttpRequestOpData&>(*operations_.back()).OnReceive();
+	int res = static_cast<CHttpRequestOpData&>(*operations_.back()).OnReceive(false);
 	if (res == FZ_REPLY_CONTINUE) {
 		SendNextCommand();
 	}
@@ -287,7 +287,9 @@ void CHttpControlSocket::FileTransfer(std::wstring const& localFile, reader_fact
 		log(logmsg::status, _("Downloading %s"), remotePath.FormatFilename(remoteFile));
 	}
 
-	Push(std::make_unique<CHttpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags));
+	auto op = std::make_unique<CHttpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
+	op->writer_factory_ = writer;
+	Push(std::move(op));
 }
 
 void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)
@@ -296,7 +298,7 @@ void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)
 
 	log(logmsg::status, _("Requesting %s"), command.uri_.to_string());
 
-	Push(std::make_unique<CHttpFileTransferOpData>(*this, command.uri_, command.verb_, command.body_));
+	Push(std::make_unique<CHttpFileTransferOpData>(*this, command.uri_, command.verb_, command.body_, command.output_));
 }
 
 void CHttpControlSocket::Request(std::shared_ptr<HttpRequestResponseInterface> const& request)
@@ -397,4 +399,29 @@ int CHttpControlSocket::OnSend()
 		}
 	}
 	return res;
+}
+
+void CHttpControlSocket::OnWriteReady(writer_base* writer)
+{
+	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_request) {
+		log(logmsg::debug_warning, L"Stale writer event");
+		return;
+	}
+
+	int res = static_cast<CHttpRequestOpData&>(*operations_.back()).OnReceive(writer);
+	if (res == FZ_REPLY_CONTINUE) {
+		SendNextCommand();
+	}
+	else if (res != FZ_REPLY_WOULDBLOCK) {
+		ResetOperation(res);
+	}
+}
+
+void CHttpControlSocket::operator()(fz::event_base const& ev)
+{
+	if (!fz::dispatch<write_ready_event>(ev, this,
+		&CHttpControlSocket::OnWriteReady))
+	{
+		CRealControlSocket::operator()(ev);
+	}
 }

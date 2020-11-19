@@ -16,10 +16,20 @@ enum class aio_result
 	error
 };
 
+namespace fz {
+class event_handler;
+}
+class CFileZillaEnginePrivate;
 class FZC_PUBLIC_SYMBOL aio_base
 {
 public:
+	explicit aio_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
 	virtual ~aio_base();
+
+	aio_base(aio_base const&) = delete;
+	aio_base& operator=(aio_base const&) = delete;
+	aio_base(aio_base &&) = default;
+	aio_base& operator=(aio_base &&) = default;
 
 	// The buffer size aimed for, actual buffer size may differ
 	static constexpr size_t buffer_size_{256*1024};
@@ -42,21 +52,33 @@ public:
 
 	std::tuple<shm_handle, uint8_t const*, size_t> shared_memory_info() const;
 
+	static constexpr auto nosize = static_cast<uint64_t>(-1);
+
 protected:
+	virtual void signal_capacity(fz::scoped_lock & l) = 0;
+
 	mutable fz::mutex mtx_{false};
 
 	bool allocate_memory(shm_flag shm);
 
+	std::wstring const name_;
+
 	std::array<fz::nonowning_buffer, buffer_count> buffers_;
 	size_t ready_pos_{};
 	size_t ready_count_{};
+
+	CFileZillaEnginePrivate & engine_;
+	fz::event_handler & handler_;
+
 	bool processing_{};
+	bool quit_{};
+	bool error_{};
+	bool handler_waiting_{};
 
 private:
 	shm_handle mapping_{shm_handle_default};
 	size_t memory_size_{};
 	uint8_t* memory_{};
-
 };
 
 #endif

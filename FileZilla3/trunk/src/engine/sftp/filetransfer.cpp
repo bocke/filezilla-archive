@@ -337,7 +337,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 	if (download()) {
 		if (resume_) {
 			offset = writer_factory_.size();
-			if (offset == writer_base::npos) {
+			if (offset == aio_base::nosize) {
 				controlSocket_.AddToStream("-1\n");
 				return;
 			}
@@ -345,7 +345,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		else {
 			offset = 0;
 		}
-		writer_ = writer_factory_.open(offset, *this, shm);
+		writer_ = writer_factory_.open(offset, engine_, *this, shm);
 		if (!writer_) {
 			controlSocket_.AddToStream("--\n");
 			return;
@@ -353,7 +353,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		info = writer_->shared_memory_info();
 	}
 	else {
-		reader_ = reader_factory_.open(offset, *this, shm);
+		reader_ = reader_factory_.open(offset, engine_, *this, shm);
 		if (!reader_) {
 			controlSocket_.AddToStream("--\n");
 			return;
@@ -427,14 +427,14 @@ void CSftpFileTransferOpData::OnFinalizeRequested(uint64_t lastWrite)
 
 void CSftpFileTransferOpData::OnSizeRequested()
 {
-	uint64_t size = writer_base::npos;
+	uint64_t size = aio_base::nosize;
 	if (reader_) {
 		size = reader_->size();
 	}
 	else if (writer_) {
 		size = writer_->size();
 	}
-	if (size == writer_base::npos) {
+	if (size == aio_base::nosize) {
 		controlSocket_.AddToStream("--1\n");
 	}
 	else {

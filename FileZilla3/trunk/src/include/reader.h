@@ -20,15 +20,13 @@ class FZC_PUBLIC_SYMBOL reader_factory
 public:
 	virtual ~reader_factory() noexcept = default;
 
-	static constexpr auto npos = static_cast<uint64_t>(-1);
-
 	virtual std::unique_ptr<reader_factory> clone() = 0;
 
 	// If shm_flag is valid, the buffers are allocated in shared memory suitable for communication with child processes
 	// On Windows pass a bool, otherwise a valid file descriptor obtained by memfd_create or shm_open.
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
 
-	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
+	virtual uint64_t size() const { return aio_base::nosize; }
 
 protected:
 	reader_factory() = default;
@@ -39,8 +37,6 @@ protected:
 class FZC_PUBLIC_SYMBOL reader_factory_holder final
 {
 public:
-	static constexpr auto npos = static_cast<uint64_t>(-1);
-
 	reader_factory_holder() = default;
 	explicit reader_factory_holder(std::unique_ptr<reader_factory> && factory);
 
@@ -51,9 +47,9 @@ public:
 	reader_factory_holder& operator=(reader_factory_holder && op) noexcept;
 	reader_factory_holder& operator=(std::unique_ptr<reader_factory> && factory);
 
-	std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
+	std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
 	{
-		return impl_ ? impl_->open(offset, handler, shm) : nullptr;
+		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
 	}
 
 	uint64_t size() const
@@ -70,17 +66,15 @@ private:
 class FZC_PUBLIC_SYMBOL file_reader_factory final : public reader_factory
 {
 public:
-	file_reader_factory(std::wstring const& file, fz::thread_pool & pool);
+	file_reader_factory(std::wstring const& file);
 	
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) override;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) override;
 	virtual std::unique_ptr<reader_factory> clone() override;
 
 	virtual uint64_t size() const override;
 
 	std::wstring file_;
 	mutable std::optional<uint64_t> size_;
-
-	fz::thread_pool * pool_{};
 };
 
 struct read_result {
@@ -95,7 +89,7 @@ struct read_result {
 class FZC_PUBLIC_SYMBOL reader_base : public aio_base
 {
 public:
-	static constexpr auto npos = static_cast<uint64_t>(-1);
+	explicit reader_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
 
 	virtual void close();
 
@@ -105,21 +99,12 @@ public:
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
 	read_result read();
-
-protected:
-	virtual void signal_capacity(fz::scoped_lock & l) = 0;
-
-	fz::event_handler * handler_{};
-
-	bool quit_{};
-	bool error_{};
-	bool handler_waiting_{};
 };
 
 class FZC_PUBLIC_SYMBOL file_reader final : public reader_base
 {
 public:
-	explicit file_reader(std::wstring const& name);
+	explicit file_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
 	~file_reader();
 
 	virtual void close() override;
@@ -132,7 +117,7 @@ protected:
 
 private:
 	friend class file_reader_factory;
-	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, shm_flag shm);
+	aio_result open(uint64_t offset, shm_flag shm);
 
 	void entry();
 
@@ -142,8 +127,6 @@ private:
 
 	fz::async_task thread_;
 	fz::condition cond_;
-
-	std::wstring const name_;
 };
 
 #endif

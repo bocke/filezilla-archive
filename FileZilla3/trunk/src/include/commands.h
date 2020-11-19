@@ -247,16 +247,18 @@ protected:
 class FZC_PUBLIC_SYMBOL CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
 {
 public:
-	// Reply body is delivered through nId_data notifications
-	CHttpRequestCommand(fz::uri const& uri, std::string const& verb = std::string("GET"), std::string const& body = std::string())
+	CHttpRequestCommand(fz::uri const& uri, writer_factory_holder const& output, std::string const& verb = std::string("GET"), std::string const& body = std::string())
 		: uri_(uri)
 		, verb_(verb)
 		, body_(body)
+		, output_(output)
 	{}
 
 	fz::uri const uri_;
 	std::string const verb_;
 	std::string const body_;
+
+	writer_factory_holder output_;
 };
 
 class FZC_PUBLIC_SYMBOL CRawCommand final : public CCommandHelper<CRawCommand, Command::raw>
