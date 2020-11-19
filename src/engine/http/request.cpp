@@ -306,13 +306,35 @@ int CHttpRequestOpData::SubcommandResult(int, COpData const&)
 	return FZ_REPLY_CONTINUE;
 }
 
-int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
+int CHttpRequestOpData::FinalizeResponseBody()
+{
+	auto & shared_response = requests_.front();
+	if (shared_response) {
+		auto & response = shared_response->response();
+		response.flags_ |= HttpResponse::flag_got_body;
+		if (response.writer_) {
+			fz::nonowning_buffer b;
+			auto r = response.writer_->finalize(b);
+			switch (r) {
+			case aio_result::ok:
+				return FZ_REPLY_OK;
+			case aio_result::wait:
+				return FZ_REPLY_WOULDBLOCK;
+			default:
+				return FZ_REPLY_ERROR;
+			}
+		}
+	}
+	return FZ_REPLY_OK;
+}
+
+int CHttpRequestOpData::ParseReceiveBuffer()
 {
 	auto & shared_response = requests_.front();
 	if (shared_response) {
 		auto & request = shared_response->request();
 		if (!(request.flags_ & HttpRequest::flag_sent_header)) {
-			if (eof) {
+			if (read_state_.eof_) {
 				log(logmsg::debug_verbose, L"Socket closed before request got sent");
 				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
@@ -325,7 +347,7 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 		auto & response = shared_response->response();
 
 		if (!response.got_header()) {
-			if (eof) {
+			if (read_state_.eof_) {
 				log(logmsg::debug_verbose, L"Socket closed before headers got received");
 				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
@@ -333,10 +355,14 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 
 			return ParseHeader();
 		}
+
+		if (response.flags_ & HttpResponse::flag_got_body) {
+			return FinalizeResponseBody();
+		}
 	}
 
 	if (read_state_.transfer_encoding_ == chunked) {
-		if (eof) {
+		if (read_state_.eof_) {
 			log(logmsg::debug_verbose, L"Socket closed, chunk incomplete");
 			log(logmsg::error, _("Connection closed by server"));
 			return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
@@ -344,7 +370,7 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 		return ParseChunkedData();
 	}
 	else {
-		if (eof) {
+		if (read_state_.eof_) {
 			assert(recv_buffer_.empty());
 
 			if (read_state_.responseContentLength_ != -1 && read_state_.receivedData_ != read_state_.responseContentLength_) {
@@ -353,16 +379,13 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
 			else {
-				if (shared_response) {
-					shared_response->response().flags_ |= HttpResponse::flag_got_body;
-				}
-				return FZ_REPLY_OK;
+				return FinalizeResponseBody();
 			}
 		}
 		else {
 			size_t size = recv_buffer_.size();
 			if (!size) {
-				return FZ_REPLY_WOULDBLOCK;
+				return FZ_REPLY_WOULDBLOCK|FZ_REPLY_CONTINUE;
 			}
 
 			if (read_state_.responseContentLength_ != -1 && read_state_.receivedData_ + static_cast<int64_t>(size) > read_state_.responseContentLength_) {
@@ -370,7 +393,7 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 			}
 
 			int res = ProcessData(recv_buffer_.get(), size);
-			recv_buffer_.consume(size);
+			recv_buffer_.consume(recv_buffer_.size() - size);
 			return res;
 		}
 	}
@@ -378,30 +401,47 @@ int CHttpRequestOpData::ParseReceiveBuffer(bool eof)
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CHttpRequestOpData::OnReceive()
+int CHttpRequestOpData::OnReceive(writer_base* writer)
+{
+	if (requests_.empty() || requests_.back()->response().writer_.get() != writer) {
+		log(logmsg::debug_warning, L"Stale writer event");
+		return FZ_REPLY_WOULDBLOCK;;
+	}
+	OnReceive(true);
+}
+
+int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 {
 	while (controlSocket_.socket_) {
-		int error;
-		size_t const recv_size = 1024 * 64;
-		int read = controlSocket_.active_layer_->read(recv_buffer_.get(recv_size), recv_size, error);
-		if (read <= -1) {
-			if (error != EAGAIN) {
-				log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
-				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-			}
-			return FZ_REPLY_WOULDBLOCK;
+		if (repeatedProcessing) {
+			repeatedProcessing = false;
 		}
-		recv_buffer_.add(static_cast<size_t>(read));
+		else {
+			int error;
+			size_t const recv_size = 1024 * 64;
+			int read = controlSocket_.active_layer_->read(recv_buffer_.get(recv_size), recv_size, error);
+			if (read <= -1) {
+				if (error != EAGAIN) {
+					log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
+					return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+				}
+				return FZ_REPLY_WOULDBLOCK;
+			}
+			recv_buffer_.add(static_cast<size_t>(read));
 
-		controlSocket_.SetActive(CFileZillaEngine::recv);
+			controlSocket_.SetActive(CFileZillaEngine::recv);
 
-		bool const eof = read == 0;
+			read_state_.eof_ = read == 0;
+		}
 
 		while (!requests_.empty()) {
 			assert(!requests_.empty());
 
-			int res = ParseReceiveBuffer(eof);
+			int res = ParseReceiveBuffer();
 			if (res == FZ_REPLY_WOULDBLOCK) {
+				return res;
+			}
+			else if (res == (FZ_REPLY_WOULDBLOCK|FZ_REPLY_CONTINUE)) {
 				break;
 			}
 
@@ -410,8 +450,8 @@ int CHttpRequestOpData::OnReceive()
 				requests_.pop_front();
 				--send_pos_;
 
-				bool keep_alive = read_state_.keep_alive_;
-				if (!keep_alive || eof) {
+				bool const socket_done = read_state_.eof_ || !read_state_.keep_alive_;
+				if (socket_done) {
 					if (!recv_buffer_.empty()) {
 						log(logmsg::error, _("Malformed response: %s"), _("Server sent too much data."));
 						return FZ_REPLY_ERROR;
@@ -433,7 +473,7 @@ int CHttpRequestOpData::OnReceive()
 					return FZ_REPLY_OK;
 				}
 
-				if (!keep_alive || eof) {
+				if (socket_done) {
 					send_pos_ = 0;
 					opState = request_init | request_reading;
 					return FZ_REPLY_CONTINUE;
@@ -482,7 +522,7 @@ int CHttpRequestOpData::ParseHeader()
 				log(logmsg::error, _("Too long header line"));
 				return FZ_REPLY_ERROR;
 			}
-			return FZ_REPLY_WOULDBLOCK;
+			return FZ_REPLY_WOULDBLOCK|FZ_REPLY_CONTINUE;
 		}
 
 		std::wstring wline = fz::to_wstring_from_utf8(reinterpret_cast<char const*>(recv_buffer_.get()), i);
@@ -552,12 +592,12 @@ int CHttpRequestOpData::ParseHeader()
 		}
 	}
 
-	return FZ_REPLY_WOULDBLOCK;
+	return FZ_REPLY_WOULDBLOCK|FZ_REPLY_CONTINUE;
 }
 
 int CHttpRequestOpData::ProcessCompleteHeader()
 {
-	log(logmsg::debug_verbose, L"CHttpRequestOpData::ParseHeader()");
+	log(logmsg::debug_verbose, L"CHttpRequestOpData::ProcessCompleteHeader()");
 
 	auto & srr = requests_.front();
 	auto & request = srr->request();
@@ -642,10 +682,10 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 					// Clear the pointer, we no longer need the request to finish, all needed information is in read_state_
 					srr.reset();
 				}
+				else {
+					response.flags_ |= HttpResponse::flag_ignore_body;
+				}
 				res = FZ_REPLY_CONTINUE;
-			}
-			else {
-				response.flags_ |= HttpResponse::flag_ignore_body;
 			}
 		}
 	}
@@ -667,12 +707,14 @@ int CHttpRequestOpData::ParseChunkedData()
 			if (read_state_.chunk_data_.size < recv_buffer_.size()) {
 				dataLen = static_cast<size_t>(read_state_.chunk_data_.size);
 			}
-			int res = ProcessData(recv_buffer_.get(), dataLen);
+			size_t remaining = dataLen;
+			int res = ProcessData(recv_buffer_.get(), remaining);
+			recv_buffer_.consume(dataLen - remaining);
+			read_state_.chunk_data_.size -= dataLen - remaining;
+
 			if (res != FZ_REPLY_CONTINUE) {
 				return res;
 			}
-			recv_buffer_.consume(dataLen);
-			read_state_.chunk_data_.size -= dataLen;
 
 			if (read_state_.chunk_data_.size == 0) {
 				read_state_.chunk_data_.terminateChunk = true;
@@ -717,12 +759,7 @@ int CHttpRequestOpData::ParseChunkedData()
 			if (!i) {
 				// We're done
 				recv_buffer_.consume(2);
-
-				auto & response = requests_.front();
-				if (response) {
-					response->response().flags_ |= HttpResponse::flag_got_body;
-				}
-				return FZ_REPLY_OK;
+				return FinalizeResponseBody();
 			}
 
 			// Ignore the trailer
@@ -755,39 +792,59 @@ int CHttpRequestOpData::ParseChunkedData()
 		recv_buffer_.consume(i + 2);
 	}
 
-	return FZ_REPLY_WOULDBLOCK;
+	return FZ_REPLY_WOULDBLOCK|FZ_REPLY_CONTINUE;
 }
 
-int CHttpRequestOpData::ProcessData(unsigned char* data, unsigned int len)
+int CHttpRequestOpData::ProcessData(unsigned char* data, size_t & remaining)
 {
-	read_state_.receivedData_ += len;
-
 	int res = FZ_REPLY_CONTINUE;
+	size_t initial = remaining;
 
 	auto & shared_response = requests_.front();
 	if (shared_response) {
 		auto & response = shared_response->response();
 
-		decltype(response.on_data_) *on_data = nullptr;
-
-		if (response.on_data_ && !(response.flags_ & HttpResponse::flag_ignore_body)) {
-			on_data = &response.on_data_;
+		if (!(response.flags_ & HttpResponse::flag_ignore_body)) {
+			if (response.success()) {
+				if (response.writer_) {
+					while (remaining) {
+						aio_result r = response.writer_->write(data, remaining);
+						if (r == aio_result::ok) {
+							remaining -= std::min(remaining, aio_base::buffer_size_);
+						}
+						else if (r == aio_result::wait) {
+							res = FZ_REPLY_WOULDBLOCK;
+							break;
+						}
+						else {
+							res = FZ_REPLY_ERROR;
+							break;
+						}
+					}
+				}
+				else {
+					remaining = 0;
+				}
+			}
+			else {
+				if (response.on_error_data_) {
+					res = response.on_error_data_(data, remaining);
+					remaining = 0;
+				}
+			}
 		}
-
-		if (response.on_error_data_ && !response.success() && !(response.flags_ & HttpResponse::flag_ignore_body)) {
-			on_data = &response.on_error_data_;
-		}
-
-		if (on_data) {
-			res = (*on_data)(data, len);
+		else {
+			remaining = 0;
 		}
 	}
+	else {
+		remaining = 0;
+	}
+
+	read_state_.receivedData_ += initial - remaining;
 
 	if (res == FZ_REPLY_CONTINUE && read_state_.receivedData_ == read_state_.responseContentLength_) {
-		if (shared_response) {
-			shared_response->response().flags_ |= HttpResponse::flag_got_body;
-		}
-		res = FZ_REPLY_OK;
+		res = FinalizeResponseBody();
 	}
 
 	return res;

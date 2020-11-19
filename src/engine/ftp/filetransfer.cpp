@@ -75,7 +75,7 @@ int CFtpFileTransferOpData::Send()
 			int64_t startOffset{};
 			if (download()) {
 				// Potentially racy
-				bool didExist = writer_factory_.size() != writer_base::npos;
+				bool didExist = writer_factory_.size() != aio_base::nosize;
 				fileDidExist_ = didExist;
 
 				if (resume_) {
@@ -165,7 +165,7 @@ int CFtpFileTransferOpData::Send()
 			controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
 			controlSocket_.m_pTransferSocket->m_binaryMode = binary;
 			if (download()) {
-				auto writer = writer_factory_.open(startOffset, *controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
+				auto writer = writer_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!writer) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
@@ -174,7 +174,7 @@ int CFtpFileTransferOpData::Send()
 				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
 			}
 			else {
-				auto reader = reader_factory_.open(startOffset, *controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
+				auto reader = reader_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!reader) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for reading"), localFile_);

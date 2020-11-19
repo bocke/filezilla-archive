@@ -319,25 +319,6 @@ protected:
 	const bool m_changed;
 };
 
-class FZC_PUBLIC_SYMBOL CDataNotification final : public CNotificationHelper<nId_data>
-{
-public:
-	CDataNotification(char* pData, size_t len);
-	virtual ~CDataNotification();
-
-	CDataNotification(CDataNotification const&) = delete;
-	CDataNotification& operator=(CDataNotification const&) = delete;
-
-	char* Detach(size_t& len);
-
-	char const* data() const { return m_pData; }
-	size_t size() const { return m_len; }
-
-protected:
-	char* m_pData;
-	size_t m_len;
-};
-
 class FZC_PUBLIC_SYMBOL CCertificateNotification final : public CAsyncRequestNotification
 {
 public:

@@ -1264,10 +1264,10 @@ void CQueueView::SendNextCommand(t_EngineData& engineData)
 			auto cmd = CFileTransferCommand(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), fileItem->GetRemotePath(),
 												fileItem->GetRemoteFile(), fileItem->flags());
 			if (!fileItem->Download()) {
-				cmd.input_ = std::make_unique<file_reader_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), m_pMainFrame->GetEngineContext().GetThreadPool());
+				cmd.input_ = std::make_unique<file_reader_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile());
 			}
 			else {
-				cmd.output_ = std::make_unique<file_writer_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile(), m_pMainFrame->GetEngineContext().GetThreadPool());
+				cmd.output_ = std::make_unique<file_writer_factory>(fileItem->GetLocalPath().GetPath() + fileItem->GetLocalFile());
 			}
 
 			int res = engineData.pEngine->Execute(cmd);

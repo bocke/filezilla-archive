@@ -15,6 +15,7 @@
 #endif
 
 #include "../include/version.h"
+#include "../include/writer.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/hash.hpp>
@@ -284,7 +285,7 @@ int CUpdater::Request(fz::uri const& uri)
 
 	CServer server(fz::equal_insensitive_ascii(uri.scheme_, std::string("http")) ? HTTP : HTTPS, DEFAULT, fz::to_wstring_from_utf8(uri.host_), uri.port_);
 	pending_commands_.emplace_back(new CConnectCommand(server, ServerHandle(), Credentials()));
-	pending_commands_.emplace_back(new CHttpRequestCommand(uri));
+	pending_commands_.emplace_back(new CHttpRequestCommand(uri, writer_factory_holder(std::make_unique<memory_writer_factory>(L"Updater", output_buffer_, 1024*1024))));
 
 	return ContinueDownload();
 }
@@ -333,8 +334,10 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 	std::wstring file = path.GetLastSegment();
 	path = path.GetParent();
 
-	transfer_flags const flags = transfer_flags::download | transfer_flags::fsync;
-	pending_commands_.emplace_back(new CFileTransferCommand(local_file, path, file, flags));
+	transfer_flags const flags = transfer_flags::download;
+	auto cmd = new CFileTransferCommand(local_file, path, file, flags);
+	cmd->output_ = std::make_unique<file_writer_factory>(local_file, true);
+	pending_commands_.emplace_back(cmd);
 	return true;
 }
 
@@ -391,9 +394,6 @@ void CUpdater::ProcessNotification(std::unique_ptr<CNotification> && notificatio
 			}
 			engine_->SetAsyncRequestReply(std::move(pData));
 		}
-		break;
-	case nId_data:
-		ProcessData(static_cast<CDataNotification&>(*notification.get()));
 		break;
 	case nId_operation:
 		ProcessOperation(static_cast<COperationNotification const&>(*notification.get()));
@@ -485,6 +485,10 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 		}
 	}
 	else if (state_ == UpdaterState::checking) {
+		if (!FilterOutput()) {
+			SetState(UpdaterState::failed);
+			return;
+		}
 		COptions::Get()->set(OPTION_UPDATECHECK_LASTVERSION, GetFileZillaVersion());
 		s = ProcessFinishedData(true);
 	}
@@ -557,43 +561,27 @@ std::wstring CUpdater::GetLocalFile(build const& b, bool allow_existing)
 	return f;
 }
 
-void CUpdater::ProcessData(CDataNotification& dataNotification)
+bool CUpdater::FilterOutput()
 {
 	if (state_ != UpdaterState::checking) {
-		return;
+		return false;
 	}
-
-	size_t len;
-	char* data = dataNotification.Detach(len);
 
 	if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-		log_ += fz::sprintf(_T("ProcessData %u\n"), len);
+		log_ += fz::sprintf(L"FilterOutput %u\n", output_buffer_.size());
 	}
 
-	if (raw_version_information_.size() + len > 0x40000) {
-		log_ += fztranslate("Received version information is too large") + L"\n";
-		if (engine_) {
-			engine_->Cancel();
+	raw_version_information_.resize(output_buffer_.size());
+	for (size_t i = 0; i < output_buffer_.size(); ++i) {
+		if (output_buffer_[i] < 10 || static_cast<unsigned char>(output_buffer_[i]) > 127) {
+			log_ += fztranslate("Received invalid character in version information") + L"\n";
+			raw_version_information_.clear();
+			return false;
 		}
-		SetState(UpdaterState::failed);
-	}
-	else {
-		for (size_t i = 0; i < len; ++i) {
-			if (data[i] < 10 || static_cast<unsigned char>(data[i]) > 127) {
-				log_ += fztranslate("Received invalid character in version information") + L"\n";
-				SetState(UpdaterState::failed);
-				if (engine_) {
-					engine_->Cancel();
-				}
-				break;
-			}
-		}
+		raw_version_information_[i] = output_buffer_[i];
 	}
 
-	if (state_ == UpdaterState::checking) {
-		raw_version_information_ += fz::to_wstring_from_utf8(std::string(data, data + len));
-	}
-	delete [] data;
+	return true;
 }
 
 void CUpdater::ParseData()

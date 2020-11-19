@@ -33,14 +33,16 @@ public:
 
 	void AddRequest(std::shared_ptr<HttpRequestResponseInterface> const& rr);
 
-	int OnReceive();
+	int OnReceive(bool repeatedProcessing);
+	int OnReceive(writer_base* writer);
 
 private:
-	int ParseReceiveBuffer(bool eof);
+	int ParseReceiveBuffer();
 	int ParseHeader();
 	int ProcessCompleteHeader();
 	int ParseChunkedData();
-	int ProcessData(unsigned char* data, unsigned int len);
+	int ProcessData(unsigned char* data, size_t & len);
+	int FinalizeResponseBody();
 
 	std::deque<std::shared_ptr<HttpRequestResponseInterface>> requests_;
 
@@ -70,6 +72,7 @@ private:
 		int64_t receivedData_{};
 
 		bool keep_alive_{};
+		bool eof_{};
 	};
 	read_state read_state_;
 

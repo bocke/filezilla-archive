@@ -60,24 +60,6 @@ int CHostKeyNotification::GetPort() const
 	return m_port;
 }
 
-CDataNotification::CDataNotification(char* pData, size_t len)
-	: m_pData(pData), m_len(len)
-{
-}
-
-CDataNotification::~CDataNotification()
-{
-	delete [] m_pData;
-}
-
-char* CDataNotification::Detach(size_t& len)
-{
-	len = m_len;
-	char* pData = m_pData;
-	m_pData = nullptr;
-	return pData;
-}
-
 CCertificateNotification::CCertificateNotification(fz::tls_session_info&& info)
 	: info_(info)
 {

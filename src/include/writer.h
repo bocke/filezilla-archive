@@ -20,18 +20,26 @@ class writer_base;
 class FZC_PUBLIC_SYMBOL writer_factory
 {
 public:
+	explicit writer_factory(std::wstring const& name) 
+		: name_(name)
+	{}
+
 	virtual ~writer_factory() noexcept = default;
 
 	static constexpr auto npos = static_cast<uint64_t>(-1);
 
-	virtual std::unique_ptr<writer_factory> clone() = 0;
+	virtual std::unique_ptr<writer_factory> clone() const = 0;
 
-	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
+	virtual std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
+
+	std::wstring name() const { return name_; }
 protected:
 	writer_factory() = default;
 	writer_factory(writer_factory const&) = default;
 	writer_factory& operator=(writer_factory const&) = default;
+
+	std::wstring name_;
 };
 
 class FZC_PUBLIC_SYMBOL writer_factory_holder final
@@ -41,6 +49,8 @@ public:
 
 	writer_factory_holder() = default;
 	explicit writer_factory_holder(std::unique_ptr<writer_factory> && factory);
+	explicit writer_factory_holder(std::unique_ptr<writer_factory> const& factory);
+	explicit writer_factory_holder(writer_factory const& factory);
 
 	writer_factory_holder(writer_factory_holder const& op);
 	writer_factory_holder& operator=(writer_factory_holder const& op);
@@ -49,14 +59,19 @@ public:
 	writer_factory_holder& operator=(writer_factory_holder && op) noexcept;
 	writer_factory_holder& operator=(std::unique_ptr<writer_factory> && factory);
 
-	std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm)
+	std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
 	{
-		return impl_ ? impl_->open(offset, handler, shm) : nullptr;
+		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
 	}
 
 	uint64_t size() const
 	{
 		return impl_ ? impl_->size() : static_cast<uint64_t>(-1);
+	}
+
+	std::wstring name() const
+	{
+		return impl_ ? impl_->name() : std::wstring();
 	}
 
 	explicit operator bool() const { return impl_.operator bool(); }
@@ -68,17 +83,16 @@ private:
 class FZC_PUBLIC_SYMBOL file_writer_factory final : public writer_factory
 {
 public:
-	file_writer_factory(std::wstring const& file, fz::thread_pool & pool);
+	file_writer_factory(std::wstring const& file, bool fsync = false);
 	
-	virtual std::unique_ptr<writer_base> open(uint64_t offset, fz::event_handler & handler, aio_base::shm_flag shm) override;
-	virtual std::unique_ptr<writer_factory> clone() override;
+	virtual std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) override;
+	virtual std::unique_ptr<writer_factory> clone() const override;
 
 	virtual uint64_t size() const override;
 
-	std::wstring file_;
 	mutable std::optional<uint64_t> size_;
 
-	fz::thread_pool * pool_{};
+	bool fsync_{};
 };
 
 
@@ -92,51 +106,47 @@ struct get_write_buffer_result {
 class FZC_PUBLIC_SYMBOL writer_base : public aio_base
 {
 public:
-	static constexpr auto npos = static_cast<uint64_t>(-1);
+	explicit writer_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
 
 	virtual void close();
 
-	virtual aio_result finalize(fz::nonowning_buffer & last_written) = 0;
+	aio_result finalize(fz::nonowning_buffer & last_written);
 
 	// May be empty
-	virtual std::wstring const& name() const = 0;
+	std::wstring const& name() const { return name_; }
 
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
 	get_write_buffer_result get_write_buffer(fz::nonowning_buffer & last_written);
 
-	// The buffer size aimed for, actual buffer size may differ
-	static constexpr size_t buffer_size{256*1024};
+	aio_result retire(fz::nonowning_buffer & last_written);
+
+	// Writes _up to_ aio_base::buffer_size_ bytes.
+	aio_result write(uint8_t* data, size_t len);
 
 protected:
-	virtual void signal_capacity(fz::scoped_lock & l) = 0;
+	virtual aio_result continue_finalize() { return aio_result::ok; }
 
-	fz::event_handler * handler_{};
-
-	bool quit_{};
-	bool error_{};
-	bool handler_waiting_{};
+	bool finalized_{};
 };
 
 class FZC_PUBLIC_SYMBOL file_writer final : public writer_base
 {
 public:
-	explicit file_writer(std::wstring const& name);
+	explicit file_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
 	~file_writer();
 
 	virtual void close() override;
 
-	virtual aio_result finalize(fz::nonowning_buffer & last_written) override;
-
-	virtual std::wstring const& name() const override { return name_; }
 	virtual uint64_t size() const override;
 
 protected:
 	virtual void signal_capacity(fz::scoped_lock & l) override;
+	virtual aio_result continue_finalize() override;
 
 private:
 	friend class file_writer_factory;
-	aio_result open(uint64_t offset, fz::thread_pool & pool_, fz::event_handler & handler, shm_flag shm);
+	aio_result open(uint64_t offset, bool fsync, shm_flag shm);
 
 	void entry();
 
@@ -146,8 +156,49 @@ private:
 
 	fz::async_task thread_;
 	fz::condition cond_;
-
-	std::wstring const name_;
+	bool fsync_{};
 };
 
+namespace fz {
+class buffer;
+}
+
+class FZC_PUBLIC_SYMBOL memory_writer_factory final : public writer_factory
+{
+public:
+	memory_writer_factory(std::wstring const& name, fz::buffer & result_buffer, size_t sizeLimit = 0);
+	
+	virtual std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) override;
+	virtual std::unique_ptr<writer_factory> clone() const override;
+
+	virtual uint64_t size() const override { return npos; }
+
+private:
+	friend class memory_writer;
+	
+	fz::buffer * result_buffer_{};
+	size_t sizeLimit_{};
+};
+
+
+class FZC_PUBLIC_SYMBOL memory_writer final : public writer_base
+{
+public:
+	explicit memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, fz::buffer & result_buffer, size_t sizeLimit);
+	~memory_writer();
+
+	virtual void close() override;
+
+	virtual uint64_t size() const override;
+
+protected:
+	virtual void signal_capacity(fz::scoped_lock & l) override;
+
+private:
+	friend class memory_writer_factory;
+	aio_result open(shm_flag shm);
+
+	fz::buffer & result_buffer_;
+	size_t sizeLimit_{};
+};
 #endif

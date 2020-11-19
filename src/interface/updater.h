@@ -4,9 +4,9 @@
 #if FZ_MANUALUPDATECHECK
 
 #include "../include/notification.h"
-
 #include <wx/timer.h>
 
+#include <libfilezilla/buffer.hpp>
 #include <libfilezilla/uri.hpp>
 
 #include <functional>
@@ -65,6 +65,7 @@ public:
 	virtual void UpdaterStateChanged(UpdaterState s, build const& v) = 0;
 };
 
+class memory_writer_factory;
 class CFileZillaEngineContext;
 class CUpdater final : public wxEvtHandler
 {
@@ -113,7 +114,7 @@ protected:
 	fz::uri GetUrl();
 	void ProcessNotification(std::unique_ptr<CNotification> && notification);
 	void ProcessOperation(COperationNotification const& operation);
-	void ProcessData(CDataNotification& dataNotification);
+	bool FilterOutput();
 	void ParseData();
 	UpdaterState ProcessFinishedDownload();
 	UpdaterState ProcessFinishedData(bool can_download);
@@ -133,6 +134,7 @@ protected:
 
 	UpdaterState state_;
 	std::wstring local_file_;
+	fz::buffer output_buffer_;
 
 	CFileZillaEngineContext& engine_context_;
 	CFileZillaEngine* engine_{};

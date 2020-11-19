@@ -179,9 +179,7 @@ public:
 	//   FZ_REPLY_ERROR: Abort connection
 	std::function<int(std::shared_ptr<HttpRequestResponseInterface> const&)> on_header_;
 
-	// Is only called after the on_header_ callback.
-	// Callback must return FZ_REPLY_CONTINUE or FZ_REPLY_ERROR
-	std::function<int(unsigned char const* data, unsigned int len)> on_data_;
+	std::unique_ptr<writer_base> writer_;
 
 	// Called if !success && got_body
 	std::function<int(unsigned char const* data, unsigned int len)> on_error_data_;
@@ -280,6 +278,9 @@ protected:
 	virtual void OnSocketError(int error) override;
 	virtual void OnReceive() override;
 	virtual int OnSend() override;
+
+	virtual void operator()(fz::event_base const& ev) override;
+	void OnWriteReady(writer_base* writer);
 
 	virtual void ResetSocket() override;
 

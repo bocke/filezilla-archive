@@ -10,7 +10,6 @@
 enum filetransferStates
 {
 	filetransfer_init = 0,
-	filetransfer_waitfileexists,
 	filetransfer_transfer,
 	filetransfer_waittransfer
 };
@@ -24,10 +23,11 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 
 }
 
-CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body)
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body, writer_factory_holder const& output_factory)
 	: CFileTransferOpData(L"CHttpFileTransferOpData", std::wstring(), std::wstring(), CServerPath(), transfer_flags::download)
 	, CHttpOpData(controlSocket)
 {
+	writer_factory_ = output_factory;
 	rr_.request_.uri_ = uri;
 	rr_.request_.body_ = std::make_unique<simple_body>(body);
 	rr_.request_.verb_ = verb;
@@ -47,9 +47,12 @@ int CHttpFileTransferOpData::Send()
 			return FZ_REPLY_ERROR;
 		}
 
-		opState = filetransfer_waitfileexists;
-		if (!localFile_.empty()) {
-			localFileSize_ = fz::local_filesys::get_size(fz::to_native(localFile_));
+		opState = filetransfer_transfer;
+		if (output_factory_) {
+			auto s = output_factory_.size();
+			if (s != aio_base::nosize) {
+				localFileSize_ = static_cast<int64_t>(s);
+			}
 
 			int res = controlSocket_.CheckOverwriteFile();
 			if (res != FZ_REPLY_OK) {
@@ -57,23 +60,12 @@ int CHttpFileTransferOpData::Send()
 			}
 		}
 		return FZ_REPLY_CONTINUE;
-	case filetransfer_waitfileexists:
-		if (!localFile_.empty()) {
-			int res = OpenFile();
-			if (res != FZ_REPLY_OK) {
-				return res;
-			}
-		}
-		opState = filetransfer_transfer;
-		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
 		if (resume_) {
 			rr_.request_.headers_["Range"] = fz::sprintf("bytes=%d-", localFileSize_);
 		}
 
-		rr_.response_ = HttpResponse();
 		rr_.response_.on_header_ = [this](auto const&) { return this->OnHeader(); };
-		rr_.response_.on_data_ = [this](auto data, auto len) { return this->OnData(data, len); };
 
 		opState = filetransfer_waittransfer;
 		controlSocket_.Request(make_simple_rr(&rr_));
@@ -85,51 +77,12 @@ int CHttpFileTransferOpData::Send()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CHttpFileTransferOpData::OpenFile()
-{
-	log(logmsg::debug_verbose, L"CHttpFileTransferOpData::OpenFile");
-	if (file_.opened()) {
-		if (flags_ & transfer_flags::fsync) {
-			file_.fsync();
-		}
-		file_.close();
-	}
-
-	controlSocket_.CreateLocalDir(localFile_);
-
-	if (!file_.open(fz::to_native(localFile_),
-		download() ? fz::file::writing : fz::file::reading,
-		fz::file::existing))
-	{
-		log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
-		return FZ_REPLY_ERROR;
-	}
-
-	assert(download());
-	int64_t end = file_.seek(0, fz::file::end);
-	if (end < 0) {
-		log(logmsg::error, _("Could not seek to the end of the file"));
-		return FZ_REPLY_ERROR;
-	}
-	if (!end) {
-		resume_ = false;
-	}
-	localFileSize_ = fz::local_filesys::get_size(fz::to_native(localFile_));
-	return FZ_REPLY_OK;
-}
-
 int CHttpFileTransferOpData::OnHeader()
 {
 	log(logmsg::debug_verbose, L"CHttpFileTransferOpData::OnHeader");
 
 	if (rr_.response_.code_ == 416 && resume_) {
-		assert(file_.opened());
-		if (file_.seek(0, fz::file::begin) != 0) {
-			log(logmsg::error, _("Could not seek to the beginning of the file"));
-			return FZ_REPLY_ERROR;
-		}
 		resume_ = false;
-
 		opState = filetransfer_transfer;
 		return FZ_REPLY_ERROR;
 	}
@@ -182,12 +135,16 @@ int CHttpFileTransferOpData::OnHeader()
 
 	// Check if the server disallowed resume
 	if (resume_ && rr_.response_.code_ != 206) {
-		assert(file_.opened());
-		if (file_.seek(0, fz::file::begin) != 0) {
-			log(logmsg::error, _("Could not seek to the beginning of the file"));
+		resume_ = false;
+	}
+
+	if (writer_factory_) {
+		auto writer = writer_factory_.open(resume_ ? localFileSize_ : 0, engine_, controlSocket_, aio_base::shm_flag_none);
+		if (!writer) {
+			log(logmsg::error, _("Failed to open \"%s\" for writing"), writer_factory_.name());
 			return FZ_REPLY_ERROR;
 		}
-		resume_ = false;
+		rr_.response_.writer_ = std::move(writer);
 	}
 
 	int64_t totalSize = fz::to_integral<int64_t>(rr_.response_.get_header("Content-Length"), -1);
@@ -205,44 +162,10 @@ int CHttpFileTransferOpData::OnHeader()
 	return FZ_REPLY_CONTINUE;
 }
 
-int CHttpFileTransferOpData::OnData(unsigned char const* data, unsigned int len)
-{
-	if (opState != filetransfer_waittransfer) {
-		return FZ_REPLY_INTERNALERROR;
-	}
-
-	if (localFile_.empty()) {
-		char* q = new char[len];
-		memcpy(q, data, len);
-		engine_.AddNotification(std::make_unique<CDataNotification>(q, len));
-	}
-	else {
-		assert(file_.opened());
-
-		auto write = static_cast<int64_t>(len);
-		if (file_.write(data, write) != write) {
-			log(logmsg::error, _("Failed to write to file %s"), localFile_);
-			return FZ_REPLY_ERROR;
-		}
-	}
-
-	engine_.transfer_status_.Update(len);
-
-	return FZ_REPLY_CONTINUE;
-}
-
 int CHttpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 {
 	if (opState == filetransfer_transfer) {
 		return FZ_REPLY_CONTINUE;
-	}
-
-	if (opState == filetransfer_waittransfer) {
-		if (file_.opened()) {
-			if (flags_ & transfer_flags::fsync) {
-				file_.fsync();
-			}
-		}
 	}
 
 	return prevResult;
