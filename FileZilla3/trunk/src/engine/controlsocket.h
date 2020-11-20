@@ -300,8 +300,6 @@ protected:
 
 	int CheckOverwriteFile();
 
-	void CreateLocalDir(std::wstring const& local_file);
-
 	bool ParsePwdReply(std::wstring reply, const CServerPath& defaultPath = CServerPath());
 
 	virtual void Push(std::unique_ptr<COpData> && pNewOpData);

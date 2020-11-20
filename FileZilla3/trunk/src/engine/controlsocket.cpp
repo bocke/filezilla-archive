@@ -1080,26 +1080,6 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 	return true;
 }
 
-void CControlSocket::CreateLocalDir(std::wstring const& local_file)
-{
-	std::wstring file;
-	CLocalPath local_path(local_file, &file);
-	if (local_path.empty() || !local_path.HasParent()) {
-		return;
-	}
-
-	fz::native_string last_created;
-	fz::mkdir(fz::to_native(local_path.GetPath()), true, false, &last_created);
-
-	if (!last_created.empty()) {
-		// Send out notification
-		auto n = std::make_unique<CLocalDirCreatedNotification>();
-		if (n->dir.SetPath(fz::to_wstring(last_created))) {
-			engine_.AddNotification(std::move(n));
-		}
-	}
-}
-
 void CControlSocket::List(CServerPath const&, std::wstring const&, int)
 {
 	Push(std::make_unique<CNotSupportedOpData>());

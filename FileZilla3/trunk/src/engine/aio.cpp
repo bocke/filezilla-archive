@@ -21,6 +21,12 @@ size_t get_page_size()
 aio_base::shm_handle const aio_base::shm_handle_default{INVALID_HANDLE_VALUE};
 #endif
 
+aio_base::aio_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler)
+	: name_(name)
+	, engine_(engine)
+	, handler_(handler)
+{}
+
 aio_base::~aio_base()
 {
 #if FZ_WINDOWS

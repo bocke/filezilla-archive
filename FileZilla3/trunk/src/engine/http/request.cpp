@@ -407,7 +407,7 @@ int CHttpRequestOpData::OnReceive(writer_base* writer)
 		log(logmsg::debug_warning, L"Stale writer event");
 		return FZ_REPLY_WOULDBLOCK;;
 	}
-	OnReceive(true);
+	return OnReceive(true);
 }
 
 int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
