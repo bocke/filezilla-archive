@@ -111,9 +111,6 @@ int CStorjFileTransferOpData::Send()
 	case filetransfer_transfer:
 
 		if (download()) {
-			if (!resume_) {
-				controlSocket_.CreateLocalDir(localFile_);
-			}
 			engine_.transfer_status_.Init(remoteFileSize_, 0, false);
 		}
 		else {

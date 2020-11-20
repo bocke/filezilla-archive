@@ -72,10 +72,6 @@ int CSftpFileTransferOpData::Send()
 			logstr = L"re";
 		}
 		if (download()) {
-			if (!resume_) {
-				controlSocket_.CreateLocalDir(localFile_);
-			}
-
 			engine_.transfer_status_.Init(remoteFileSize_, resume_ ? localFileSize_ : 0, false);
 			cmd += "get ";
 			logstr += L"get ";

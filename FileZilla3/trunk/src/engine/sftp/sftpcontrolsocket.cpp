@@ -117,23 +117,26 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 
 			bool tmp;
 			CTransferStatus status = engine_.transfer_status_.Get(tmp);
-			if (!status.empty() && !status.madeProgress) {
+			if (!status.empty()) {
 				if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
 					auto & data = static_cast<CSftpFileTransferOpData &>(*operations_.back());
-					if (data.download()) {
-						if (value > 0) {
-							engine_.transfer_status_.SetMadeProgress();
-						}
+					if (!data.download()) {
+						engine_.transfer_status_.Update(value);	
 					}
-					else {
-						if (status.currentOffset > status.startOffset + 65565) {
-							engine_.transfer_status_.SetMadeProgress();
+					if (!status.madeProgress) {
+						if (data.download()) {
+							if (value > 0) {
+								engine_.transfer_status_.SetMadeProgress();
+							}
+						}
+						else {
+							if (status.currentOffset > status.startOffset + 65565) {
+								engine_.transfer_status_.SetMadeProgress();
+							}
 						}
 					}
 				}
 			}
-
-			engine_.transfer_status_.Update(value);
 		}
 		break;
 	case sftpEvent::AskHostkey:

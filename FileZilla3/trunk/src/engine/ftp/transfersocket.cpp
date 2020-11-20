@@ -267,7 +267,6 @@ void CTransferSocket::OnReceive()
 					m_madeProgress = 2;
 					engine_.transfer_status_.SetMadeProgress();
 				}
-				engine_.transfer_status_.Update(numread);
 
 				buffer_.add(static_cast<size_t>(numread));
 			}

@@ -85,9 +85,9 @@ uint64_t file_writer_factory::size() const
 	return *size_;
 }
 
-std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
+std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status)
 {
-	auto ret = std::make_unique<file_writer>(name_, engine, handler);
+	auto ret = std::make_unique<file_writer>(name_, engine, handler, update_transfer_status);
 
 	if (ret->open(offset, fsync_, shm) != aio_result::ok) {
 		ret.reset();
@@ -116,8 +116,9 @@ void remove_writer_events(fz::event_handler * handler, writer_base const* writer
 }
 }
 
-writer_base::writer_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler)
+writer_base::writer_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status)
 	: aio_base(name, engine, handler)
+	, update_transfer_status_(update_transfer_status)
 {}
 
 void writer_base::close()
@@ -237,8 +238,8 @@ aio_result writer_base::finalize(fz::nonowning_buffer & last_written)
 	return res;
 }
 
-file_writer::file_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler)
-	: writer_base(name, engine, handler)
+file_writer::file_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status)
+	: writer_base(name, engine, handler, update_transfer_status)
 {
 }
 
@@ -330,6 +331,9 @@ void file_writer::entry()
 			}
 			if (written > 0) {
 				b.consume(static_cast<size_t>(written));
+				if (update_transfer_status_) {
+					engine_.transfer_status_.Update(written);
+				}
 			}
 			else {
 				error_ = true;
@@ -394,13 +398,13 @@ std::unique_ptr<writer_factory> memory_writer_factory::clone() const
 	return std::make_unique<memory_writer_factory>(*this);
 }
 
-std::unique_ptr<writer_base> memory_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
+std::unique_ptr<writer_base> memory_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status)
 {
 	if (!result_buffer_ || offset) {
 		return nullptr;
 	}
 
-	auto ret = std::make_unique<memory_writer>(name_, engine, handler, *result_buffer_, sizeLimit_);
+	auto ret = std::make_unique<memory_writer>(name_, engine, handler, update_transfer_status, *result_buffer_, sizeLimit_);
 	if (ret->open(shm) != aio_result::ok) {
 		ret.reset();
 	}
@@ -408,8 +412,8 @@ std::unique_ptr<writer_base> memory_writer_factory::open(uint64_t offset, CFileZ
 	return ret;
 }
 
-memory_writer::memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, fz::buffer & result_buffer, size_t sizeLimit)
-	: writer_base(name, engine, handler)
+memory_writer::memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit)
+	: writer_base(name, engine, handler, update_transfer_status)
 	, result_buffer_(result_buffer)
 	, sizeLimit_(sizeLimit)
 {}
@@ -451,5 +455,8 @@ void memory_writer::signal_capacity(fz::scoped_lock & l)
 	}
 	else {
 		result_buffer_.append(b.get(), b.size());
+		if (update_transfer_status_) {
+			engine_.transfer_status_.Update(b.size());
+		}
 	}
 }
