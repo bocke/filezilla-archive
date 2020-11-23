@@ -54,6 +54,8 @@ public:
 
 	static constexpr auto nosize = static_cast<uint64_t>(-1);
 
+	std::wstring const& name() const { return name_; }
+
 protected:
 	virtual void signal_capacity(fz::scoped_lock & l) = 0;
 

@@ -18,83 +18,18 @@
 #include <assert.h>
 #include <string.h>
 
-int simple_body::data_request(unsigned char* data, unsigned int & len)
-{
-	len = static_cast<unsigned int>(std::min(static_cast<size_t>(len), body_.size() - written_));
-	memcpy(data, body_.c_str() + written_, len);
-	written_ += len;
-	return FZ_REPLY_CONTINUE;
-}
-
-
-file_body::file_body(fz::file & file, uint64_t start, uint64_t size, fz::logger_interface & logger)
-	: file_(file)
-	, start_(start)
-	, size_(size)
-	, logger_(logger)
-{
-}
-
-int file_body::data_request(unsigned char* data, unsigned int & len)
-{
-	assert(size_ >= written_);
-	assert(len > 0);
-	len = static_cast<unsigned int>(std::min(static_cast<uint64_t>(len), size_ - written_));
-	if (!len) {
-		return FZ_REPLY_CONTINUE;
-	}
-	auto bytes_read = file_.read(data, len);
-	if (bytes_read < 0) {
-		len = 0;
-		logger_.log(logmsg::error, _("Reading from local file failed"));
-		return FZ_REPLY_ERROR;
-	}
-	else if (bytes_read == 0) {
-		len = 0;
-		return FZ_REPLY_ERROR;
-	}
-
-	if (progress_callback_) {
-		progress_callback_(bytes_read);
-	}
-
-	len = static_cast<unsigned int>(bytes_read);
-	written_ += len;
-	return FZ_REPLY_CONTINUE;
-}
-
-int file_body::rewind()
-{
-	if (progress_callback_) {
-		progress_callback_(-static_cast<int64_t>(written_));
-	}
-	written_ = 0;
-
-	int64_t s = static_cast<int64_t>(start_);
-	if (file_.seek(s, fz::file::begin) != s) {
-		if (!start_) {
-			logger_.log(logmsg::error, _("Could not seek to the beginning of the file"));
-		}
-		else {
-			logger_.log(logmsg::error, _("Could not seek to offset %d within file"), start_);
-		}
-		return FZ_REPLY_ERROR;
-	}
-
-	return FZ_REPLY_CONTINUE;
-}
-
-
 int HttpRequest::reset()
 {
-	flags_ = 0;
+	flags_ &= ~flag_update_transferstatus;
 
 	if (body_) {
-		int res = body_->rewind();
-		if (res != FZ_REPLY_CONTINUE) {
-			return res;
+		aio_result res = body_->rewind();
+		if (res != aio_result::ok) {
+			return FZ_REPLY_ERROR;
 		}
+		body_buffer_ = fz::nonowning_buffer();
 	}
+
 	return FZ_REPLY_CONTINUE;
 }
 

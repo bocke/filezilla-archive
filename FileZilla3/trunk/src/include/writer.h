@@ -112,9 +112,6 @@ public:
 
 	aio_result finalize(fz::nonowning_buffer & last_written);
 
-	// May be empty
-	std::wstring const& name() const { return name_; }
-
 	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
 	get_write_buffer_result get_write_buffer(fz::nonowning_buffer & last_written);

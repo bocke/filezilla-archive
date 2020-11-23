@@ -13,74 +13,6 @@ auto const http_request = Command::private1;
 auto const http_connect = Command::private2;
 }
 
-class request_body
-{
-public:
-	virtual ~request_body() = default;
-
-	virtual uint64_t size() const = 0;
-
-	// data_request must write up to len bytes into the provided buffer,
-	// and update len with the amount written.
-	// Must return FZ_REPLY_CONTINUE or FZ_REPLY_ERROR
-	virtual int data_request(unsigned char* data, unsigned int & len) = 0;
-
-	// reset() must return FZ_REPLY_CONTINUE or FZ_REPLY_ERROR
-	virtual int rewind() = 0;
-};
-
-class simple_body final : public request_body
-{
-public:
-	simple_body() = default;
-	explicit simple_body(std::string const& body)
-		: body_(body)
-	{}
-
-	void set(std::string const& body)
-	{
-		body_ = body;
-		written_ = 0;
-	}
-
-	virtual int data_request(unsigned char* data, unsigned int & len) override;
-
-	virtual int rewind() override
-	{
-		written_ = 0;
-		return FZ_REPLY_CONTINUE;
-	}
-
-	virtual uint64_t size() const override { return body_.size(); }
-
-private:
-	size_t written_{};
-	std::string body_;
-};
-
-
-class file_body final : public request_body
-{
-public:
-	file_body(fz::file & file, uint64_t start, uint64_t size, fz::logger_interface & logger);
-
-	virtual uint64_t size() const override { return size_; }
-
-	virtual int data_request(unsigned char* data, unsigned int & len) override;
-
-	virtual int rewind() override;
-
-	std::function<void(int64_t)> progress_callback_;
-
-protected:
-	fz::file & file_;
-	uint64_t start_{};
-	uint64_t written_{};
-	uint64_t size_{};
-
-	fz::logger_interface & logger_;
-};
-
 #define HEADER_NAME_CONTENT_LENGTH "Content-Length"
 #define HEADER_NAME_CONTENT_TYPE "Content-Type"
 class WithHeaders
@@ -133,11 +65,13 @@ public:
 
 	enum flags {
 		flag_sent_header = 0x01,
-		flag_sent_body = 0x02
+		flag_sent_body = 0x02,
+		flag_update_transferstatus = 0x04
 	};
 	int flags_{};
 
-	std::unique_ptr<request_body> body_;
+	std::unique_ptr<reader_base> body_;
+	fz::nonowning_buffer body_buffer_;
 
 	virtual int reset();
 };

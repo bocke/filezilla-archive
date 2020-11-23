@@ -4,6 +4,10 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
+reader_factory::reader_factory(std::wstring const& name)
+	: name_(name)
+{}
+
 reader_factory_holder::reader_factory_holder(reader_factory_holder const& op)
 {
 	if (op.impl_) {
@@ -51,11 +55,11 @@ reader_factory_holder& reader_factory_holder::operator=(std::unique_ptr<reader_f
 }
 
 file_reader_factory::file_reader_factory(std::wstring const& file)
-	: file_(file)
+	: reader_factory(file)
 {
 }
 
-std::unique_ptr<reader_factory> file_reader_factory::clone()
+std::unique_ptr<reader_factory> file_reader_factory::clone() const
 {
 	return std::make_unique<file_reader_factory>(*this);
 }
@@ -65,7 +69,7 @@ uint64_t file_reader_factory::size() const
 	if (size_) {
 		return *size_;
 	}
-	auto s = fz::local_filesys::get_size(fz::to_native(file_));
+	auto s = fz::local_filesys::get_size(fz::to_native(name_));
 	if (s < 0) {
 		size_ = aio_base::nosize;
 	}
@@ -77,7 +81,7 @@ uint64_t file_reader_factory::size() const
 
 std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
 {
-	auto ret = std::make_unique<file_reader>(file_, engine, handler);
+	auto ret = std::make_unique<file_reader>(name_, engine, handler);
 
 	if (ret->open(offset, shm) != aio_result::ok) {
 		ret.reset();
@@ -179,6 +183,8 @@ aio_result file_reader::open(uint64_t offset, shm_flag shm)
 		return aio_result::error;
 	}
 
+	start_offset_ = offset;
+
 	if (offset) {
 		auto const ofs = static_cast<int64_t>(offset);
 		if (file_.seek(ofs, fz::file::begin) != ofs) {
@@ -188,6 +194,21 @@ aio_result file_reader::open(uint64_t offset, shm_flag shm)
 
 	thread_ = engine_.GetThreadPool().spawn([this]() { entry(); });
 	if (!thread_) {
+		return aio_result::error;
+	}
+
+	return aio_result::ok;
+}
+
+aio_result file_reader::rewind()
+{
+	if (error_) {
+		return aio_result::error;
+	}
+
+	auto const ofs = static_cast<int64_t>(start_offset_);
+	if (file_.seek(ofs, fz::file::begin) != ofs) {
+		error_ = true;
 		return aio_result::error;
 	}
 
@@ -252,4 +273,160 @@ uint64_t file_reader::size() const
 		size_ = static_cast<uint64_t>(s);
 	}
 	return *size_;
+}
+
+
+
+#include <libfilezilla/buffer.hpp>
+
+memory_reader_factory::memory_reader_factory(std::wstring const& name, fz::buffer & data)
+	: reader_factory(name)
+	, data_(reinterpret_cast<char const*>(data.get()), data.size())
+{}
+
+memory_reader_factory::memory_reader_factory(std::wstring const& name, std::string_view const& data)
+	: reader_factory(name)
+	, data_(data)
+{}
+
+std::unique_ptr<reader_base> memory_reader_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
+{
+	auto ret = std::make_unique<memory_reader>(name_, engine, handler, data_);
+	if (ret->open(offset, shm) != aio_result::ok) {
+		ret.reset();
+	}
+
+	return ret;
+}
+
+std::unique_ptr<reader_factory> memory_reader_factory::clone() const
+{
+	return std::make_unique<memory_reader_factory>(*this);
+}
+
+uint64_t memory_reader_factory::size() const
+{
+	return data_.size();
+}
+
+
+memory_reader::memory_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string_view const& data)
+	: reader_base(name, engine, handler)
+	, start_data_(data)
+	, data_(start_data_)
+{
+	ready_count_ = buffer_count;
+}
+
+aio_result memory_reader::open(uint64_t offset, shm_flag shm)
+{
+	if (!allocate_memory(shm)) {
+		return aio_result::error;
+	}
+
+	if (offset > data_.size()) {
+		return aio_result::error;
+	}
+
+	data_ = data_.substr(offset);
+	start_data_ = data_;
+
+	processing_ = true;
+	ready_count_ = 8;
+	
+	return aio_result::ok;
+}
+
+
+void memory_reader::signal_capacity(fz::scoped_lock & l)
+{
+	++ready_count_;
+	
+	size_t c = std::min(data_.size(), buffer_size_);
+
+	auto& b = buffers_[ready_pos_];
+	b.resize(c);
+	if (c) {
+		memcpy(b.get(c), data_.data(), c);
+		b.add(c);
+		data_ = data_.substr(c);
+	}
+}
+
+uint64_t memory_reader::size() const
+{
+	return start_data_.size();
+}
+
+aio_result memory_reader::rewind()
+{
+	data_ = start_data_;
+	return aio_result::ok;
+}
+
+
+
+
+string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string const& data)
+	: reader_base(name, engine, handler)
+	, start_data_(data)
+	, data_(start_data_)
+{
+	ready_count_ = buffer_count;
+	processing_ = true;
+}
+
+string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string && data)
+	: reader_base(name, engine, handler)
+	, start_data_(std::move(data_))
+	, data_(start_data_)
+{
+	ready_count_ = buffer_count;
+	processing_ = true;
+}
+
+std::unique_ptr<string_reader> string_reader::create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string const& data, shm_flag shm)
+{
+	std::unique_ptr<string_reader> ret(new string_reader(name, engine, handler, data));
+	if (!ret->allocate_memory(shm)) {
+		ret.reset();
+	}
+
+	return ret;
+}
+
+std::unique_ptr<string_reader> string_reader::create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string && data, shm_flag shm)
+{
+	std::unique_ptr<string_reader> ret(new string_reader(name, engine, handler, data));
+	if (!ret->allocate_memory(shm)) {
+		ret.reset();
+	}
+
+	return ret;
+}
+
+void string_reader::signal_capacity(fz::scoped_lock & l)
+{
+	++ready_count_;
+	
+	size_t c = std::min(data_.size(), buffer_size_);
+
+	auto& b = buffers_[ready_pos_];
+	b.resize(c);
+	if (c) {
+		memcpy(b.get(c), data_.data(), c);
+		b.add(c);
+		data_ = data_.substr(c);
+	}
+}
+
+uint64_t string_reader::size() const
+{
+	return start_data_.size();
+}
+
+aio_result string_reader::rewind()
+{
+	data_ = start_data_;
+	return aio_result::ok;
 }
