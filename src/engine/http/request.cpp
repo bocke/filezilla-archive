@@ -13,7 +13,7 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 {
 	opState = request_init | request_reading;
 
-	request->request().flags_ = 0;
+	request->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
 	request->response().flags_ = 0;
 
 	requests_.emplace_back(request);
@@ -25,7 +25,7 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 	, requests_(requests)
 {
 	for (auto & rr : requests_) {
-		rr->request().flags_ = 0;
+		rr->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
 		rr->response().flags_ = 0;
 	}
 	opState = request_init | request_reading;
@@ -53,7 +53,7 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 			}
 		}
 	}
-	rr->request().flags_ = 0;
+	rr->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
 	rr->response().flags_ = 0;
 	requests_.push_back(rr);
 }
@@ -225,27 +225,7 @@ int CHttpRequestOpData::Send()
 				return result;
 			}
 			else {
-				int const chunkSize = 65536;
-
-				while (dataToSend_ || controlSocket_.send_buffer_) {
-					if (!controlSocket_.send_buffer_) {
-						unsigned int len = chunkSize;
-						if (chunkSize > dataToSend_) {
-							len = static_cast<unsigned int>(dataToSend_);
-						}
-						int res = req.body_->data_request(controlSocket_.send_buffer_.get(len), len);
-						if (res != FZ_REPLY_CONTINUE) {
-							return res;
-						}
-						if (len > dataToSend_) {
-							log(logmsg::debug_warning, L"req.body_ returned too much data");
-							return FZ_REPLY_INTERNALERROR;
-						}
-
-						controlSocket_.send_buffer_.add(len);
-						dataToSend_ -= len;
-					}
-
+				while (controlSocket_.send_buffer_) {
 					int error;
 					int written = controlSocket_.active_layer_->write(controlSocket_.send_buffer_.get(), controlSocket_.send_buffer_.size(), error);
 					if (written < 0) {
@@ -256,11 +236,51 @@ int CHttpRequestOpData::Send()
 						}
 						return FZ_REPLY_WOULDBLOCK;
 					}
-
-					if (written) {
+					else if (written) {
 						controlSocket_.SetActive(CFileZillaEngine::send);
-
 						controlSocket_.send_buffer_.consume(static_cast<size_t>(written));
+					}
+				}
+
+				while (dataToSend_) {
+
+					if (req.body_buffer_.empty()) {
+						read_result r = req.body_->read();
+						if (r.type_ == aio_result::wait) {
+							return FZ_REPLY_WOULDBLOCK;
+						}
+						else if (r.type_ == aio_result::error) {
+							return FZ_REPLY_ERROR;
+						}
+						req.body_buffer_ = r.buffer_;
+
+						if (req.body_buffer_.empty() && dataToSend_) {
+							log(logmsg::error, _("Unexpected end-of-file on '%s'"), req.body_->name());
+							return FZ_REPLY_ERROR;
+						}
+						else if (req.body_buffer_.size() > dataToSend_) {
+							log(logmsg::error, _("Excess data read from '%s'"), req.body_->name());
+							return FZ_REPLY_ERROR;
+						}
+					}
+
+					int error;
+					int written = controlSocket_.active_layer_->write(req.body_buffer_.get(), req.body_buffer_.size(), error);
+					if (written < 0) {
+						if (error != EAGAIN) {
+							log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
+							log(logmsg::error, _("Disconnected from server"));
+							return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+						}
+						return FZ_REPLY_WOULDBLOCK;
+					}
+					else if (written) {
+						controlSocket_.SetActive(CFileZillaEngine::send);
+						req.body_buffer_.consume(static_cast<size_t>(written));
+						dataToSend_ -= written;
+						if (req.flags_ & HttpRequest::flag_update_transferstatus) {
+							engine_.transfer_status_.Update(written);
+						}
 					}
 				}
 
