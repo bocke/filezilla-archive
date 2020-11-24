@@ -389,7 +389,7 @@ string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate &
 
 string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string && data)
 	: reader_base(name, engine, handler)
-	, start_data_(std::move(data_))
+	, start_data_(std::move(data))
 	, data_(start_data_)
 {
 	ready_count_ = buffer_count;

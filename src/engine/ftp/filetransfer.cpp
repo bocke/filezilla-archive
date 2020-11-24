@@ -59,15 +59,14 @@ int CFtpFileTransferOpData::Send()
 		}
 
 		{
-			int64_t startOffset{};
+			resumeOffset = 0;
 			if (download()) {
 				// Potentially racy
-				bool didExist = writer_factory_.size() != aio_base::nosize;
-				fileDidExist_ = didExist;
+				localFileSize_ = writer_factory_.size(); 
+				fileDidExist_ = localFileSize_ != aio_base::nosize;
 
 				if (resume_) {
-					startOffset = didExist ? writer_factory_.size() : 0;
-					localFileSize_ = startOffset;
+					resumeOffset = fileDidExist_ ? static_cast<int64_t>(localFileSize_) : 0;
 
 					// Check resume capabilities
 					if (opState == filetransfer_resumetest) {
@@ -81,10 +80,7 @@ int CFtpFileTransferOpData::Send()
 					localFileSize_ = 0;
 				}
 
-				resumeOffset = resume_ ? localFileSize_ : 0;
-				startOffset = resumeOffset;
-
-				engine_.transfer_status_.Init(remoteFileSize_, startOffset, false);
+				engine_.transfer_status_.Init(remoteFileSize_, resumeOffset, false);
 
 				/* TODO
 				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
@@ -111,9 +107,9 @@ int CFtpFileTransferOpData::Send()
 			else {
 				if (resume_) {
 					if (remoteFileSize_ > 0) {
-						startOffset = remoteFileSize_;
+						resumeOffset = remoteFileSize_;
 
-						if (startOffset == localFileSize_ && binary) {
+						if (localFileSize_ != aio_base::nosize && resumeOffset >= static_cast<int64_t>(localFileSize_) && binary) {
 							log(logmsg::debug_info, L"No need to resume, remote file size matches local file size.");
 
 							if (engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
@@ -128,30 +124,15 @@ int CFtpFileTransferOpData::Send()
 							return FZ_REPLY_OK;
 						}
 					}
-					else {
-						startOffset = 0;
-					}
-				}
-				else {
-					startOffset = 0;
 				}
 
-				if (CServerCapabilities::GetCapability(currentServer_, rest_stream) == yes) {
-					// Use REST + STOR if resuming
-					resumeOffset = startOffset;
-				}
-				else {
-					// Play it safe, use APPE if resuming
-					resumeOffset = 0;
-				}
-
-				engine_.transfer_status_.Init(reader_factory_.size(), startOffset, false);
+				engine_.transfer_status_.Init(reader_factory_.size(), resumeOffset, false);
 			}
 
 			controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
 			controlSocket_.m_pTransferSocket->m_binaryMode = binary;
 			if (download()) {
-				auto writer = writer_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
+				auto writer = writer_factory_.open(resumeOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!writer) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
@@ -160,7 +141,7 @@ int CFtpFileTransferOpData::Send()
 				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
 			}
 			else {
-				auto reader = reader_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
+				auto reader = reader_factory_.open(resumeOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!reader) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);
@@ -173,12 +154,11 @@ int CFtpFileTransferOpData::Send()
 		if (download()) {
 			cmd = L"RETR ";
 		}
-		else if (resume_) {
+		else if (resume_ && resumeOffset != 0) {
 			if (CServerCapabilities::GetCapability(currentServer_, rest_stream) == yes) {
 				cmd = L"STOR "; // In this case REST gets sent since resume offset was set earlier
 			}
 			else {
-				assert(resumeOffset == 0);
 				cmd = L"APPE ";
 			}
 		}
