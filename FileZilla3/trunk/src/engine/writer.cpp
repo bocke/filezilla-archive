@@ -446,7 +446,7 @@ uint64_t memory_writer::size() const
 	return result_buffer_.size();
 }
 
-void memory_writer::signal_capacity(fz::scoped_lock & l)
+void memory_writer::signal_capacity(fz::scoped_lock &)
 {
 	--ready_count_;
 	auto & b = buffers_[ready_pos_];
