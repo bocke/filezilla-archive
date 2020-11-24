@@ -991,7 +991,7 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 		}
 		break;
 	case CFileExistsNotification::resume:
-		if (data.download() && data.localFileSize_ >= 0) {
+		if (data.download() && data.localFileSize_ != aio_base::nosize) {
 			data.resume_ = true;
 		}
 		else if (!data.download() && data.remoteFileSize_ >= 0) {
