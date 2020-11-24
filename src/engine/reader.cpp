@@ -347,7 +347,7 @@ aio_result memory_reader::open(uint64_t offset, shm_flag shm)
 }
 
 
-void memory_reader::signal_capacity(fz::scoped_lock & l)
+void memory_reader::signal_capacity(fz::scoped_lock &)
 {
 	++ready_count_;
 	
@@ -414,7 +414,7 @@ std::unique_ptr<string_reader> string_reader::create(std::wstring const& name, C
 	return ret;
 }
 
-void string_reader::signal_capacity(fz::scoped_lock & l)
+void string_reader::signal_capacity(fz::scoped_lock &)
 {
 	++ready_count_;
 	
