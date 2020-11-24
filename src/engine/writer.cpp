@@ -2,6 +2,8 @@
 #include "engineprivate.h"
 #include <libfilezilla/local_filesys.hpp>
 
+#include <string.h>
+
 writer_factory_holder::writer_factory_holder(writer_factory_holder const& op)
 {
 	if (op.impl_) {

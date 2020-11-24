@@ -4,6 +4,8 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
+#include <string.h>
+
 reader_factory::reader_factory(std::wstring const& name)
 	: name_(name)
 {}
