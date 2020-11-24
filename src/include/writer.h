@@ -36,7 +36,7 @@ public:
 
 	virtual uint64_t size() const { return aio_base::nosize; }
 	virtual fz::datetime mtime() const { return fz::datetime(); }
-	virtual bool set_mtime(fz::datetime const& t) const { return false; }
+	virtual bool set_mtime(fz::datetime const&) const { return false; }
 
 protected:
 	writer_factory() = default;
