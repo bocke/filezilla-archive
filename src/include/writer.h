@@ -65,7 +65,7 @@ public:
 
 	std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status = true)
 	{
-		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
+		return impl_ ? impl_->open(offset, engine, handler, shm, update_transfer_status) : nullptr;
 	}
 
 	std::wstring name() const { return impl_ ? impl_->name() : std::wstring(); }
