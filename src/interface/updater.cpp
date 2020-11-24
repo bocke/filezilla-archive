@@ -335,8 +335,7 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 	path = path.GetParent();
 
 	transfer_flags const flags = transfer_flags::download;
-	auto cmd = new CFileTransferCommand(local_file, path, file, flags);
-	cmd->output_ = std::make_unique<file_writer_factory>(local_file, true);
+	auto cmd = new CFileTransferCommand(file_writer_factory(local_file, true), path, file, flags);
 	pending_commands_.emplace_back(cmd);
 	return true;
 }

@@ -213,18 +213,15 @@ void CHttpControlSocket::OnConnect()
 	}
 }
 
-void CHttpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
-									std::wstring const& remoteFile, transfer_flags const& flags)
+void CHttpControlSocket::FileTransfer(CFileTransferCommand const& cmd)
 {
 	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");
 
-	if (flags & transfer_flags::download) {
-		log(logmsg::status, _("Downloading %s"), remotePath.FormatFilename(remoteFile));
+	if (cmd.GetFlags() & transfer_flags::download) {
+		log(logmsg::status, _("Downloading %s"), cmd.GetRemotePath().FormatFilename(cmd.GetRemoteFile()));
 	}
 
-	auto op = std::make_unique<CHttpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
-	op->writer_factory_ = writer;
-	Push(std::move(op));
+	Push(std::make_unique<CHttpFileTransferOpData>(*this, cmd));
 }
 
 void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)

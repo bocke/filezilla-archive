@@ -44,6 +44,15 @@ reader_factory_holder::reader_factory_holder(std::unique_ptr<reader_factory> && 
 {
 }
 
+reader_factory_holder::reader_factory_holder(std::unique_ptr<reader_factory> const& factory)
+	: impl_(factory ? factory->clone() : nullptr)
+{
+}
+
+reader_factory_holder::reader_factory_holder(reader_factory const& factory)
+	: impl_(factory.clone())
+{
+}
 
 reader_factory_holder& reader_factory_holder::operator=(std::unique_ptr<reader_factory> && factory)
 {

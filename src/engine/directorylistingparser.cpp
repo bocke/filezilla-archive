@@ -73,31 +73,34 @@ public:
 		hex
 	};
 
-	CToken(wchar_t const* p, unsigned int len)
-		: m_pToken(p)
-		, m_len(len)
+	CToken(std::wstring_view data)
+		: data_(data)
 	{}
 
-	wchar_t const* GetToken() const
+	CToken(wchar_t const* data, size_t len)
+		: data_(data, len)
+	{}
+
+	wchar_t const* data() const
 	{
-		return m_pToken;
+		return data_.data();
 	}
 
-	unsigned size() const {
-		return m_len;
+	size_t size() const {
+		return data_.size();
 	}
 
-	explicit operator bool() const { return m_len != 0; }
+	explicit operator bool() const { return !data_.empty(); }
 
-	wchar_t operator[](unsigned int i) const { return m_pToken[i]; }
+	wchar_t operator[](size_t i) const { return data_[i]; }
 
 	std::wstring GetString() const
 	{
-		if (!m_pToken || !m_len) {
+		if (data_.empty()) {
 			return std::wstring();
 		}
 		else {
-			return std::wstring(m_pToken, m_len);
+			return std::wstring(data_.data(), data_.size());
 		}
 	}
 
@@ -109,8 +112,8 @@ public:
 		default:
 			if (!(flags_ & (numeric | non_numeric))) {
 				flags_ |= numeric;
-				for (unsigned int i = 0; i < m_len; ++i) {
-					if (m_pToken[i] < '0' || m_pToken[i] > '9') {
+				for (size_t i = 0; i < data_.size(); ++i) {
+					if (data_[i] < '0' || data_[i] > '9') {
 						flags_ ^= numeric | non_numeric;
 						break;
 					}
@@ -118,8 +121,8 @@ public:
 			}
 			return flags_ & numeric;
 		case hex:
-			for (unsigned int i = 0; i < m_len; ++i) {
-				auto const c = m_pToken[i];
+			for (size_t i = 0; i < data_.size(); ++i) {
+				auto const c = data_[i];
 				if ((c < '0' || c > '9') && (c < 'A' || c > 'F') && (c < 'a' || c > 'f')) {
 					return false;
 				}
@@ -128,10 +131,10 @@ public:
 		}
 	}
 
-	bool IsNumeric(unsigned int start, unsigned int len)
+	bool IsNumeric(size_t start, size_t len)
 	{
-		for (unsigned int i = start; i < std::min(start + len, m_len); ++i) {
-			if (m_pToken[i] < '0' || m_pToken[i] > '9') {
+		for (size_t i = start; i < std::min(start + len, data_.size()); ++i) {
+			if (data_[i] < '0' || data_[i] > '9') {
 				return false;
 			}
 		}
@@ -141,7 +144,7 @@ public:
 	bool IsLeftNumeric()
 	{
 		if (!(flags_ & (numeric_left | non_numeric_left))) {
-			if (m_len < 2 || m_pToken[0] < '0' || m_pToken[0] > '9') {
+			if (data_.size() < 2 || data_[0] < '0' || data_[0] > '9') {
 				flags_ |= non_numeric_left;
 			}
 			else {
@@ -154,7 +157,7 @@ public:
 	bool IsRightNumeric()
 	{
 		if (!(flags_ & (numeric_right | non_numeric_right))) {
-			if (m_len < 2 || m_pToken[m_len - 1] < '0' || m_pToken[m_len - 1] > '9') {
+			if (data_.size() < 2 || data_.back() < '0' || data_.back() > '9') {
 				flags_ |= non_numeric_right;
 			}
 			else {
@@ -164,15 +167,15 @@ public:
 		return flags_ & numeric_right;
 	}
 
-	int Find(const wchar_t* chr, int start = 0) const
+	int Find(wchar_t const* chr, size_t start = 0) const
 	{
 		if (!chr) {
 			return -1;
 		}
 
-		for (unsigned int i = start; i < m_len; ++i) {
-			for (int c = 0; chr[c]; ++c) {
-				if (m_pToken[i] == chr[c]) {
+		for (size_t i = start; i < data_.size(); ++i) {
+			for (size_t c = 0; chr[c]; ++c) {
+				if (data_[i] == chr[c]) {
 					return i;
 				}
 			}
@@ -180,14 +183,10 @@ public:
 		return -1;
 	}
 
-	int Find(wchar_t chr, int start = 0) const
+	int Find(wchar_t chr, size_t start = 0) const
 	{
-		if (!m_pToken) {
-			return -1;
-		}
-
-		for (unsigned int i = start; i < m_len; ++i) {
-			if (m_pToken[i] == chr) {
+		for (size_t i = start; i < data_.size(); ++i) {
+			if (data_[i] == chr) {
 				return i;
 			}
 		}
@@ -195,30 +194,30 @@ public:
 		return -1;
 	}
 
-	int64_t GetNumber(unsigned int start, int len)
+	int64_t GetNumber(size_t start, int len)
 	{
 		if (len == -1) {
-			len = m_len - start;
+			len = data_.size() - start;
 		}
 		if (len < 1) {
 			return -1;
 		}
 
-		if (start + static_cast<unsigned int>(len) > m_len) {
+		if (start + static_cast<size_t>(len) > data_.size()) {
 			return -1;
 		}
 
-		if (m_pToken[start] < '0' || m_pToken[start] > '9') {
+		if (data_[start] < '0' || data_[start] > '9') {
 			return -1;
 		}
 
 		int64_t number = 0;
-		for (unsigned int i = start; i < (start + len); ++i) {
-			if (m_pToken[i] < '0' || m_pToken[i] > '9') {
+		for (size_t i = start; i < (start + len); ++i) {
+			if (data_[i] < '0' || data_[i] > '9') {
 				break;
 			}
 			number *= 10;
-			number += m_pToken[i] - '0';
+			number += data_[i] - '0';
 		}
 		return number;
 	}
@@ -232,8 +231,8 @@ public:
 				constexpr int64_t max = (std::numeric_limits<int64_t>::max() - 9) / 10;
 				if (IsNumeric() || IsLeftNumeric()) {
 					m_number = 0;
-					for (unsigned int i = 0; i < m_len; ++i) {
-						if (m_pToken[i] < '0' || m_pToken[i] > '9') {
+					for (size_t i = 0; i < data_.size(); ++i) {
+						if (data_[i] < '0' || data_[i] > '9') {
 							break;
 						}
 						if (m_number > max) {
@@ -241,22 +240,22 @@ public:
 							break;
 						}
 						m_number *= 10;
-						m_number += m_pToken[i] - '0';
+						m_number += data_[i] - '0';
 					}
 				}
 				else if (IsRightNumeric()) {
 					m_number = 0;
-					int start = m_len - 1;
-					while (m_pToken[start - 1] >= '0' && m_pToken[start - 1] <= '9') {
+					size_t start = data_.size() - 1;
+					while (data_[start - 1] >= '0' && data_[start - 1] <= '9') {
 						--start;
 					}
-					for (unsigned int i = start; i < m_len; ++i) {
+					for (size_t i = start; i < data_.size(); ++i) {
 						if (m_number > max) {
 							m_number = -1;
 							break;
 						}
 						m_number *= 10;
-						m_number += m_pToken[i] - '0';
+						m_number += data_[i] - '0';
 					}
 				}
 			}
@@ -265,11 +264,11 @@ public:
 			{
 				constexpr int64_t max = (std::numeric_limits<int64_t>::max() - 15) / 16;
 				int64_t number = 0;
-				for (unsigned int i = 0; i < m_len; ++i) {
+				for (size_t i = 0; i < data_.size(); ++i) {
 					if (number > max) {
 						return -1;
 					}
-					const wchar_t& c = m_pToken[i];
+					wchar_t const& c = data_[i];
 					if (c >= '0' && c <= '9') {
 						number *= 16;
 						number += c - '0';
@@ -294,10 +293,7 @@ public:
 protected:
 	int64_t m_number{std::numeric_limits<int64_t>::min()};
 
-	wchar_t const* m_pToken{};
-
-	unsigned int m_len{};
-
+	std::wstring_view data_;
 	unsigned char flags_{};
 };
 
@@ -365,7 +361,7 @@ public:
 			if (!ref) {
 				return ref;
 			}
-			wchar_t const* p = ref.GetToken() + ref.size() + 1;
+			wchar_t const* p = ref.data() + ref.size() + 1;
 
 			if (static_cast<size_t>(p - line_.c_str()) >= line_.size()) {
 				return CToken();
@@ -396,7 +392,7 @@ public:
 
 		for (unsigned int i = static_cast<unsigned int>(m_LineEndTokens.size()); i <= n; ++i) {
 			CToken const& refToken = m_Tokens[i];
-			const wchar_t* p = refToken.GetToken();
+			const wchar_t* p = refToken.data();
 			if ((p - line_.c_str()) + trailing_whitespace_ >= line_.size()) {
 				return CToken();
 			}
@@ -1085,7 +1081,7 @@ bool CDirectoryListingParser::ParseUnixDateTime(CLine & line, int &index, CDiren
 				if (day < 1 || day > 31) {
 					return false;
 				}
-				dateMonth = CToken(token.GetToken(), pos);
+				dateMonth = CToken(token.data(), pos);
 			}
 			else {
 				dateMonth = token;
@@ -1742,7 +1738,7 @@ bool CDirectoryListingParser::ParseAsVms(CLine &line, CDirentry &entry)
 		if (pos == -1)
 			sizeToken = token;
 		else
-			sizeToken = CToken(token.GetToken(), pos);
+			sizeToken = CToken(token.data(), pos);
 		if (!ParseComplexFileSize(sizeToken, entry.size, 512))
 			return false;
 		gotSize = true;
@@ -1797,7 +1793,7 @@ bool CDirectoryListingParser::ParseAsVms(CLine &line, CDirentry &entry)
 		if (pos == -1)
 			sizeToken = token;
 		else
-			sizeToken = CToken(token.GetToken(), pos);
+			sizeToken = CToken(token.data(), pos);
 		if (!ParseComplexFileSize(sizeToken, entry.size, 512))
 			return false;
 	}

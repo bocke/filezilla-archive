@@ -12,11 +12,11 @@
 
 #include <assert.h>
 
-CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
-	: CFileTransferOpData(L"CFtpFileTransferOpData", local_file, remote_file, remote_path, flags)
+CFtpFileTransferOpData::CFtpFileTransferOpData(CFtpControlSocket& controlSocket, CFileTransferCommand const& cmd)
+	: CFileTransferOpData(L"CFtpFileTransferOpData", cmd)
 	, CFtpOpData(controlSocket)
 {
-	binary = !(flags & ftp_transfer_flags::ascii);
+	binary = !(cmd.GetFlags() & ftp_transfer_flags::ascii);
 }
 
 int CFtpFileTransferOpData::Send()
@@ -25,28 +25,15 @@ int CFtpFileTransferOpData::Send()
 	switch (opState)
 	{
 	case filetransfer_init:
-		if (localFile_.empty()) {
-			if (!download()) {
-				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
-			}
-			else {
-				return FZ_REPLY_SYNTAXERROR;
-			}
-		}
-
 		if (download()) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			log(logmsg::status, _("Starting upload of %s"), localFile_);
+			log(logmsg::status, _("Starting upload of %s"), localName_);
 		}
 
-		int64_t size;
-		bool isLink;
-		if (fz::local_filesys::get_file_info(fz::to_native(localFile_), isLink, &size, nullptr, nullptr) == fz::local_filesys::file) {
-			localFileSize_ = size;
-		}
+		localFileSize_ = download() ? writer_factory_.size() : reader_factory_.size();
 
 		opState = filetransfer_waitcwd;
 
@@ -132,9 +119,8 @@ int CFtpFileTransferOpData::Send()
 							if (engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS) &&
 								CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
 							{
-								fz::datetime mtime = fz::local_filesys::get_modification_time(fz::to_native(localFile_));
-								if (!mtime.empty()) {
-									fileTime_ = mtime;
+								localFileTime_ = reader_factory_.mtime();
+								if (!localFileTime_.empty()) {
 									opState = filetransfer_mfmt;
 									return FZ_REPLY_CONTINUE;
 								}
@@ -168,7 +154,7 @@ int CFtpFileTransferOpData::Send()
 				auto writer = writer_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!writer) {
 					// TODO: Handle different errors
-					log(logmsg::error, _("Failed to open \"%s\" for writing"), localFile_);
+					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
 					return FZ_REPLY_ERROR;
 				}
 				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
@@ -177,7 +163,7 @@ int CFtpFileTransferOpData::Send()
 				auto reader = reader_factory_.open(startOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
 				if (!reader) {
 					// TODO: Handle different errors
-					log(logmsg::error, _("Failed to open \"%s\" for reading"), localFile_);
+					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);
 					return FZ_REPLY_ERROR;
 				}
 				controlSocket_.m_pTransferSocket->set_reader(std::move(reader));
@@ -207,7 +193,7 @@ int CFtpFileTransferOpData::Send()
 	case filetransfer_mfmt:
 	{
 		cmd = L"MFMT ";
-		fz::datetime t = fileTime_;
+		fz::datetime t = localFileTime_;
 		t -= fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
 		cmd += t.format(L"%Y%m%d%H%M%S ", fz::datetime::utc);
 		cmd += remotePath_.FormatFilename(remoteFile_, !tryAbsolutePath_);
@@ -235,7 +221,7 @@ int CFtpFileTransferOpData::TestResumeCapability()
 	}
 
 	for (int i = 0; i < 2; ++i) {
-		if (localFileSize_ >= (1ll << (i ? 31 : 32))) {
+		if (localFileSize_ >= (1ull << (i ? 31 : 32))) {
 			switch (CServerCapabilities::GetCapability(currentServer_, i ? resume2GBbug : resume4GBbug))
 			{
 			case yes:
@@ -328,9 +314,9 @@ int CFtpFileTransferOpData::ParseResponse()
 	case filetransfer_mdtm:
 		opState = filetransfer_resumetest;
 		if (response.substr(0, 4) == L"213 " && response.size() > 16) {
-			fileTime_ = fz::datetime(response.substr(4), fz::datetime::utc);
-			if (!fileTime_.empty()) {
-				fileTime_ += fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
+			remoteFileTime_ = fz::datetime(response.substr(4), fz::datetime::utc);
+			if (!remoteFileTime_.empty()) {
+				remoteFileTime_ += fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
 			}
 		}
 
@@ -379,7 +365,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					if (matchedCase) {
 						remoteFileSize_ = entry.size;
 						if (entry.has_date()) {
-							fileTime_ = entry.time;
+							remoteFileTime_ = entry.time;
 						}
 
 						if (download() &&
@@ -438,7 +424,7 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (matchedCase && !entry.is_unsure()) {
 					remoteFileSize_ = entry.size;
 					if (entry.has_date()) {
-						fileTime_ = entry.time;
+						remoteFileTime_ = entry.time;
 					}
 
 					if (download() &&
@@ -473,16 +459,15 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 			if (!download() &&
 				CServerCapabilities::GetCapability(currentServer_, mfmt_command) == yes)
 			{
-				fz::datetime mtime = fz::local_filesys::get_modification_time(fz::to_native(localFile_));
-				if (!mtime.empty()) {
-					fileTime_ = mtime;
+				localFileTime_ = reader_factory_.mtime();
+				if (!localFileTime_.empty()) {
 					opState = filetransfer_mfmt;
 					return FZ_REPLY_CONTINUE;
 				}
 			}
-			else if (download() && !fileTime_.empty()) {
+			else if (download() && !remoteFileTime_.empty()) {
 				// TODO: reset socket if exists
-				if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_)) {
+				if (!writer_factory_.set_mtime(remoteFileTime_)) {
 					log(logmsg::debug_warning, L"Could not set modification time");
 				}
 			}

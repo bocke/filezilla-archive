@@ -185,9 +185,12 @@ public:
 	// Set overwriteAction to the desired action
 	OverwriteAction overwriteAction{unknown};
 
-	// Set to new filename if overwriteAction is rename. Might trigger further
+	// On uploads: Set to new filename if overwriteAction is rename. Might trigger further
 	// file exists notifications if new target file exists as well.
 	std::wstring newName;
+
+	// On downloads: New writer if overwriteAction is rename
+	writer_factory_holder new_writer_factory_;
 };
 
 class FZC_PUBLIC_SYMBOL CInteractiveLoginNotification final : public CAsyncRequestNotification

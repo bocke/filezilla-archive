@@ -348,6 +348,9 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 		}
 		if (nErrorCode != FZ_REPLY_OK && data.download() && !data.fileDidExist_) {
 			// TODO: destroy socket if exists
+
+			// TODO: remove unprogressed local file
+			/*
 			int64_t size;
 			bool isLink;
 			if (fz::local_filesys::get_file_info(fz::to_native(data.localFile_), isLink, &size, nullptr, nullptr) == fz::local_filesys::file && size == 0) {
@@ -357,6 +360,7 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 				log(logmsg::debug_verbose, L"Deleting empty file");
 				fz::remove_file(fz::to_native(data.localFile_));
 			}
+			*/
 		}
 	}
 
@@ -416,14 +420,11 @@ void CFtpControlSocket::ChangeDir(CServerPath const& path, std::wstring const& s
 	Push(std::move(pData));
 }
 
-void CFtpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
-									std::wstring const& remoteFile, transfer_flags const& flags)
+void CFtpControlSocket::FileTransfer(CFileTransferCommand const& cmd)
 {
 	log(logmsg::debug_verbose, L"CFtpControlSocket::FileTransfer()");
 
-	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
-	pData->reader_factory_ = reader;
-	pData->writer_factory_ = writer;
+	auto pData = std::make_unique<CFtpFileTransferOpData>(*this, cmd);
 	Push(std::move(pData));
 }
 

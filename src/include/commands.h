@@ -223,22 +223,21 @@ namespace ftp_transfer_flags
 class FZC_PUBLIC_SYMBOL CFileTransferCommand final : public CCommandHelper<CFileTransferCommand, Command::transfer>
 {
 public:
-	// For uploads, set download to false.
-	// For downloads, localFile can be left empty if supported by protocol.
-	// Check for nId_data notification.
-	// FIXME: localFile empty iff protocol is HTTP.
-	CFileTransferCommand(std::wstring const& localFile, CServerPath const& remotePath, std::wstring const& remoteFile, transfer_flags const& flags);
+	CFileTransferCommand(reader_factory_holder const& reader, CServerPath const& remotePath, std::wstring const& remoteFile, transfer_flags const& flags);
+	CFileTransferCommand(writer_factory_holder const& writer, CServerPath const& remotePath, std::wstring const& remoteFile, transfer_flags const& flags);
 
-	std::wstring GetLocalFile() const;
 	CServerPath GetRemotePath() const;
 	std::wstring GetRemoteFile() const;
 	bool Download() const { return flags_ & transfer_flags::download; }
 	transfer_flags const& GetFlags() const { return flags_; }
 
-	writer_factory_holder output_;
-	reader_factory_holder input_;
+	bool valid() const;
+
+	reader_factory_holder const& GetReader() const { return reader_; }
+	writer_factory_holder const& GetWriter() const { return writer_; }
 protected:
-	std::wstring const m_localFile;
+	reader_factory_holder const reader_;
+	writer_factory_holder const writer_;
 	CServerPath const m_remotePath;
 	std::wstring const m_remoteFile;
 	transfer_flags const flags_;

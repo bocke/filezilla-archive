@@ -123,7 +123,7 @@ private:
 class CFileTransferOpData : public COpData
 {
 public:
-	CFileTransferOpData(wchar_t const* name, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags);
+	CFileTransferOpData(wchar_t const* name, CFileTransferCommand const& cmd);
 
 	bool download() const { return flags_ & transfer_flags::download; }
 
@@ -136,15 +136,18 @@ public:
 	// starts the actual transfer
 	bool transferInitiated_{};
 
-	std::wstring localFile_;
+	//std::wstring localFile_; // TODO: Remove
 	reader_factory_holder reader_factory_;
 	writer_factory_holder writer_factory_;
+	std::wstring localName_;
 	std::wstring remoteFile_;
 	CServerPath remotePath_;
 
-	fz::datetime fileTime_;
-	int64_t localFileSize_{-1};
+	uint64_t localFileSize_{aio_base::nosize};
+	fz::datetime localFileTime_;
+
 	int64_t remoteFileSize_{-1};
+	fz::datetime remoteFileTime_;
 };
 
 class CMkdirOpData : public COpData
@@ -214,8 +217,7 @@ public:
 	virtual void Connect(CServer const& server, Credentials const& credentials) = 0;
 	virtual void List(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), int flags = 0);
 
-	virtual void FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
-							 std::wstring const& remoteFile, transfer_flags const& flags) = 0;
+	virtual void FileTransfer(CFileTransferCommand const& command) = 0;
 	virtual void RawCommand(std::wstring const& command = std::wstring());
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files);
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring());

@@ -31,9 +31,13 @@ public:
 	virtual std::unique_ptr<writer_factory> clone() const = 0;
 
 	virtual std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status = true) = 0;
-	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
 	std::wstring name() const { return name_; }
+
+	virtual uint64_t size() const { return aio_base::nosize; }
+	virtual fz::datetime mtime() const { return fz::datetime(); }
+	virtual bool set_mtime(fz::datetime const& t) const { return false; }
+
 protected:
 	writer_factory() = default;
 	writer_factory(writer_factory const&) = default;
@@ -48,9 +52,9 @@ public:
 	static constexpr auto npos = static_cast<uint64_t>(-1);
 
 	writer_factory_holder() = default;
-	explicit writer_factory_holder(std::unique_ptr<writer_factory> && factory);
-	explicit writer_factory_holder(std::unique_ptr<writer_factory> const& factory);
-	explicit writer_factory_holder(writer_factory const& factory);
+	writer_factory_holder(std::unique_ptr<writer_factory> && factory);
+	writer_factory_holder(std::unique_ptr<writer_factory> const& factory);
+	writer_factory_holder(writer_factory const& factory);
 
 	writer_factory_holder(writer_factory_holder const& op);
 	writer_factory_holder& operator=(writer_factory_holder const& op);
@@ -64,15 +68,10 @@ public:
 		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
 	}
 
-	uint64_t size() const
-	{
-		return impl_ ? impl_->size() : static_cast<uint64_t>(-1);
-	}
-
-	std::wstring name() const
-	{
-		return impl_ ? impl_->name() : std::wstring();
-	}
+	std::wstring name() const { return impl_ ? impl_->name() : std::wstring(); }
+	uint64_t size() const {	return impl_ ? impl_->size() : aio_base::nosize; }
+	fz::datetime mtime() const { return impl_ ? impl_->mtime() : fz::datetime(); }
+	bool set_mtime(fz::datetime const& t) const { return impl_ ? impl_->set_mtime(t) : false; }
 
 	explicit operator bool() const { return impl_.operator bool(); }
 

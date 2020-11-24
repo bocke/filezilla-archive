@@ -22,8 +22,7 @@ public:
 	virtual void Connect(CServer const& server, Credentials const& credentials) override;
 	virtual void List(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), int flags = 0) override;
 	void ChangeDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring(), bool link_discovery = false);
-	virtual void FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
-		std::wstring const& remoteFile, transfer_flags const& flags) override;
+	virtual void FileTransfer(CFileTransferCommand const& cmd) override;
 	virtual void Delete(CServerPath const& path, std::vector<std::wstring>&& files) override;
 	virtual void RemoveDir(CServerPath const& path = CServerPath(), std::wstring const& subDir = std::wstring()) override;
 	virtual void Mkdir(CServerPath const& path) override;

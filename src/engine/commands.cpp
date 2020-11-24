@@ -55,16 +55,18 @@ bool CListCommand::valid() const
 	return true;
 }
 
-CFileTransferCommand::CFileTransferCommand(std::wstring const& localFile, CServerPath const& remotePath,
+CFileTransferCommand::CFileTransferCommand(reader_factory_holder const& reader, CServerPath const& remotePath,
 										   std::wstring const& remoteFile, transfer_flags const& flags)
-	: m_localFile(localFile), m_remotePath(remotePath), m_remoteFile(remoteFile)
+	: reader_(reader), m_remotePath(remotePath), m_remoteFile(remoteFile)
 	, flags_(flags)
 {
 }
 
-std::wstring CFileTransferCommand::GetLocalFile() const
+CFileTransferCommand::CFileTransferCommand(writer_factory_holder const& writer, CServerPath const& remotePath,
+										   std::wstring const& remoteFile, transfer_flags const& flags)
+	: writer_(writer), m_remotePath(remotePath), m_remoteFile(remoteFile)
+	, flags_(flags)
 {
-	return m_localFile;
 }
 
 CServerPath CFileTransferCommand::GetRemotePath() const
@@ -75,6 +77,19 @@ CServerPath CFileTransferCommand::GetRemotePath() const
 std::wstring CFileTransferCommand::GetRemoteFile() const
 {
 	return m_remoteFile;
+}
+
+bool CFileTransferCommand::valid() const
+{
+	if (!reader_ && !writer_) {
+		return false;
+	}
+
+	if (m_remotePath.empty() || m_remoteFile.empty()) {
+		return false;
+	}
+
+	return true;
 }
 
 CRawCommand::CRawCommand(std::wstring const& command)
