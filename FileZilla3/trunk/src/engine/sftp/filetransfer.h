@@ -6,8 +6,8 @@
 class CSftpFileTransferOpData final : public CFileTransferOpData, public CSftpOpData, public fz::event_handler
 {
 public:
-	CSftpFileTransferOpData(CSftpControlSocket & controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
-		: CFileTransferOpData(L"CSftpFileTransferOpData", local_file, remote_file, remote_path, flags)
+	CSftpFileTransferOpData(CSftpControlSocket & controlSocket, CFileTransferCommand const& cmd)
+		: CFileTransferOpData(L"CSftpFileTransferOpData", cmd)
 		, CSftpOpData(controlSocket)
 		, fz::event_handler(controlSocket.event_loop_)
 	{}

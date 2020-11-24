@@ -29,29 +29,17 @@ CSftpFileTransferOpData::~CSftpFileTransferOpData()
 int CSftpFileTransferOpData::Send()
 {
 	if (opState == filetransfer_init) {
-
-		if (localFile_.empty()) {
-			if (!download()) {
-				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
-			}
-			else {
-				return FZ_REPLY_SYNTAXERROR;
-			}
-		}
-
 		if (download()) {
 			std::wstring filename = remotePath_.FormatFilename(remoteFile_);
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			log(logmsg::status, _("Starting upload of %s"), localFile_);
+			log(logmsg::status, _("Starting upload of %s"), localName_);
 		}
 
-		int64_t size;
-		bool isLink;
-		if (fz::local_filesys::get_file_info(fz::to_native(localFile_), isLink, &size, nullptr, nullptr) == fz::local_filesys::file) {
-			localFileSize_ = size;
-		}
+		localFileSize_ = download() ? writer_factory_.size() : reader_factory_.size();
+		localFileTime_ = download() ? writer_factory_.mtime() : reader_factory_.mtime();
+
 
 		opState = filetransfer_waitcwd;
 
@@ -84,7 +72,7 @@ int CSftpFileTransferOpData::Send()
 			cmd += remoteFile + " ";
 			logstr += controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_, !tryAbsolutePath_)) + L" "; 
 			
-			std::wstring localFile = controlSocket_.QuoteFilename(localFile_);
+			std::wstring localFile = controlSocket_.QuoteFilename(localName_);
 			cmd += fz::to_utf8(localFile);
 			logstr += localFile;
 		}
@@ -93,7 +81,7 @@ int CSftpFileTransferOpData::Send()
 			cmd += "put ";
 			logstr += L"put ";
 
-			std::wstring localFile = controlSocket_.QuoteFilename(localFile_);
+			std::wstring localFile = controlSocket_.QuoteFilename(localName_);
 			cmd += fz::to_utf8(localFile) + " ";
 			logstr += localFile + L" ";
 
@@ -117,7 +105,7 @@ int CSftpFileTransferOpData::Send()
 		return controlSocket_.SendCommand(L"mtime " + quotedFilename);
 	}
 	else if (opState == filetransfer_chmtime) {
-		assert(!fileTime_.empty());
+		assert(!localFileTime_.empty());
 		if (download()) {
 			log(logmsg::debug_info, L"  filetransfer_chmtime during download");
 			return FZ_REPLY_INTERNALERROR;
@@ -125,7 +113,7 @@ int CSftpFileTransferOpData::Send()
 
 		std::wstring quotedFilename = controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_, !tryAbsolutePath_));
 
-		fz::datetime t = fileTime_;
+		fz::datetime t = localFileTime_;
 		t -= fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
 
 		// Y2K38
@@ -142,14 +130,14 @@ int CSftpFileTransferOpData::ParseResponse()
 	if (opState == filetransfer_transfer) {
 		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (download()) {
-				if (!fileTime_.empty()) {
-					if (!fz::local_filesys::set_modification_time(fz::to_native(localFile_), fileTime_))
+				if (!remoteFileTime_.empty()) {
+					if (!writer_factory_.set_mtime(remoteFileTime_)) {
 						log(logmsg::debug_warning, L"Could not set modification time");
+					}
 				}
 			}
 			else {
-				fileTime_ = fz::local_filesys::get_modification_time(fz::to_native(localFile_));
-				if (!fileTime_.empty()) {
+				if (!localFileTime_.empty()) {
 					opState = filetransfer_chmtime;
 					return FZ_REPLY_CONTINUE;
 				}
@@ -172,8 +160,8 @@ int CSftpFileTransferOpData::ParseResponse()
 			if (parsed) {
 				fz::datetime fileTime = fz::datetime(seconds, fz::datetime::seconds);
 				if (!fileTime.empty()) {
-					fileTime_ = fileTime;
-					fileTime_ += fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
+					remoteFileTime_ = fileTime;
+					remoteFileTime_+= fz::duration::from_minutes(currentServer_.GetTimezoneOffset());
 				}
 			}
 		}
@@ -226,7 +214,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					if (matchedCase) {
 						remoteFileSize_ = entry.size;
 						if (entry.has_date()) {
-							fileTime_ = entry.time;
+							remoteFileTime_ = entry.time;
 						}
 
 						if (download() && !entry.has_time() &&
@@ -282,7 +270,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (matchedCase && !entry.is_unsure()) {
 					remoteFileSize_ = entry.size;
 					if (entry.has_date()) {
-						fileTime_ = entry.time;
+						remoteFileTime_ = entry.time;
 					}
 
 					if (download() && !entry.has_time() &&

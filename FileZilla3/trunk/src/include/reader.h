@@ -27,21 +27,25 @@ public:
 	// On Windows pass a bool, otherwise a valid file descriptor obtained by memfd_create or shm_open.
 	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
 
+	std::wstring const& name() const { return name_; }
 	virtual uint64_t size() const { return aio_base::nosize; }
+	virtual fz::datetime mtime() const { return fz::datetime(); }
 
 protected:
 	reader_factory() = default;
 	reader_factory(reader_factory const&) = default;
 	reader_factory& operator=(reader_factory const&) = default;
 
-	std::wstring name_;
+	std::wstring const name_;
 };
 
 class FZC_PUBLIC_SYMBOL reader_factory_holder final
 {
 public:
 	reader_factory_holder() = default;
-	explicit reader_factory_holder(std::unique_ptr<reader_factory> && factory);
+	reader_factory_holder(std::unique_ptr<reader_factory> && factory);
+	reader_factory_holder(std::unique_ptr<reader_factory> const& factory);
+	reader_factory_holder(reader_factory const& factory);
 
 	reader_factory_holder(reader_factory_holder const& op);
 	reader_factory_holder& operator=(reader_factory_holder const& op);
@@ -55,10 +59,9 @@ public:
 		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
 	}
 
-	uint64_t size() const
-	{
-		return impl_ ? impl_->size() : static_cast<uint64_t>(-1);
-	}
+	std::wstring name() const { return impl_ ? impl_->name() : std::wstring(); }
+	uint64_t size() const {	return impl_ ? impl_->size() : aio_base::nosize; }
+	fz::datetime mtime() const { return impl_ ? impl_->mtime() : fz::datetime(); }
 
 	explicit operator bool() const { return impl_.operator bool(); }
 

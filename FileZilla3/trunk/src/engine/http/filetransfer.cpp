@@ -14,8 +14,8 @@ enum filetransferStates
 	filetransfer_waittransfer
 };
 
-CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags)
-	: CFileTransferOpData(L"CHttpFileTransferOpData", local_file, remote_file, remote_path, flags)
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, CFileTransferCommand const& cmd)
+	: CFileTransferOpData(L"CHttpFileTransferOpData", cmd)
 	, CHttpOpData(controlSocket)
 {
 	rr_.request_.uri_ = fz::uri(fz::to_utf8(currentServer_.Format(ServerFormat::url)) + fz::percent_encode(fz::to_utf8(remotePath_.FormatFilename(remoteFile_)), true));
@@ -23,8 +23,9 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 
 }
 
+// FIXME
 CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body, writer_factory_holder const& output_factory)
-	: CFileTransferOpData(L"CHttpFileTransferOpData", std::wstring(), std::wstring(), CServerPath(), transfer_flags::download)
+	: CFileTransferOpData(L"CHttpFileTransferOpData", CFileTransferCommand(writer_factory_holder(), CServerPath(), std::wstring(), transfer_flags::download))
 	, CHttpOpData(controlSocket)
 {
 	writer_factory_ = output_factory;

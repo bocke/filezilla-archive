@@ -505,13 +505,9 @@ void CSftpControlSocket::ProcessReply(int result, std::wstring const& reply)
 		}
 	}
 }
-void CSftpControlSocket::FileTransfer(std::wstring const& localFile, reader_factory_holder const& reader, writer_factory_holder const& writer,CServerPath const& remotePath,
-									std::wstring const& remoteFile, transfer_flags const& flags)
+void CSftpControlSocket::FileTransfer(CFileTransferCommand const& cmd)
 {
-	auto pData = std::make_unique<CSftpFileTransferOpData>(*this, localFile, remoteFile, remotePath, flags);
-	pData->reader_factory_ = reader;
-	pData->writer_factory_ = writer;
-	Push(std::move(pData));
+	Push(std::make_unique<CSftpFileTransferOpData>(*this, cmd));
 }
 
 int CSftpControlSocket::DoClose(int nErrorCode)

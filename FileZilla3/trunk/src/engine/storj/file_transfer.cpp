@@ -19,15 +19,6 @@ int CStorjFileTransferOpData::Send()
 	switch (opState) {
 	case filetransfer_init:
 	{
-		if (localFile_.empty()) {
-			if (!download()) {
-				return FZ_REPLY_CRITICALERROR | FZ_REPLY_NOTSUPPORTED;
-			}
-			else {
-				return FZ_REPLY_SYNTAXERROR;
-			}
-		}
-
 		if (!remotePath_.SegmentCount()) {
 			if (!download()) {
 				log(logmsg::error, _("You cannot upload files into the root directory."));
@@ -40,13 +31,7 @@ int CStorjFileTransferOpData::Send()
 			log(logmsg::status, _("Starting download of %s"), filename);
 		}
 		else {
-			log(logmsg::status, _("Starting upload of %s"), localFile_);
-		}
-
-		int64_t size;
-		bool isLink;
-		if (fz::local_filesys::get_file_info(fz::to_native(localFile_), isLink, &size, 0, 0) == fz::local_filesys::file) {
-			localFileSize_ = size;
+			log(logmsg::status, _("Starting upload of %s"), localName_);
 		}
 
 		if (remotePath_.GetType() == DEFAULT) {
@@ -68,7 +53,7 @@ int CStorjFileTransferOpData::Send()
 				if (matchedCase) {
 					remoteFileSize_ = entry.size;
 					if (entry.has_date()) {
-						fileTime_ = entry.time;
+						remoteFileTime_ = entry.time;
 					}
 				}
 			}
@@ -120,10 +105,10 @@ int CStorjFileTransferOpData::Send()
 		engine_.transfer_status_.SetStartTime();
 		transferInitiated_ = true;
 		if (download()) {
-			return controlSocket_.SendCommand(L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localFile_));
+			return controlSocket_.SendCommand(L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localName_));
 		}
 		else {
-			return controlSocket_.SendCommand(L"put " + controlSocket_.QuoteFilename(localFile_) + L" " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)));
+			return controlSocket_.SendCommand(L"put " + controlSocket_.QuoteFilename(localName_) + L" " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)));
 		}
 
 		return FZ_REPLY_WOULDBLOCK;
@@ -157,7 +142,7 @@ int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (matchedCase) {
 					remoteFileSize_ = entry.size;
 					if (entry.has_date()) {
-						fileTime_ = entry.time;
+						remoteFileTime_ = entry.time;
 					}
 				}
 			}
@@ -173,4 +158,3 @@ int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
 }
-

@@ -10,7 +10,7 @@ class CServerPath;
 class CHttpFileTransferOpData final : public CFileTransferOpData, public CHttpOpData
 {
 public:
-	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, std::wstring const& local_file, std::wstring const& remote_file, CServerPath const& remote_path, transfer_flags const& flags);
+	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, CFileTransferCommand const&);
 	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body, writer_factory_holder const& output_factory);
 
 	virtual int Send() override;
