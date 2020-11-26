@@ -6,7 +6,9 @@ AC_DEFUN([CHECK_MEMFD_CREATE], [
 
   AC_LINK_IFELSE([
     AC_LANG_PROGRAM([[
+      #ifndef _GNU_SOURCE
       #define _GNU_SOURCE
+      #endif
       #include <sys/mman.h>
     ]], [[
       (void)memfd_create("configure test", MFD_CLOEXEC);
