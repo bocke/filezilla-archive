@@ -337,7 +337,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		info = writer_->shared_memory_info();
 	}
 	else {
-		reader_ = reader_factory_.open(offset, engine_, *this, shm);
+		reader_ = reader_factory_.open(offset, engine_, this, shm);
 		if (!reader_) {
 			controlSocket_.AddToStream("--\n");
 			return;

@@ -363,6 +363,12 @@ int CControlSocket::CheckOverwriteFile()
 	auto & data = static_cast<CFileTransferOpData &>(*operations_.back());
 	data.localFileSize_ = data.download() ? data.writer_factory_.size() : data.reader_factory_.size();
 	data.localFileTime_ = data.download() ? data.writer_factory_.mtime() : data.reader_factory_.mtime();
+
+	if (data.download()) {
+		if (data.localFileSize_ == aio_base::nosize && data.localFileTime_.empty()) {
+			return FZ_REPLY_OK;
+		}
+	}
 	
 	CDirentry entry;
 	bool dirDidExist;
@@ -443,6 +449,8 @@ CFileTransferOpData::CFileTransferOpData(wchar_t const* name, CFileTransferComma
 	, flags_(cmd.GetFlags())
 	, reader_factory_(cmd.GetReader()), writer_factory_(cmd.GetWriter()), localName_(reader_factory_ ? reader_factory_.name() : writer_factory_.name()), remoteFile_(cmd.GetRemoteFile()), remotePath_(cmd.GetRemotePath())
 {
+	localFileSize_ = download() ? writer_factory_.size() : reader_factory_.size();
+	localFileTime_ = download() ? writer_factory_.mtime() : reader_factory_.mtime();
 }
 
 std::wstring CControlSocket::ConvToLocal(char const* buffer, size_t len)

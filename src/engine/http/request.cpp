@@ -10,10 +10,11 @@
 CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::shared_ptr<HttpRequestResponseInterface> const& request)
 	: COpData(PrivCommand::http_request, L"CHttpRequestOpData")
 	, CHttpOpData(controlSocket)
+	, fz::event_handler(engine_.event_loop_)
 {
 	opState = request_init | request_reading;
 
-	request->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
+	request->request().flags_ &= HttpRequest::flag_update_transferstatus;
 	request->response().flags_ = 0;
 
 	requests_.emplace_back(request);
@@ -22,13 +23,26 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests)
 	: COpData(PrivCommand::http_request, L"CHttpRequestOpData")
 	, CHttpOpData(controlSocket)
+	, fz::event_handler(engine_.event_loop_)
 	, requests_(requests)
 {
 	for (auto & rr : requests_) {
-		rr->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
+		rr->request().flags_ &= HttpRequest::flag_update_transferstatus;
 		rr->response().flags_ = 0;
 	}
 	opState = request_init | request_reading;
+}
+
+CHttpRequestOpData::~CHttpRequestOpData()
+{
+	for (auto & rr : requests_) {
+		if (rr) {
+			if (rr->request().body_) {
+				rr->request().body_->set_handler(nullptr);
+			}
+		}
+	}
+	remove_handler();
 }
 
 void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface> const& rr)
@@ -53,7 +67,7 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 			}
 		}
 	}
-	rr->request().flags_ &= ~HttpRequest::flag_update_transferstatus;
+	rr->request().flags_ &= HttpRequest::flag_update_transferstatus;
 	rr->response().flags_ = 0;
 	requests_.push_back(rr);
 }
@@ -82,6 +96,9 @@ int CHttpRequestOpData::Send()
 		int res = req.reset();
 		if (res != FZ_REPLY_CONTINUE) {
 			return res;
+		}
+		if (req.body_) {
+			req.body_->set_handler(this);
 		}
 
 		res = rr.response().reset();
@@ -467,6 +484,9 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 
 			if (res == FZ_REPLY_OK) {
 				log(logmsg::debug_info, L"Finished a response");
+				if (requests_.front()->request().body_) {
+					requests_.front()->request().body_->set_handler(nullptr);
+				}
 				requests_.pop_front();
 				--send_pos_;
 
@@ -843,14 +863,17 @@ int CHttpRequestOpData::ProcessData(unsigned char* data, size_t & remaining)
 					}
 				}
 				else {
+					if (response.body_.size() < 1024*1024*16) {
+						response.body_.append(data, remaining);
+					}
 					remaining = 0;
 				}
 			}
 			else {
-				if (response.on_error_data_) {
-					res = response.on_error_data_(data, remaining);
-					remaining = 0;
+				if (response.body_.size() < 1024*1024*16) {
+					response.body_.append(data, remaining);
 				}
+				remaining = 0;
 			}
 		}
 		else {
@@ -889,4 +912,25 @@ int CHttpRequestOpData::Reset(int result)
 	}
 
 	return result;
+}
+
+void CHttpRequestOpData::operator()(fz::event_base const& ev)
+{
+	fz::dispatch<read_ready_event>(ev, this, &CHttpRequestOpData::OnLocalData);
+}
+
+void CHttpRequestOpData::OnLocalData(reader_base * r)
+{
+	if (requests_.empty() || !requests_[send_pos_]) {
+		return;
+	}
+
+	auto & rr = *requests_[send_pos_];
+	auto & req = rr.request();
+	if (req.body_.get() != r) {
+		return;
+	}
+	if (req.flags_ & HttpRequest::flag_sent_header && !(req.flags_ & HttpRequest::flag_sent_body)) {
+		controlSocket_.SendNextCommand();
+	}
 }
