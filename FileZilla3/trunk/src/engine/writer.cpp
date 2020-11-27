@@ -119,7 +119,7 @@ void remove_writer_events(fz::event_handler * handler, writer_base const* writer
 }
 
 writer_base::writer_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status)
-	: aio_base(name, engine, handler)
+	: aio_base(name, engine, &handler)
 	, update_transfer_status_(update_transfer_status)
 {}
 
@@ -127,7 +127,7 @@ void writer_base::close()
 {
 	ready_count_ = 0;
 	
-	remove_writer_events(&handler_, this);
+	remove_writer_events(handler_, this);
 }
 
 get_write_buffer_result writer_base::get_write_buffer(fz::nonowning_buffer & last_written)
@@ -314,7 +314,7 @@ void file_writer::entry()
 		if (!ready_count_) {
 			if (handler_waiting_) {
 				handler_waiting_ = false;
-				handler_.send_event<write_ready_event>(this);
+				handler_->send_event<write_ready_event>(this);
 				break;
 			}
 
@@ -348,7 +348,7 @@ void file_writer::entry()
 
 		if (handler_waiting_) {
 			handler_waiting_ = false;
-			handler_.send_event<write_ready_event>(this);
+			handler_->send_event<write_ready_event>(this);
 		}
 	}
 }
@@ -406,7 +406,7 @@ std::unique_ptr<writer_base> memory_writer_factory::open(uint64_t offset, CFileZ
 		return nullptr;
 	}
 
-	auto ret = std::make_unique<memory_writer>(name_, engine, handler, update_transfer_status, *result_buffer_, sizeLimit_);
+	std::unique_ptr<memory_writer> ret(new memory_writer(name_, engine, handler, update_transfer_status, *result_buffer_, sizeLimit_));
 	if (ret->open(shm) != aio_result::ok) {
 		ret.reset();
 	}
@@ -419,6 +419,15 @@ memory_writer::memory_writer(std::wstring const& name, CFileZillaEnginePrivate &
 	, result_buffer_(result_buffer)
 	, sizeLimit_(sizeLimit)
 {}
+
+std::unique_ptr<memory_writer> memory_writer::create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit)
+{
+	std::unique_ptr<memory_writer> ret(new memory_writer(name, engine, handler, update_transfer_status, result_buffer, sizeLimit));
+	if (ret->open(shm) != aio_result::ok) {
+		ret.reset();
+	}
+	return ret;
+}
 
 memory_writer::~memory_writer()
 {

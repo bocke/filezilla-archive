@@ -141,7 +141,7 @@ int CFtpFileTransferOpData::Send()
 				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
 			}
 			else {
-				auto reader = reader_factory_.open(resumeOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
+				auto reader = reader_factory_.open(resumeOffset, engine_, controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
 				if (!reader) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);

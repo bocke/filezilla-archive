@@ -20,10 +20,11 @@ namespace fz {
 class event_handler;
 }
 class CFileZillaEnginePrivate;
+
 class FZC_PUBLIC_SYMBOL aio_base
 {
 public:
-	explicit aio_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
+	explicit aio_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler);
 	virtual ~aio_base();
 
 	aio_base(aio_base const&) = delete;
@@ -70,7 +71,7 @@ protected:
 	size_t ready_count_{};
 
 	CFileZillaEnginePrivate & engine_;
-	fz::event_handler & handler_;
+	fz::event_handler * handler_{};
 
 	bool processing_{};
 	bool quit_{};

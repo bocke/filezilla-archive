@@ -31,7 +31,7 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 	writer_factory_ = output_factory;
 	rr_.request_.uri_ = uri;
 	if (!body.empty()) {
-		rr_.request_.body_ = string_reader::create(L"HTTP Request body", engine_, controlSocket, body);
+		rr_.request_.body_ = string_reader::create(L"HTTP Request body", engine_, nullptr, body);
 	}
 	rr_.request_.verb_ = verb;
 }

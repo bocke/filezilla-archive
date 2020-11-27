@@ -20,7 +20,7 @@
 
 int HttpRequest::reset()
 {
-	flags_ &= ~flag_update_transferstatus;
+	flags_ &= flag_update_transferstatus;
 
 	if (body_) {
 		aio_result res = body_->rewind();
@@ -38,6 +38,7 @@ int HttpResponse::reset()
 	flags_ = 0;
 	code_ = 0;
 	headers_.clear();
+	body_.clear();
 
 	return FZ_REPLY_CONTINUE;
 }

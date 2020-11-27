@@ -25,7 +25,7 @@ public:
 
 	// If shm_flag is valid, the buffers are allocated in shared memory suitable for communication with child processes
 	// On Windows pass a bool, otherwise a valid file descriptor obtained by memfd_create or shm_open.
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) = 0;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size = aio_base::nosize) = 0;
 
 	std::wstring const& name() const { return name_; }
 	virtual uint64_t size() const { return aio_base::nosize; }
@@ -54,9 +54,9 @@ public:
 	reader_factory_holder& operator=(reader_factory_holder && op) noexcept;
 	reader_factory_holder& operator=(std::unique_ptr<reader_factory> && factory);
 
-	std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm)
+	std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size = aio_base::nosize)
 	{
-		return impl_ ? impl_->open(offset, engine, handler, shm) : nullptr;
+		return impl_ ? impl_->open(offset, engine, handler, shm, max_size) : nullptr;
 	}
 
 	std::wstring name() const { return impl_ ? impl_->name() : std::wstring(); }
@@ -74,7 +74,7 @@ class FZC_PUBLIC_SYMBOL file_reader_factory final : public reader_factory
 public:
 	file_reader_factory(std::wstring const& file);
 	
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) override;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size = aio_base::nosize) override;
 	virtual std::unique_ptr<reader_factory> clone() const override;
 
 	virtual uint64_t size() const override;
@@ -91,50 +91,54 @@ struct read_result {
 	fz::nonowning_buffer buffer_;
 };
 
-class FZC_PUBLIC_SYMBOL reader_base : public aio_base
+class reader_base : public aio_base
 {
 public:
-	explicit reader_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
+	explicit reader_base(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler);
 
 	virtual void close();
 
-	virtual uint64_t size() const { return static_cast<uint64_t>(-1); }
 
-	virtual aio_result rewind() = 0;
+	aio_result rewind() { return seek(aio_base::nosize, aio_base::nosize); }
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) = 0;
 
 	read_result read();
 
+	uint64_t size() const;
+
+	void set_handler(fz::event_handler * handler);
+
 protected:
 	uint64_t start_offset_{};
+	uint64_t size_{aio_base::nosize};
+	bool called_read_{};
 };
 
-class FZC_PUBLIC_SYMBOL file_reader final : public reader_base
+class file_reader final : public reader_base
 {
 public:
-	explicit file_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler);
+	explicit file_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler);
 	~file_reader();
 
 	virtual void close() override;
 
-	virtual uint64_t size() const override;
-
-	virtual aio_result rewind() override;
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override;
 
 protected:
 	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 private:
 	friend class file_reader_factory;
-	aio_result open(uint64_t offset, shm_flag shm);
+	aio_result open(uint64_t offset, uint64_t max_size, shm_flag shm);
 
 	void entry();
 
 	fz::file file_;
 
-	mutable std::optional<uint64_t> size_;
-
 	fz::async_task thread_;
 	fz::condition cond_;
+
+	uint64_t remaining_{};
 };
 
 
@@ -151,10 +155,12 @@ public:
 	memory_reader_factory(std::wstring const& name, fz::buffer & data);
 	memory_reader_factory(std::wstring const& name, std::string_view const& data);
 	
-	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm) override;
+	virtual std::unique_ptr<reader_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size = aio_base::nosize) override;
 	virtual std::unique_ptr<reader_factory> clone() const override;
 
-	virtual uint64_t size() const override;
+	virtual uint64_t size() const override {
+		return data_.size();
+	}
 
 private:
 	friend class memory_reader;
@@ -163,44 +169,65 @@ private:
 };
 
 // Does not own the data
-class FZC_PUBLIC_SYMBOL memory_reader final : public reader_base
+class memory_reader final : public reader_base
 {
 public:
-	explicit memory_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string_view const& data);
+	explicit memory_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string_view const& data);
 	
-	virtual uint64_t size() const override;
-	virtual aio_result rewind() override;
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override;
+
+	static std::unique_ptr<memory_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string_view const& data, shm_flag shm = shm_flag_none);
 
 protected:
 	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 protected:
 	friend class memory_reader_factory;
-	aio_result open(uint64_t offset, shm_flag shm);
+	aio_result open(uint64_t offset, uint64_t max_size, shm_flag shm);
 
 	std::string_view start_data_;
 	std::string_view data_;
 };
 
 // Owns the data
-class FZC_PUBLIC_SYMBOL string_reader final : public reader_base
+class string_reader final : public reader_base
 {
 public:
-	
-	virtual uint64_t size() const override;
-	virtual aio_result rewind() override;
 
-	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string const& data, shm_flag shm = shm_flag_none);
-	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string && data, shm_flag shm = shm_flag_none);
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override;
+
+	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data, shm_flag shm = shm_flag_none);
+	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string && data, shm_flag shm = shm_flag_none);
 protected:
-	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string const& data);
-	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, std::string && data);
+	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data);
+	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string && data);
 
 	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 protected:
-	std::string_view start_data_;
-	std::string data_;
+	std::string start_data_;
+	std::string_view data_;
+};
+
+#include <libfilezilla/buffer.hpp>
+
+class buffer_reader final : public reader_base
+{
+public:
+
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override;
+
+	static std::unique_ptr<buffer_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer const& data, shm_flag shm = shm_flag_none);
+	static std::unique_ptr<buffer_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer && data, shm_flag shm = shm_flag_none);
+protected:
+	explicit buffer_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer const& data);
+	explicit buffer_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer && data);
+
+	virtual void signal_capacity(fz::scoped_lock & l) override;
+
+protected:
+	fz::buffer start_data_;
+	std::string_view data_;
 };
 
 #endif

@@ -89,7 +89,9 @@ public:
 class HttpResponse : public WithHeaders
 {
 public:
-	virtual ~HttpResponse() {};
+	// Use a writer if you need more.
+	static size_t constexpr max_simple_body_size{1024 * 1024 * 16};
+
 	unsigned int code_{};
 
 	enum flags {
@@ -113,10 +115,11 @@ public:
 	//   FZ_REPLY_ERROR: Abort connection
 	std::function<int(std::shared_ptr<HttpRequestResponseInterface> const&)> on_header_;
 
+	// Writer isn't called if !success()
 	std::unique_ptr<writer_base> writer_;
 
-	// Called if !success && got_body
-	std::function<int(unsigned char const* data, unsigned int len)> on_error_data_;
+	// Holds error body and success body if there is no writer.
+	fz::buffer body_;
 
 	bool success() const {
 		return code_ >= 200 && code_ < 300;

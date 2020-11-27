@@ -20,11 +20,12 @@ enum requestStates
 	request_send_mask = 0xf
 };
 
-class CHttpRequestOpData final : public COpData, public CHttpOpData
+class CHttpRequestOpData final : public COpData, public CHttpOpData, fz::event_handler
 {
 public:
 	CHttpRequestOpData(CHttpControlSocket & controlSocket, std::shared_ptr<HttpRequestResponseInterface> const& request);
 	CHttpRequestOpData(CHttpControlSocket & controlSocket, std::deque<std::shared_ptr<HttpRequestResponseInterface>> && requests);
+	virtual ~CHttpRequestOpData();
 
 	virtual int Send() override;
 	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
@@ -37,6 +38,9 @@ public:
 	int OnReceive(writer_base* writer);
 
 private:
+	virtual void operator()(fz::event_base const& ev) override;
+	void OnLocalData(reader_base * r);
+
 	int ParseReceiveBuffer();
 	int ParseHeader();
 	int ProcessCompleteHeader();

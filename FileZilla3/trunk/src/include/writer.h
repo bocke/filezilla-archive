@@ -181,14 +181,16 @@ private:
 class FZC_PUBLIC_SYMBOL memory_writer final : public writer_base
 {
 public:
-	explicit memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit);
 	~memory_writer();
 
 	virtual void close() override;
 
 	virtual uint64_t size() const override;
 
+	std::unique_ptr<memory_writer> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit);
+
 protected:
+	explicit memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit);
 	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 private:
