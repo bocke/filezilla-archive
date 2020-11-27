@@ -296,7 +296,7 @@ protected:
 	void LogTransferResultMessage(int nErrorCode, CFileTransferOpData *pData);
 
 	// Called by ResetOperation if there's a queued operation
-	int ParseSubcommandResult(int prevResult, COpData const& previousOperation);
+	int ParseSubcommandResult(int prevResult, std::unique_ptr<COpData> && previousOperation);
 
 	std::wstring ConvertDomainName(std::wstring const& domain);
 
