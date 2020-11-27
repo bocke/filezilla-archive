@@ -145,10 +145,11 @@ int CControlSocket::ResetOperation(int nErrorCode)
 			nErrorCode == FZ_REPLY_ERROR_NOTFOUND)
 		{
 			if (!oldOperation->topLevelOperation_) {
-				return ParseSubcommandResult(nErrorCode, *oldOperation);
+				return ParseSubcommandResult(nErrorCode, std::move(oldOperation));
 			}
 		}
 		else {
+			oldOperation.reset();
 			return ResetOperation(nErrorCode);
 		}
 	}
@@ -213,6 +214,8 @@ int CControlSocket::ResetOperation(int nErrorCode)
 			}
 			break;
 		}
+
+		oldOperation.reset();
 	}
 
 	engine_.transfer_status_.Reset();
@@ -611,17 +614,21 @@ int CControlSocket::SendNextCommand()
 	return FZ_REPLY_OK;
 }
 
-int CControlSocket::ParseSubcommandResult(int prevResult, COpData const& opData)
+int CControlSocket::ParseSubcommandResult(int prevResult, std::unique_ptr<COpData> && previousOperation)
 {
 	if (operations_.empty()) {
 		log(logmsg::debug_warning, L"CControlSocket::ParseSubcommandResult(%d) called without active operation", prevResult);
+		previousOperation.reset();
 		ResetOperation(FZ_REPLY_ERROR);
 		return FZ_REPLY_ERROR;
 	}
 
 	auto & data = *operations_.back();
 	log(logmsg::debug_verbose, L"%s::SubcommandResult(%d) in state %d", data.name_, prevResult, data.opState);
-	int res = data.SubcommandResult(prevResult, opData);
+	int res = data.SubcommandResult(prevResult, *previousOperation);
+
+	previousOperation.reset();
+
 	if (res == FZ_REPLY_WOULDBLOCK) {
 		return FZ_REPLY_WOULDBLOCK;
 	}
