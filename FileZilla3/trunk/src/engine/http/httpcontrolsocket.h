@@ -30,11 +30,6 @@ public:
 		return result;
 	}
 
-	void set_content_length(int64_t length)
-	{
-		headers_[HEADER_NAME_CONTENT_LENGTH] = fz::to_string(length);
-	}
-
 	void set_content_type(std::string const& content_type)
 	{
 		headers_[HEADER_NAME_CONTENT_TYPE] = content_type;
@@ -72,6 +67,8 @@ public:
 
 	std::unique_ptr<reader_base> body_;
 	fz::nonowning_buffer body_buffer_;
+
+	uint64_t update_content_length();
 
 	virtual int reset();
 };

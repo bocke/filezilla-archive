@@ -169,26 +169,11 @@ int CHttpRequestOpData::Send()
 		else {
 			auto & req = requests_[send_pos_]->request();
 			if (!(req.flags_ & HttpRequest::flag_sent_header)) {
-				if (req.body_) {
-					req.set_content_length(req.body_->size());
-				}
-				else {
-					if (req.verb_ == "GET" || req.verb_ == "HEAD" || req.verb_ == "OPTIONS") {
-						req.headers_.erase("Content-Length");
-					}
-					else {
-						req.set_content_length(0);
-					}
-				}
+				dataToSend_ = req.update_content_length();
 
-				auto const cl = req.get_header("Content-Length");
-				if (!cl.empty()) {
-					int64_t requestContentLength = fz::to_integral<int64_t>(cl, -1);
-					if (requestContentLength < 0) {
-						log(logmsg::error, _("Malformed request header: %s"), _("Invalid Content-Length"));
-						return FZ_REPLY_INTERNALERROR;
-					}
-					dataToSend_ = static_cast<uint64_t>(requestContentLength);
+				if (dataToSend_ == aio_base::nosize) {
+					log(logmsg::error, _("Malformed request header: %s"), _("Invalid Content-Length"));
+					return FZ_REPLY_INTERNALERROR;
 				}
 
 				// Assemble request and headers
@@ -484,7 +469,7 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 
 			if (res == FZ_REPLY_OK) {
 				log(logmsg::debug_info, L"Finished a response");
-				if (requests_.front()->request().body_) {
+				if (requests_.front() && requests_.front()->request().body_) {
 					requests_.front()->request().body_->set_handler(nullptr);
 				}
 				requests_.pop_front();

@@ -44,15 +44,17 @@ aio_base::~aio_base()
 	}
 }
 
-bool aio_base::allocate_memory(shm_flag shm)
+bool aio_base::allocate_memory(bool single, shm_flag shm)
 {
 	if (memory_) {
 		return true;
 	}
 
+	size_t const count = single ? 1 : buffer_count;
+
 	// Since different threads/processes operate on different buffers at the same time, use
 	// seperate them with a padding page to prevent false sharing due to automatic prefetching.
-	memory_size_ = (buffer_size_ + get_page_size()) * buffer_count + get_page_size();
+	memory_size_ = (buffer_size_ + get_page_size()) * count + get_page_size();
 #if FZ_WINDOWS
 	if (shm) {
 		HANDLE mapping = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, static_cast<DWORD>(memory_size_), nullptr);
@@ -79,7 +81,7 @@ bool aio_base::allocate_memory(shm_flag shm)
 	else {
 		memory_ = new uint8_t[memory_size_];
 	}
-	for (size_t i = 0; i < buffer_count; ++i) {
+	for (size_t i = 0; i < count; ++i) {
 		buffers_[i] = fz::nonowning_buffer(memory_ + i * (buffer_size_ + get_page_size()) + get_page_size(), buffer_size_);
 	}
 

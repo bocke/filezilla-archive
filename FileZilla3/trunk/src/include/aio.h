@@ -58,11 +58,11 @@ public:
 	std::wstring const& name() const { return name_; }
 
 protected:
-	virtual void signal_capacity(fz::scoped_lock & l) = 0;
+	virtual void signal_capacity(fz::scoped_lock &) {};
 
 	mutable fz::mutex mtx_{false};
 
-	bool allocate_memory(shm_flag shm);
+	bool allocate_memory(bool single, shm_flag shm);
 
 	std::wstring const name_;
 
