@@ -24,6 +24,10 @@
 
 #include <assert.h>
 
+#ifndef FZ_WINDOWS
+#include <unistd.h>
+#endif
+
 CStorjControlSocket::CStorjControlSocket(CFileZillaEnginePrivate & engine)
 	: CControlSocket(engine)
 {
@@ -166,6 +170,18 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 			engine_.transfer_status_.Update(value);
 		}
 		break;
+	case storjEvent::io_nextbuf:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CStorjFileTransferOpData&>(*operations_.back());
+			data.OnNextBufferRequested(fz::to_integral<uint64_t>(message.text[0]));
+		}
+		break;
+	case storjEvent::io_finalize:
+		if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
+			auto & data = static_cast<CStorjFileTransferOpData&>(*operations_.back());
+			data.OnFinalizeRequested(fz::to_integral<uint64_t>(message.text[0]));
+		}
+		break;
 	default:
 		log(logmsg::debug_warning, L"Message type %d not handled", message.type);
 		break;
@@ -207,18 +223,23 @@ int CStorjControlSocket::SendCommand(std::wstring const& cmd, std::wstring const
 
 int CStorjControlSocket::AddToStream(std::wstring const& cmd)
 {
-	if (!process_) {
-		ResetOperation(FZ_REPLY_INTERNALERROR);
-		return false;
-	}
-
 	std::string const str = ConvToServer(cmd, true);
 	if (str.empty()) {
 		log(logmsg::error, _("Could not convert command to server encoding"));
 		return FZ_REPLY_ERROR;
 	}
 
-	if (!process_->write(str)) {
+	return AddToStream(str);
+}
+
+int CStorjControlSocket::AddToStream(std::string_view const& cmd)
+{
+	if (!process_) {
+		ResetOperation(FZ_REPLY_INTERNALERROR);
+		return false;
+	}
+
+	if (!process_->write(cmd)) {
 		return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 	}
 
@@ -319,6 +340,14 @@ int CStorjControlSocket::DoClose(int nErrorCode)
 		event_loop_.filter_events(threadEventsFilter);
 	}
 	process_.reset();
+
+#ifndef FZ_WINDOWS
+	if (shm_fd_ != -1) {
+		close(shm_fd_);
+		shm_fd_ = -1;
+	}
+#endif
+
 	return CControlSocket::DoClose(nErrorCode);
 }
 

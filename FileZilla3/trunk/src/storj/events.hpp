@@ -16,11 +16,13 @@ enum class storjEvent {
 	Transfer,
 	UsedQuotaRecv,
 	UsedQuotaSend,
+	io_nextbuf,
+	io_finalize,
 
 	count
 };
 
-#define FZSTORJ_PROTOCOL_VERSION 2
+#define FZSTORJ_PROTOCOL_VERSION 3
 
 #endif
 

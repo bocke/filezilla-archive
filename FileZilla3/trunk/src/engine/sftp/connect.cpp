@@ -15,12 +15,6 @@
 #include "config.h"
 #endif
 
-#if HAVE_MEMFD_CREATE
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#else
-#endif
 #include <libfilezilla/util.hpp>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -43,6 +37,7 @@ int CSftpConnectOpData::Send()
 		{
 			log(logmsg::status, _("Connecting to %s..."), currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_));
 
+			engine_.GetRateLimiter().add(&controlSocket_);
 			if (!controlSocket_.credentials_.keyFile_.empty()) {
 				keyfiles_ = fz::strtok(controlSocket_.credentials_.keyFile_, L"\r\n");
 			}
@@ -66,13 +61,13 @@ int CSftpConnectOpData::Send()
 			if (executable.empty()) {
 				executable = fzT("fzsftp");
 			}
+
 			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args = { fzT("-v") };
 			if (engine_.GetOptions().get_int(OPTION_SFTP_COMPRESSION)) {
 				args.push_back(fzT("-C"));
 			}
-			engine_.GetRateLimiter().add(&controlSocket_);
 #ifndef FZ_WINDOWS
 			if (controlSocket_.shm_fd_ == -1) {
 #if HAVE_MEMFD_CREATE
@@ -81,7 +76,7 @@ int CSftpConnectOpData::Send()
 				std::string name = "/" + fz::base32_encode(fz::random_bytes(16));
 				controlSocket_.shm_fd_ = shm_open(name.c_str(), O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
 				if (controlSocket_.shm_fd_ != -1) {
-						shm_unlink(name.c_str());
+					shm_unlink(name.c_str());
 				}
 #endif
 				if (controlSocket_.shm_fd_ == -1) {

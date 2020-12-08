@@ -45,7 +45,11 @@ protected:
 
 	int SendCommand(std::wstring const& cmd, std::wstring const& show = std::wstring());
 	int AddToStream(std::wstring const& cmd);
+	int AddToStream(std::string_view const& cmd);
 
+#ifndef FZ_WINDOWS
+	int shm_fd_{-1};
+#endif
 	std::unique_ptr<fz::process> process_;
 	std::unique_ptr<CStorjInputThread> input_thread_;
 

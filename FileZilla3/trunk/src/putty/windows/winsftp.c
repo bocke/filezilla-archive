@@ -57,7 +57,7 @@ char *psftp_lcd(char *dir)
         ret = dupprintf("%.*s", i, (LPCTSTR)message);
         LocalFree(message);
     }
-	sfree(w);
+    sfree(w);
 
     return ret;
 }
@@ -140,8 +140,8 @@ RFile *open_existing_file(const char *name, uint64_t offset,
     sfree(s);
 
     uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    CloseHandle(mapping);
     if (!memory) {
-        CloseHandle(mapping);
         return NULL;
     }
 
@@ -242,7 +242,9 @@ void close_rfile(RFile *f)
     if (!f) {
         return;
     }
-#if 0
+#if 1
+    UnmapViewOfFile(f->memory_);
+#else
     CloseHandle(f->h);
 #endif
     sfree(f);
@@ -457,7 +459,13 @@ void set_file_times(WFile *f, unsigned long mtime, unsigned long atime)
 
 void close_wfile(WFile *f)
 {
-#if 0
+    if (!f) {
+        return;
+    }
+
+#if 1
+    UnmapViewOfFile(f->memory_);
+#else
     CloseHandle(f->h);
 #endif
     sfree(f);

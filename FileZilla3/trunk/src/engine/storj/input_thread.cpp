@@ -114,6 +114,8 @@ void CStorjInputThread::processEvent(storjEvent eventType, std::wstring &error)
 	case storjEvent::Info:
 	case storjEvent::Status:
 	case storjEvent::Transfer:
+	case storjEvent::io_finalize:
+	case storjEvent::io_nextbuf:
 		lines = 1;
 		break;
 	case storjEvent::Listentry:
