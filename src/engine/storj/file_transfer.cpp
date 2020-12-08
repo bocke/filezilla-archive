@@ -3,6 +3,7 @@
 #include "../directorycache.h"
 #include "file_transfer.h"
 
+#include <libfilezilla/format.hpp>
 #include <libfilezilla/local_filesys.hpp>
 
 enum FileTransferStates
@@ -13,6 +14,11 @@ enum FileTransferStates
 	filetransfer_delete,
 	filetransfer_transfer
 };
+
+CStorjFileTransferOpData::~CStorjFileTransferOpData()
+{
+	remove_handler();
+}
 
 int CStorjFileTransferOpData::Send()
 {
@@ -94,24 +100,72 @@ int CStorjFileTransferOpData::Send()
 //		}
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
+		{
 
-		if (download()) {
-			engine_.transfer_status_.Init(remoteFileSize_, 0, false);
-		}
-		else {
-			engine_.transfer_status_.Init(localFileSize_, 0, false);
-		}
+#ifdef FZ_WINDOWS
+			aio_base::shm_flag shm = true;
+#else
+			aio_base::shm_flag shm = controlSocket_.shm_fd_;
+#endif
+			uint64_t offset{};
 
-		engine_.transfer_status_.SetStartTime();
-		transferInitiated_ = true;
-		if (download()) {
-			return controlSocket_.SendCommand(L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localName_));
-		}
-		else {
-			return controlSocket_.SendCommand(L"put " + controlSocket_.QuoteFilename(localName_) + L" " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)));
-		}
+			decltype(std::declval<aio_base>().shared_memory_info()) info;
+			if (download()) {
+				writer_ = writer_factory_.open(offset, engine_, *this, shm);
+				if (!writer_) {
+					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
+					return FZ_REPLY_ERROR;
+				}
+				info = writer_->shared_memory_info();
+			}
+			else {
+				reader_ = reader_factory_.open(offset, engine_, this, shm);
+				if (!reader_) {
+					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);
+					return FZ_REPLY_ERROR;
+				}
+				else {
+					info = reader_->shared_memory_info();
+				}
+			}
+#ifdef FZ_WINDOWS
+			HANDLE target;
+			if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
+				log(logmsg::debug_warning, L"DuplicateHandle failed");
+				controlSocket_.ResetOperation(FZ_REPLY_ERROR);
+				return FZ_REPLY_ERROR;
+			}
+#endif
+			base_address_ = std::get<1>(info);
 
-		return FZ_REPLY_WOULDBLOCK;
+			if (download()) {
+				engine_.transfer_status_.Init(remoteFileSize_, 0, false);
+			}
+			else {
+				engine_.transfer_status_.Init(localFileSize_, 0, false);
+			}
+
+			engine_.transfer_status_.SetStartTime();
+			transferInitiated_ = true;
+
+			std::wstring cmd;
+			if (download()) {
+				cmd = L"get " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_)) + L" " + controlSocket_.QuoteFilename(localName_);
+			}
+			else {
+				cmd = L"put " + controlSocket_.QuoteFilename(localName_) + L" " + controlSocket_.QuoteFilename(remotePath_.FormatFilename(remoteFile_));
+			}
+			controlSocket_.log_raw(logmsg::command, cmd);
+			controlSocket_.AddToStream(cmd);
+
+#ifdef FZ_WINDOWS
+			controlSocket_.AddToStream(fz::sprintf(" %u %u %u\n", reinterpret_cast<uintptr_t>(target), std::get<2>(info), offset));
+#else
+			controlSocket_.AddToStream(fz::sprintf(" %d %u %u\n", std::get<0>(info), std::get<2>(info), offset));
+#endif
+
+			return FZ_REPLY_WOULDBLOCK;
+		}
 	}
 
 	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::Send()");
@@ -157,4 +211,75 @@ int CStorjFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 
 	log(logmsg::debug_warning, L"Unknown opState in CStorjFileTransferOpData::SubcommandResult()");
 	return FZ_REPLY_INTERNALERROR;
+}
+
+void CStorjFileTransferOpData::OnNextBufferRequested(uint64_t processed)
+{
+	if (reader_) {
+		auto r = reader_->read();
+		if (r == aio_result::wait) {
+			return;
+		}
+		if (r.type_ == aio_result::error) {
+			controlSocket_.AddToStream("--1\n");
+			return;
+		}
+		controlSocket_.AddToStream(fz::sprintf("-%d %d\n", r.buffer_.get() - base_address_, r.buffer_.size()));
+	}
+	else if (writer_) {
+		buffer_.resize(processed);
+		auto r = writer_->get_write_buffer(buffer_);
+		if (r == aio_result::wait) {
+			return;
+		}
+		if (r.type_ == aio_result::error) {
+			controlSocket_.AddToStream("--1\n");
+			return;
+		}
+		buffer_ = r.buffer_;
+		controlSocket_.AddToStream(fz::sprintf("-%d %d\n", buffer_.get() - base_address_, buffer_.capacity()));
+	}
+	else {
+		controlSocket_.AddToStream("--1\n");
+		return;
+	}
+}
+
+void CStorjFileTransferOpData::OnFinalizeRequested(uint64_t lastWrite)
+{
+	finalizing_ = true;
+	buffer_.resize(lastWrite);
+	auto res = writer_->finalize(buffer_);
+	if (res == aio_result::wait) {
+		return;
+	}
+	else if (res == aio_result::ok) {
+		controlSocket_.AddToStream(fz::sprintf("-1\n"));
+	}
+	else {
+		controlSocket_.AddToStream(fz::sprintf("-0\n"));
+	}
+}
+
+void CStorjFileTransferOpData::operator()(fz::event_base const& ev)
+{
+	fz::dispatch<read_ready_event, write_ready_event>(ev, this,
+		&CStorjFileTransferOpData::OnReaderEvent,
+		&CStorjFileTransferOpData::OnWriterEvent
+	);
+}
+
+void CStorjFileTransferOpData::OnReaderEvent(reader_base*)
+{
+	OnNextBufferRequested(0);
+}
+
+void CStorjFileTransferOpData::OnWriterEvent(writer_base*)
+{
+	if (finalizing_) {
+		OnFinalizeRequested(0);
+	}
+	else {
+		OnNextBufferRequested(0);
+	}
 }

@@ -11,6 +11,16 @@
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
 
+#ifndef FZ_WINDOWS
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#endif
+
 int CStorjConnectOpData::Send()
 {
 	switch (opState)
@@ -33,8 +43,32 @@ int CStorjConnectOpData::Send()
 			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args;
+
+#ifndef FZ_WINDOWS
+			if (controlSocket_.shm_fd_ == -1) {
+#if HAVE_MEMFD_CREATE
+				controlSocket_.shm_fd_ = memfd_create("fzstorj", MFD_CLOEXEC);
+#else
+				std::string name = "/" + fz::base32_encode(fz::random_bytes(16));
+				controlSocket_.shm_fd_ = shm_open(name.c_str(), O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
+				if (controlSocket_.shm_fd_ != -1) {
+					shm_unlink(name.c_str());
+				}
+#endif
+				if (controlSocket_.shm_fd_ == -1) {
+					log(logmsg::debug_warning, L"Could not create shm_fd_");
+					return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+				}
+			}
+#endif
 			controlSocket_.process_ = std::make_unique<fz::process>();
+#ifndef FZ_WINDOWS
+			std::vector<int> fds;
+			fds.push_back(controlSocket_.shm_fd_);
+			if (!controlSocket_.process_->spawn(executable, args, fds)) {
+#else
 			if (!controlSocket_.process_->spawn(executable, args)) {
+#endif
 				log(logmsg::debug_warning, L"Could not create process");
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}

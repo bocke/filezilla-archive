@@ -10,6 +10,10 @@ typedef bool _Bool;
 
 #include <memory>
 
+#ifndef FZ_WINDOWS
+#include <sys/mman.h>
+#endif
+
 namespace {
 
 fz::mutex output_mutex;
@@ -198,7 +202,7 @@ bool close_and_free_download(UplinkDownloadResult& download_result, bool silent)
 	return true;
 }
 
-void downloadObject(UplinkProject *project, std::string bucket, std::string const& id, std::string const& file)
+void downloadObject(UplinkProject *project, std::string bucket, std::string const& id, uint8_t * const memory)
 {
 	UplinkDownloadResult download_result = uplink_download_object(project, bucket.c_str(), id.c_str(), nullptr);
 	if (download_result.error) {
@@ -207,24 +211,28 @@ void downloadObject(UplinkProject *project, std::string bucket, std::string cons
 		return;
 	}
 
-	fz::file f(fz::to_native(fz::to_wstring_from_utf8(file)), fz::file::writing, fz::file::empty);
-	if (!f.opened()) {
-		fzprintf(storjEvent::Error, "Could not local file for writing");
-		close_and_free_download(download_result, true);
-		return;
-	}
-
-	size_t const buffer_size = 32768;
-	auto buffer = std::make_unique<char[]>(buffer_size);
-
 	UplinkDownload *download = download_result.download;
 
-	size_t downloaded_total = 0;
+	size_t capacity{};
+	size_t written{};
+	uint8_t* buffer{};
 
 	while (true) {
-		UplinkReadResult result = uplink_download_read(download, buffer.get(), buffer_size);
-		downloaded_total += result.bytes_read;
+		if (written == capacity) {
+			fzprintf(storjEvent::io_nextbuf, "%u", written);
+			std::string line;
+			if (!getLine(line) || line.empty() || line[0] != '-' || line[1] == '-') {
+				fzprintf(storjEvent::Error, "Could not get next buffer");
+				close_and_free_download(download_result, true);
+				return;
+			}
+			line = line.substr(1);
+			buffer = memory + fz::to_integral<uintptr_t>(next_argument(line));
+			capacity = fz::to_integral<size_t>(next_argument(line));
+			written = 0;
+		}
 
+		UplinkReadResult result = uplink_download_read(download, buffer + written, capacity - written);
 
 		if (result.error) {
 			if (result.error->code == EOF) {
@@ -238,46 +246,30 @@ void downloadObject(UplinkProject *project, std::string bucket, std::string cons
 			return;
 		}
 
-		int written = f.write(buffer.get(), result.bytes_read);
-
+		written += result.bytes_read;
 		uplink_free_read_result(result);
-
-		if (written < 0 || static_cast<size_t>(written) != result.bytes_read) {
-			fzprintf(storjEvent::Error, "Could not write to local file");
-			close_and_free_download(download_result, true);
-			return;
-		}
-
-		fzprintf(storjEvent::Transfer, "%u", result.bytes_read);
 	}
 
 	if (!close_and_free_download(download_result, false)) {
 		return;
 	}
 
+	fzprintf(storjEvent::io_finalize, "%d", written);
+	std::string line;
+	if (!getLine(line) || line.empty() || line[0] != '-' || line[1] != '1') {
+		fzprintf(storjEvent::Error, "Could not write to file");
+		return;
+	}
+
 	fzprintf(storjEvent::Done);
 }
 
-void uploadObject(UplinkProject *project, std::string const& bucket, std::string const& prefix, std::string const& file, std::string const& objectName)
+void uploadObject(UplinkProject *project, std::string const& bucket, std::string const& prefix, std::string const& objectName, uint8_t * const memory)
 {
 	std::string object_key = bucket;
 	if (!prefix.empty()) {
 		object_key += "/" + prefix;
 	}
-
-	fz::file f;
-	if (!file.empty()) {
-		if (!f.open(fz::to_native(fz::to_wstring_from_utf8(file)), fz::file::reading, fz::file::existing)) {
-			fzprintf(storjEvent::Error, "Could not open local file");
-			return;
-		}
-	}
-
-	// get length of file:
-	size_t length = file.empty() ? 0 : f.size();
-
-	size_t const buffer_size = 32768;
-	auto buffer = std::make_unique<char[]>(buffer_size);
 
 	UplinkUploadResult upload_result = uplink_upload_object(project, object_key.c_str(), objectName.c_str(), nullptr);
 
@@ -295,17 +287,25 @@ void uploadObject(UplinkProject *project, std::string const& bucket, std::string
 
 	UplinkUpload *upload = upload_result.upload;
 
-	size_t uploaded_total = 0;
-
-	while (uploaded_total < length) {
-
-		int r = f.read(buffer.get(), buffer_size);
-		if (r <= 0) {
-			fzprintf(storjEvent::Error, "Could not read from local file");
-			uplink_free_upload_result(upload_result);
-			return;
+	size_t remaining{};
+	uint8_t * buffer{};
+	while (true) {
+		if (!remaining) {
+			fzprintf(storjEvent::io_nextbuf, "0");
+			std::string line;
+			if (!getLine(line) || line.empty() || line[0] != '-' || line[1] == '-') {
+				fzprintf(storjEvent::Error, "Could not get next buffer");
+				uplink_free_upload_result(upload_result);
+				return;
+			}
+			line = line.substr(1);
+			buffer = memory + fz::to_integral<uintptr_t>(next_argument(line));
+			remaining = fz::to_integral<size_t>(next_argument(line));
+			if (!remaining) {
+				break;
+			}
 		}
-		UplinkWriteResult result = uplink_upload_write(upload, buffer.get(), r);
+		UplinkWriteResult result = uplink_upload_write(upload, buffer, remaining);
 
 		if (result.error) {
 			print_error("upload failed: %s", result.error);
@@ -320,7 +320,7 @@ void uploadObject(UplinkProject *project, std::string const& bucket, std::string
 			uplink_free_upload_result(upload_result);
 			return;
 		}
-		uploaded_total += result.bytes_written;
+		remaining -= result.bytes_written;
 
 		fzprintf(storjEvent::Transfer, "%u", result.bytes_written);
 		uplink_free_write_result(result);
@@ -456,6 +456,14 @@ int main()
 		return true;
 	};
 
+#if FZ_WINDOWS
+	using shm_type = HANDLE;
+	auto unmap = [](uint8_t* p, uint64_t) { UnmapViewOfFile(p); };
+#else
+	using shm_type = int;
+	auto unmap = [](uint8_t* p, uint64_t s) { munmap(p, s); };
+#endif
+
 	int ret = 0;
 	while (true) {
 		std::string command;
@@ -512,23 +520,72 @@ int main()
 			auto [bucket, key] = SplitPath(next_argument(arg));
 			std::string file = next_argument(arg);
 
+			shm_type mapping = fz::to_integral<shm_type>(next_argument(arg));
+			uint64_t memory_size = fz::to_integral<uint64_t>(next_argument(arg));
+			uint64_t offset = fz::to_integral<uint64_t>(next_argument(arg));
+
+			if (!memory_size || offset) {
+				fzprintf(storjEvent::Error, "Bad arguments");
+				continue;
+			}
+
+#if FZ_WINDOWS
+			uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+			CloseHandle(mapping);
+#else
+			uint8_t* memory = reinterpret_cast<uint8_t*>(mmap(NULL, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0));
+#endif
+			if (!memory) {
+				fzprintf(storjEvent::Error, "Could not map memory");
+				continue;
+			}
+
 			if (file.empty() || bucket.empty() || key.empty() || key.back() == '/') {
+				unmap(memory, memory_size);
 				fzprintf(storjEvent::Error, "Bad arguments");
 				continue;
 			}
 
 			if (!openStorjProject()) {
+				unmap(memory, memory_size);
 				continue;
 			}
 
-			downloadObject(project_result.project, bucket, key, file);
+			downloadObject(project_result.project, bucket, key, memory);
+			unmap(memory, memory_size);
 		}
 		else if (command == "put") {
 			std::string file = next_argument(arg);
 			auto [bucket, key] = SplitPath(next_argument(arg));
 
+#if FZ_WINDOWS
+			using shm_type = HANDLE;
+#else
+			using shm_type = int;
+#endif
+			shm_type mapping = fz::to_integral<shm_type>(next_argument(arg));
+			uint64_t memory_size = fz::to_integral<uint64_t>(next_argument(arg));
+			uint64_t offset = fz::to_integral<uint64_t>(next_argument(arg));
+
+			if (!memory_size || offset) {
+				fzprintf(storjEvent::Error, "Bad arguments");
+				continue;
+			}
+
+#if FZ_WINDOWS
+			uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+			CloseHandle(mapping);
+#else
+			uint8_t* memory = reinterpret_cast<uint8_t*>(mmap(NULL, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0));
+#endif
+			if (!memory) {
+				fzprintf(storjEvent::Error, "Could not map memory");
+				continue;
+			}
+
 			if (file.empty() || bucket.empty() || key.empty() || key.back() == '/') {
 				fzprintf(storjEvent::Error, "Bad arguments");
+				unmap(memory, memory_size);
 				continue;
 			}
 
@@ -549,9 +606,11 @@ int main()
 			}
 
 			if (!openStorjProject()) {
+				unmap(memory, memory_size);
 				continue;
 			}
-			uploadObject(project_result.project, bucket, prefix, file, objectName);
+			uploadObject(project_result.project, bucket, prefix, objectName, memory);
+			unmap(memory, memory_size);
 		}
 		else if (command == "rm") {
 			auto [bucket, key] = SplitPath(next_argument(arg));
