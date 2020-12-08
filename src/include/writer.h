@@ -8,8 +8,6 @@
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/thread_pool.hpp>
 
-#include <optional>
-
 class writer_base;
 
 struct write_ready_event_type{};
@@ -36,7 +34,7 @@ public:
 
 	virtual uint64_t size() const { return aio_base::nosize; }
 	virtual fz::datetime mtime() const { return fz::datetime(); }
-	virtual bool set_mtime(fz::datetime const&) const { return false; }
+	virtual bool set_mtime(fz::datetime const&) { return false; }
 
 protected:
 	writer_factory() = default;
@@ -71,7 +69,7 @@ public:
 	std::wstring name() const { return impl_ ? impl_->name() : std::wstring(); }
 	uint64_t size() const {	return impl_ ? impl_->size() : aio_base::nosize; }
 	fz::datetime mtime() const { return impl_ ? impl_->mtime() : fz::datetime(); }
-	bool set_mtime(fz::datetime const& t) const { return impl_ ? impl_->set_mtime(t) : false; }
+	bool set_mtime(fz::datetime const& t) { return impl_ ? impl_->set_mtime(t) : false; }
 
 	explicit operator bool() const { return impl_.operator bool(); }
 
@@ -88,8 +86,9 @@ public:
 	virtual std::unique_ptr<writer_factory> clone() const override;
 
 	virtual uint64_t size() const override;
+	virtual fz::datetime mtime() const override;
 
-	mutable std::optional<uint64_t> size_;
+	virtual bool set_mtime(fz::datetime const&) override;
 
 	bool fsync_{};
 };
@@ -148,8 +147,6 @@ private:
 	void entry();
 
 	fz::file file_;
-
-	mutable std::optional<uint64_t> size_;
 
 	fz::async_task thread_;
 	fz::condition cond_;

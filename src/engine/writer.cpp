@@ -74,17 +74,23 @@ std::unique_ptr<writer_factory> file_writer_factory::clone() const
 
 uint64_t file_writer_factory::size() const
 {
-	if (size_) {
-		return *size_;
-	}
 	auto s = fz::local_filesys::get_size(fz::to_native(name_));
 	if (s < 0) {
-		size_ = npos;
+		return npos;
 	}
 	else {
-		size_ = static_cast<uint64_t>(s);
+		return static_cast<uint64_t>(s);
 	}
-	return *size_;
+}
+
+fz::datetime file_writer_factory::mtime() const
+{
+	return fz::local_filesys::get_modification_time(fz::to_native(name_));
+}
+
+bool file_writer_factory::set_mtime(fz::datetime const& t)
+{
+	return fz::local_filesys::set_modification_time(fz::to_native(name_), t);
 }
 
 std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status)
@@ -267,7 +273,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 {
 	fsync_ = fsync;
 
-	if (!allocate_memory(shm)) {
+	if (!allocate_memory(false, shm)) {
 		return aio_result::error;
 	}
 
@@ -334,6 +340,7 @@ void file_writer::entry()
 			if (written > 0) {
 				b.consume(static_cast<size_t>(written));
 				if (update_transfer_status_) {
+					engine_.transfer_status_.SetMadeProgress();
 					engine_.transfer_status_.Update(written);
 				}
 			}
@@ -360,18 +367,13 @@ void file_writer::signal_capacity(fz::scoped_lock & l)
 
 uint64_t file_writer::size() const
 {
-	fz::scoped_lock l(mtx_);
-	if (size_) {
-		return *size_;
-	}
 	auto s = file_.size();
 	if (s < 0) {
-		size_ = nosize;
+		return nosize;
 	}
 	else {
-		size_ = static_cast<uint64_t>(s);
+		return static_cast<uint64_t>(s);
 	}
-	return *size_;
 }
 
 aio_result file_writer::continue_finalize()
@@ -444,7 +446,7 @@ void memory_writer::close()
 aio_result memory_writer::open(shm_flag shm)
 {
 	result_buffer_.clear();
-	if (!allocate_memory(shm)) {
+	if (!allocate_memory(false, shm)) {
 		return aio_result::error;
 	}
 	
@@ -467,6 +469,7 @@ void memory_writer::signal_capacity(fz::scoped_lock &)
 	else {
 		result_buffer_.append(b.get(), b.size());
 		if (update_transfer_status_) {
+			engine_.transfer_status_.SetMadeProgress();
 			engine_.transfer_status_.Update(b.size());
 		}
 	}

@@ -8,8 +8,6 @@
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/thread_pool.hpp>
 
-#include <optional>
-
 class reader_base;
 
 struct read_ready_event_type{};
@@ -78,8 +76,7 @@ public:
 	virtual std::unique_ptr<reader_factory> clone() const override;
 
 	virtual uint64_t size() const override;
-
-	mutable std::optional<uint64_t> size_;
+	virtual fz::datetime mtime() const override;
 };
 
 struct read_result {
@@ -102,7 +99,7 @@ public:
 	aio_result rewind() { return seek(aio_base::nosize, aio_base::nosize); }
 	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) = 0;
 
-	read_result read();
+	virtual read_result read();
 
 	uint64_t size() const;
 
@@ -178,8 +175,7 @@ public:
 
 	static std::unique_ptr<memory_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string_view const& data, shm_flag shm = shm_flag_none);
 
-protected:
-	virtual void signal_capacity(fz::scoped_lock & l) override;
+	virtual read_result read() override;
 
 protected:
 	friend class memory_reader_factory;
@@ -198,11 +194,12 @@ public:
 
 	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data, shm_flag shm = shm_flag_none);
 	static std::unique_ptr<string_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string && data, shm_flag shm = shm_flag_none);
+
+	virtual read_result read() override;
+
 protected:
 	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data);
 	explicit string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string && data);
-
-	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 protected:
 	std::string start_data_;
@@ -219,11 +216,13 @@ public:
 
 	static std::unique_ptr<buffer_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer const& data, shm_flag shm = shm_flag_none);
 	static std::unique_ptr<buffer_reader> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer && data, shm_flag shm = shm_flag_none);
+
+	virtual read_result read() override;
+
 protected:
 	explicit buffer_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer const& data);
 	explicit buffer_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, fz::buffer && data);
 
-	virtual void signal_capacity(fz::scoped_lock & l) override;
 
 protected:
 	fz::buffer start_data_;
