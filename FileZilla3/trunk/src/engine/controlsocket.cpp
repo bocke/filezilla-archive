@@ -411,6 +411,7 @@ int CControlSocket::CheckOverwriteFile()
 	notification->remoteFile = data.remoteFile_;
 	notification->remotePath = data.remotePath_;
 	notification->localSize = static_cast<int64_t>(data.localFileSize_);
+	notification->localTime = data.localFileTime_;
 	notification->remoteSize = data.remoteFileSize_;
 	notification->remoteTime = data.remoteFileTime_;
 
