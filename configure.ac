@@ -143,7 +143,7 @@ if test "$buildmain" = "yes"; then
   if ! echo $host_os | grep "cygwin\|mingw" > /dev/null 2>&1; then
     CHECK_MEMFD_CREATE
     if test "$have_memfd_create" != "yes"; then
-      AX_APPEND_FLAG([-lrt], LDFLAGS)
+      CHECK_LRT_FOR_SHM_OPEN
     fi
   fi
 

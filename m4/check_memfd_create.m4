@@ -17,7 +17,9 @@ AC_DEFUN([CHECK_MEMFD_CREATE], [
   ], [
     AC_MSG_RESULT([yes])
     AC_DEFINE([HAVE_MEMFD_CREATE], [1], [Define if MEMFD_CREATE is supported])
+    have_memfd_create=yes
   ], [
     AC_MSG_RESULT([no])
+    have_memfd_create=no
   ])
 ])
