@@ -29,8 +29,8 @@ public:
 
 	aio_base(aio_base const&) = delete;
 	aio_base& operator=(aio_base const&) = delete;
-	aio_base(aio_base &&) = default;
-	aio_base& operator=(aio_base &&) = default;
+	aio_base(aio_base &&) = delete;
+	aio_base& operator=(aio_base &&) = delete;
 
 	// The buffer size aimed for, actual buffer size may differ
 	static constexpr size_t buffer_size_{256*1024};
