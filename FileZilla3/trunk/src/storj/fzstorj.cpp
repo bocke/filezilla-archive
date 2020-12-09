@@ -457,10 +457,10 @@ int main()
 	};
 
 #if FZ_WINDOWS
-	using shm_type = HANDLE;
+	auto get_mapping = [](std::string_view s) { return reinterpret_cast<HANDLE>(fz::to_integral<uintptr_t>(s)); };
 	auto unmap = [](uint8_t* p, uint64_t) { UnmapViewOfFile(p); };
 #else
-	using shm_type = int;
+	auto get_mapping = [](std::string_view s) { return fz::to_integral<int>(s, -1); };
 	auto unmap = [](uint8_t* p, uint64_t s) { munmap(p, s); };
 #endif
 
@@ -520,7 +520,7 @@ int main()
 			auto [bucket, key] = SplitPath(next_argument(arg));
 			std::string file = next_argument(arg);
 
-			shm_type mapping = fz::to_integral<shm_type>(next_argument(arg));
+			auto mapping = get_mapping(next_argument(arg));
 			uint64_t memory_size = fz::to_integral<uint64_t>(next_argument(arg));
 			uint64_t offset = fz::to_integral<uint64_t>(next_argument(arg));
 
@@ -530,7 +530,7 @@ int main()
 			}
 
 #if FZ_WINDOWS
-			uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+			uint8_t* memory = reinterpret_cast<uint8_t*>(MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size));
 			CloseHandle(mapping);
 #else
 			uint8_t* memory = reinterpret_cast<uint8_t*>(mmap(NULL, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0));
@@ -558,12 +558,7 @@ int main()
 			std::string file = next_argument(arg);
 			auto [bucket, key] = SplitPath(next_argument(arg));
 
-#if FZ_WINDOWS
-			using shm_type = HANDLE;
-#else
-			using shm_type = int;
-#endif
-			shm_type mapping = fz::to_integral<shm_type>(next_argument(arg));
+			auto mapping = get_mapping(next_argument(arg));
 			uint64_t memory_size = fz::to_integral<uint64_t>(next_argument(arg));
 			uint64_t offset = fz::to_integral<uint64_t>(next_argument(arg));
 
@@ -573,7 +568,7 @@ int main()
 			}
 
 #if FZ_WINDOWS
-			uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+			uint8_t* memory = reinterpret_cast<uint8_t*>(MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size));
 			CloseHandle(mapping);
 #else
 			uint8_t* memory = reinterpret_cast<uint8_t*>(mmap(NULL, memory_size, PROT_READ|PROT_WRITE, MAP_SHARED, mapping, 0));
