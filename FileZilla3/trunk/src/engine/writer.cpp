@@ -74,7 +74,7 @@ std::unique_ptr<writer_factory> file_writer_factory::clone() const
 
 uint64_t file_writer_factory::size() const
 {
-	auto s = fz::local_filesys::get_size(fz::to_native(name_));
+	auto s = fz::local_filesys::get_size(fz::to_native(name()));
 	if (s < 0) {
 		return npos;
 	}
@@ -85,17 +85,17 @@ uint64_t file_writer_factory::size() const
 
 fz::datetime file_writer_factory::mtime() const
 {
-	return fz::local_filesys::get_modification_time(fz::to_native(name_));
+	return fz::local_filesys::get_modification_time(fz::to_native(name()));
 }
 
 bool file_writer_factory::set_mtime(fz::datetime const& t)
 {
-	return fz::local_filesys::set_modification_time(fz::to_native(name_), t);
+	return fz::local_filesys::set_modification_time(fz::to_native(name()), t);
 }
 
 std::unique_ptr<writer_base> file_writer_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status)
 {
-	auto ret = std::make_unique<file_writer>(name_, engine, handler, update_transfer_status);
+	auto ret = std::make_unique<file_writer>(name(), engine, handler, update_transfer_status);
 
 	if (ret->open(offset, fsync_, shm) != aio_result::ok) {
 		ret.reset();
@@ -278,7 +278,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 	}
 
 	std::wstring tmp;
-	CLocalPath local_path(name_, &tmp);
+	CLocalPath local_path(name(), &tmp);
 	if (local_path.HasParent()) {
 		fz::native_string last_created;
 		fz::mkdir(fz::to_native(local_path.GetPath()), true, false, &last_created);
@@ -291,7 +291,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 		}
 	}
 
-	if (!file_.open(fz::to_native(name_), fz::file::writing, offset ? fz::file::existing : fz::file::empty)) {
+	if (!file_.open(fz::to_native(name()), fz::file::writing, offset ? fz::file::existing : fz::file::empty)) {
 		return aio_result::error;
 	}
 
@@ -408,7 +408,7 @@ std::unique_ptr<writer_base> memory_writer_factory::open(uint64_t offset, CFileZ
 		return nullptr;
 	}
 
-	std::unique_ptr<memory_writer> ret(new memory_writer(name_, engine, handler, update_transfer_status, *result_buffer_, sizeLimit_));
+	std::unique_ptr<memory_writer> ret(new memory_writer(name(), engine, handler, update_transfer_status, *result_buffer_, sizeLimit_));
 	if (ret->open(shm) != aio_result::ok) {
 		ret.reset();
 	}
