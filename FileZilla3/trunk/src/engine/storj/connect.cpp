@@ -10,6 +10,7 @@
 #include <libfilezilla/hash.hpp>
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
+#include <libfilezilla/util.hpp>
 
 #ifndef FZ_WINDOWS
 #ifdef HAVE_CONFIG_H
