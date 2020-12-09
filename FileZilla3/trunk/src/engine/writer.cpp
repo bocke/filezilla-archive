@@ -185,7 +185,7 @@ aio_result writer_base::retire(fz::nonowning_buffer & last_written)
 		}
 	}
 	last_written.reset();
-	return {aio_result::ok};
+	return aio_result::ok;
 }
 
 aio_result writer_base::write(uint8_t* data, size_t len)

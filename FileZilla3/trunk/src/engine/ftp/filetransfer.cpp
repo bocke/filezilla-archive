@@ -205,22 +205,22 @@ int CFtpFileTransferOpData::TestResumeCapability()
 			switch (CServerCapabilities::GetCapability(currentServer_, i ? resume2GBbug : resume4GBbug))
 			{
 			case yes:
-				if (remoteFileSize_ == localFileSize_) {
+				if (static_cast<uint64_t>(remoteFileSize_) == localFileSize_) {
 					log(logmsg::debug_info, _("Server does not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
 					return FZ_REPLY_OK;
 				}
 				log(logmsg::error, _("Server does not support resume of files > %d GB."), i ? 2 : 4);
 				return FZ_REPLY_CRITICALERROR;
 			case unknown:
-				if (remoteFileSize_ < localFileSize_) {
+				if (static_cast<uint64_t>(remoteFileSize_) < localFileSize_) {
 					// Don't perform test
 					break;
 				}
-				if (remoteFileSize_ == localFileSize_) {
+				if (static_cast<uint64_t>(remoteFileSize_) == localFileSize_) {
 					log(logmsg::debug_info, _("Server may not support resume of files > %d GB. End transfer since file sizes match."), i ? 2 : 4);
 					return FZ_REPLY_OK;
 				}
-				else if (remoteFileSize_ > localFileSize_) {
+				else if (static_cast<uint64_t>(remoteFileSize_) > localFileSize_) {
 					log(logmsg::status, _("Testing resume capabilities of server"));
 
 					opState = filetransfer_waitresumetest;

@@ -20,7 +20,7 @@
 
 uint64_t HttpRequest::update_content_length()
 {
-	int64_t ret{};
+	uint64_t ret{};
 	if (body_) {
 		ret = body_->size();
 		if (ret != aio_base::nosize) {
