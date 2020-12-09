@@ -5,6 +5,7 @@
 
 #include <libfilezilla/format.hpp>
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/process.hpp>
 
 enum FileTransferStates
 {
