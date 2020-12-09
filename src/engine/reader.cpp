@@ -77,7 +77,7 @@ std::unique_ptr<reader_factory> file_reader_factory::clone() const
 
 uint64_t file_reader_factory::size() const
 {
-	auto s = fz::local_filesys::get_size(fz::to_native(name_));
+	auto s = fz::local_filesys::get_size(fz::to_native(name()));
 	if (s < 0) {
 		return aio_base::nosize;
 	}
@@ -88,12 +88,12 @@ uint64_t file_reader_factory::size() const
 
 fz::datetime file_reader_factory::mtime() const
 {
-	return fz::local_filesys::get_modification_time(fz::to_native(name_));
+	return fz::local_filesys::get_modification_time(fz::to_native(name()));
 }
 
 std::unique_ptr<reader_base> file_reader_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size)
 {
-	auto ret = std::make_unique<file_reader>(name_, engine, handler);
+	auto ret = std::make_unique<file_reader>(name(), engine, handler);
 
 	if (ret->open(offset, max_size, shm) != aio_result::ok) {
 		ret.reset();
@@ -236,7 +236,7 @@ aio_result file_reader::open(uint64_t offset, uint64_t max_size, shm_flag shm)
 		return aio_result::error;
 	}
 
-	if (!file_.open(fz::to_native(name_), fz::file::reading, fz::file::existing)) {
+	if (!file_.open(fz::to_native(name()), fz::file::reading, fz::file::existing)) {
 		return aio_result::error;
 	}
 
@@ -395,7 +395,7 @@ memory_reader_factory::memory_reader_factory(std::wstring const& name, std::stri
 
 std::unique_ptr<reader_base> memory_reader_factory::open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, uint64_t max_size)
 {
-	auto ret = std::make_unique<memory_reader>(name_, engine, handler, data_);
+	auto ret = std::make_unique<memory_reader>(name(), engine, handler, data_);
 	if (ret->open(offset, max_size, shm) != aio_result::ok) {
 		ret.reset();
 	}

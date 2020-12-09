@@ -41,6 +41,7 @@ protected:
 	writer_factory(writer_factory const&) = default;
 	writer_factory& operator=(writer_factory const&) = default;
 
+private:
 	std::wstring name_;
 };
 

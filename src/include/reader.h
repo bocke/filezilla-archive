@@ -34,7 +34,8 @@ protected:
 	reader_factory(reader_factory const&) = default;
 	reader_factory& operator=(reader_factory const&) = default;
 
-	std::wstring const name_;
+private:
+	std::wstring name_;
 };
 
 class FZC_PUBLIC_SYMBOL reader_factory_holder final
