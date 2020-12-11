@@ -132,6 +132,9 @@ private:
 	void OnBeginLabelEdit(wxListEvent& event);
 	void OnEndLabelEdit(wxListEvent& event);
 	void OnColumnDragging(wxListEvent& event);
+#ifdef __WXMSW__
+	void SystemColorChange(wxSysColourChangedEvent& event);
+#endif
 
 	bool m_prefixSearch_enabled{};
 	fz::datetime m_prefixSearch_lastKeyPress;

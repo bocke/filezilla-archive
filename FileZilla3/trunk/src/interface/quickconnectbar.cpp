@@ -98,6 +98,15 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 		}
 	});
 
+#ifdef __WXMSW__
+	Bind(wxEVT_SYS_COLOUR_CHANGED, [this](wxSysColourChangedEvent& evt) {
+		// Delay refresh until children had time to process change.
+		CallAfter([this](){Refresh();});
+		evt.Skip();
+	});
+#endif
+
+
 	GetSizer()->Fit(this);
 	return true;
 }

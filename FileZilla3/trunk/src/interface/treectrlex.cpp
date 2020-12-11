@@ -44,6 +44,13 @@ wxTreeCtrlEx::wxTreeCtrlEx(wxWindow *parent, wxWindowID id /*=wxID_ANY*/,
 		inPrefixSearch_ = false;
 		evt.Skip();
 	});
+#ifdef __WXMSW__
+	Bind(wxEVT_SYS_COLOUR_CHANGED, [this](wxSysColourChangedEvent& evt) {
+		SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+		SetForegroundColour(wxWindow::GetParent()->GetForegroundColour());
+		evt.Skip();
+	});
+#endif
 }
 
 wxTreeItemId wxTreeCtrlEx::GetSelection() const

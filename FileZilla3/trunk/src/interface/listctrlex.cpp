@@ -32,7 +32,9 @@ EVT_LIST_ITEM_SELECTED(wxID_ANY, wxListCtrlEx::OnSelectionChanged)
 EVT_KEY_DOWN(wxListCtrlEx::OnKeyDown)
 EVT_LIST_BEGIN_LABEL_EDIT(wxID_ANY, wxListCtrlEx::OnBeginLabelEdit)
 EVT_LIST_END_LABEL_EDIT(wxID_ANY, wxListCtrlEx::OnEndLabelEdit)
-#ifndef __WXMSW__
+#ifdef __WXMSW__
+EVT_SYS_COLOUR_CHANGED(wxListCtrlEx::SystemColorChange)
+#else
 EVT_LIST_COL_DRAGGING(wxID_ANY, wxListCtrlEx::OnColumnDragging)
 #endif
 END_EVENT_TABLE()
@@ -1168,3 +1170,11 @@ wxRect wxListCtrlEx::GetActualClientRect() const
 
 	return windowRect;
 }
+
+#ifdef __WXMSW__
+void wxListCtrlEx::SystemColorChange(wxSysColourChangedEvent& event)
+{
+	SetTextColour(GetDefaultAttributes().colFg);
+	event.Skip();
+}
+#endif
