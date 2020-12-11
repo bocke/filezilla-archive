@@ -9,6 +9,15 @@ wxTextCtrlEx::wxTextCtrlEx(wxWindow* parent, int id, wxString const& value, wxPo
 	if (!(style & wxTE_MULTILINE))
 #endif
 	SetMaxLength(512 * 1024);
+
+#ifdef __WXMSW__
+	if (style & wxTE_MULTILINE && style & wxTE_READONLY) {
+		Bind(wxEVT_SYS_COLOUR_CHANGED, [this](wxSysColourChangedEvent& evt) {
+			SetBackgroundColour(GetClassDefaultAttributes().colBg);
+			evt.Skip();
+		});
+	}
+#endif
 }
 
 bool wxTextCtrlEx::Create(wxWindow* parent, int id, wxString const& value, wxPoint const& pos, wxSize const& size, long style)

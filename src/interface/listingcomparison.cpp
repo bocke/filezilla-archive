@@ -7,10 +7,14 @@
 
 CComparableListing::CComparableListing(wxWindow* pParent)
 {
-	m_pComparisonManager = 0;
 	m_pParent = pParent;
 
 	// Init backgrounds for directory comparison
+	InitColors();
+}
+
+void CComparableListing::InitColors()
+{
 	wxColour background = m_pParent->GetBackgroundColour();
 	if (background.Red() + background.Green() + background.Blue() >= 384) {
 		// Light background
@@ -24,8 +28,6 @@ CComparableListing::CComparableListing(wxWindow* pParent)
 		m_comparisonBackgrounds[1].SetBackgroundColour(wxColour(192, 192, 64));
 		m_comparisonBackgrounds[2].SetBackgroundColour(wxColour(64, 192, 64));
 	}
-
-	m_pOther = 0;
 }
 
 bool CComparableListing::IsComparing() const

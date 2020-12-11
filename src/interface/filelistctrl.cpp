@@ -281,6 +281,16 @@ template<class CFileData> CFileListCtrl<CFileData>::CFileListCtrl(wxWindow* pPar
 #ifndef __WXMSW__
 	GetMainWindow()->SetBackgroundStyle(wxBG_STYLE_SYSTEM);
 #endif
+
+#ifdef __WXMSW__
+	Bind(wxEVT_SYS_COLOUR_CHANGED, [this](wxSysColourChangedEvent& evt) {
+		// Delay refresh until parent had time to process change.
+		CallAfter([this](){
+			InitColors();
+		});
+		evt.Skip();
+	});
+#endif
 }
 
 template<class CFileData> void CFileListCtrl<CFileData>::SortList(int column /*=-1*/, int direction /*=-1*/, bool updateSelections /*=true*/)

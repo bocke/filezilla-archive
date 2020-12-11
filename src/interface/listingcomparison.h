@@ -43,15 +43,16 @@ public:
 	void SetOther(CComparableListing* pOther) { m_pOther = pOther; }
 	CComparableListing* GetOther() { return m_pOther; }
 
+	void InitColors();
 protected:
 
 	wxListItemAttr m_comparisonBackgrounds[3];
 
 private:
-	wxWindow* m_pParent;
+	wxWindow* m_pParent{};
 
-	CComparableListing* m_pOther;
-	CComparisonManager* m_pComparisonManager;
+	CComparableListing* m_pOther{};
+	CComparisonManager* m_pComparisonManager{};
 };
 
 class CState;
