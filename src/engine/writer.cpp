@@ -1,6 +1,7 @@
 #include "../include/writer.h"
 #include "engineprivate.h"
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/translate.hpp>
 
 #include <string.h>
 
@@ -267,6 +268,25 @@ void file_writer::close()
 	thread_.join();
 
 	writer_base::close();
+
+	if (file_.opened()) {
+		bool remove{};
+		if (from_beginning_ && !file_.position() && !finalized_) {
+			// Freshly created file to which nothing has been written.
+			remove = true;
+		}
+		else if (preallocated_) {
+			// The file might have been preallocated and the writing stopped before being completed,
+			// so always truncate the file before closing it regardless of finalize state.
+			file_.truncate();
+		}
+		file_.close();
+
+		if (remove) {
+			engine_.GetLogger().log(logmsg::debug_verbose, L"Deleting empty file '%s'", name());
+			fz::remove_file(fz::to_native(name()));
+		}
+	}
 }
 
 aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
@@ -303,6 +323,9 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 		if (!file_.truncate()) {
 			return aio_result::error;
 		}
+	}
+	else {
+		from_beginning_ = true;
 	}
 
 	thread_ = engine_.GetThreadPool().spawn([this]() { entry(); });
@@ -384,6 +407,38 @@ aio_result file_writer::continue_finalize()
 			return aio_result::error;
 		}
 	}
+	return aio_result::ok;
+}
+
+
+aio_result file_writer::preallocate(uint64_t size)
+{
+	if (error_) {
+		return aio_result::error;
+	}
+
+	engine_.GetLogger().log(logmsg::debug_info, L"Preallocating %d bytes for the file \"%s\"", size, name());
+
+	fz::scoped_lock l(mtx_);
+
+	auto oldPos = file_.seek(0, fz::file::current);
+	if (oldPos < 0) {
+		return aio_result::error;
+	}
+
+	auto seek_offet = static_cast<int64_t>(oldPos + size);
+	if (file_.seek(seek_offet, fz::file::begin) == seek_offet) {
+		if (!file_.truncate()) {
+			engine_.GetLogger().log(logmsg::debug_warning, L"Could not preallocate the file");
+		}
+	}
+	if (file_.seek(oldPos, fz::file::begin) != oldPos) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d within file"), oldPos);
+		error_ = true;
+		return aio_result::error;
+	}
+	preallocated_ = true;
+
 	return aio_result::ok;
 }
 
@@ -473,4 +528,16 @@ void memory_writer::signal_capacity(fz::scoped_lock &)
 			engine_.transfer_status_.Update(b.size());
 		}
 	}
+}
+
+aio_result memory_writer::preallocate(uint64_t size)
+{
+	if (error_) {
+		return aio_result::error;
+	}
+	
+	fz::scoped_lock l(mtx_);
+	result_buffer_.reserve(size);
+
+	return aio_result::ok;
 }

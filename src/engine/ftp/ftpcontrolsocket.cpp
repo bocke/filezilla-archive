@@ -346,22 +346,6 @@ int CFtpControlSocket::ResetOperation(int nErrorCode)
 				}
 			}
 		}
-		if (nErrorCode != FZ_REPLY_OK && data.download() && !data.fileDidExist_) {
-			// TODO: destroy socket if exists
-
-			// TODO: remove unprogressed local file
-			/*
-			int64_t size;
-			bool isLink;
-			if (fz::local_filesys::get_file_info(fz::to_native(data.localFile_), isLink, &size, nullptr, nullptr) == fz::local_filesys::file && size == 0) {
-				// Download failed and a new local file was created before, but
-				// nothing has been written to it. Remove it again, so we don't
-				// leave a bunch of empty files all over the place.
-				log(logmsg::debug_verbose, L"Deleting empty file");
-				fz::remove_file(fz::to_native(data.localFile_));
-			}
-			*/
-		}
 	}
 
 	if (!operations_.empty() && operations_.back()->opId == PrivCommand::rawtransfer &&
