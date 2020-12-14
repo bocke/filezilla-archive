@@ -81,28 +81,6 @@ int CFtpFileTransferOpData::Send()
 				}
 
 				engine_.transfer_status_.Init(remoteFileSize_, resumeOffset, false);
-
-				/* TODO
-				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
-					// Try to preallocate the file in order to reduce fragmentation
-					int64_t sizeToPreallocate = remoteFileSize_ - startOffset;
-					if (sizeToPreallocate > 0) {
-						log(logmsg::debug_info, L"Preallocating %d bytes for the file \"%s\"", sizeToPreallocate, localFile_);
-						auto oldPos = pFile->seek(0, fz::file::current);
-						if (oldPos >= 0) {
-							if (pFile->seek(sizeToPreallocate, fz::file::end) == remoteFileSize_) {
-								if (!pFile->truncate()) {
-									log(logmsg::debug_warning, L"Could not preallocate the file");
-								}
-							}
-							if (pFile->seek(oldPos, fz::file::begin) != oldPos) {
-								log(logmsg::error, _("Could not seek to offset %d within file"), oldPos);
-								return FZ_REPLY_ERROR;
-							}
-						}
-					}
-				}
-				*/
 			}
 			else {
 				if (resume_) {
@@ -137,6 +115,13 @@ int CFtpFileTransferOpData::Send()
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
 					return FZ_REPLY_ERROR;
+				}
+				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
+					if (remoteFileSize_ != aio_base::nosize && remoteFileSize_ > static_cast<uint64_t>(resumeOffset)) {
+						if (writer->preallocate(remoteFileSize_ - static_cast<uint64_t>(resumeOffset)) != aio_result::ok) {
+							return FZ_REPLY_ERROR;
+						}
+					}
 				}
 				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
 			}

@@ -341,7 +341,7 @@ void file_reader::entry()
 		if (remaining_ < to_read) {
 			to_read = remaining_;
 		}
-		int read{};
+		int64_t read{};
 		if (to_read) {
 			l.unlock();
 			read = file_.read(b.get(to_read), to_read);

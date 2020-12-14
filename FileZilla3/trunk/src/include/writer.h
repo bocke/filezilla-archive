@@ -120,6 +120,8 @@ public:
 	// Writes _up to_ aio_base::buffer_size_ bytes.
 	aio_result write(uint8_t* data, size_t len);
 
+	virtual aio_result preallocate(uint64_t size) { return aio_result::ok; }
+
 protected:
 	virtual aio_result continue_finalize() { return aio_result::ok; }
 
@@ -137,6 +139,8 @@ public:
 
 	virtual uint64_t size() const override;
 
+	virtual aio_result preallocate(uint64_t size) override;
+
 protected:
 	virtual void signal_capacity(fz::scoped_lock & l) override;
 	virtual aio_result continue_finalize() override;
@@ -151,7 +155,9 @@ private:
 
 	fz::async_task thread_;
 	fz::condition cond_;
+	bool from_beginning_{};
 	bool fsync_{};
+	bool preallocated_{};
 };
 
 namespace fz {
@@ -186,6 +192,8 @@ public:
 	virtual uint64_t size() const override;
 
 	std::unique_ptr<memory_writer> create(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, aio_base::shm_flag shm, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit);
+
+	virtual aio_result preallocate(uint64_t size) override;
 
 protected:
 	explicit memory_writer(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler & handler, bool update_transfer_status, fz::buffer & result_buffer, size_t sizeLimit);
