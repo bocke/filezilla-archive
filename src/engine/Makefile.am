@@ -37,7 +37,6 @@ libfzclient_private_la_SOURCES = \
 		http/httpcontrolsocket.cpp \
 		http/internalconnect.cpp \
 		http/request.cpp \
-		iothread.cpp \
 		local_path.cpp \
 		logging.cpp \
 		lookup.cpp \
@@ -93,7 +92,6 @@ noinst_HEADERS = \
 		http/httpcontrolsocket.h \
 		http/internalconnect.h \
 		http/request.h \
-		iothread.h \
 		logging_private.h \
 		lookup.h \
 		oplock_manager.h \
