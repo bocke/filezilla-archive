@@ -36,8 +36,8 @@ public:
 
 	TransferEndReason GetTransferEndreason() const { return m_transferEndReason; }
 
-	void set_reader(std::unique_ptr<reader_base> && reader) { reader_ = std::move(reader); }
-	void set_writer(std::unique_ptr<writer_base> && writer) { writer_ = std::move(writer); }
+	void set_reader(std::unique_ptr<reader_base> && reader, bool ascii);
+	void set_writer(std::unique_ptr<writer_base> && writer, bool ascii);
 
 protected:
 	bool CheckGetNextWriteBuffer();
@@ -99,6 +99,8 @@ protected:
 	std::unique_ptr<writer_base> writer_;
 	fz::nonowning_buffer buffer_;
 	size_t resumetest_{};
+
+	fz::buffer line_ending_buffer_;
 };
 
 #endif

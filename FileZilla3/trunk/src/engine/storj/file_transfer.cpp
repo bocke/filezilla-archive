@@ -112,7 +112,7 @@ int CStorjFileTransferOpData::Send()
 
 			decltype(std::declval<aio_base>().shared_memory_info()) info;
 			if (download()) {
-				writer_ = writer_factory_.open(offset, engine_, *this, shm);
+				writer_ = writer_factory_.open(offset, engine_, this, shm);
 				if (!writer_) {
 					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
 					return FZ_REPLY_ERROR;
