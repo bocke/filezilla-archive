@@ -328,6 +328,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 	fsync_ = fsync;
 
 	if (!allocate_memory(false, shm)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for writing."), name_);
 		return aio_result::error;
 	}
 
@@ -346,15 +347,18 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 	}
 
 	if (!file_.open(fz::to_native(name()), fz::file::writing, offset ? fz::file::existing : fz::file::empty)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not open '%s' for writing."), name_);
 		return aio_result::error;
 	}
 
 	if (offset) {
 		auto const ofs = static_cast<int64_t>(offset);
 		if (file_.seek(ofs, fz::file::begin) != ofs) {
+			engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s'."), ofs, name_);
 			return aio_result::error;
 		}
 		if (!file_.truncate()) {
+			engine_.GetLogger().log(logmsg::error, fztranslate("Could not truncate '%s' to offset %d."), name_, ofs);
 			return aio_result::error;
 		}
 	}
@@ -364,6 +368,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 
 	thread_ = engine_.GetThreadPool().spawn([this]() { entry(); });
 	if (!thread_) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not spawn worker thread for writing '%s'."), name_);
 		return aio_result::error;
 	}
 
@@ -404,6 +409,7 @@ void file_writer::entry()
 				}
 			}
 			else {
+				engine_.GetLogger().log(logmsg::error, fztranslate("Could not write to '%s'."), name_);
 				error_ = true;
 				break;
 			}
@@ -441,6 +447,7 @@ aio_result file_writer::continue_finalize()
 {
 	if (fsync_) {
 		if (!file_.fsync()) {
+			engine_.GetLogger().log(logmsg::error, fztranslate("Could not sync '%s' to disk."), name_);
 			error_ = true;
 			return aio_result::error;
 		}
@@ -455,7 +462,7 @@ aio_result file_writer::preallocate(uint64_t size)
 		return aio_result::error;
 	}
 
-	engine_.GetLogger().log(logmsg::debug_info, L"Preallocating %d bytes for the file \"%s\"", size, name());
+	engine_.GetLogger().log(logmsg::debug_info, L"Preallocating %d bytes for the file \"%s\"", size, name_);
 
 	fz::scoped_lock l(mtx_);
 
@@ -471,7 +478,7 @@ aio_result file_writer::preallocate(uint64_t size)
 		}
 	}
 	if (file_.seek(oldPos, fz::file::begin) != oldPos) {
-		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d within file"), oldPos);
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d within '%s'."), oldPos, name_);
 		error_ = true;
 		return aio_result::error;
 	}
@@ -540,6 +547,7 @@ aio_result memory_writer::open(shm_flag shm)
 {
 	result_buffer_.clear();
 	if (!allocate_memory(false, shm)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for writing."), name_);
 		return aio_result::error;
 	}
 	
@@ -557,6 +565,7 @@ void memory_writer::signal_capacity(fz::scoped_lock &)
 	--ready_count_;
 	auto & b = buffers_[ready_pos_];
 	if (sizeLimit_ && b.size() > sizeLimit_ - result_buffer_.size()) {
+		engine_.GetLogger().log(logmsg::debug_warning, "Attempting to write %u bytes with only %u remaining", b.size(), sizeLimit_ - result_buffer_.size());
 		error_ = true;
 	}
 	else {

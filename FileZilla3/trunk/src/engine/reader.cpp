@@ -2,7 +2,9 @@
 
 #include "engineprivate.h"
 
+#include <libfilezilla/buffer.hpp>
 #include <libfilezilla/local_filesys.hpp>
+#include <libfilezilla/translate.hpp>
 
 #include <string.h>
 
@@ -168,9 +170,6 @@ read_result reader_base::read()
 		processing_ = true;
 		return {aio_result::ok, buffers_[ready_pos_]};
 	}
-	else if (error_) {
-		return {aio_result::error, fz::nonowning_buffer()};
-	}
 	else {
 		handler_waiting_ = true;
 		processing_ = false;
@@ -205,7 +204,6 @@ void reader_base::set_handler(fz::event_handler * handler)
 
 
 
-
 file_reader::file_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler)
 	: reader_base(name, engine, handler)
 {
@@ -233,10 +231,12 @@ void file_reader::close()
 aio_result file_reader::open(uint64_t offset, uint64_t max_size, shm_flag shm)
 {
 	if (!allocate_memory(false, shm)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name_);
 		return aio_result::error;
 	}
 
 	if (!file_.open(fz::to_native(name()), fz::file::reading, fz::file::existing)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not open '%s' for reading."), name_);
 		return aio_result::error;
 	}
 
@@ -289,38 +289,39 @@ aio_result file_reader::seek(uint64_t offset, uint64_t max_size)
 		start_offset_ = offset;
 	}
 	else {
-		max_size = size_;
+		max_size = aio_base::nosize;
 	}
 
 	auto const ofs = static_cast<int64_t>(start_offset_);
 	if (file_.seek(ofs, fz::file::begin) != ofs) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s'."), ofs, name_);
 		error_ = true;
 		return aio_result::error;
 	}
 
-	if (max_size != aio_base::nosize) {
+	auto s = file_.size();
+	if (s < 0) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not obtain size of '%s'."), name_);
+		error_ = true;
+		return aio_result::error;
+	}
+	if (static_cast<uint64_t>(s) < start_offset_) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s' of size %d."), start_offset_, name_, s);
+		error_ = true;
+		return aio_result::error;
+	}
+	size_ = static_cast<int64_t>(s) - start_offset_;
+	if (max_size != aio_base::nosize && max_size < size_) {
 		size_ = max_size;
 	}
-	else {
-		auto s = file_.size();
-		if (s < 0) {
-			error_ = true;
-			return aio_result::error;
-		}
-		if (static_cast<uint64_t>(s) < start_offset_) {
-			error_ = true;
-			return aio_result::error;
-		}
-		size_ = static_cast<int64_t>(s) - start_offset_;
-	}
+	remaining_ = size_;
 
 	thread_ = engine_.GetThreadPool().spawn([this]() { entry(); });
 	if (!thread_) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not spawn worker thread for reading '%s'."), name_);
 		error_ = true;
 		return aio_result::error;
 	}
-
-	remaining_ = size_;
 
 	return aio_result::ok;
 }
@@ -359,6 +360,7 @@ void file_reader::entry()
 			remaining_ -= static_cast<uint64_t>(read);
 		}
 		else {
+			engine_.GetLogger().log(logmsg::error, fztranslate("Could not read from '%s'."), name_);
 			error_ = true;
 		}
 
@@ -379,9 +381,6 @@ void file_reader::signal_capacity(fz::scoped_lock & l)
 {
 	cond_.signal(l);
 }
-
-
-#include <libfilezilla/buffer.hpp>
 
 memory_reader_factory::memory_reader_factory(std::wstring const& name, fz::buffer & data)
 	: reader_factory(name)
@@ -421,6 +420,7 @@ std::unique_ptr<memory_reader> memory_reader::create(std::wstring const& name, C
 {
 	std::unique_ptr<memory_reader> ret(new memory_reader(name, engine, handler, data));
 	if (!ret->allocate_memory(true, shm)) {
+		engine.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name);
 		ret.reset();
 	}
 
@@ -430,6 +430,7 @@ std::unique_ptr<memory_reader> memory_reader::create(std::wstring const& name, C
 aio_result memory_reader::open(uint64_t offset, uint64_t max_size, shm_flag shm)
 {
 	if (!allocate_memory(true, shm)) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name_);
 		return aio_result::error;
 	}
 
@@ -458,18 +459,20 @@ aio_result memory_reader::seek(uint64_t offset, uint64_t max_size)
 	if (offset != aio_base::nosize) {
 		start_offset_ = offset;
 	}
+	else {
+		max_size = size_;
+	}
 
 	if (start_offset_ > start_data_.size()) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s' of size %d."), start_offset_, name_, start_data_.size());
 		error_ = true;
 		return aio_result::error;
 	}
 	size_ = start_data_.size() - start_offset_;
 	if (max_size != aio_base::nosize) {
-		if (max_size > size_) {
-			error_ = true;
-			return aio_result::error;
+		if (max_size < size_) {
+			size_ = max_size;
 		}
-		size_ = max_size;
 	}
 
 	data_ = start_data_.substr(start_offset_, size_);

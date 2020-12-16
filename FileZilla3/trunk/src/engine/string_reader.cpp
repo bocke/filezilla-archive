@@ -1,4 +1,6 @@
 #include "string_reader.h"
+#include "engineprivate.h"
+#include <libfilezilla/translate.hpp>
 
 string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data)
 	: reader_base(name, engine, handler)
@@ -20,6 +22,7 @@ std::unique_ptr<string_reader> string_reader::create(std::wstring const& name, C
 {
 	std::unique_ptr<string_reader> ret(new string_reader(name, engine, handler, data));
 	if (!ret->allocate_memory(true, shm)) {
+		engine.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name);
 		ret.reset();
 	}
 
@@ -30,6 +33,7 @@ std::unique_ptr<string_reader> string_reader::create(std::wstring const& name, C
 {
 	std::unique_ptr<string_reader> ret(new string_reader(name, engine, handler, data));
 	if (!ret->allocate_memory(true, shm)) {
+		engine.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name);
 		ret.reset();
 	}
 
@@ -102,6 +106,7 @@ std::unique_ptr<buffer_reader> buffer_reader::create(std::wstring const& name, C
 {
 	std::unique_ptr<buffer_reader> ret(new buffer_reader(name, engine, handler, data));
 	if (!ret->allocate_memory(true, shm)) {
+		engine.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name);
 		ret.reset();
 	}
 
@@ -112,6 +117,7 @@ std::unique_ptr<buffer_reader> buffer_reader::create(std::wstring const& name, C
 {
 	std::unique_ptr<buffer_reader> ret(new buffer_reader(name, engine, handler, data));
 	if (!ret->allocate_memory(true, shm)) {
+		engine.GetLogger().log(logmsg::error, fztranslate("Could not allocate memory to open '%s' for reading."), name);
 		ret.reset();
 	}
 
