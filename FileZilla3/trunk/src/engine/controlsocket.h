@@ -136,7 +136,6 @@ public:
 	// starts the actual transfer
 	bool transferInitiated_{};
 
-	//std::wstring localFile_; // TODO: Remove
 	reader_factory_holder reader_factory_;
 	writer_factory_holder writer_factory_;
 	std::wstring localName_;

@@ -246,7 +246,7 @@ protected:
 class FZC_PUBLIC_SYMBOL CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
 {
 public:
-	CHttpRequestCommand(fz::uri const& uri, writer_factory_holder const& output, std::string const& verb = std::string("GET"), std::string const& body = std::string())
+	CHttpRequestCommand(fz::uri const& uri, writer_factory_holder const& output, std::string const& verb = std::string("GET"), reader_factory_holder const& body = reader_factory_holder())
 		: uri_(uri)
 		, verb_(verb)
 		, body_(body)
@@ -255,8 +255,8 @@ public:
 
 	fz::uri const uri_;
 	std::string const verb_;
-	std::string const body_;
 
+	reader_factory_holder body_;
 	writer_factory_holder output_;
 };
 

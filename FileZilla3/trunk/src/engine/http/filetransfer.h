@@ -11,7 +11,7 @@ class CHttpFileTransferOpData final : public CFileTransferOpData, public CHttpOp
 {
 public:
 	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, CFileTransferCommand const&);
-	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body, writer_factory_holder const& output_factory);
+	CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, reader_factory_holder const& reader, writer_factory_holder const& writer);
 
 	virtual int Send() override;
 	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
