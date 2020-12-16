@@ -112,7 +112,7 @@ int CFtpFileTransferOpData::Send()
 			if (download()) {
 				auto writer = writer_factory_.open(resumeOffset, engine_, controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
 				if (!writer) {
-					return FZ_REPLY_CRITITALERROR;
+					return FZ_REPLY_CRITICALERROR;
 				}
 				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
 					if (remoteFileSize_ != aio_base::nosize && remoteFileSize_ > static_cast<uint64_t>(resumeOffset)) {
@@ -126,7 +126,7 @@ int CFtpFileTransferOpData::Send()
 			else {
 				auto reader = reader_factory_.open(resumeOffset, engine_, nullptr, aio_base::shm_flag_none);
 				if (!reader) {
-					return FZ_REPLY_CRITITALERROR;
+					return FZ_REPLY_CRITICALERROR;
 				}
 				controlSocket_.m_pTransferSocket->set_reader(std::move(reader), flags_ & ftp_transfer_flags::ascii);
 			}

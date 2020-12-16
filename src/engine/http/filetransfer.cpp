@@ -50,7 +50,7 @@ int CHttpFileTransferOpData::Send()
 		if (reader_factory_) {
 			rr_.request_.body_ = reader_factory_.open(0, engine_, nullptr, aio_base::shm_flag_none);
 			if (!rr_.request_.body_) {
-				return FZ_REPLY_CRITITALERROR;
+				return FZ_REPLY_CRITICALERROR;
 			}
 		}
 
@@ -148,7 +148,7 @@ int CHttpFileTransferOpData::OnHeader()
 	if (writer_factory_) {
 		auto writer = writer_factory_.open(resume_ ? localFileSize_ : 0, engine_, &controlSocket_, aio_base::shm_flag_none);
 		if (!writer) {
-			return FZ_REPLY_CRITITALERROR;
+			return FZ_REPLY_CRITICALERROR;
 		}
 		rr_.response_.writer_ = std::move(writer);
 	}

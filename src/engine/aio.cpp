@@ -1,5 +1,7 @@
 #include "../include/aio.h"
 
+#include "engineprivate.h"
+
 #ifndef FZ_WINDOWS
 #include <sys/mman.h>
 #include <unistd.h>
@@ -31,11 +33,13 @@ aio_base::~aio_base()
 {
 #if FZ_WINDOWS
 	if (mapping_ != INVALID_HANDLE_VALUE) {
-		UnmapViewOfFile(memory_);
+		if (memory_) {
+			UnmapViewOfFile(memory_);
+		}
 		CloseHandle(mapping_);
 	}
 #else
-	if (mapping_ != -1) {
+	if (memory_) {
 		munmap(memory_, memory_size_);
 	}
 #endif
@@ -52,34 +56,45 @@ bool aio_base::allocate_memory(bool single, shm_flag shm)
 
 	size_t const count = single ? 1 : buffer_count;
 
-	// Since different threads/processes operate on different buffers at the same time, use
+	// Since different threads/processes operate on different buffers at the same time
 	// seperate them with a padding page to prevent false sharing due to automatic prefetching.
 	memory_size_ = (buffer_size_ + get_page_size()) * count + get_page_size();
 #if FZ_WINDOWS
 	if (shm) {
 		HANDLE mapping = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, static_cast<DWORD>(memory_size_), nullptr);
 		if (!mapping || mapping == INVALID_HANDLE_VALUE) {
+			DWORD err = GetLastError();
+			engine_.GetLogger().log(logmsg::debug_warning, "CreateFileMapping failed with error %u", err);
 			return false;
 		}
 		memory_ = static_cast<uint8_t*>(MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size_));
 		if (!memory_) {
+			DWORD err = GetLastError();
+			engine_.GetLogger().log(logmsg::debug_warning, "MapViewOfFile failed with error %u", err);
 			return false;
 		}
 		mapping_ = mapping;
 #else
 	if (shm >= 0) {
 		if (ftruncate(shm, memory_size_) != 0) {
+			int err = errno;
+			engine_.GetLogger().log(logmsg::debug_warning, "ftruncate failed with error %d", err);
 			return false;
 		}
 		memory_ = static_cast<uint8_t*>(mmap(nullptr, memory_size_, PROT_READ|PROT_WRITE, MAP_SHARED, shm, 0));
 		if (!memory_) {
+			int err = errno;
+			engine_.GetLogger().log(logmsg::debug_warning, "mmap failed with error %d", err);
 			return false;
 		}
 		mapping_ = shm;
 #endif
 	}
 	else {
-		memory_ = new uint8_t[memory_size_];
+		memory_ = new(std::nothrow) uint8_t[memory_size_];
+		if (!memory_) {
+			return false;
+		}
 	}
 	for (size_t i = 0; i < count; ++i) {
 		buffers_[i] = fz::nonowning_buffer(memory_ + i * (buffer_size_ + get_page_size()) + get_page_size(), buffer_size_);

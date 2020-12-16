@@ -114,14 +114,14 @@ int CStorjFileTransferOpData::Send()
 			if (download()) {
 				writer_ = writer_factory_.open(offset, engine_, this, shm);
 				if (!writer_) {
-					return FZ_REPLY_CRITITALERROR;
+					return FZ_REPLY_CRITICALERROR;
 				}
 				info = writer_->shared_memory_info();
 			}
 			else {
 				reader_ = reader_factory_.open(offset, engine_, this, shm);
 				if (!reader_) {
-					return FZ_REPLY_CRITITALERROR;
+					return FZ_REPLY_CRITICALERROR;
 				}
 				else {
 					info = reader_->shared_memory_info();
