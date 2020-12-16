@@ -17,7 +17,6 @@
 #include "../directorycache.h"
 #include "../directorylistingparser.h"
 #include "../engineprivate.h"
-#include "../iothread.h"
 #include "../pathcache.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"

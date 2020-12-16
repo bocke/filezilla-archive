@@ -110,7 +110,7 @@ int CFtpFileTransferOpData::Send()
 			controlSocket_.m_pTransferSocket = std::make_unique<CTransferSocket>(engine_, controlSocket_, download() ? TransferMode::download : TransferMode::upload);
 			controlSocket_.m_pTransferSocket->m_binaryMode = binary;
 			if (download()) {
-				auto writer = writer_factory_.open(resumeOffset, engine_, *controlSocket_.m_pTransferSocket, aio_base::shm_flag_none);
+				auto writer = writer_factory_.open(resumeOffset, engine_, controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
 				if (!writer) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
@@ -123,16 +123,16 @@ int CFtpFileTransferOpData::Send()
 						}
 					}
 				}
-				controlSocket_.m_pTransferSocket->set_writer(std::move(writer));
+				controlSocket_.m_pTransferSocket->set_writer(std::move(writer), flags_ & ftp_transfer_flags::ascii);
 			}
 			else {
-				auto reader = reader_factory_.open(resumeOffset, engine_, controlSocket_.m_pTransferSocket.get(), aio_base::shm_flag_none);
+				auto reader = reader_factory_.open(resumeOffset, engine_, nullptr, aio_base::shm_flag_none);
 				if (!reader) {
 					// TODO: Handle different errors
 					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);
 					return FZ_REPLY_ERROR;
 				}
-				controlSocket_.m_pTransferSocket->set_reader(std::move(reader));
+				controlSocket_.m_pTransferSocket->set_reader(std::move(reader), flags_ & ftp_transfer_flags::ascii);
 			}
 		}
 

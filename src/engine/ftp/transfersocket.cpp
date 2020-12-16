@@ -15,6 +15,177 @@
 
 #include <assert.h>
 
+#ifndef FZ_WINDOWS
+#define HAVE_ASCII_TRANSFORM 1
+#endif
+
+#if HAVE_ASCII_TRANSFORM
+namespace {
+class ascii_writer final : public writer_base, public fz::event_handler
+{
+public:
+	ascii_writer(CFileZillaEnginePrivate& engine, fz::event_handler * handler, std::unique_ptr<writer_base> && writer)
+		: writer_base(writer->name(), engine, handler, true)
+		, fz::event_handler(engine.event_loop_)
+		, writer_(std::move(writer))
+	{
+		writer_->set_handler(this);
+	}
+
+	~ascii_writer() {
+		writer_.reset();
+		remove_handler();
+	}
+
+	virtual uint64_t size() const override
+	{
+		return writer_->size();
+	}
+
+	virtual get_write_buffer_result get_write_buffer(fz::nonowning_buffer & last_written) override
+	{
+		transform(last_written);
+		get_write_buffer_result r = writer_->get_write_buffer(last_written);
+		if (r.type_ == aio_result::ok) {
+			if (was_cr_) {
+				r.buffer_.append('\r');
+				was_cr_ = false;
+			}
+		}
+		return r;
+	}
+
+	virtual aio_result finalize(fz::nonowning_buffer & last_written)
+	{
+		transform(last_written);
+		if (was_cr_) {
+			last_written.append('\r');
+			was_cr_ = false;
+		}
+		return writer_->finalize(last_written);
+	}
+
+private:
+	void transform(fz::nonowning_buffer & b)
+	{
+		if (!b.empty()) {
+			auto *start = b.get();
+			auto *p = start;
+			auto *q = start;
+			auto *end = start + b.size();
+			while (p != end) {
+				auto c = *(p++);
+				if (c == '\r') {
+					was_cr_ = true;
+				}
+				else if (c == '\n') {
+					was_cr_ = false;
+					*(q++) = c;
+				}
+				else {
+					if (was_cr_) {
+						*(q++) = '\r';
+					}
+					*(q++) = c;
+				}
+			}
+			b.resize(q - start);
+		}
+	}
+
+	std::unique_ptr<writer_base> writer_;
+
+	void operator()(fz::event_base const& ev)
+	{
+		if (handler_) {
+			handler_->operator()(write_ready_event(this));
+		}
+	}
+
+	bool was_cr_{};
+};
+
+class ascii_reader final : public reader_base, public fz::event_handler
+{
+public:
+	ascii_reader(CFileZillaEnginePrivate& engine, fz::event_handler * handler, std::unique_ptr<reader_base> && reader)
+		: reader_base(reader->name(), engine, handler)
+		, fz::event_handler(engine.event_loop_)
+		, reader_(std::move(reader))
+	{
+		reader_->set_handler(this);
+		size_ = reader_->size();
+	}
+
+	~ascii_reader()
+	{
+		reader_.reset();
+		remove_handler();
+	}
+
+	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override
+	{
+		return aio_result::error;
+	}
+
+	virtual read_result read() override
+	{
+		read_result ret = reader_->read();
+		if (ret.type_ != aio_result::ok) {
+			return ret;
+		}
+
+
+		buffer_.clear();
+
+		// In the worst case, length will doubled: If reading
+		// only LFs from the file
+		auto * q = buffer_.get(ret.buffer_.size() * 2);
+
+		auto const * p = ret.buffer_.get();
+		auto const * end = ret.buffer_.get() + ret.buffer_.size();
+
+
+		// Convert all stand-alone LFs into CRLF pairs.
+		while (p != end) {
+			auto const& c = *(p++);
+			if (c == '\n') {
+				if (!was_cr_) {
+					*(q++) = '\r';
+				}
+				was_cr_ = false;
+			}
+			else if (c == '\r') {
+				was_cr_ = true;
+			}
+			else {
+				was_cr_ = false;
+			}
+
+			*(q++) = c;
+		}
+
+		buffer_.add(q - buffer_.get());
+		ret.buffer_ = fz::nonowning_buffer(buffer_.get(), buffer_.capacity(), buffer_.size());
+		return ret;
+	}
+
+	std::unique_ptr<reader_base> reader_;
+
+	void operator()(fz::event_base const& ev)
+	{
+		if (handler_) {
+			handler_->operator()(read_ready_event(this));
+		}
+	}
+
+private:
+	fz::buffer buffer_;
+	bool was_cr_{};
+};
+}
+#endif
+
 CTransferSocket::CTransferSocket(CFileZillaEnginePrivate & engine, CFtpControlSocket & controlSocket, TransferMode transferMode)
 : fz::event_handler(controlSocket.event_loop_)
 , engine_(engine)
@@ -33,6 +204,36 @@ CTransferSocket::~CTransferSocket()
 	
 	reader_.reset();
 	writer_.reset();
+}
+
+void CTransferSocket::set_reader(std::unique_ptr<reader_base> && reader, bool ascii)
+{
+#if HAVE_ASCII_TRANSFORM
+	if (ascii) {
+		reader_ = std::make_unique<ascii_reader>(engine_, this, std::move(reader));
+	}
+	else
+#endif
+	{
+		(void)ascii;
+		reader_ = std::move(reader);
+		reader_->set_handler(this);
+	}
+}
+
+void CTransferSocket::set_writer(std::unique_ptr<writer_base> && writer, bool ascii)
+{
+#if HAVE_ASCII_TRANSFORM
+	if (ascii) {
+		writer_ = std::make_unique<ascii_writer>(engine_, this, std::move(writer));
+	}
+	else
+#endif
+	{
+		(void)ascii;
+		writer_ = std::move(writer);
+		writer_->set_handler(this);
+	}
 }
 
 void CTransferSocket::ResetSocket()

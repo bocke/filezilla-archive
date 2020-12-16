@@ -142,7 +142,7 @@ int CHttpFileTransferOpData::OnHeader()
 	}
 
 	if (writer_factory_) {
-		auto writer = writer_factory_.open(resume_ ? localFileSize_ : 0, engine_, controlSocket_, aio_base::shm_flag_none);
+		auto writer = writer_factory_.open(resume_ ? localFileSize_ : 0, engine_, &controlSocket_, aio_base::shm_flag_none);
 		if (!writer) {
 			log(logmsg::error, _("Failed to open \"%s\" for writing"), writer_factory_.name());
 			return FZ_REPLY_ERROR;

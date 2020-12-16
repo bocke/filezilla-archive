@@ -329,7 +329,7 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 		else {
 			offset = 0;
 		}
-		writer_ = writer_factory_.open(offset, engine_, *this, shm);
+		writer_ = writer_factory_.open(offset, engine_, this, shm);
 		if (!writer_) {
 			controlSocket_.AddToStream("--\n");
 			return;
