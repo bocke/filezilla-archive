@@ -159,7 +159,6 @@
     <ClCompile Include="http\httpcontrolsocket.cpp" />
     <ClCompile Include="http\internalconnect.cpp" />
     <ClCompile Include="http\request.cpp" />
-    <ClCompile Include="iothread.cpp" />
     <ClCompile Include="local_path.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="lookup.cpp" />
@@ -235,7 +234,6 @@
     <ClInclude Include="http\httpcontrolsocket.h" />
     <ClInclude Include="http\internalconnect.h" />
     <ClInclude Include="http\request.h" />
-    <ClInclude Include="iothread.h" />
     <ClInclude Include="..\include\libfilezilla_engine.h" />
     <ClInclude Include="..\include\local_path.h" />
     <ClInclude Include="..\include\logging.h" />
