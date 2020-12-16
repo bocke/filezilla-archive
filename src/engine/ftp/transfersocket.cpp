@@ -807,8 +807,6 @@ bool CTransferSocket::CheckGetNextWriteBuffer()
 			return false;
 		}
 		else if (res == aio_result::error) {
-			// TODO: Error
-			controlSocket_.log(logmsg::error, _("Can't write to file"));
 			TransferEnd(TransferEndReason::transfer_failure_critical);
 			return false;
 		}
@@ -827,8 +825,6 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 			return false;
 		}
 		else if (res == aio_result::error) {
-			// TODO: Error
-			controlSocket_.log(logmsg::error, _("Can't read from file"));
 			TransferEnd(TransferEndReason::transfer_failure_critical);
 			return false;
 		}
@@ -885,7 +881,6 @@ void CTransferSocket::FinalizeWrite()
 		TransferEnd(TransferEndReason::successful);
 	}
 	else {
-		// TODO: Better error
 		TransferEnd(TransferEndReason::transfer_failure_critical);
 	}
 

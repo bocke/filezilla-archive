@@ -114,16 +114,14 @@ int CStorjFileTransferOpData::Send()
 			if (download()) {
 				writer_ = writer_factory_.open(offset, engine_, this, shm);
 				if (!writer_) {
-					log(logmsg::error, _("Failed to open \"%s\" for writing"), localName_);
-					return FZ_REPLY_ERROR;
+					return FZ_REPLY_CRITITALERROR;
 				}
 				info = writer_->shared_memory_info();
 			}
 			else {
 				reader_ = reader_factory_.open(offset, engine_, this, shm);
 				if (!reader_) {
-					log(logmsg::error, _("Failed to open \"%s\" for reading"), localName_);
-					return FZ_REPLY_ERROR;
+					return FZ_REPLY_CRITITALERROR;
 				}
 				else {
 					info = reader_->shared_memory_info();

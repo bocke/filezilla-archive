@@ -23,16 +23,13 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 
 }
 
-// FIXME
-CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, std::string const& body, writer_factory_holder const& output_factory)
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, reader_factory_holder const& reader, writer_factory_holder const& writer)
 	: CFileTransferOpData(L"CHttpFileTransferOpData", CFileTransferCommand(writer_factory_holder(), CServerPath(), std::wstring(), transfer_flags::download))
 	, CHttpOpData(controlSocket)
 {
-	writer_factory_ = output_factory;
+	reader_factory_ = reader;
+	output_factory_ = writer;
 	rr_.request_.uri_ = uri;
-	if (!body.empty()) {
-		rr_.request_.body_ = string_reader::create(L"HTTP Request body", engine_, nullptr, body);
-	}
 	rr_.request_.verb_ = verb;
 }
 
@@ -48,6 +45,13 @@ int CHttpFileTransferOpData::Send()
 		if (rr_.request_.uri_.empty()) {
 			log(logmsg::error, _("Could not create URI for this transfer."));
 			return FZ_REPLY_ERROR;
+		}
+
+		if (reader_factory_) {
+			rr_.request_.body_ = reader_factory_.open(0, engine_, nullptr, aio_base::shm_flag_none);
+			if (!rr_.request_.body_) {
+				return FZ_REPLY_CRITITALERROR;
+			}
 		}
 
 		opState = filetransfer_transfer;
@@ -144,8 +148,7 @@ int CHttpFileTransferOpData::OnHeader()
 	if (writer_factory_) {
 		auto writer = writer_factory_.open(resume_ ? localFileSize_ : 0, engine_, &controlSocket_, aio_base::shm_flag_none);
 		if (!writer) {
-			log(logmsg::error, _("Failed to open \"%s\" for writing"), writer_factory_.name());
-			return FZ_REPLY_ERROR;
+			return FZ_REPLY_CRITITALERROR;
 		}
 		rr_.response_.writer_ = std::move(writer);
 	}
