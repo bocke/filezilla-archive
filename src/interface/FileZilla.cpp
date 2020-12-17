@@ -47,8 +47,10 @@ IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
 namespace {
 #if FZ_WINDOWS
 std::wstring const PATH_SEP = L";";
+#define L_DIR_SEP L"\\"
 #else
 std::wstring const PATH_SEP = L":";
+#define L_DIR_SEP L"/"
 #endif
 }
 
@@ -409,15 +411,15 @@ CLocalPath CFileZillaApp::GetDataDir(std::vector<std::wstring> const& fileToFind
 			return ret;
 		}
 
-		if (!prefixSub.empty() && selfDir.size() > 5 && fz::ends_with(selfDir, std::wstring(L"/bin/"))) {
-			std::wstring path = selfDir.substr(0, selfDir.size() - 4) + prefixSub + L"/";
+		if (!prefixSub.empty() && selfDir.size() > 5 && fz::ends_with(selfDir, std::wstring(L_DIR_SEP L"bin" L_DIR_SEP))) {
+			std::wstring path = selfDir.substr(0, selfDir.size() - 4) + prefixSub + L_DIR_SEP;
 			if (testPath(path)) {
 				return ret;
 			}
 		}
 
 		// Development paths
-		if (searchSelfDir && selfDir.size() > 7 && fz::ends_with(selfDir, std::wstring(L"/.libs/"))) {
+		if (searchSelfDir && selfDir.size() > 7 && fz::ends_with(selfDir, std::wstring(L_DIR_SEP L".libs" L_DIR_SEP))) {
 			std::wstring path = selfDir.substr(0, selfDir.size() - 6);
 			if (FileExists(path + L"Makefile")) {
 				if (testPath(path)) {
@@ -434,8 +436,8 @@ CLocalPath CFileZillaApp::GetDataDir(std::vector<std::wstring> const& fileToFind
 
 		for (auto const& segment : segments) {
 			auto const cur = CLocalPath(segment).GetPath();
-			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L"/bin/"))) {
-				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L"/";
+			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L_DIR_SEP L"bin" L_DIR_SEP))) {
+				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L_DIR_SEP;
 				if (testPath(path)) {
 					return ret;
 				}
