@@ -111,8 +111,8 @@ noinst_HEADERS = \
 		sftp/mkd.h \
 		sftp/rename.h \
 		sftp/rmd.h \
-		sftp/sftpcontrolsocket.h
-		string_reader.h \
+		sftp/sftpcontrolsocket.h \
+		string_reader.h
 
 if ENABLE_STORJ
 libfzclient_private_la_SOURCES += \
