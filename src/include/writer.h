@@ -120,7 +120,7 @@ public:
 	// Writes _up to_ aio_base::buffer_size_ bytes.
 	virtual aio_result write(uint8_t* data, size_t len);
 
-	virtual aio_result preallocate(uint64_t size) { return aio_result::ok; }
+	virtual aio_result preallocate(uint64_t /*size*/) { return aio_result::ok; }
 
 	void set_handler(fz::event_handler * handler);
 
