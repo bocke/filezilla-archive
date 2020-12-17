@@ -2,6 +2,8 @@
 #include "engineprivate.h"
 #include <libfilezilla/translate.hpp>
 
+#include <string.h>
+
 string_reader::string_reader(std::wstring const& name, CFileZillaEnginePrivate & engine, fz::event_handler * handler, std::string const& data)
 	: reader_base(name, engine, handler)
 	, start_data_(data)
