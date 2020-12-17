@@ -427,7 +427,6 @@ int CFtpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				}
 			}
 			else if (download() && !remoteFileTime_.empty()) {
-				// TODO: reset socket if exists
 				if (!writer_factory_.set_mtime(remoteFileTime_)) {
 					log(logmsg::debug_warning, L"Could not set modification time");
 				}
