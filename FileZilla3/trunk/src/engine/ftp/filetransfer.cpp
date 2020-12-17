@@ -115,8 +115,8 @@ int CFtpFileTransferOpData::Send()
 					return FZ_REPLY_CRITICALERROR;
 				}
 				if (engine_.GetOptions().get_int(OPTION_PREALLOCATE_SPACE)) {
-					if (remoteFileSize_ != aio_base::nosize && remoteFileSize_ > static_cast<uint64_t>(resumeOffset)) {
-						if (writer->preallocate(remoteFileSize_ - static_cast<uint64_t>(resumeOffset)) != aio_result::ok) {
+					if (remoteFileSize_ > 0 && resumeOffset > 0 && remoteFileSize_ > resumeOffset) {
+						if (writer->preallocate(static_cast<uint64_t>(remoteFileSize_ - resumeOffset)) != aio_result::ok) {
 							return FZ_REPLY_ERROR;
 						}
 					}

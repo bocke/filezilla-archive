@@ -95,7 +95,7 @@ private:
 
 	std::unique_ptr<writer_base> writer_;
 
-	void operator()(fz::event_base const& ev)
+	void operator()(fz::event_base const&)
 	{
 		if (handler_) {
 			handler_->operator()(write_ready_event(this));
@@ -123,7 +123,7 @@ public:
 		remove_handler();
 	}
 
-	virtual aio_result seek(uint64_t offset, uint64_t max_size = aio_base::nosize) override
+	virtual aio_result seek(uint64_t, uint64_t = aio_base::nosize) override
 	{
 		return aio_result::error;
 	}
@@ -172,7 +172,7 @@ public:
 
 	std::unique_ptr<reader_base> reader_;
 
-	void operator()(fz::event_base const& ev)
+	void operator()(fz::event_base const&)
 	{
 		if (handler_) {
 			handler_->operator()(read_ready_event(this));
