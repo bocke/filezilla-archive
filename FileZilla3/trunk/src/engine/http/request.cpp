@@ -701,7 +701,13 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 	if (response.on_header_) {
 		res = response.on_header_(srr);
 
-		if (res != FZ_REPLY_CONTINUE) {
+		if (res == FZ_REPLY_CONTINUE) {
+			if (response.writer_) {
+				response.writer_->set_handler(&controlSocket_);
+			}
+
+		}
+		else {
 			if (res == FZ_REPLY_OK) {
 				if (!request.body_ || request.flags_ & HttpRequest::flag_sent_body) {
 					// Clear the pointer, we no longer need the request to finish, all needed information is in read_state_
