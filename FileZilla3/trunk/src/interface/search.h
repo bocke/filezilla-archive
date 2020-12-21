@@ -69,7 +69,9 @@ protected:
 	void OnCharHook(wxKeyEvent& event);
 	void OnChangeSearchMode(wxCommandEvent&);
 	void OnGetUrl(wxCommandEvent& event);
-	void OnOpen(wxCommandEvent& event);
+	void OnLocalOpen(wxCommandEvent& event);
+	void OnRemoteOpen(wxCommandEvent& event);
+	void OnShowFileManager(wxCommandEvent& event);
 	void OnChangeCompareOption(wxCommandEvent& event);
 
 	std::set<CServerPath> m_visited;

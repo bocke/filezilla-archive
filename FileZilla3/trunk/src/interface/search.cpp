@@ -599,8 +599,9 @@ EVT_MENU(XRCID("ID_MENU_SEARCH_DELETE"), CSearchDialog::OnDeleteLocal)
 EVT_MENU(XRCID("ID_MENU_SEARCH_DELETE_REMOTE"), CSearchDialog::OnDeleteRemote)
 EVT_MENU(XRCID("ID_MENU_SEARCH_GETURL"), CSearchDialog::OnGetUrl)
 EVT_MENU(XRCID("ID_MENU_SEARCH_GETURL_PASSWORD"), CSearchDialog::OnGetUrl)
-EVT_MENU(XRCID("ID_MENU_SEARCH_OPEN"), CSearchDialog::OnOpen)
-EVT_MENU(XRCID("ID_MENU_SEARCH_FILEMANAGER"), CSearchDialog::OnOpen)
+EVT_MENU(XRCID("ID_MENU_SEARCH_LOCAL_OPEN"), CSearchDialog::OnLocalOpen)
+EVT_MENU(XRCID("ID_MENU_SEARCH_REMOTE_OPEN"), CSearchDialog::OnRemoteOpen)
+EVT_MENU(XRCID("ID_MENU_SEARCH_FILEMANAGER"), CSearchDialog::OnShowFileManager)
 EVT_CHAR_HOOK(CSearchDialog::OnCharHook)
 EVT_RADIOBUTTON(XRCID("ID_LOCAL_SEARCH"), CSearchDialog::OnChangeSearchMode)
 EVT_RADIOBUTTON(XRCID("ID_REMOTE_SEARCH"), CSearchDialog::OnChangeSearchMode)
@@ -1215,7 +1216,7 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 	wxMenu menu;
 	if (local_results) {
 		menu.Append(XRCID("ID_MENU_SEARCH_UPLOAD"), _("&Upload..."));
-		menu.Append(XRCID("ID_MENU_SEARCH_OPEN"), _("O&pen"));
+		menu.Append(XRCID("ID_MENU_SEARCH_LOCAL_OPEN"), _("&Set as local directory and close dialog"));
 		menu.Append(XRCID("ID_MENU_SEARCH_FILEMANAGER"), _("Show in file &manager"));
 		menu.Append(XRCID("ID_MENU_SEARCH_DELETE"), _("D&elete"));
 
@@ -1223,6 +1224,7 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 	}
 	else {
 		menu.Append(XRCID("ID_MENU_SEARCH_DOWNLOAD"), _("&Download..."));
+		menu.Append(XRCID("ID_MENU_SEARCH_REMOTE_OPEN"), _("&Set as remote directory and close dialog"));
 		menu.Append(XRCID("ID_MENU_SEARCH_EDIT"), _("&View/Edit"));
 		menu.Append(XRCID("ID_MENU_SEARCH_DELETE_REMOTE"), _("D&elete"));
 
@@ -1234,6 +1236,7 @@ void CSearchDialog::OnContextMenu(wxContextMenuEvent& event)
 		}
 
 		menu.Enable(XRCID("ID_MENU_SEARCH_DOWNLOAD"), connected);
+		menu.Enable(XRCID("ID_MENU_SEARCH_REMOTE_OPEN"), connected);
 		menu.Enable(XRCID("ID_MENU_SEARCH_DELETE_REMOTE"), connected);
 		menu.Enable(XRCID("ID_MENU_SEARCH_EDIT"), connected);
 	}
@@ -1960,7 +1963,46 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 	wxTheClipboard->Close();
 }
 
-void CSearchDialog::OnOpen(wxCommandEvent & event)
+void CSearchDialog::OnLocalOpen(wxCommandEvent& event)
+{
+	// Find all selected files and directories
+	std::deque<CLocalPath> selected_dirs;
+	std::list<int> selected_files;
+	ProcessSelection(selected_files, selected_dirs, m_results->localFileData_, m_results);
+
+	if (selected_dirs.empty() || selected_dirs.size() > 1) {
+		wxBell();
+		return;
+	}
+
+	m_state.SetLocalDir(selected_dirs[0]);
+
+	EndDialog(wxID_OK);
+}
+
+void CSearchDialog::OnRemoteOpen(wxCommandEvent& event)
+{
+	CSearchDialogFileList *results = m_results;
+	if (mode_ == search_mode::comparison) {
+		results = m_remoteResults;
+	}
+
+	// Find all selected files and directories
+	std::deque<CServerPath> selected_dirs;
+	std::list<int> selected_files;
+	ProcessSelection(selected_files, selected_dirs, results->remoteFileData_, results);
+
+	if (selected_dirs.empty() || selected_dirs.size() > 1) {
+		wxBell();
+		return;
+	}
+
+	m_state.ChangeRemoteDir(selected_dirs[0]);
+
+	EndDialog(wxID_OK);
+}
+
+void CSearchDialog::OnShowFileManager(wxCommandEvent& event)
 {
 	std::list<CLocalSearchFileData> selected_item_list;
 
