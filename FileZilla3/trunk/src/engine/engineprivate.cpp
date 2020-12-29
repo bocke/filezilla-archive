@@ -339,7 +339,7 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 						server.GetProtocol() == SWIFT || server.GetProtocol() == GOOGLE_CLOUD ||
 						server.GetProtocol() == GOOGLE_DRIVE || server.GetProtocol() == DROPBOX ||
 						server.GetProtocol() == ONEDRIVE || server.GetProtocol() == B2 ||
-						server.GetProtocol() == BOX) {
+						server.GetProtocol() == BOX || server.GetProtocol() == RACKSPACE) {
 					path = command.GetPath();
 					path.ChangePath(command.GetSubDir());
 				}
