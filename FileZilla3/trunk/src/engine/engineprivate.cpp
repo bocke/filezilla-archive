@@ -893,6 +893,7 @@ void CTransferStatusManager::Init(int64_t totalSize, int64_t startOffset, bool l
 
 	status_ = CTransferStatus(totalSize, startOffset, list);
 	currentOffset_ = 0;
+	made_progress_ = false;
 }
 
 void CTransferStatusManager::SetStartTime()
@@ -907,12 +908,7 @@ void CTransferStatusManager::SetStartTime()
 
 void CTransferStatusManager::SetMadeProgress()
 {
-	fz::scoped_lock lock(mutex_);
-	if (!status_) {
-		return;
-	}
-
-	status_.madeProgress = true;
+	made_progress_ = true;
 }
 
 void CTransferStatusManager::Update(int64_t transferredBytes)
@@ -929,6 +925,7 @@ void CTransferStatusManager::Update(int64_t transferredBytes)
 
 			if (!send_state_) {
 				status_.currentOffset += currentOffset_.exchange(0);
+				status_.madeProgress = made_progress_;
 				notification = std::make_unique<CTransferStatusNotification>(status_);
 			}
 			send_state_ = 2;

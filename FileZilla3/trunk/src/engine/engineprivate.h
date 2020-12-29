@@ -50,6 +50,7 @@ protected:
 	CTransferStatus status_;
 	std::atomic<int64_t> currentOffset_{};
 	int send_state_{};
+	std::atomic_bool made_progress_;
 
 	CFileZillaEnginePrivate& engine_;
 };
