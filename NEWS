@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.52.0-rc1 (2020-12-29)
+
++ Added context menu item in the search dialog to close the search and set the selected directory as the current local/remote directory
+- Minor fixes for updating the HTTP transfer status
+
 3.52.0-beta1 (2020-12-17)
 
 + Use asynchronous file readers/writers in the engine
