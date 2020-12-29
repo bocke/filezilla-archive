@@ -865,6 +865,18 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"identpath", ParameterSection::host, 0, std::wstring(), _("Path of identity service")});
 				ret.emplace_back(ParameterTraits{"identuser", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"keystone_version", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"domain", ParameterSection::custom, ParameterTraits::optional, L"Default", std::wstring()});
+				return ret;
+			}();
+			return ret;
+		}
+	case RACKSPACE:
+		{
+			static std::vector<ParameterTraits> ret = []() {
+				std::vector<ParameterTraits> ret;
+				ret.emplace_back(ParameterTraits{"identpath", ParameterSection::host, 0, L"/v2.0/tokens", _("Path of identity service")});
+				ret.emplace_back(ParameterTraits{"identuser", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;
@@ -876,6 +888,8 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 				ret.emplace_back(ParameterTraits{"ssealgorithm", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"ssekmskey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"ssecustomerkey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"stsrolearn", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"stsmfaserial", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;
@@ -892,6 +906,15 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		return ret;
 	}
 	case DROPBOX:
+	{
+		static std::vector<ParameterTraits> ret = []() {
+			std::vector<ParameterTraits> ret;
+			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			ret.emplace_back(ParameterTraits{"root_namespace", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+			return ret;
+		}();
+		return ret;
+	}
 	case BOX:
 	{
 		static std::vector<ParameterTraits> ret = []() {
@@ -940,6 +963,8 @@ std::tuple<std::wstring, std::wstring> GetDefaultHost(ServerProtocol protocol)
 		return std::tuple<std::wstring, std::wstring>{L"api.backblazeb2.com", L""};
 	case BOX:
 		return std::tuple<std::wstring, std::wstring>{L"api.box.com", L""};
+	case RACKSPACE:
+		return std::tuple<std::wstring, std::wstring>{L"identity.api.rackspacecloud.com", L""};
 	default:
 		break;
 	}
