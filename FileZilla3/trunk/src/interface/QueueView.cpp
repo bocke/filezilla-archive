@@ -2966,7 +2966,7 @@ void CQueueView::OnSize(wxSizeEvent& event)
 	event.Skip();
 }
 
-void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString& newName, bool local)
+void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString& newName, bool local, writer_factory_holder & new_writer)
 {
 	t_EngineData* const pEngineData = GetEngineData(pEngine);
 	if (!pEngineData || !pEngineData->pItem) {
@@ -2982,6 +2982,7 @@ void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, const wxString&
 		wxFileName fn(pFile->GetLocalPath().GetPath(), pFile->GetLocalFile());
 		fn.SetFullName(newName);
 		pFile->SetTargetFile(fn.GetFullName().ToStdWstring());
+		new_writer = file_writer_factory(fn.GetFullPath().ToStdWstring());
 	}
 	else {
 		pFile->SetTargetFile(newName.ToStdWstring());

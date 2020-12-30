@@ -378,10 +378,11 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 						notification.overwriteAction = CFileExistsNotification::rename;
 						notification.newName = dlg.GetValue().ToStdWstring();
 
-						// If request got processed successfully, notify queue about filename change
-						if (SendReply(entry) && m_pQueueView) {
-							m_pQueueView->RenameFileInTransfer(entry.pEngine, dlg.GetValue().ToStdWstring(), notification.download);
+						if (m_pQueueView) {
+							m_pQueueView->RenameFileInTransfer(entry.pEngine, dlg.GetValue().ToStdWstring(), notification.download, notification.new_writer_factory_);
 						}
+						SendReply(entry);
+
 						return true;
 					}
 				}

@@ -1023,7 +1023,8 @@ bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNot
 					return false;
 				}
 
-				data.writer_factory_ = pFileExistsNotification->new_writer_factory_;
+				data.writer_factory_ = std::move(pFileExistsNotification->new_writer_factory_);
+				data.localName_ = data.writer_factory_.name();
 			}
 
 			data.localFileSize_ = data.writer_factory_.size();
