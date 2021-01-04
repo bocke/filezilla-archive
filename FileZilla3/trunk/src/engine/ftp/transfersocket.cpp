@@ -55,7 +55,7 @@ public:
 		return r;
 	}
 
-	virtual aio_result finalize(fz::nonowning_buffer & last_written)
+	virtual aio_result finalize(fz::nonowning_buffer & last_written) override
 	{
 		transform(last_written);
 		if (was_cr_) {
@@ -95,7 +95,7 @@ private:
 
 	std::unique_ptr<writer_base> writer_;
 
-	void operator()(fz::event_base const&)
+	virtual void operator()(fz::event_base const&) override
 	{
 		if (handler_) {
 			handler_->operator()(write_ready_event(this));
@@ -172,7 +172,7 @@ public:
 
 	std::unique_ptr<reader_base> reader_;
 
-	void operator()(fz::event_base const&)
+	virtual void operator()(fz::event_base const&) override
 	{
 		if (handler_) {
 			handler_->operator()(read_ready_event(this));
