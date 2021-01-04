@@ -1963,7 +1963,7 @@ void CSearchDialog::OnGetUrl(wxCommandEvent& event)
 	wxTheClipboard->Close();
 }
 
-void CSearchDialog::OnLocalOpen(wxCommandEvent& event)
+void CSearchDialog::OnLocalOpen(wxCommandEvent&)
 {
 	// Find all selected files and directories
 	std::deque<CLocalPath> selected_dirs;
@@ -1980,7 +1980,7 @@ void CSearchDialog::OnLocalOpen(wxCommandEvent& event)
 	EndDialog(wxID_OK);
 }
 
-void CSearchDialog::OnRemoteOpen(wxCommandEvent& event)
+void CSearchDialog::OnRemoteOpen(wxCommandEvent&)
 {
 	CSearchDialogFileList *results = m_results;
 	if (mode_ == search_mode::comparison) {
