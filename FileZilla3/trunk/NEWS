@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.52.0.1 (2021-01-05)
+
+- macOS: Rebuilt to address a toolchain issue
+
 3.52.0 (2021-01-04)
 
 - Fixed a regression with the rename file exists action on downloads
