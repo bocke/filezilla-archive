@@ -59,13 +59,23 @@ void CToolBar::MakeTools()
 	MakeTool("ID_TOOLBAR_FIND", L"ART_FIND", _("Search for files recursively."), _("File search"));
 }
 
+#ifdef __WXMAC__
+void fix_toolbar_style(wxFrame& frame);
+#endif
+
 CToolBar* CToolBar::Load(CMainFrame* pMainFrame)
 {
+	if (!pMainFrame) {
+		return nullptr;
+	}
+
 	CToolBar* toolbar = new CToolBar();
 	toolbar->m_pMainFrame = pMainFrame;
 
 	toolbar->iconSize_ = CThemeProvider::GetIconSize(iconSizeSmall, true);
 #ifdef __WXMAC__
+	fix_toolbar_style(*pMainFrame);
+
 	// OS X only knows two hardcoded toolbar sizes.
 	if (toolbar->iconSize_.x >= 32) {
 		toolbar->iconSize_ = wxSize(32, 32);
@@ -81,7 +91,7 @@ CToolBar* CToolBar::Load(CMainFrame* pMainFrame)
 #endif
 	if (!toolbar->Create(pMainFrame, XRCID("ID_TOOLBAR"), wxDefaultPosition, wxDefaultSize, style)) {
 		delete toolbar;
-		return 0;
+		return nullptr;
 	}
 	toolbar->SetToolBitmapSize(toolbar->iconSize_);
 	toolbar->MakeTools();
