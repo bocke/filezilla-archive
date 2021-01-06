@@ -46,7 +46,14 @@ public:
 
 	bool keep_alive() const
 	{
-		return fz::str_tolower_ascii(get_header("Connection")) != "close";
+		auto h = fz::str_tolower_ascii(get_header("Connection"));
+		auto tokens = fz::strtok_view(h, ", ");
+		for (auto const& token : tokens) {
+			if (token == "close") {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	HttpHeaders headers_;
