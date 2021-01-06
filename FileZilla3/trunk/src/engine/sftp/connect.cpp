@@ -73,7 +73,7 @@ int CSftpConnectOpData::Send()
 #if HAVE_MEMFD_CREATE
 				controlSocket_.shm_fd_ = memfd_create("fzsftp", MFD_CLOEXEC);
 #else
-				std::string name = "/" + fz::base32_encode(fz::random_bytes(16));
+				std::string name = "/" + fz::base32_encode(fz::random_bytes(16), fz::base32_type::locale_safe, false);
 				controlSocket_.shm_fd_ = shm_open(name.c_str(), O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
 				if (controlSocket_.shm_fd_ != -1) {
 					shm_unlink(name.c_str());
