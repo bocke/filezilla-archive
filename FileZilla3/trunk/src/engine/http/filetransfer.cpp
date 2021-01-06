@@ -28,7 +28,7 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 	, CHttpOpData(controlSocket)
 {
 	reader_factory_ = reader;
-	output_factory_ = writer;
+	writer_factory_ = writer;
 	rr_.request_.uri_ = uri;
 	rr_.request_.verb_ = verb;
 }
@@ -55,8 +55,8 @@ int CHttpFileTransferOpData::Send()
 		}
 
 		opState = filetransfer_transfer;
-		if (output_factory_) {
-			auto s = output_factory_.size();
+		if (writer_factory_) {
+			auto s = writer_factory_.size();
 			if (s != aio_base::nosize) {
 				localFileSize_ = static_cast<int64_t>(s);
 			}
