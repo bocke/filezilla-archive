@@ -21,7 +21,6 @@ private:
 	int OnHeader();
 
 	HttpRequestResponse rr_;
-	writer_factory_holder output_factory_;
 
 	int redirectCount_{};
 };
