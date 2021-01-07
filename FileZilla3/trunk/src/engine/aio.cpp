@@ -6,6 +6,9 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #endif
+#ifdef FZ_MAC
+#include <sys/stat.h>
+#endif
 
 namespace {
 size_t get_page_size()
@@ -76,10 +79,24 @@ bool aio_base::allocate_memory(bool single, shm_flag shm)
 		mapping_ = mapping;
 #else
 	if (shm >= 0) {
-		if (ftruncate(shm, memory_size_) != 0) {
+#if FZ_MAC
+		// There's a bug on macOS: ftruncate can only be called _once_ on a shared memory object.
+		// The manpages do not cover this bug, only XNU's bsd/kern/posix_shm.c mentions it.
+		struct stat s;
+		if (fstat(shm, &s) != 0) {
 			int err = errno;
-			engine_.GetLogger().log(logmsg::debug_warning, "ftruncate failed with error %d", err);
+			engine_.GetLogger().log(logmsg::debug_warning, "fstat failed with error %d", err);
 			return false;
+		}
+
+		if (s.st_size < memory_size_)
+#endif
+		{
+			if (ftruncate(shm, memory_size_) != 0) {
+				int err = errno;
+				engine_.GetLogger().log(logmsg::debug_warning, "ftruncate failed with error %d", err);
+				return false;
+			}
 		}
 		memory_ = static_cast<uint8_t*>(mmap(nullptr, memory_size_, PROT_READ|PROT_WRITE, MAP_SHARED, shm, 0));
 		if (!memory_) {
