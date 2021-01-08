@@ -69,10 +69,10 @@ private:
 	void transform(fz::nonowning_buffer & b)
 	{
 		if (!b.empty()) {
-			auto *start = b.get();
+			auto * const start = b.get();
 			auto *p = start;
 			auto *q = start;
-			auto *end = start + b.size();
+			auto * const end = start + b.size();
 			while (p != end) {
 				auto c = *(p++);
 				if (c == '\r') {
@@ -85,6 +85,7 @@ private:
 				else {
 					if (was_cr_) {
 						*(q++) = '\r';
+						was_cr_ = false;
 					}
 					*(q++) = c;
 				}
