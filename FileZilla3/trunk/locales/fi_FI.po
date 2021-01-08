@@ -4264,7 +4264,7 @@ msgstr "Suodata pois kohteet, jotka täsmäävät kaikkien seuraavien kanssa"
 
 #: ../src/interface/filteredit.cpp:124
 msgid "Filter out items matching any of the following"
-msgstr "Suodata pois kohteet, jotka täsmäävät kaikkien seuraavien kanssa"
+msgstr "Suodata pois kohteet, jotka täsmäävät yhdenkin seuraavan kanssa"
 
 #: ../src/interface/filteredit.cpp:125
 msgid "Filter out items matching none of the following"
