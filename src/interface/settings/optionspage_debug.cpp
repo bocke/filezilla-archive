@@ -65,7 +65,7 @@ bool COptionsPageDebug::CreateControls(wxWindow* parent)
 bool COptionsPageDebug::LoadPage()
 {
 	impl_->debugMenu_->SetValue(m_pOptions->get_bool(OPTION_DEBUG_MENU));
-	impl_->level_->SetSelection(m_pOptions->get_bool(OPTION_LOGGING_DEBUGLEVEL));
+	impl_->level_->SetSelection(m_pOptions->get_int(OPTION_LOGGING_DEBUGLEVEL));
 	impl_->rawListing_->SetValue(m_pOptions->get_bool(OPTION_LOGGING_RAWLISTING));
 	return true;
 }
