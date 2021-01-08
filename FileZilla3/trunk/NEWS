@@ -10,6 +10,12 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.52.0.5 (2021-01-08)
+
+- FTP: Fixed crash if downloading ASCII files with stray carriage returns
+- Fixed too strict requirements for preallocation
+- *nix: Fixed a memory leak
+
 3.52.0.4 (2021-01-07)
 
 - macOS: Work around a kernel bug where ftruncate cannot be called more than once on a shared memory object
