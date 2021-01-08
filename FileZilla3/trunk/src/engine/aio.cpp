@@ -42,8 +42,10 @@ aio_base::~aio_base()
 		CloseHandle(mapping_);
 	}
 #else
-	if (memory_) {
-		munmap(memory_, memory_size_);
+	if (mapping_ != -1) {
+		if (memory_) {
+			munmap(memory_, memory_size_);
+		}
 	}
 #endif
 	else {
