@@ -402,13 +402,13 @@ void ProtectedCredentials::Protect(fz::public_key const& key)
 		}
 
 		// Different key used. Try decrypting it
-		auto priv = CLoginManager::Get().GetDecryptor(key);
+		auto priv = CLoginManager::Get().GetDecryptor(encrypted_);
 		if (!priv || !Unprotect(priv, true)) {
 			return;
 		}
 		// It succeeded, continue encrypting it with new key.
 	}
-	
+
 	auto plain = fz::to_utf8(password_);
 	if (plain.size() < 16) {
 		// Primitive length hiding
