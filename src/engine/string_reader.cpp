@@ -65,19 +65,19 @@ aio_result string_reader::seek(uint64_t offset, uint64_t max_size)
 {
 	if (offset != aio_base::nosize) {
 		start_offset_ = offset;
+		max_size_ = max_size;
 	}
 
 	if (start_offset_ > start_data_.size()) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s' of size %d."), start_offset_, name_, start_data_.size());
 		error_ = true;
 		return aio_result::error;
 	}
 	size_ = start_data_.size() - start_offset_;
-	if (max_size != aio_base::nosize) {
-		if (max_size > size_) {
-			error_ = true;
-			return aio_result::error;
+	if (max_size_ != aio_base::nosize) {
+		if (max_size_ < size_) {
+			size_ = max_size_;
 		}
-		size_ = max_size;
 	}
 
 	data_ = start_data_;
@@ -148,19 +148,19 @@ aio_result buffer_reader::seek(uint64_t offset, uint64_t max_size)
 {
 	if (offset != aio_base::nosize) {
 		start_offset_ = offset;
+		max_size_ = max_size;
 	}
 
 	if (start_offset_ > start_data_.size()) {
+		engine_.GetLogger().log(logmsg::error, fztranslate("Could not seek to offset %d in '%s' of size %d."), start_offset_, name_, start_data_.size());
 		error_ = true;
 		return aio_result::error;
 	}
 	size_ = start_data_.size() - start_offset_;
-	if (max_size != aio_base::nosize) {
-		if (max_size > size_) {
-			error_ = true;
-			return aio_result::error;
+	if (max_size_ != aio_base::nosize) {
+		if (max_size_ < size_) {
+			size_ = max_size_;
 		}
-		size_ = max_size;
 	}
 
 	data_ = std::string_view(reinterpret_cast<char const*>(start_data_.get() + start_offset_), size_);

@@ -108,6 +108,7 @@ public:
 
 protected:
 	uint64_t start_offset_{};
+	uint64_t max_size_{aio_base::nosize};
 	uint64_t size_{aio_base::nosize};
 	bool called_read_{};
 };
