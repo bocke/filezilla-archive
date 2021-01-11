@@ -82,7 +82,7 @@ class FZC_PUBLIC_SYMBOL file_writer_factory final : public writer_factory
 {
 public:
 	file_writer_factory(std::wstring const& file, bool fsync = false);
-	
+
 	virtual std::unique_ptr<writer_base> open(uint64_t offset, CFileZillaEnginePrivate & engine, fz::event_handler * handler, aio_base::shm_flag shm, bool update_transfer_status = true) override;
 	virtual std::unique_ptr<writer_factory> clone() const override;
 
@@ -97,6 +97,7 @@ public:
 
 struct get_write_buffer_result {
 	bool operator==(aio_result const t) const { return type_ == t; }
+	bool operator!=(aio_result const t) const { return type_ != t; }
 
 	aio_result type_{aio_result::error};
 	fz::nonowning_buffer buffer_;
@@ -116,9 +117,6 @@ public:
 	virtual get_write_buffer_result get_write_buffer(fz::nonowning_buffer & last_written);
 
 	virtual aio_result retire(fz::nonowning_buffer & last_written);
-
-	// Writes _up to_ aio_base::buffer_size_ bytes.
-	virtual aio_result write(uint8_t* data, size_t len);
 
 	virtual aio_result preallocate(uint64_t /*size*/) { return aio_result::ok; }
 

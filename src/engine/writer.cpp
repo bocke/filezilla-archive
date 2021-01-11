@@ -205,36 +205,6 @@ aio_result writer_base::retire(fz::nonowning_buffer & last_written)
 	return aio_result::ok;
 }
 
-aio_result writer_base::write(uint8_t* data, size_t len)
-{
-	fz::scoped_lock l(mtx_);
-	if (error_ || processing_) {
-		return aio_result::error;
-	}
-
-	if (!len) {
-		 return aio_result::ok;
-	}
-
-	if (ready_count_ >= buffers_.size()) {
-		handler_waiting_ = true;
-		return aio_result::wait;
-	}
-
-	auto & b = buffers_[(ready_pos_ + ready_count_) % buffers_.size()];
-
-	len = std::min(len, buffer_size_);
-	memcpy(b.get(len), data, len);
-	b.add(len);
-
-	bool signal = !ready_count_;
-	++ready_count_;
-	if (signal) {
-		signal_capacity(l);
-	}
-	return aio_result::ok;
-}
-
 aio_result writer_base::finalize(fz::nonowning_buffer & last_written)
 {
 	fz::scoped_lock l(mtx_);
@@ -574,6 +544,7 @@ void memory_writer::signal_capacity(fz::scoped_lock &)
 			engine_.transfer_status_.SetMadeProgress();
 			engine_.transfer_status_.Update(b.size());
 		}
+		b.resize(0);
 	}
 }
 

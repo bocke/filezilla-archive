@@ -333,17 +333,18 @@ int CHttpRequestOpData::FinalizeResponseBody()
 	auto & shared_response = requests_.front();
 	if (shared_response) {
 		auto & response = shared_response->response();
-		response.flags_ |= HttpResponse::flag_got_body;
-		if (response.writer_) {
-			fz::nonowning_buffer b;
-			auto r = response.writer_->finalize(b);
-			switch (r) {
-			case aio_result::ok:
-				return FZ_REPLY_OK;
-			case aio_result::wait:
-				return FZ_REPLY_WOULDBLOCK;
-			default:
-				return FZ_REPLY_ERROR;
+		if (!(response.flags_ & HttpResponse::flag_ignore_body)) {
+			response.flags_ |= HttpResponse::flag_got_body;
+			if (response.writer_) {
+				auto r = response.writer_->finalize(read_state_.writer_buffer_);
+				switch (r) {
+				case aio_result::ok:
+					return FZ_REPLY_OK;
+				case aio_result::wait:
+					return FZ_REPLY_WOULDBLOCK;
+				default:
+					return FZ_REPLY_ERROR;
+				}
 			}
 		}
 	}
@@ -723,7 +724,7 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 
 	if (res == FZ_REPLY_CONTINUE) {
 		if (!read_state_.responseContentLength_) {
-			res = FZ_REPLY_OK;
+			return FinalizeResponseBody();
 		}
 	}
 
@@ -839,18 +840,23 @@ int CHttpRequestOpData::ProcessData(unsigned char* data, size_t & remaining)
 			if (response.success()) {
 				if (response.writer_) {
 					while (remaining) {
-						aio_result r = response.writer_->write(data, remaining);
-						if (r == aio_result::ok) {
-							remaining -= std::min(remaining, aio_base::buffer_size_);
+						if (read_state_.writer_buffer_.size() >= read_state_.writer_buffer_.capacity()) {
+							auto r = response.writer_->get_write_buffer(read_state_.writer_buffer_);
+							if (r == aio_result::wait) {
+								res = FZ_REPLY_WOULDBLOCK;
+								break;
+							}
+							else if (r == aio_result::error) {
+								res =  FZ_REPLY_CRITICALERROR;
+								break;
+							}
+
+							read_state_.writer_buffer_ = r.buffer_;
 						}
-						else if (r == aio_result::wait) {
-							res = FZ_REPLY_WOULDBLOCK;
-							break;
-						}
-						else {
-							res = FZ_REPLY_ERROR;
-							break;
-						}
+
+						size_t s = std::min(remaining, read_state_.writer_buffer_.capacity() - read_state_.writer_buffer_.size());
+						read_state_.writer_buffer_.append(data, s);
+						remaining -= s;
 					}
 				}
 				else {

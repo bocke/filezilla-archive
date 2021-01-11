@@ -75,6 +75,8 @@ private:
 		int64_t responseContentLength_{-1};
 		int64_t receivedData_{};
 
+		fz::nonowning_buffer writer_buffer_;
+
 		bool keep_alive_{};
 		bool eof_{};
 	};
