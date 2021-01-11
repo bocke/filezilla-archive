@@ -261,7 +261,7 @@ aio_result file_reader::seek(uint64_t offset, uint64_t max_size)
 		if (offset != start_offset_) {
 			change = true;
 		}
-		if (max_size != aio_base::nosize && max_size != size_) {
+		if (max_size != max_size_) {
 			change = true;
 		}
 	}
@@ -287,9 +287,7 @@ aio_result file_reader::seek(uint64_t offset, uint64_t max_size)
 
 	if (offset != aio_base::nosize) {
 		start_offset_ = offset;
-	}
-	else {
-		max_size = aio_base::nosize;
+		max_size_ = max_size;
 	}
 
 	auto const ofs = static_cast<int64_t>(start_offset_);
@@ -311,8 +309,8 @@ aio_result file_reader::seek(uint64_t offset, uint64_t max_size)
 		return aio_result::error;
 	}
 	size_ = static_cast<int64_t>(s) - start_offset_;
-	if (max_size != aio_base::nosize && max_size < size_) {
-		size_ = max_size;
+	if (max_size_ != aio_base::nosize && max_size_ < size_) {
+		size_ = max_size_;
 	}
 	remaining_ = size_;
 
@@ -458,9 +456,7 @@ aio_result memory_reader::seek(uint64_t offset, uint64_t max_size)
 {
 	if (offset != aio_base::nosize) {
 		start_offset_ = offset;
-	}
-	else {
-		max_size = size_;
+		max_size_ = max_size;
 	}
 
 	if (start_offset_ > start_data_.size()) {
@@ -469,9 +465,9 @@ aio_result memory_reader::seek(uint64_t offset, uint64_t max_size)
 		return aio_result::error;
 	}
 	size_ = start_data_.size() - start_offset_;
-	if (max_size != aio_base::nosize) {
-		if (max_size < size_) {
-			size_ = max_size;
+	if (max_size_ != aio_base::nosize) {
+		if (max_size_ < size_) {
+			size_ = max_size_;
 		}
 	}
 
