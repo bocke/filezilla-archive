@@ -91,7 +91,7 @@ bool aio_base::allocate_memory(bool single, shm_flag shm)
 			return false;
 		}
 
-		if (s.st_size < memory_size_)
+		if (s.st_size < 0 || static_cast<size_t>(s.st_size) < memory_size_)
 #endif
 		{
 			if (ftruncate(shm, memory_size_) != 0) {
