@@ -137,6 +137,7 @@ int CSftpFileTransferOpData::ParseResponse()
 				}
 			}
 			else {
+				writer_.reset();
 				if (!localFileTime_.empty()) {
 					opState = filetransfer_chmtime;
 					return FZ_REPLY_CONTINUE;
