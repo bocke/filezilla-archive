@@ -109,7 +109,7 @@ public:
 
 	bool got_code() const { return flags_ & flag_got_code; }
 	bool got_header() const { return flags_ & flag_got_header; }
-	bool got_body() const { return flags_ & flag_got_body; }
+	bool got_body() const { return (flags_ & (flag_got_body | flag_no_body | flag_ignore_body)) == flag_got_body; }
 	bool no_body() const { return flags_ & flag_no_body; }
 
 	// Called once the complete header has been received.
