@@ -333,7 +333,7 @@ int CHttpRequestOpData::FinalizeResponseBody()
 	auto & shared_response = requests_.front();
 	if (shared_response) {
 		auto & response = shared_response->response();
-		if (!(response.flags_ & HttpResponse::flag_ignore_body)) {
+		if (!(response.flags_ & (HttpResponse::flag_ignore_body | HttpResponse::flag_no_body))) {
 			response.flags_ |= HttpResponse::flag_got_body;
 			if (response.writer_) {
 				auto r = response.writer_->finalize(read_state_.writer_buffer_);
@@ -856,6 +856,7 @@ int CHttpRequestOpData::ProcessData(unsigned char* data, size_t & remaining)
 
 						size_t s = std::min(remaining, read_state_.writer_buffer_.capacity() - read_state_.writer_buffer_.size());
 						read_state_.writer_buffer_.append(data, s);
+						data += s;
 						remaining -= s;
 					}
 				}
