@@ -335,7 +335,7 @@ int CHttpRequestOpData::FinalizeResponseBody()
 		auto & response = shared_response->response();
 		if (!(response.flags_ & (HttpResponse::flag_ignore_body | HttpResponse::flag_no_body))) {
 			response.flags_ |= HttpResponse::flag_got_body;
-			if (response.writer_) {
+			if (response.success() && response.writer_) {
 				auto r = response.writer_->finalize(read_state_.writer_buffer_);
 				switch (r) {
 				case aio_result::ok:
