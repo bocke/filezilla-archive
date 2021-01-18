@@ -93,6 +93,28 @@ bool CWindowStateManager::ReadDefaults(interfaceOptions const optionId, bool& ma
 		position.y = screen_size.GetTop();
 	}
 
+#if wxUSE_DISPLAY
+	// In a second step, adjust vertical again, but this time based on the screen at the assumed centerpoint of the titlebar
+	wxPoint title_center = wxPoint(position.x + size.x / 2, position.y + 4);
+	int const di = wxDisplay::GetFromPoint(title_center);
+	if (di != wxNOT_FOUND) {
+		wxDisplay d(di);
+		if (d.IsOk()) {
+			wxRect const dr = d.GetClientArea();
+
+			int dy = position.y - dr.GetTop();
+			if (dy > -100 && dy < 0) {
+				position.y = dr.GetTop();
+			}
+
+			dy = position.y - dr.GetBottom() - 30;
+			if (dy > 0 && dy < 100) {
+				position.y = dr.GetBottom() - 30;
+			}
+		}
+	}
+#endif
+
 	maximized = values[0] != 0;
 
 	return true;
@@ -194,7 +216,7 @@ wxRect CWindowStateManager::GetScreenDimensions()
 	// Get bounding rectangle of virtual screen
 	for (unsigned int i = 0; i < wxDisplay::GetCount(); ++i) {
 		wxDisplay display(i);
-		wxRect rect = display.GetGeometry();
+		wxRect rect = display.GetClientArea();
 		screen_size.Union(rect);
 	}
 	if (screen_size.GetWidth() <= 0 || screen_size.GetHeight() <= 0) {
