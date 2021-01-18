@@ -107,8 +107,8 @@ bool CWindowStateManager::ReadDefaults(interfaceOptions const optionId, bool& ma
 				position.y = dr.GetTop();
 			}
 
-			dy = position.y - dr.GetBottom() - 30;
-			if (dy > 0 && dy < 100) {
+			dy = (dr.GetBottom() - 30) - position.y;
+			if (dy > -100 && dy < 0) {
 				position.y = dr.GetBottom() - 30;
 			}
 		}
