@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.52.2 (2021-01-18)
+
+- When restoring the main window position at startup, detect if the title bar would become hidden behind taskbars or global menu bars and reposition it appropriately
+- SFTP: Fixed preserving of timestamps on downloads
+
 3.52.0.5 (2021-01-08)
 
 - FTP: Fixed crash if downloading ASCII files with stray carriage returns
