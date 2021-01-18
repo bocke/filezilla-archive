@@ -128,6 +128,7 @@ int CSftpFileTransferOpData::Send()
 int CSftpFileTransferOpData::ParseResponse()
 {
 	if (opState == filetransfer_transfer) {
+		writer_.reset();
 		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (download()) {
 				if (!remoteFileTime_.empty()) {
@@ -137,7 +138,6 @@ int CSftpFileTransferOpData::ParseResponse()
 				}
 			}
 			else {
-				writer_.reset();
 				if (!localFileTime_.empty()) {
 					opState = filetransfer_chmtime;
 					return FZ_REPLY_CONTINUE;
