@@ -7,7 +7,7 @@ for further use.
 Directory get either purged from the cache if the maximum cache time exceeds,
 or on possible data inconsistencies.
 For example since some servers are case sensitive and others aren't, a
-directory is removed from cache once an operation effects a file wich matches
+directory is removed from cache once an operation effects a file which matches
 multiple entries in a cache directory using a case insensitive search
 On other operations, the directory is marked as unsure. It may still be valid,
 but for some operations the engine/interface prefers to retrieve a clean
