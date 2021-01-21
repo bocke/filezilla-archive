@@ -2,12 +2,13 @@
 #include "bookmarks_dialog.h"
 #include "filezillaapp.h"
 #include "sitemanager.h"
-#include "ipcmutex.h"
 #include "state.h"
 #include "themeprovider.h"
 #include "treectrlex.h"
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <wx/dirdlg.h>
 #include <wx/statline.h>
@@ -370,7 +371,7 @@ void CBookmarksDialog::SaveGlobalBookmarks()
 		}
 	}
 
-	if (!file.Save(false)) {
+	if (!file.Save()) {
 		wxString msg = wxString::Format(_("Could not write \"%s\", the global bookmarks could no be saved: %s"), file.GetFileName(), file.GetError());
 		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
 	}
@@ -925,7 +926,7 @@ bool CBookmarksDialog::AddBookmark(const wxString &name, const wxString &local_d
 		AddTextElementUtf8(bookmark, "DirectoryComparison", "1");
 	}
 
-	if (!file.Save(false)) {
+	if (!file.Save()) {
 		wxString msg = wxString::Format(_("Could not write \"%s\", the bookmark could not be added: %s"), file.GetFileName(), file.GetError());
 		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
 		return false;

@@ -237,6 +237,6 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 	}
 	else {
 		xrc_call(*this, "ID_COMMENTS", &wxTextCtrl::ChangeValue, site.comments_);
-		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site.m_colour));
+		xrc_call(*this, "ID_COLOR", &wxChoice::Select, CSiteManager::GetColourIndex(site_colour_to_wx(site.m_colour)));
 	}
 }

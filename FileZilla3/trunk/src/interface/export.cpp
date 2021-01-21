@@ -2,9 +2,10 @@
 #include "export.h"
 #include "filezillaapp.h"
 #include "xmlfunctions.h"
-#include "ipcmutex.h"
 #include "queue.h"
 #include "xrc_helper.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <wx/filedlg.h>
 
@@ -107,5 +108,5 @@ void CExportDialog::Run()
 		}
 	}
 
-	xml.Save(true);
+	SaveWithErrorDialog(xml);
 }

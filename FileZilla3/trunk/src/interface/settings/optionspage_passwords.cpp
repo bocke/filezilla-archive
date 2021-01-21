@@ -164,9 +164,9 @@ bool COptionsPagePasswords::SavePage()
 		for (auto& site : recentServers) {
 			if (!forget) {
 				loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
-				site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+				unprotect(site.credentials, loginManager.GetDecryptor(site.credentials.encrypted_), true);
 			}
-			site.credentials.Protect();
+			protect(site.credentials);
 		}
 		CRecentServerList::SetMostRecentServers(recentServers);
 	}
@@ -176,9 +176,9 @@ bool COptionsPagePasswords::SavePage()
 		auto path = state->GetLastServerPath();
 		if (!forget) {
 			loginManager.AskDecryptor(site.credentials.encrypted_, true, false);
-			site.credentials.Unprotect(loginManager.GetDecryptor(site.credentials.encrypted_), true);
+			unprotect(site.credentials, loginManager.GetDecryptor(site.credentials.encrypted_), true);
 		}
-		site.credentials.Protect();
+		protect(site.credentials);
 		state->SetLastSite(site, path);
 	}
 

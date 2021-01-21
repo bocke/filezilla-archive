@@ -6,7 +6,7 @@
 #include "LocalListView.h"
 #include "queue.h"
 #include "filezillaapp.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "file_utils.h"
 #include "infotext.h"
 #include "inputdialog.h"
@@ -392,7 +392,7 @@ regular_dir:
 
 		auto result = local_filesys.begin_find_files(fz::to_native(m_dir.GetPath()), false);
 		if (!result) {
-			
+
 			if (result.error_ == fz::result::noperm) {
 				SetInfoText(_("You do not have permission to list this directory"));
 			}
@@ -814,20 +814,20 @@ void CLocalListView::OnContextMenu(wxContextMenuEvent& event)
 	item->SetBitmap(wxArtProvider::GetBitmap(_T("ART_UPLOADADD"), wxART_MENU));
 	menu.Append(item);
 	menu.Append(XRCID("ID_ENTER"), _("E&nter directory"), _("Enter selected directory"));
-	
+
 	menu.AppendSeparator();
-	menu.Append(XRCID("ID_OPEN"), _("&Open"), _("Open the file."));		
+	menu.Append(XRCID("ID_OPEN"), _("&Open"), _("Open the file."));
 	menu.Append(XRCID("ID_EDIT"), _("&Edit"), _("Edit the file with the configured editor and upload changes to the server."));
-		
+
 	menu.AppendSeparator();
-	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));		
+	menu.Append(XRCID("ID_MKDIR"), _("&Create directory"), _("Create a new subdirectory in the current directory"));
 	menu.Append(XRCID("ID_MKDIR_CHGDIR"), _("Create director&y and enter it"), _("Create a new subdirectory in the current directory and change into it"));
 	menu.Append(XRCID("ID_CONTEXT_REFRESH"), _("Re&fresh"));
-		
+
 	menu.AppendSeparator();
 	menu.Append(XRCID("ID_DELETE"),_("&Delete"), _("Delete selected files and directories"));
 	menu.Append(XRCID("ID_RENAME"), _("&Rename"), _("Rename selected files and directories"));
-		
+
 	const bool connected = m_state.IsRemoteConnected();
 	if (!connected) {
 		menu.Enable(XRCID("ID_EDIT"), COptions::Get()->get_int(OPTION_EDIT_TRACK_LOCAL) == 0);
@@ -953,7 +953,7 @@ void CLocalListView::OnMenuUpload(wxCommandEvent& event)
 	if (!root.empty()) {
 		recursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
-		recursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
+		recursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
 	}
 }
 
@@ -1184,7 +1184,7 @@ bool CLocalListView::OnAcceptRename(const wxListEvent& event)
 void CLocalListView::ApplyCurrentFilter()
 {
 	CStateFilterManager const& filter = m_state.GetStateFilterManager();
-	
+
 	if (!filter.HasSameLocalAndRemoteFilters() && IsComparing()) {
 		ExitComparisonMode();
 	}
@@ -1406,10 +1406,10 @@ void CLocalListView::OnStateChange(t_statechange_notifications notification, std
 	}
 	else if (notification == STATECHANGE_SERVER) {
 		if (m_windowTinter) {
-			m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+			m_windowTinter->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 		}
 		if (m_pInfoText) {
-			m_pInfoText->SetBackgroundTint(m_state.GetSite().m_colour);
+			m_pInfoText->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 		}
 	}
 	else {

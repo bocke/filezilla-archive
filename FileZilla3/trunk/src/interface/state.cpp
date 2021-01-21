@@ -803,7 +803,7 @@ void DoUploadDroppedFiles(CState& state, CMainFrame & mainFrame, T const& files,
 	}
 
 	CFilterManager filter;
-	recursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
+	recursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
 }
 }
 
@@ -1033,7 +1033,7 @@ bool CState::DownloadDroppedFiles(const CRemoteDataObject* pRemoteDataObject, co
 		m_pRemoteRecursiveOperation->AddRecursionRoot(std::move(root));
 
 		CFilterManager filter;
-		m_pRemoteRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
+		m_pRemoteRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !queueOnly);
 	}
 
 	return true;
@@ -1050,7 +1050,7 @@ bool CState::IsRemoteConnected() const
 
 bool CState::IsRemoteIdle(bool ignore_recursive) const
 {
-	if (!ignore_recursive && m_pRemoteRecursiveOperation && m_pRemoteRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none) {
+	if (!ignore_recursive && m_pRemoteRecursiveOperation && m_pRemoteRecursiveOperation->GetOperationMode() != recursive_operation::recursive_none) {
 		return false;
 	}
 
@@ -1063,7 +1063,7 @@ bool CState::IsRemoteIdle(bool ignore_recursive) const
 
 bool CState::IsLocalIdle(bool ignore_recursive) const
 {
-	if (!ignore_recursive && m_pLocalRecursiveOperation && m_pLocalRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_none) {
+	if (!ignore_recursive && m_pLocalRecursiveOperation && m_pLocalRecursiveOperation->GetOperationMode() != recursive_operation::recursive_none) {
 		return false;
 	}
 

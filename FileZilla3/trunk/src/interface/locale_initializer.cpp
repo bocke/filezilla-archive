@@ -1,5 +1,6 @@
 #include "filezilla.h"
 #include "locale_initializer.h"
+#include "../commonui/fz_paths.h"
 #ifdef HAVE_LIBPUGIXML
 #include <pugixml.hpp>
 #else

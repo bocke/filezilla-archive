@@ -6,6 +6,7 @@
 #include "option_change_event_handler.h"
 #include "queue.h"
 #include "queue_storage.h"
+#include "state.h"
 
 #include "../include/libfilezilla_engine.h"
 #include "../include/notification.h"

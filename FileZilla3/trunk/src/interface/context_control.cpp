@@ -117,7 +117,7 @@ bool CContextControl::CreateTab(CLocalPath const& localPath, Site const& site, C
 				return false;
 			}
 		}
-	
+
 		pState->SetLastSite(site, remotePath);
 
 		CreateContextControls(*pState);
@@ -185,7 +185,7 @@ void CContextControl::CreateContextControls(CState& state)
 		if (currentControls.pRemoteListView) {
 			currentControls.pRemoteListView->SaveColumnSettings(OPTION_REMOTEFILELIST_COLUMN_WIDTHS, OPTION_REMOTEFILELIST_COLUMN_SHOWN, OPTION_REMOTEFILELIST_COLUMN_ORDER);
 		}
-		
+
 		if (!m_tabs) {
 			m_tabs = new wxAuiNotebookEx();
 
@@ -197,7 +197,7 @@ void CContextControl::CreateContextControls(CState& state)
 			currentControls.pViewSplitter->Reparent(m_tabs);
 
 			m_tabs->AddPage(currentControls.pViewSplitter, currentControls.pState->GetTitle());
-			m_tabs->SetTabColour(0, currentControls.pState->GetSite().m_colour);
+			m_tabs->SetTabColour(0, site_colour_to_wx(currentControls.pState->GetSite().m_colour));
 			ReplaceWindow(currentControls.pViewSplitter, m_tabs);
 
 			m_tabs->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler(CContextControl::OnTabChanged), 0, this);
@@ -662,7 +662,7 @@ void CContextControl::OnStateChange(CState* pState, t_statechange_notifications 
 		if (controls && controls->used()) {
 			int i = m_tabs->GetPageIndex(controls->pViewSplitter);
 			if (i != wxNOT_FOUND) {
-				m_tabs->SetTabColour(i, controls->pState->GetSite().m_colour);
+				m_tabs->SetTabColour(i, site_colour_to_wx(controls->pState->GetSite().m_colour));
 				m_tabs->SetPageText(i, controls->pState->GetTitle());
 			}
 		}

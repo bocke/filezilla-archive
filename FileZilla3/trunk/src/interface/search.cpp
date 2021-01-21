@@ -6,7 +6,6 @@
 #include "commandqueue.h"
 #include "filelistctrl.h"
 #include "file_utils.h"
-#include "ipcmutex.h"
 #include "Options.h"
 #include "queue.h"
 #include "remote_recursive_operation.h"
@@ -16,6 +15,8 @@
 #include "window_state_manager.h"
 #include "xrc_helper.h"
 #include "customheightlistctrl.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/process.hpp>
 #include <libfilezilla/uri.hpp>
@@ -817,7 +818,7 @@ void CSearchDialog::OnStateChange(t_statechange_notifications notification, std:
 	if (notification == STATECHANGE_REMOTE_DIR_OTHER && data2) {
 		if (searching_ && mode_ != search_mode::local) {
 			auto recursiveOperation = m_state.GetRemoteRecursiveOperation();
-			if (recursiveOperation && recursiveOperation->GetOperationMode() == CRecursiveOperation::recursive_list) {
+			if (recursiveOperation && recursiveOperation->GetOperationMode() == recursive_operation::recursive_list) {
 				std::shared_ptr<CDirectoryListing> const& listing = *reinterpret_cast<std::shared_ptr<CDirectoryListing> const*>(data2);
 
 				ProcessDirectoryListing(listing);
@@ -1119,7 +1120,7 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		root.add_dir_to_visit(m_local_search_root);
 		m_state.GetLocalRecursiveOperation()->AddRecursionRoot(std::move(root));
 		ActiveFilters const filters; // Empty, recurse into everything
-		m_state.GetLocalRecursiveOperation()->StartRecursiveOperation(CRecursiveOperation::recursive_list, filters, true, false);
+		m_state.GetLocalRecursiveOperation()->StartRecursiveOperation(recursive_operation::recursive_list, filters, true, false);
 	}
 
 	if (mode_ != search_mode::local) {
@@ -1127,7 +1128,7 @@ void CSearchDialog::OnSearch(wxCommandEvent&)
 		root.add_dir_to_visit_restricted(m_remote_search_root, std::wstring(), true);
 		m_state.GetRemoteRecursiveOperation()->AddRecursionRoot(std::move(root));
 		ActiveFilters const filters; // Empty, recurse into everything
-		m_state.GetRemoteRecursiveOperation()->StartRecursiveOperation(CRecursiveOperation::recursive_list, filters);
+		m_state.GetRemoteRecursiveOperation()->StartRecursiveOperation(recursive_operation::recursive_list, filters);
 	}
 
 	SetCtrlState();
@@ -1489,7 +1490,7 @@ void CSearchDialog::OnDownload(wxCommandEvent&)
 	}
 	m_pQueue->QueueFile_Finish(start);
 
-	auto const mode = flatten ? CRecursiveOperation::recursive_transfer_flatten : CRecursiveOperation::recursive_transfer;
+	auto const mode = flatten ? recursive_operation::recursive_transfer_flatten : recursive_operation::recursive_transfer;
 
 	for (auto const& dir : selected_dirs) {
 		CLocalPath target_path = path;
@@ -1568,7 +1569,7 @@ void CSearchDialog::OnUpload(wxCommandEvent&)
 	}
 	m_pQueue->QueueFile_Finish(start);
 
-	auto const mode = flatten ? CRecursiveOperation::recursive_transfer_flatten : CRecursiveOperation::recursive_transfer;
+	auto const mode = flatten ? recursive_operation::recursive_transfer_flatten : recursive_operation::recursive_transfer;
 
 	for (auto const& dir : selected_dirs) {
 		CServerPath target_path = path;
@@ -1715,7 +1716,7 @@ void CSearchDialog::OnDeleteRemote(wxCommandEvent&)
 	}
 
 	ActiveFilters const filters; // Empty, recurse into everything
-	m_state.GetRemoteRecursiveOperation()->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filters);
+	m_state.GetRemoteRecursiveOperation()->StartRecursiveOperation(recursive_operation::recursive_delete, filters);
 }
 
 void CSearchDialog::OnDeleteLocal(wxCommandEvent&)
@@ -1786,7 +1787,7 @@ void CSearchDialog::LoadConditions()
 		return;
 	}
 
-	if (!CFilterManager::LoadFilter(filter, m_search_filter)) {
+	if (!load_filter(filter, m_search_filter)) {
 		m_search_filter = CFilter();
 	}
 
@@ -1821,7 +1822,7 @@ void CSearchDialog::SaveConditions()
 	}
 	filter = document.append_child("Filter");
 
-	CFilterManager::SaveFilter(filter, m_search_filter);
+	save_filter(filter, m_search_filter);
 
 	pugi::xml_node comparative;
 	while ((comparative = document.child("Comparative"))) {
@@ -1832,7 +1833,7 @@ void CSearchDialog::SaveConditions()
 	AddTextElement(comparative, "CompareSizes", xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::GetValue) ? "1" : "0");
 	AddTextElement(comparative, "HideIdentical", xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::GetValue) ? "1" : "0");
 
-	file.Save(true);
+	SaveWithErrorDialog(file);
 }
 
 void CSearchDialog::OnChangeSearchMode(wxCommandEvent&)

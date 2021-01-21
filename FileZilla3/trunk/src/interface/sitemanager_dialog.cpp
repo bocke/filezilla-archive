@@ -7,7 +7,6 @@
 #include "drop_target_ex.h"
 #include "filezillaapp.h"
 #include "inputdialog.h"
-#include "ipcmutex.h"
 #include "Options.h"
 #include "sitemanager_site.h"
 #include "themeprovider.h"
@@ -17,6 +16,8 @@
 #include "wrapengine.h"
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <wx/dirdlg.h>
 #include <wx/dnd.h>
@@ -294,7 +295,7 @@ wxPanel * CreateBookmarkPanel(wxWindow* parent, DialogLayout const& lay)
 	main->AddGrowableCol(0);
 
 	main->Add(new wxStaticText(panel, -1, _("&Local directory:")));
-	
+
 	auto row = lay.createFlex(0, 1);
 	main->Add(row, lay.grow);
 	row->AddGrowableCol(0);
@@ -818,7 +819,7 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 
 		bool res = Save(element, m_ownSites);
 
-		if (!xml.Save(false)) {
+		if (!xml.Save()) {
 			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 				return res;
 			}
@@ -1902,7 +1903,7 @@ void CSiteManagerDialog::RememberLastSelected()
 	if (sel) {
 		path = GetSitePath(sel);
 	}
-	
+
 	COptions::Get()->set(OPTION_SITEMANAGER_LASTSELECTED, path);
 }
 
@@ -1959,7 +1960,7 @@ void CSiteManagerDialog::OnExportSelected(wxCommandEvent&)
 		}
 	}
 
-	if (!xml.Save(false)) {
+	if (!xml.Save()) {
 		wxString msg = wxString::Format(_("Could not write \"%s\", the selected sites could not be exported: %s"), xml.GetFileName(), xml.GetError());
 		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
 	}

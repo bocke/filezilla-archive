@@ -1,10 +1,11 @@
 #include "filezilla.h"
 #include "wrapengine.h"
 #include "filezillaapp.h"
-#include "ipcmutex.h"
 #include "xmlfunctions.h"
 #include "buildinfo.h"
 #include "Options.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/local_filesys.hpp>
@@ -285,7 +286,7 @@ bool CWrapEngine::WrapText(wxWindow* parent, wxString& text, unsigned long maxLe
 			if (width + m_spaceWidth >= (int)maxLength) {
 				// Current segment too big to even fit into a line just by itself
 
-				if( i != wrapAfter ) {
+				if ( i != wrapAfter ) {
 					if (!wrappedText.empty())
 						wrappedText += _T("\n");
 					wrappedText += text.Mid(wrapAfter + 1, i - wrapAfter - 1);
@@ -887,7 +888,7 @@ void CWrapEngine::SetWidthToCache(const char* name, int width)
 	}
 
 	SetAttributeInt(dialog, "width", width);
-	xml.Save(false);
+	xml.Save();
 }
 
 CWrapEngine::CWrapEngine()
@@ -973,7 +974,7 @@ bool CWrapEngine::LoadCache()
 	}
 
 	CLocalPath resourceDir = wxGetApp().GetResourceDir();
-	
+
 	if (resourceDir.empty()) {
 		cacheValid = false;
 		while (resources.remove_child("xrc")) {};
@@ -1091,7 +1092,7 @@ bool CWrapEngine::LoadCache()
 		return true;
 	}
 
-	if (!xml.Save(false)) {
+	if (!xml.Save()) {
 		m_use_cache = false;
 	}
 	return true;

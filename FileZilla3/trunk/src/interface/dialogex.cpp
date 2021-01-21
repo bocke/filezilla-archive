@@ -217,7 +217,7 @@ void wxDialogEx::InitDialog()
 	if (s) {
 		wxSize min = GetMinClientSize();
 		wxSize smin = s->GetMinSize();
-		if( min.x < smin.x || min.y < smin.y ) {
+		if ( min.x < smin.x || min.y < smin.y ) {
 			s->Fit(this);
 			SetMinSize(GetSize());
 		}

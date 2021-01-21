@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_FILTEREDIT_HEADER
 #define FILEZILLA_INTERFACE_FILTEREDIT_HEADER
 
-#include "filter.h"
+#include "filter_manager.h"
 #include "filter_conditions_dialog.h"
 
 class wxCustomHeightListCtrl;

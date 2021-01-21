@@ -3,10 +3,12 @@
 
 #include "dialogex.h"
 #include "filezillaapp.h"
-#include "ipcmutex.h"
 #include "loginmanager.h"
 #include "Options.h"
 #include "xmlfunctions.h"
+
+#include "../commonui/fz_paths.h"
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/translate.hpp>
 
@@ -18,6 +20,7 @@ struct background_color {
 	char const*const name;
 };
 
+//note: the order needs to be the same as in site_colour (site.h) as that is used as index for this array
 background_color const background_colors[] = {
 	{ wxColour(), fztranslate_mark("None") },
 	{ wxColour(255, 0, 0, 32), fztranslate_mark("Red") },
@@ -35,101 +38,12 @@ std::map<int, std::unique_ptr<Site>> CSiteManager::m_idMap;
 
 bool CSiteManager::Load(CSiteManagerXmlHandler& handler)
 {
-	CXmlFile file(wxGetApp().GetSettingsFile(_T("sitemanager")));
-	auto document = file.Load();
-	if (!document) {
-		wxMessageBoxEx(file.GetError(), _("Error loading xml file"), wxICON_ERROR);
-		return false;
+	std::wstring error;
+	bool ret = site_manager::Load(wxGetApp().GetSettingsFile(_T("sitemanager")), handler, error);
+	if (!ret) {
+		wxMessageBoxEx(error, _("Error loading xml file"), wxICON_ERROR);
 	}
-
-	auto element = document.child("Servers");
-	if (!element) {
-		return false;
-	}
-
-	return Load(element, handler);
-}
-
-bool CSiteManager::Load(pugi::xml_node element, CSiteManagerXmlHandler& handler)
-{
-	wxASSERT(element);
-
-	for (auto child = element.first_child(); child; child = child.next_sibling()) {
-		if (!strcmp(child.name(), "Folder")) {
-			std::wstring name = GetTextElement_Trimmed(child);
-			if (name.empty()) {
-				continue;
-			}
-
-			const bool expand = GetTextAttribute(child, "expanded") != _T("0");
-			if (!handler.AddFolder(name.substr(0, 255), expand)) {
-				return false;
-			}
-			Load(child, handler);
-			if (!handler.LevelUp()) {
-				return false;
-			}
-		}
-		else if (!strcmp(child.name(), "Server")) {
-			std::unique_ptr<Site> data = ReadServerElement(child);
-
-			if (data) {
-				handler.AddSite(std::move(data));
-			}
-		}
-	}
-
-	return true;
-}
-
-bool CSiteManager::ReadBookmarkElement(Bookmark & bookmark, pugi::xml_node element)
-{
-	bookmark.m_localDir = GetTextElement(element, "LocalDir");
-	bookmark.m_remoteDir.SetSafePath(GetTextElement(element, "RemoteDir"));
-
-	if (bookmark.m_localDir.empty() && bookmark.m_remoteDir.empty()) {
-		return false;
-	}
-
-	if (!bookmark.m_localDir.empty() && !bookmark.m_remoteDir.empty()) {
-		bookmark.m_sync = GetTextElementBool(element, "SyncBrowsing", false);
-	}
-
-	bookmark.m_comparison = GetTextElementBool(element, "DirectoryComparison", false);
-
-	return true;
-}
-
-std::unique_ptr<Site> CSiteManager::ReadServerElement(pugi::xml_node element)
-{
-	auto data = std::make_unique<Site>();
-	if (!::GetServer(element, *data)) {
-		return nullptr;
-	}
-	if (data->GetName().empty()) {
-		return nullptr;
-	}
-
-	data->comments_ = GetTextElement(element, "Comments");
-	data->m_colour = GetColourFromIndex(GetTextElementInt(element, "Colour"));
-
-	ReadBookmarkElement(data->m_default_bookmark, element);
-
-	// Bookmarks
-	for (auto bookmark = element.child("Bookmark"); bookmark; bookmark = bookmark.next_sibling("Bookmark")) {
-		std::wstring name = GetTextElement_Trimmed(bookmark, "Name");
-		if (name.empty()) {
-			continue;
-		}
-
-		Bookmark bookmarkData;
-		if (ReadBookmarkElement(bookmarkData, bookmark)) {
-			bookmarkData.m_name = name.substr(0, 255);
-			data->m_bookmarks.push_back(bookmarkData);
-		}
-	}
-
-	return data;
+	return ret;
 }
 
 class CSiteManagerXmlHandler_Menu : public CSiteManagerXmlHandler
@@ -308,29 +222,7 @@ void CSiteManager::ClearIdMap()
 
 bool CSiteManager::LoadPredefined(CSiteManagerXmlHandler& handler)
 {
-	CLocalPath const defaultsDir = wxGetApp().GetDefaultsDir();
-	if (defaultsDir.empty()) {
-		return false;
-	}
-
-	std::wstring const name(defaultsDir.GetPath() + _T("fzdefaults.xml"));
-	CXmlFile file(name);
-
-	auto document = file.Load();
-	if (!document) {
-		return false;
-	}
-
-	auto element = document.child("Servers");
-	if (!element) {
-		return false;
-	}
-
-	if (!Load(element, handler)) {
-		return false;
-	}
-
-	return true;
+	return site_manager::LoadPredefined(wxGetApp().GetDefaultsDir(), handler);
 }
 
 std::unique_ptr<wxMenu> CSiteManager::GetSitesMenu_Predefined(std::map<int, std::unique_ptr<Site>> &idMap)
@@ -362,158 +254,15 @@ std::unique_ptr<Site> CSiteManager::GetSiteById(int id)
 	return pData;
 }
 
-bool CSiteManager::UnescapeSitePath(std::wstring path, std::vector<std::wstring>& result)
-{
-	result.clear();
-
-	std::wstring name;
-	wchar_t const* p = path.c_str();
-
-	// Undo escapement
-	bool lastBackslash = false;
-	while (*p) {
-		const wxChar& c = *p;
-		if (c == '\\') {
-			if (lastBackslash) {
-				name += _T("\\");
-				lastBackslash = false;
-			}
-			else {
-				lastBackslash = true;
-			}
-		}
-		else if (c == '/') {
-			if (lastBackslash) {
-				name += _T("/");
-				lastBackslash = 0;
-			}
-			else {
-				if (!name.empty()) {
-					result.push_back(name);
-				}
-				name.clear();
-			}
-		}
-		else {
-			name += *p;
-		}
-		++p;
-	}
-	if (lastBackslash) {
-		return false;
-	}
-	if (!name.empty()) {
-		result.push_back(name);
-	}
-
-	return !result.empty();
-}
-
-std::wstring CSiteManager::EscapeSegment(std::wstring segment)
-{
-	fz::replace_substrings(segment, _T("\\"), _T("\\\\"));
-	fz::replace_substrings(segment, _T("/"), _T("\\/"));
-	return segment;
-}
-
-std::wstring CSiteManager::BuildPath(wxChar root, std::vector<std::wstring> const& segments)
-{
-	std::wstring ret;
-	ret += root;
-	for (auto const& segment : segments) {
-		ret += _T("/") + EscapeSegment(segment);
-	}
-
-	return ret;
-}
-
 std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::GetSiteByPath(std::wstring const& sitePath, bool printErrors)
 {
-	wxString error;
+	std::wstring error;
 
-	auto ret = DoGetSiteByPath(sitePath, error);
+	CLocalPath settings_path{COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR)};
+	app_paths paths{settings_path, wxGetApp().GetDefaultsDir()};
+	auto ret = site_manager::GetSiteByPath(paths, sitePath, error);
 	if (!ret.first && printErrors) {
 		wxMessageBoxEx(_("Site does not exist."), error);
-	}
-
-	return ret;
-}
-
-std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::DoGetSiteByPath(std::wstring sitePath, wxString& error)
-{
-	std::pair<std::unique_ptr<Site>, Bookmark> ret;
-	wxChar c = sitePath.empty() ? 0 : sitePath[0];
-	if (c != '0' && c != '1') {
-		error = _("Site path has to begin with 0 or 1.");
-		return ret;
-	}
-
-	sitePath = sitePath.substr(1);
-
-	// We have to synchronize access to sitemanager.xml so that multiple processed don't write
-	// to the same file or one is reading while the other one writes.
-	CInterProcessMutex mutex(MUTEX_SITEMANAGER);
-
-	CXmlFile file;
-	if (c == '0') {
-		file.SetFileName(wxGetApp().GetSettingsFile(_T("sitemanager")));
-	}
-	else {
-		CLocalPath const defaultsDir = wxGetApp().GetDefaultsDir();
-		if (defaultsDir.empty()) {
-			error = _("Site does not exist.");
-			return ret;
-		}
-		file.SetFileName(defaultsDir.GetPath() + _T("fzdefaults.xml"));
-	}
-
-	auto document = file.Load();
-	if (!document) {
-		wxMessageBoxEx(file.GetError(), _("Error loading xml file"), wxICON_ERROR);
-		return ret;
-	}
-
-	auto element = document.child("Servers");
-	if (!element) {
-		error = _("Site does not exist.");
-		return ret;
-	}
-
-	std::vector<std::wstring> segments;
-	if (!UnescapeSitePath(sitePath, segments) || segments.empty()) {
-		error = _("Site path is malformed.");
-		return ret;
-	}
-
-	auto child = GetElementByPath(element, segments);
-	if (!child) {
-		error = _("Site does not exist.");
-		return ret;
-	}
-
-	pugi::xml_node bookmark;
-	if (!strcmp(child.name(), "Bookmark")) {
-		bookmark = child;
-		child = child.parent();
-		segments.pop_back();
-	}
-
-	ret.first = ReadServerElement(child);
-	if (!ret.first) {
-		error = _("Could not read server item.");
-	}
-	else {
-		if (bookmark) {
-			Bookmark bm;
-			if (ReadBookmarkElement(bm, bookmark)) {
-				ret.second = bm;
-			}
-		}
-		else {
-			ret.second = ret.first->m_default_bookmark;
-		}
-
-		ret.first->SetSitePath(BuildPath(c, segments));
 	}
 
 	return ret;
@@ -572,7 +321,7 @@ std::wstring CSiteManager::AddServer(Site site)
 	SetServer(xServer, site);
 	AddTextElement(xServer, name);
 
-	if (!file.Save(false)) {
+	if (!file.Save()) {
 		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return std::wstring();
 		}
@@ -583,38 +332,6 @@ std::wstring CSiteManager::AddServer(Site site)
 	}
 
 	return L"0/" + EscapeSegment(name);
-}
-
-pugi::xml_node CSiteManager::GetElementByPath(pugi::xml_node node, std::vector<std::wstring> const& segments)
-{
-	for (auto const& segment : segments) {
-		pugi::xml_node child;
-		for (child = node.first_child(); child; child = child.next_sibling()) {
-			if (strcmp(child.name(), "Server") && strcmp(child.name(), "Folder") && strcmp(child.name(), "Bookmark")) {
-				continue;
-			}
-
-			std::wstring name = GetTextElement_Trimmed(child, "Name");
-			if (name.empty()) {
-				name = GetTextElement_Trimmed(child);
-			}
-			if (name.empty()) {
-				continue;
-			}
-
-			if (name == segment) {
-				break;
-			}
-		}
-		if (!child) {
-			return pugi::xml_node();
-		}
-
-		node = child;
-		continue;
-	}
-
-	return node;
 }
 
 bool CSiteManager::AddBookmark(std::wstring sitePath, wxString const& name, wxString const& local_dir, CServerPath const& remote_dir, bool sync, bool comparison)
@@ -697,7 +414,7 @@ bool CSiteManager::AddBookmark(std::wstring sitePath, wxString const& name, wxSt
 		AddTextElementUtf8(bookmark, "DirectoryComparison", "1");
 	}
 
-	if (!file.Save(false)) {
+	if (!file.Save()) {
 		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
@@ -754,7 +471,7 @@ bool CSiteManager::ClearBookmarks(std::wstring sitePath)
 		bookmark = child.child("Bookmark");
 	}
 
-	if (!file.Save(false)) {
+	if (!file.Save()) {
 		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
@@ -772,14 +489,6 @@ bool CSiteManager::HasSites()
 	Load(handler);
 
 	return handler.sites_ > 0;
-}
-
-wxColour CSiteManager::GetColourFromIndex(int i)
-{
-	if (i < 0 || static_cast<unsigned int>(i) + 1 >= (sizeof(background_colors) / sizeof(background_color) + 1)) {
-		return wxColour();
-	}
-	return background_colors[i].color;
 }
 
 int CSiteManager::GetColourIndex(wxColour const& c)
@@ -813,9 +522,9 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, pugi::xml_node element,
 			if (site) {
 				if (!forget) {
 					loginManager.AskDecryptor(site->credentials.encrypted_, true, false);
-					site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), on_failure_set_to_ask);
+					unprotect(site->credentials, loginManager.GetDecryptor(site->credentials.encrypted_), on_failure_set_to_ask);
 				}
-				site->credentials.Protect();
+				protect(site->credentials);
 				Save(child, *site);
 			}
 		}
@@ -843,7 +552,7 @@ void CSiteManager::Rewrite(CLoginManager & loginManager, bool on_failure_set_to_
 
 	Rewrite(loginManager, element, on_failure_set_to_ask);
 
-	file.Save(true);
+	SaveWithErrorDialog(file);
 }
 
 void CSiteManager::Save(pugi::xml_node element, Site const& site)
@@ -856,7 +565,7 @@ void CSiteManager::Save(pugi::xml_node element, Site const& site)
 	}
 
 	// Save colour
-	int col = CSiteManager::GetColourIndex(site.m_colour);
+	int col = CSiteManager::GetColourIndex(site_colour_to_wx(site.m_colour));
 	if (col) {
 		AddTextElement(element, "Colour", col);
 	}
@@ -909,7 +618,7 @@ pugi::xml_node GetChildWithName(pugi::xml_node element, std::wstring const& name
 			return child;
 		}
 	}
-	
+
 	return pugi::xml_node();
 }
 
@@ -952,7 +661,7 @@ bool CSiteManager::ImportSites(pugi::xml_node sites)
 		return false;
 	}
 
-	return file.Save(true);
+	return SaveWithErrorDialog(file);
 }
 
 bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node existingSites)
@@ -983,7 +692,7 @@ bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exis
 		if (!site) {
 			continue;
 		}
-			
+
 		// Find free name
 		auto const name = site->GetName();
 		std::wstring newName = name;
@@ -993,8 +702,8 @@ bool CSiteManager::ImportSites(pugi::xml_node sitesToImport, pugi::xml_node exis
 		}
 		site->SetName(newName);
 
-		site->credentials.Unprotect(loginManager.GetDecryptor(site->credentials.encrypted_), false);
-		site->credentials.Protect();
+		unprotect(site->credentials, loginManager.GetDecryptor(site->credentials.encrypted_), false);
+		protect(site->credentials);
 
 		auto xsite = existingSites.append_child("Server");
 		Save(xsite, *site);
