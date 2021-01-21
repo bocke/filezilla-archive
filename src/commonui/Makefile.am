@@ -8,8 +8,9 @@ libfzclient_commonui_private_la_CPPFLAGS += -DBUILDING_FZ_COMMONUI
 
 libfzclient_commonui_private_la_CXXFLAGS = -fvisibility=hidden
 libfzclient_commonui_private_la_LDFLAGS = -no-undefined -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_MICRO)
-libfzclient_commonui_private_la_LDFLAGS += $(LIBFILEZILLA_LIBS)
+libfzclient_commonui_private_la_LDFLAGS += ../engine/libfzclient-private.la $(LIBFILEZILLA_LIBS) $(PUGIXML_LIBS)
 
+libfzclient_commonui_private_la_DEPENDENCIES = ../engine/libfzclient-private.la
 
 libfzclient_commonui_private_la_SOURCES = \
 	cert_store.cpp \
