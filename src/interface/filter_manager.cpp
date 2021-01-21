@@ -1,25 +1,22 @@
 #include "filezilla.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "filteredit.h"
 #include "filezillaapp.h"
 #include "inputdialog.h"
-#include "ipcmutex.h"
 #include "Mainfrm.h"
 #include "Options.h"
 #include "state.h"
 #include "xmlfunctions.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/local_filesys.hpp>
 
 #include <wx/statline.h>
 #include <wx/statbox.h>
 
-#include <array>
-
 bool CFilterManager::m_loaded = false;
-std::vector<CFilter> CFilterManager::m_globalFilters;
-std::vector<CFilterSet> CFilterManager::m_globalFilterSets;
-unsigned int CFilterManager::m_globalCurrentFilterSet = 0;
+filter_data CFilterManager::global_filters_;
 bool CFilterManager::m_filters_disabled = false;
 
 BEGIN_EVENT_TABLE(CFilterDialog, wxDialogEx)
@@ -39,83 +36,11 @@ EVT_BUTTON(XRCID("ID_REMOTE_ENABLEALL"), CFilterDialog::OnChangeAll)
 EVT_BUTTON(XRCID("ID_REMOTE_DISABLEALL"), CFilterDialog::OnChangeAll)
 END_EVENT_TABLE()
 
-namespace {
-std::array<std::wstring, 4> matchTypeXmlNames =
-	{ L"All", L"Any", L"None", L"Not all" };
-}
-
-bool CFilterCondition::set(t_filterType t, std::wstring const& v, int c, bool matchCase)
-{
-	if (v.empty()) {
-		return false;
-	}
-
-	type = t;
-	condition = c;
-	strValue = v;
-
-	pRegEx.reset();
-
-	switch (t) {
-	case filter_name:
-	case filter_path:
-		if (condition == 4) {
-			if (strValue.size() > 2000) {
-				return false;
-			}
-			try {
-				auto flags = std::regex_constants::ECMAScript;
-				if (!matchCase) {
-					flags |= std::regex_constants::icase;
-				}
-				pRegEx = std::make_shared<std::wregex>(strValue, flags);
-			}
-			catch (std::regex_error const&) {
-				return false;
-			}
-		}
-		else {
-			if (!matchCase) {
-				lowerValue = fz::str_tolower(v);
-			}
-		}
-		break;
-	case filter_size:
-	case filter_attributes:
-	case filter_permissions:
-		value = fz::to_integral<int64_t>(v);
-		break;
-	case filter_date:
-		date = fz::datetime(v, fz::datetime::local);
-		if (date.empty()) {
-			return false;
-		}
-		break;
-	}
-
-	return true;
-}
-
-bool CFilter::HasConditionOfType(t_filterType type) const
-{
-	for (std::vector<CFilterCondition>::const_iterator iter = filters.begin(); iter != filters.end(); ++iter) {
-		if (iter->type == type) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool CFilter::IsLocalFilter() const
-{
-	 return HasConditionOfType(filter_attributes) || HasConditionOfType(filter_permissions);
-}
 
 CFilterDialog::CFilterDialog()
-	: m_filters(m_globalFilters)
-	, m_filterSets(m_globalFilterSets)
-	, m_currentFilterSet(m_globalCurrentFilterSet)
+	: m_filters(global_filters_.filters)
+	, m_filterSets(global_filters_.filter_sets)
+	, m_currentFilterSet(global_filters_.current_filter_set)
 {
 }
 
@@ -201,7 +126,7 @@ bool CFilterDialog::Create(CMainFrame* parent)
 		buttons->Add(new wxButton(this, wxID_CANCEL, _("Cancel")), lay.valigng);
 		buttons->Add(new wxButton(this, wxID_APPLY, _("Apply")), lay.valigng);
 	}
-	
+
 	DisplayFilters();
 
 	SetCtrlState();
@@ -213,9 +138,9 @@ bool CFilterDialog::Create(CMainFrame* parent)
 
 void CFilterDialog::OnOkOrApply(wxCommandEvent& event)
 {
-	m_globalFilters = m_filters;
-	m_globalFilterSets = m_filterSets;
-	m_globalCurrentFilterSet = m_currentFilterSet;
+	global_filters_.filters = m_filters;
+	global_filters_.filter_sets = m_filterSets;
+	global_filters_.current_filter_set = m_currentFilterSet;
 
 	SaveFilters();
 	m_filters_disabled = false;
@@ -245,7 +170,7 @@ void CFilterDialog::OnEdit(wxCommandEvent&)
 
 	m_filters = dlg.GetFilters();
 	m_filterSets = dlg.GetFilterSets();
-	
+
 	DisplayFilters();
 }
 
@@ -528,18 +453,18 @@ bool CFilterManager::HasActiveFilters(bool ignore_disabled)
 		LoadFilters();
 	}
 
-	if (m_globalFilterSets.empty()) {
+	if (global_filters_.filter_sets.empty()) {
 		return false;
 	}
 
-	wxASSERT(m_globalCurrentFilterSet < m_globalFilterSets.size());
+	wxASSERT(global_filters_.current_filter_set < global_filters_.filter_sets.size());
 
 	if (m_filters_disabled && !ignore_disabled) {
 		return false;
 	}
 
-	const CFilterSet& set = m_globalFilterSets[m_globalCurrentFilterSet];
-	for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+	const CFilterSet& set = global_filters_.filter_sets[global_filters_.current_filter_set];
+	for (unsigned int i = 0; i < global_filters_.filters.size(); ++i) {
 		if (set.local[i]) {
 			return true;
 		}
@@ -554,7 +479,7 @@ bool CFilterManager::HasActiveFilters(bool ignore_disabled)
 
 bool CFilterManager::HasSameLocalAndRemoteFilters() const
 {
-	CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+	CFilterSet const& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 	return set.local == set.remote;
 
 	return true;
@@ -566,357 +491,21 @@ bool CFilterManager::FilenameFiltered(std::wstring const& name, std::wstring con
 		return false;
 	}
 
-	wxASSERT(m_globalCurrentFilterSet < m_globalFilterSets.size());
+	wxASSERT(global_filters_.current_filter_set < global_filters_.filter_sets.size());
 
-	CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+	CFilterSet const& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 	auto const& active = local ? set.local : set.remote;
 
 	// Check active filters
-	for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+	for (unsigned int i = 0; i < global_filters_.filters.size(); ++i) {
 		if (active[i]) {
-			if (FilenameFilteredByFilter(m_globalFilters[i], name, path, dir, size, attributes, date)) {
+			if (FilenameFilteredByFilter(global_filters_.filters[i], name, path, dir, size, attributes, date)) {
 				return true;
 			}
 		}
 	}
 
 	return false;
-}
-
-bool CFilterManager::FilenameFiltered(std::vector<CFilter> const& filters, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date) const
-{
-	for (auto const& filter : filters) {
-		if (FilenameFilteredByFilter(filter, name, path, dir, size, attributes, date)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-static bool StringMatch(std::wstring const& subject, CFilterCondition const& condition, bool matchCase)
-{
-	bool match = false;
-
-	switch (condition.condition)
-	{
-	case 0:
-		if (matchCase) {
-			if (subject.find(condition.strValue) != std::wstring::npos) {
-				match = true;
-			}
-		}
-		else {
-			if (fz::str_tolower(subject).find(condition.lowerValue) != std::wstring::npos) {
-				match = true;
-			}
-		}
-		break;
-	case 1:
-		if (matchCase) {
-			if (subject == condition.strValue) {
-				match = true;
-			}
-		}
-		else {
-			if (fz::str_tolower(subject) == condition.lowerValue) {
-				match = true;
-			}
-		}
-		break;
-	case 2:
-		{
-			if (matchCase) {
-				match = fz::starts_with(subject, condition.strValue);
-			}
-			else {
-				match = fz::starts_with(fz::str_tolower(subject), condition.lowerValue);
-			}
-		}
-		break;
-	case 3:
-		{
-			if (matchCase) {
-				match = fz::ends_with(subject, condition.strValue);
-			}
-			else {
-				match = fz::ends_with(fz::str_tolower(subject), condition.lowerValue);
-			}
-		}
-		break;
-	case 4:
-		if (condition.pRegEx && std::regex_search(subject, *condition.pRegEx)) {
-			match = true;
-		}
-		break;
-	case 5:
-		if (matchCase) {
-			if (subject.find(condition.strValue) == std::wstring::npos) {
-				match = true;
-			}
-		}
-		else {
-			if (fz::str_tolower(subject).find(condition.lowerValue) == std::wstring::npos) {
-				match = true;
-			}
-		}
-		break;
-	}
-
-	return match;
-}
-
-bool CFilterManager::FilenameFilteredByFilter(CFilter const& filter, std::wstring const& name, std::wstring const& path, bool dir, int64_t size, int attributes, fz::datetime const& date)
-{
-	if (dir && !filter.filterDirs) {
-		return false;
-	}
-	else if (!dir && !filter.filterFiles) {
-		return false;
-	}
-
-	for (auto const& condition : filter.filters) {
-		bool match = false;
-
-		switch (condition.type)
-		{
-		case filter_name:
-			match = StringMatch(name, condition, filter.matchCase);
-			break;
-		case filter_path:
-			match = StringMatch(path, condition, filter.matchCase);
-			break;
-		case filter_size:
-			if (size == -1) {
-				continue;
-			}
-			switch (condition.condition)
-			{
-			case 0:
-				if (size > condition.value) {
-					match = true;
-				}
-				break;
-			case 1:
-				if (size == condition.value) {
-					match = true;
-				}
-				break;
-			case 2:
-				if (size != condition.value) {
-					match = true;
-				}
-				break;
-			case 3:
-				if (size < condition.value) {
-					match = true;
-				}
-				break;
-			}
-			break;
-		case filter_attributes:
-#ifndef __WXMSW__
-			continue;
-#else
-			if (!attributes) {
-				continue;
-			}
-
-			{
-				int flag = 0;
-				switch (condition.condition)
-				{
-				case 0:
-					flag = FILE_ATTRIBUTE_ARCHIVE;
-					break;
-				case 1:
-					flag = FILE_ATTRIBUTE_COMPRESSED;
-					break;
-				case 2:
-					flag = FILE_ATTRIBUTE_ENCRYPTED;
-					break;
-				case 3:
-					flag = FILE_ATTRIBUTE_HIDDEN;
-					break;
-				case 4:
-					flag = FILE_ATTRIBUTE_READONLY;
-					break;
-				case 5:
-					flag = FILE_ATTRIBUTE_SYSTEM;
-					break;
-				}
-
-				int set = (flag & attributes) ? 1 : 0;
-				if (set == condition.value) {
-					match = true;
-				}
-			}
-#endif //__WXMSW__
-			break;
-		case filter_permissions:
-#ifdef __WXMSW__
-			continue;
-#else
-			if (attributes == -1) {
-				continue;
-			}
-
-			{
-				int flag = 0;
-				switch (condition.condition)
-				{
-				case 0:
-					flag = S_IRUSR;
-					break;
-				case 1:
-					flag = S_IWUSR;
-					break;
-				case 2:
-					flag = S_IXUSR;
-					break;
-				case 3:
-					flag = S_IRGRP;
-					break;
-				case 4:
-					flag = S_IWGRP;
-					break;
-				case 5:
-					flag = S_IXGRP;
-					break;
-				case 6:
-					flag = S_IROTH;
-					break;
-				case 7:
-					flag = S_IWOTH;
-					break;
-				case 8:
-					flag = S_IXOTH;
-					break;
-				}
-
-				int set = (flag & attributes) ? 1 : 0;
-				if (set == condition.value) {
-					match = true;
-				}
-			}
-#endif //__WXMSW__
-			break;
-		case filter_date:
-			if (!date.empty()) {
-				int cmp = date.compare(condition.date);
-				switch (condition.condition)
-				{
-				case 0: // Before
-					match = cmp < 0;
-					break;
-				case 1: // Equals
-					match = cmp == 0;
-					break;
-				case 2: // Not equals
-					match = cmp != 0;
-					break;
-				case 3: // After
-					match = cmp > 0;
-					break;
-				}
-			}
-			break;
-		default:
-			wxFAIL_MSG(_T("Unhandled filter type"));
-			break;
-		}
-		if (match) {
-			if (filter.matchType == CFilter::any) {
-				return true;
-			}
-			else if (filter.matchType == CFilter::none) {
-				return false;
-			}
-		}
-		else {
-			if (filter.matchType == CFilter::all) {
-				return false;
-			}
-			else if (filter.matchType == CFilter::not_all) {
-				return true;
-			}
-		}
-	}
-
-	if (filter.matchType == CFilter::not_all) {
-		return false;
-	}
-
-	if (filter.matchType != CFilter::any || filter.filters.empty()) {
-		return true;
-	}
-
-	return false;
-}
-
-bool CFilterManager::LoadFilter(pugi::xml_node& element, CFilter& filter)
-{
-	filter.name = GetTextElement(element, "Name").substr(0, 255);
-	filter.filterFiles = GetTextElement(element, "ApplyToFiles") == L"1";
-	filter.filterDirs = GetTextElement(element, "ApplyToDirs") == L"1";
-
-	std::wstring const matchType = GetTextElement(element, "MatchType");
-	filter.matchType = CFilter::all;
-	for (size_t i = 0; i < matchTypeXmlNames.size(); ++i) {
-		if (matchType == matchTypeXmlNames[i]) {
-			filter.matchType = static_cast<CFilter::t_matchType>(i);
-		}
-	}
-	filter.matchCase = GetTextElement(element, "MatchCase") == L"1";
-
-	auto xConditions = element.child("Conditions");
-	if (!xConditions) {
-		return false;
-	}
-
-	for (auto xCondition = xConditions.child("Condition"); xCondition; xCondition = xCondition.next_sibling("Condition")) {
-		t_filterType type;
-		int const t = GetTextElementInt(xCondition, "Type", 0);
-		switch (t) {
-		case 0:
-			type = filter_name;
-			break;
-		case 1:
-			type = filter_size;
-			break;
-		case 2:
-			type = filter_attributes;
-			break;
-		case 3:
-			type = filter_permissions;
-			break;
-		case 4:
-			type = filter_path;
-			break;
-		case 5:
-			type = filter_date;
-			break;
-		default:
-			continue;
-		}
-
-		std::wstring value = GetTextElement(xCondition, "Value");
-		int cond = GetTextElementInt(xCondition, "Condition", 0);
-
-		CFilterCondition condition;
-		if (!condition.set(type, value, cond, filter.matchCase)) {
-			continue;
-		}
-
-		if (filter.filters.size() < 1000) {
-			filter.filters.push_back(condition);
-		}
-	}
-
-	if (filter.filters.empty()) {
-		return false;
-	}
-	return true;
 }
 
 void CFilterManager::LoadFilters()
@@ -936,7 +525,7 @@ void CFilterManager::LoadFilters()
 
 	CXmlFile xml(file);
 	auto element = xml.Load();
-	LoadFilters(element);
+	load_filters(element, global_filters_);
 
 	if (!element) {
 		wxString msg = xml.GetError() + _T("\n\n") + _("Any changes made to the filters will not be saved.");
@@ -950,9 +539,9 @@ void CFilterManager::Import(pugi::xml_node& element)
 		return;
 	}
 
-	m_globalFilters.clear();
-	m_globalFilterSets.clear();
-	m_globalCurrentFilterSet = 0;
+	global_filters_.filters.clear();
+	global_filters_.filter_sets.clear();
+	global_filters_.current_filter_set = 0;
 	m_filters_disabled = false;
 
 	CReentrantInterProcessMutexLocker mutex(MUTEX_FILTERS);
@@ -965,61 +554,13 @@ void CFilterManager::Import(pugi::xml_node& element)
 
 void CFilterManager::LoadFilters(pugi::xml_node& element)
 {
-	auto xFilters = element.child("Filters");
-	if (xFilters) {
-
-		auto xFilter = xFilters.child("Filter");
-		while (xFilter) {
-			CFilter filter;
-
-			bool loaded = LoadFilter(xFilter, filter);
-
-			if (loaded && !filter.name.empty() && !filter.filters.empty()) {
-				m_globalFilters.push_back(filter);
-			}
-
-			xFilter = xFilter.next_sibling("Filter");
-		}
-
-		auto xSets = element.child("Sets");
-		if (xSets) {
-			for (auto xSet = xSets.child("Set"); xSet; xSet = xSet.next_sibling("Set")) {
-				CFilterSet set;
-				auto xItem = xSet.child("Item");
-				while (xItem) {
-					std::wstring local = GetTextElement(xItem, "Local");
-					std::wstring remote = GetTextElement(xItem, "Remote");
-					set.local.push_back(local == L"1" ? true : false);
-					set.remote.push_back(remote == L"1" ? true : false);
-
-					xItem = xItem.next_sibling("Item");
-				}
-
-				if (!m_globalFilterSets.empty()) {
-					set.name = GetTextElement(xSet, "Name").substr(0, 255);
-					if (set.name.empty()) {
-						continue;
-					}
-				}
-
-				if (set.local.size() == m_globalFilters.size()) {
-					m_globalFilterSets.push_back(set);
-				}
-			}
-
-			int value = GetAttributeInt(xSets, "Current");
-			if (value >= 0 && static_cast<size_t>(value) < m_globalFilterSets.size()) {
-				m_globalCurrentFilterSet = value;
-			}
-		}
-	}
-
-	if (m_globalFilterSets.empty()) {
+	load_filters(element, global_filters_);
+	if (global_filters_.filter_sets.empty()) {
 		CFilterSet set;
-		set.local.resize(m_globalFilters.size(), false);
-		set.remote.resize(m_globalFilters.size(), false);
+		set.local.resize(global_filters_.filters.size(), false);
+		set.remote.resize(global_filters_.filters.size(), false);
 
-		m_globalFilterSets.push_back(set);
+		global_filters_.filter_sets.push_back(set);
 	}
 }
 
@@ -1036,88 +577,9 @@ void CFilterManager::SaveFilters()
 		return;
 	}
 
-	auto xFilters = element.child("Filters");
-	while (xFilters) {
-		element.remove_child(xFilters);
-		xFilters = element.child("Filters");
-	}
+	save_filters(element, global_filters_);
 
-	xFilters = element.append_child("Filters");
-
-	for (auto const& filter : m_globalFilters) {
-		auto xFilter = xFilters.append_child("Filter");
-		SaveFilter(xFilter, filter);
-	}
-
-	auto xSets = element.child("Sets");
-	while (xSets) {
-		element.remove_child(xSets);
-		xSets = element.child("Sets");
-	}
-
-	xSets = element.append_child("Sets");
-	SetAttributeInt(xSets, "Current", m_globalCurrentFilterSet);
-
-	for (auto const& set : m_globalFilterSets) {
-		auto xSet = xSets.append_child("Set");
-
-		if (!set.name.empty()) {
-			AddTextElement(xSet, "Name", set.name);
-		}
-
-		for (unsigned int i = 0; i < set.local.size(); ++i) {
-			auto xItem = xSet.append_child("Item");
-			AddTextElement(xItem, "Local", set.local[i] ? "1" : "0");
-			AddTextElement(xItem, "Remote", set.remote[i] ? "1" : "0");
-		}
-	}
-
-	xml.Save(true);
-}
-
-void CFilterManager::SaveFilter(pugi::xml_node& element, const CFilter& filter)
-{
-	AddTextElement(element, "Name", filter.name);
-	AddTextElement(element, "ApplyToFiles", filter.filterFiles ? "1" : "0");
-	AddTextElement(element, "ApplyToDirs", filter.filterDirs ? "1" : "0");
-	AddTextElement(element, "MatchType", matchTypeXmlNames[filter.matchType]);
-	AddTextElement(element, "MatchCase", filter.matchCase ? "1" : "0");
-
-	auto xConditions = element.append_child("Conditions");
-	for (std::vector<CFilterCondition>::const_iterator conditionIter = filter.filters.begin(); conditionIter != filter.filters.end(); ++conditionIter) {
-		const CFilterCondition& condition = *conditionIter;
-
-		int type;
-		switch (condition.type)
-		{
-		case filter_name:
-			type = 0;
-			break;
-		case filter_size:
-			type = 1;
-			break;
-		case filter_attributes:
-			type = 2;
-			break;
-		case filter_permissions:
-			type = 3;
-			break;
-		case filter_path:
-			type = 4;
-			break;
-		case filter_date:
-			type = 5;
-			break;
-		default:
-			wxFAIL_MSG(_T("Unhandled filter type"));
-			continue;
-		}
-
-		auto xCondition = xConditions.append_child("Condition");
-		AddTextElement(xCondition, "Type", type);
-		AddTextElement(xCondition, "Condition", condition.condition);
-		AddTextElement(xCondition, "Value", condition.strValue);
-	}
+	SaveWithErrorDialog(xml);
 }
 
 void CFilterManager::ToggleFilters()
@@ -1135,9 +597,9 @@ void CFilterManager::ToggleFilters()
 bool CFilterManager::HasActiveLocalFilters() const
 {
 	if (!m_filters_disabled) {
-		CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+		CFilterSet const& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 		// Check active filters
-		for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+		for (unsigned int i = 0; i < global_filters_.filters.size(); ++i) {
 			if (set.local[i]) {
 				return true;
 			}
@@ -1150,9 +612,9 @@ bool CFilterManager::HasActiveLocalFilters() const
 bool CFilterManager::HasActiveRemoteFilters() const
 {
 	if (!m_filters_disabled) {
-		CFilterSet const& set = m_globalFilterSets[m_globalCurrentFilterSet];
+		CFilterSet const& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 		// Check active filters
-		for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+		for (unsigned int i = 0; i < global_filters_.filters.size(); ++i) {
 			if (set.remote[i]) {
 				return true;
 			}
@@ -1170,15 +632,15 @@ ActiveFilters CFilterManager::GetActiveFilters()
 		return filters;
 	}
 
-	const CFilterSet& set = m_globalFilterSets[m_globalCurrentFilterSet];
+	const CFilterSet& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 
 	// Check active filters
-	for (unsigned int i = 0; i < m_globalFilters.size(); ++i) {
+	for (unsigned int i = 0; i < global_filters_.filters.size(); ++i) {
 		if (set.local[i]) {
-			filters.first.push_back(m_globalFilters[i]);
+			filters.first.push_back(global_filters_.filters[i]);
 		}
 		if (set.remote[i]) {
-			filters.second.push_back(m_globalFilters[i]);
+			filters.second.push_back(global_filters_.filters[i]);
 		}
 	}
 
