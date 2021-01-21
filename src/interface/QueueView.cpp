@@ -7,7 +7,6 @@
 #include "xmlfunctions.h"
 #include "filezillaapp.h"
 #include "file_utils.h"
-#include "ipcmutex.h"
 #include "local_recursive_operation.h"
 #include "state.h"
 #include "asyncrequestqueue.h"
@@ -23,6 +22,8 @@
 #include "auto_ascii_files.h"
 #include "dragdropmanager.h"
 #include "drop_target_ex.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/glue/wxinvoker.hpp>
 
@@ -493,7 +494,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 				if (pEngineData->active && asyncRequestNotification->GetRequestID() != reqId_fileexists) {
 					m_pAsyncRequestQueue->AddRequest(pEngineData->pEngine, std::move(asyncRequestNotification));
 				}
-			}			
+			}
 		}
 		break;
 	case nId_active:
@@ -1592,7 +1593,7 @@ void CQueueView::LoadQueueFromXML()
 		return;
 	}
 
-	if (!xml.Save(false)) {
+	if (!xml.Save()) {
 		wxString msg = wxString::Format(_("Could not write \"%s\", the queue could not be saved.\n%s"), xml.GetFileName(), xml.GetError());
 		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
 	}
@@ -1692,7 +1693,7 @@ void CQueueView::ImportQueue(pugi::xml_node element, bool updateSelections)
 				std::wstring localFile = GetTextElement(file, "LocalFile");
 				std::wstring remoteFile = GetTextElement(file, "RemoteFile");
 				std::wstring safeRemotePath = GetTextElement(file, "RemotePath");
-				
+
 				transfer_flags flags = queue_flags::queued | static_cast<transfer_flags>(GetTextElementInt(file, "Flags"));
 				bool const old_download = GetTextElementInt(file, "Download") != 0;
 				if (old_download) {
@@ -1829,7 +1830,7 @@ void CQueueView::OnContextMenu(wxContextMenuEvent&)
     menuPriority->Append(XRCID("ID_PRIORITY_NORMAL"), _("&Normal"), wxString(), wxITEM_CHECK);
     menuPriority->Append(XRCID("ID_PRIORITY_LOW"), _("&Low"), wxString(), wxITEM_CHECK);
     menuPriority->Append(XRCID("ID_PRIORITY_LOWEST"), _("L&owest"), wxString(), wxITEM_CHECK);
-  
+
 	auto menuAfter = new wxMenu;
 	menu.AppendSubMenu(menuAfter, _("Action after queue &completion"))->SetId(XRCID("ID_ACTIONAFTER"));
     menuAfter->Append(XRCID("ID_ACTIONAFTER_NONE"), _("&None"), wxString(), wxITEM_CHECK);
@@ -3132,7 +3133,7 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 				for (it = m_serverList.begin(); it != m_serverList.end(); ++it) {
 					if ((*it)->GetSite() == site) {
 						site = (*it)->GetSite(); // Credentials aren't in ==
-						site.credentials.Unprotect(loginManager->GetDecryptor(site.credentials.encrypted_), true);
+						unprotect(site.credentials, loginManager->GetDecryptor(site.credentials.encrypted_), true);
 						(*it)->GetCredentials() = site.credentials;
 						break;
 					}
@@ -3144,7 +3145,7 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 				}
 			}
 
-			(*it)->GetCredentials().Protect();
+			protect((*it)->GetCredentials());
 			++it;
 		}
 	}

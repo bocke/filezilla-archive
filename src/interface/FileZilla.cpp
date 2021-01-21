@@ -12,6 +12,7 @@
 #include "msgbox.h"
 #include "themeprovider.h"
 #include "wxfilesystem_blob_handler.h"
+#include "../commonui/fz_paths.h"
 #include "../include/version.h"
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/translate.hpp>
@@ -52,61 +53,6 @@ std::wstring const PATH_SEP = L";";
 std::wstring const PATH_SEP = L":";
 #define L_DIR_SEP L"/"
 #endif
-}
-
-// If non-empty, always terminated by a separator
-std::wstring GetOwnExecutableDir()
-{
-#ifdef FZ_WINDOWS
-	// Add executable path
-	std::wstring path;
-	path.resize(4095);
-	DWORD res;
-	while (true) {
-		res = GetModuleFileNameW(0, &path[0], path.size() - 1);
-		if (!res) {
-			// Failure
-			return std::wstring();
-		}
-
-		if (res < path.size() - 1) {
-			path.resize(res);
-			break;
-		}
-
-		path.resize(path.size() * 2 + 1);
-	}
-	size_t pos = path.find_last_of(L"\\/");
-	if (pos != std::wstring::npos) {
-		return path.substr(0, pos + 1);
-	}
-#elif defined(FZ_MAC)
-	// Fixme: Remove wxDependency and move entire function to libfilezilla
-	std::wstring executable = wxStandardPaths::Get().GetExecutablePath().ToStdWstring();
-	size_t pos = executable.rfind('/');
-	if (pos != std::wstring::npos) {
-		return executable.substr(0, pos + 1);
-	}
-#else
-	std::string path;
-	path.resize(4095);
-	while (true) {
-		int res = readlink("/proc/self/exe", &path[0], path.size());
-		if (res < 0) {
-			return std::wstring();
-		}
-		if (static_cast<size_t>(res) < path.size()) {
-			path.resize(res);
-			break;
-		}
-		path.resize(path.size() * 2 + 1);
-	}
-	size_t pos = path.rfind('/');
-	if (pos != std::wstring::npos) {
-		return fz::to_wstring(path.substr(0, pos + 1));
-	}
-#endif
-	return std::wstring();
 }
 
 CFileZillaApp::CFileZillaApp()
@@ -359,101 +305,10 @@ bool CFileZillaApp::FileExists(std::wstring const& file) const
 	return fz::local_filesys::get_file_type(fz::to_native(file), true) == fz::local_filesys::file;
 }
 
-CLocalPath CFileZillaApp::GetDataDir(std::vector<std::wstring> const& fileToFind, std::wstring const& prefixSub, bool searchSelfDir) const
-{
-	/*
-	 * Finding the resources in all cases is a difficult task,
-	 * due to the huge variety of diffent systems and their filesystem
-	 * structure.
-	 * Basically we just check a couple of paths for presence of the resources,
-	 * and hope we find them. If not, the user can still specify on the cmdline
-	 * and using environment variables where the resources are.
-	 *
-	 * At least on OS X it's simple: All inside application bundle.
-	 */
-
-	CLocalPath ret;
-
-	auto testPath = [&](std::wstring const& path) {
-		ret = CLocalPath(path);
-		if (ret.empty()) {
-			return false;
-		}
-
-		for (auto const& file : fileToFind) {
-			if (FileExists(ret.GetPath() + file)) {
-				return true;
-			}
-		}
-		return false;
-	};
-
-#ifdef __WXMAC__
-	(void)prefixSub;
-
-	if (searchSelfDir && testPath(wxStandardPaths::Get().GetDataDir().ToStdWstring())) {
-		return ret;
-	}
-
-	return CLocalPath();
-#else
-
-	// First try the user specified data dir.
-	if (searchSelfDir) {
-		if (testPath(GetEnv("FZ_DATADIR"))) {
-			return ret;
-		}
-	}
-
-	std::wstring selfDir = GetOwnExecutableDir();
-	if (!selfDir.empty()) {
-		if (searchSelfDir && testPath(selfDir)) {
-			return ret;
-		}
-
-		if (!prefixSub.empty() && selfDir.size() > 5 && fz::ends_with(selfDir, std::wstring(L_DIR_SEP L"bin" L_DIR_SEP))) {
-			std::wstring path = selfDir.substr(0, selfDir.size() - 4) + prefixSub + L_DIR_SEP;
-			if (testPath(path)) {
-				return ret;
-			}
-		}
-
-		// Development paths
-		if (searchSelfDir && selfDir.size() > 7 && fz::ends_with(selfDir, std::wstring(L_DIR_SEP L".libs" L_DIR_SEP))) {
-			std::wstring path = selfDir.substr(0, selfDir.size() - 6);
-			if (FileExists(path + L"Makefile")) {
-				if (testPath(path)) {
-					return ret;
-				}
-			}
-		}
-	}
-
-	// Now scan through the path
-	if (!prefixSub.empty()) {
-		std::wstring path = GetEnv("PATH");
-		auto const segments = fz::strtok(path, PATH_SEP);
-
-		for (auto const& segment : segments) {
-			auto const cur = CLocalPath(segment).GetPath();
-			if (cur.size() > 5 && fz::ends_with(cur, std::wstring(L_DIR_SEP L"bin" L_DIR_SEP))) {
-				std::wstring path = cur.substr(0, cur.size() - 4) + prefixSub + L_DIR_SEP;
-				if (testPath(path)) {
-					return ret;
-				}
-			}
-		}
-	}
-
-	ret.clear();
-	return ret;
-#endif
-}
-
 bool CFileZillaApp::LoadResourceFiles()
 {
 	AddStartupProfileRecord("CFileZillaApp::LoadResourceFiles");
-	m_resourceDir = GetDataDir({L"resources/defaultfilters.xml"}, L"share/filezilla");
+	m_resourceDir = GetFZDataDir({L"resources/defaultfilters.xml"}, L"share/filezilla");
 
 	wxImage::AddHandler(new wxPNGHandler());
 
@@ -475,35 +330,20 @@ bool CFileZillaApp::LoadResourceFiles()
 bool CFileZillaApp::InitDefaultsDir()
 {
 	AddStartupProfileRecord("InitDefaultsDir");
-#ifdef __WXGTK__
-	m_defaultsDir = COptions::GetUnadjustedSettingsDir();
-	if (m_defaultsDir.empty() || !FileExists(m_defaultsDir.GetPath() + L"fzdefaults.xml")) {
-		if (FileExists(L"/etc/filezilla/fzdefaults.xml")) {
-			m_defaultsDir.SetPath(L"/etc/filezilla");
-		}
-		else {
-			m_defaultsDir.clear();
-		}
-	}
-
-#endif
-	if (m_defaultsDir.empty()) {
-		m_defaultsDir = GetDataDir({L"fzdefaults.xml"}, L"share/filezilla");
-	}
-
+	m_defaultsDir = GetDefaultsDir();
 	return !m_defaultsDir.empty();
 }
 
 bool CFileZillaApp::LoadLocales()
 {
 	AddStartupProfileRecord("CFileZillaApp::LoadLocales");
-	m_localesDir = GetDataDir({L"locales/de/filezilla.mo"}, std::wstring());
+	m_localesDir = GetFZDataDir({L"locales/de/filezilla.mo"}, std::wstring());
 	if (!m_localesDir.empty()) {
 		m_localesDir.AddSegment(_T("locales"));
 	}
 #ifndef __WXMAC__
 	else {
-		m_localesDir = GetDataDir({L"de/filezilla.mo", L"de/LC_MESSAGES/filezilla.mo"}, L"share/locale", false);
+		m_localesDir = GetFZDataDir({L"de/filezilla.mo", L"de/LC_MESSAGES/filezilla.mo"}, L"share/locale", false);
 	}
 #endif
 	if (!m_localesDir.empty()) {
@@ -753,7 +593,7 @@ void CFileZillaApp::ShowStartupProfile()
 		wxString msg = _T("Profile:\n");
 
 		size_t const max_digits = fz::to_string((m_startupProfile.back().first - m_profile_start).get_milliseconds()).size();
-		
+
 		int64_t prev{};
 		for (auto const& p : m_startupProfile) {
 			auto const diff = p.first - m_profile_start;

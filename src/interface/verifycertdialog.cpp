@@ -2,10 +2,11 @@
 #include "filezillaapp.h"
 #include "verifycertdialog.h"
 #include "dialogex.h"
-#include "ipcmutex.h"
 #include "Options.h"
 #include "timeformatting.h"
 #include "themeprovider.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/iputils.hpp>
 
@@ -14,344 +15,24 @@
 #include <wx/scrolwin.h>
 #include <wx/statbox.h>
 
+#include <cassert>
+
 CertStore::CertStore()
-	: m_xmlFile(wxGetApp().GetSettingsFile(L"trustedcerts"))
+	: xml_cert_store(wxGetApp().GetSettingsFile(L"trustedcerts"))
 {
 }
 
-bool CertStore::IsTrusted(fz::tls_session_info const& info)
+void CertStore::SavingFileFailed(std::wstring const& file, std::wstring const& error)
 {
-	if (info.get_algorithm_warnings() != 0) {
-		// These certs are never trusted.
-		return false;
-	}
-
-	LoadTrustedCerts();
-
-	fz::x509_certificate cert = info.get_certificates()[0];
-
-	return IsTrusted(info.get_host(), info.get_port(), cert.get_raw_data(), false, !info.mismatched_hostname());
+	assert(!error.empty());
+	wxString msg = wxString::Format(_("Could not write \"%s\":"), file);
+	wxMessageBoxEx(msg + _T("\n") + error, _("Error writing xml file"), wxICON_ERROR);
 }
 
-bool CertStore::IsInsecure(std::string const& host, unsigned int port, bool permanentOnly)
+bool CertStore::StoreToXml() const
 {
-	auto const t = std::make_tuple(host, port);
-	if (!permanentOnly && sessionInsecureHosts_.find(t) != sessionInsecureHosts_.cend()) {
-		return true;
-	}
-
-	LoadTrustedCerts();
-
-	if (insecureHosts_.find(t) != insecureHosts_.cend()) {
-		return true;
-	}
-
-	return false;
+	return COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2;
 }
-
-bool CertStore::HasCertificate(std::string const& host, unsigned int port)
-{
-	for (auto const& cert : sessionTrustedCerts_) {
-		if (cert.host == host && cert.port == port) {
-			return true;
-		}
-	}
-
-	LoadTrustedCerts();
-
-	for (auto const& cert : trustedCerts_) {
-		if (cert.host == host && cert.port == port) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool CertStore::DoIsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<CertStore::t_certData> const& trustedCerts, bool allowSans)
-{
-	if (!data.size()) {
-		return false;
-	}
-
-	bool const dnsname = fz::get_address_type(host) == fz::address_type::unknown;
-
-	for (auto const& cert : trustedCerts) {
-		if (port != cert.port) {
-			continue;
-		}
-
-		if (cert.data != data) {
-			continue;
-		}
-
-		if (host != cert.host) {
-			if (!dnsname || !allowSans || !cert.trustSans) {
-				continue;
-			}
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-bool CertStore::IsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans)
-{
-	bool trusted = DoIsTrusted(host, port, data, trustedCerts_, allowSans);
-	if (!trusted && !permanentOnly) {
-		trusted = DoIsTrusted(host, port, data, sessionTrustedCerts_, allowSans);
-	}
-
-	return trusted;
-}
-
-void CertStore::LoadTrustedCerts()
-{
-	CReentrantInterProcessMutexLocker mutex(MUTEX_TRUSTEDCERTS);
-	if (!m_xmlFile.Modified()) {
-		return;
-	}
-
-	auto root = m_xmlFile.Load();
-	if (!root) {
-		return;
-	}
-
-	insecureHosts_.clear();
-	trustedCerts_.clear();
-
-	pugi::xml_node element;
-
-	bool modified = false;
-	if ((element = root.child("TrustedCerts"))) {
-
-		auto const processEntry = [&](pugi::xml_node const& cert)
-		{
-			std::wstring value = GetTextElement(cert, "Data");
-
-			t_certData data;
-			data.data = fz::hex_decode(value);
-			if (data.data.empty()) {
-				return false;
-			}
-
-			data.host = cert.child_value("Host");
-			data.port = GetTextElementInt(cert, "Port");
-			if (data.host.empty() || data.port < 1 || data.port > 65535) {
-				return false;
-			}
-
-			fz::datetime const now = fz::datetime::now();
-			int64_t activationTime = GetTextElementInt(cert, "ActivationTime", 0);
-			if (activationTime == 0 || activationTime > now.get_time_t()) {
-				return false;
-			}
-
-			int64_t expirationTime = GetTextElementInt(cert, "ExpirationTime", 0);
-			if (expirationTime == 0 || expirationTime < now.get_time_t()) {
-				return false;
-			}
-
-			data.trustSans = GetTextElementBool(cert, "TrustSANs");
-
-			// Weed out duplicates
-			if (IsTrusted(data.host, data.port, data.data, true, false)) {
-				return false;
-			}
-
-			trustedCerts_.emplace_back(std::move(data));
-
-			return true;
-		};
-
-		auto cert = element.child("Certificate");
-		while (cert) {
-
-			auto nextCert = cert.next_sibling("Certificate");
-			if (!processEntry(cert)) {
-				modified = true;
-				element.remove_child(cert);
-			}
-			cert = nextCert;
-		}
-	}
-
-	if ((element = root.child("InsecureHosts"))) {
-
-		auto const processEntry = [&](pugi::xml_node const& node)
-		{
-			std::string host = node.child_value();
-			unsigned int port = node.attribute("Port").as_uint();
-			if (host.empty() || port < 1 || port > 65535) {
-				return false;
-			}
-
-			for (auto const& cert : trustedCerts_) {
-				// A host can't be both trusted and insecure
-				if (cert.host == host && cert.port == port) {
-					return false;
-				}
-			}
-
-			insecureHosts_.emplace(std::make_tuple(host, port));
-
-			return true;
-		};
-
-		auto host = element.child("Host");
-		while (host) {
-
-			auto nextHost = host.next_sibling("Host");
-			if (!processEntry(host)) {
-				modified = true;
-				element.remove_child(host);
-			}
-			host = nextHost;
-		}
-	}
-
-	if (modified) {
-		m_xmlFile.Save(false);
-	}
-}
-
-void CertStore::SetInsecure(std::string const& host, unsigned int port, bool permanent)
-{
-	// A host can't be both trusted and insecure
-	sessionTrustedCerts_.erase(
-		std::remove_if(sessionTrustedCerts_.begin(), sessionTrustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
-		sessionTrustedCerts_.end()
-	);
-
-	if (!permanent) {
-		sessionInsecureHosts_.emplace(std::make_tuple(host, port));
-		return;
-	}
-
-	CReentrantInterProcessMutexLocker mutex(MUTEX_TRUSTEDCERTS);
-	LoadTrustedCerts();
-
-	if (IsInsecure(host, port, true)) {
-		return;
-	}
-
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
-		auto root = m_xmlFile.GetElement();
-		if (root) {
-			auto certs = root.child("TrustedCerts");
-
-			// Purge certificates for this host
-			auto const processEntry = [&host, &port](pugi::xml_node const& cert)
-			{
-				return host != cert.child_value("Host") || port != GetTextElementInt(cert, "Port");
-			};
-
-			auto cert = certs.child("Certificate");
-			while (cert) {
-				auto nextCert = cert.next_sibling("Certificate");
-				if (!processEntry(cert)) {
-					certs.remove_child(cert);
-				}
-				cert = nextCert;
-			}
-
-			auto insecureHosts = root.child("InsecureHosts");
-			if (!insecureHosts) {
-				insecureHosts = root.append_child("InsecureHosts");
-			}
-
-			// Remember host as insecure
-			auto xhost = insecureHosts.append_child("Host");
-			xhost.append_attribute("Port").set_value(port);
-			xhost.text().set(fz::to_utf8(host).c_str());
-
-			m_xmlFile.Save(true);
-		}
-	}
-
-	// A host can't be both trusted and insecure
-	trustedCerts_.erase(
-		std::remove_if(trustedCerts_.begin(), trustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
-		trustedCerts_.end()
-	);
-
-	insecureHosts_.emplace(std::make_tuple(host, port));
-}
-
-void CertStore::SetTrusted(fz::tls_session_info const& info, bool permanent, bool trustAllHostnames)
-{
-	const fz::x509_certificate certificate = info.get_certificates()[0];
-
-	t_certData cert;
-	cert.host = info.get_host();
-	cert.port = info.get_port();
-	cert.data = certificate.get_raw_data();
-
-	if (trustAllHostnames) {
-		cert.trustSans = true;
-	}
-
-	// A host can't be both trusted and insecure
-	sessionInsecureHosts_.erase(std::make_tuple(cert.host, cert.port));
-
-	if (!permanent) {
-		sessionTrustedCerts_.emplace_back(std::move(cert));
-
-		return;
-	}
-
-	CReentrantInterProcessMutexLocker mutex(MUTEX_TRUSTEDCERTS);
-	LoadTrustedCerts();
-
-	if (IsTrusted(cert.host, cert.port, cert.data, true, false)) {
-		return;
-	}
-
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
-		auto root = m_xmlFile.GetElement();
-		if (root) {
-			auto certs = root.child("TrustedCerts");
-			if (!certs) {
-				certs = root.append_child("TrustedCerts");
-			}
-
-			auto xCert = certs.append_child("Certificate");
-			AddTextElementUtf8(xCert, "Data", fz::hex_encode<std::string>(cert.data));
-			AddTextElement(xCert, "ActivationTime", static_cast<int64_t>(certificate.get_activation_time().get_time_t()));
-			AddTextElement(xCert, "ExpirationTime", static_cast<int64_t>(certificate.get_expiration_time().get_time_t()));
-			AddTextElement(xCert, "Host", cert.host);
-			AddTextElement(xCert, "Port", cert.port);
-			AddTextElement(xCert, "TrustSANs", cert.trustSans ? L"1" : L"0");
-
-			// Purge insecure host
-			auto const processEntry = [&cert](pugi::xml_node const& xhost)
-			{
-				return cert.host != GetTextElement(xhost) || cert.port != xhost.attribute("Port").as_uint();
-			};
-
-			auto insecureHosts = root.child("InsecureHosts");
-			auto xhost = insecureHosts.child("Host");
-			while (xhost) {
-
-				auto nextHost = xhost.next_sibling("Host");
-				if (!processEntry(xhost)) {
-					insecureHosts.remove_child(xhost);
-				}
-				xhost = nextHost;
-			}
-
-			m_xmlFile.Save(true);
-		}
-	}
-
-	// A host can't be both trusted and insecure
-	insecureHosts_.erase(std::make_tuple(cert.host, cert.port));
-
-	trustedCerts_.emplace_back(std::move(cert));
-}
-
 
 struct CVerifyCertDialog::impl final
 {
@@ -554,7 +235,7 @@ bool CVerifyCertDialog::CreateVerificationDialog(CCertificateNotification const&
 		auto label1 = _("The server's certificate is unknown. Please carefully examine the certificate to make sure the server can be trusted.");
 		WrapText(this, label1, 600);
 		main->Add(new wxStaticText(this, nullID, label1));
-		
+
 		auto label2 =_("Compare the displayed fingerprint with the certificate fingerprint you have received from your server administrator or server hosting provider.");
 		WrapText(this, label2, 600);
 		main->Add(new wxStaticText(this, nullID, label2));

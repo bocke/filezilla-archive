@@ -1,10 +1,11 @@
 #ifndef FILEZILLA_INTERFACE_STATE_HEADER
 #define FILEZILLA_INTERFACE_STATE_HEADER
 
-#include "../include/local_path.h"
+#include "filter_manager.h"
 #include "sitemanager.h"
 #include "sitemanager_dialog.h"
-#include "filter.h"
+
+#include "../include/local_path.h"
 
 #include <memory>
 
@@ -104,7 +105,7 @@ public:
 	void SetCurrentContext(CState* pState);
 
 	void ProcessDirectoryListing(CServer const& server, std::shared_ptr<CDirectoryListing> const& listing, CState const* exempt);
-	
+
 protected:
 	CContextManager();
 
@@ -240,9 +241,9 @@ protected:
 	CRemoteRecursiveOperation* m_pRemoteRecursiveOperation;
 
 	CComparisonManager* m_pComparisonManager;
-	
+
 	CStateFilterManager m_stateFilterManager;
-	
+
 	struct t_handlersForNotification
 	{
 		std::vector<CStateEventHandler*> handlers;

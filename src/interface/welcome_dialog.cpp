@@ -156,8 +156,14 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 			delete p;
 		}
 	}
+<<<<<<<
 }
 }
+=======
+	if (old_customer) {
+		main->Add(new wxStaticText(this, -1, _("As long-time customer you are eligible for a complimentary\ncopy of FileZilla Pro for Windows. Please send an mail to\ninfo@filezillapro.com if you are interested.")));
+	}
+>>>>>>>
 #endif
 
 void CWelcomeDialog::InitFooter(wxString const& resources)

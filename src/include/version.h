@@ -16,4 +16,6 @@ std::wstring FZC_PUBLIC_SYMBOL GetDependencyVersion(lib_dependency d);
 
 std::wstring FZC_PUBLIC_SYMBOL GetFileZillaVersion();
 
+int64_t FZC_PUBLIC_SYMBOL ConvertToVersionNumber(wchar_t const* version);
+
 #endif

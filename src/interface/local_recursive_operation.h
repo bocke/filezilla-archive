@@ -1,84 +1,34 @@
 #ifndef FILEZILLA_LOCAL_RECURSIVE_OPERATION_HEADER
 #define FILEZILLA_LOCAL_RECURSIVE_OPERATION_HEADER
 
-#include "recursive_operation.h"
+#include "../commonui/local_recursive_operation.h"
 
-#include <libfilezilla/thread_pool.hpp>
+class CQueueView;
+class CActionAfterBlocker;
+class CState;
 
-#include <set>
-
-class local_recursion_root final
+class CLocalRecursiveOperation final : public local_recursive_operation, public wxEvtHandler
 {
 public:
-	local_recursion_root() = default;
-
-	void add_dir_to_visit(CLocalPath const& localPath, CServerPath const& remotePath = CServerPath());
-
-	bool empty() const { return m_dirsToVisit.empty(); }
-
-private:
-	friend class CLocalRecursiveOperation;
-
-	class new_dir final
-	{
-	public:
-		CLocalPath localPath;
-		CServerPath remotePath;
-	};
-
-	std::set<CLocalPath> m_visitedDirs;
-	std::deque<new_dir> m_dirsToVisit;
-};
-
-class CLocalRecursiveOperation final : public CRecursiveOperation, public wxEvtHandler
-{
-public:
-	class listing final
-	{
-	public:
-		class entry
-		{
-		public:
-			std::wstring name;
-			int64_t size{};
-			fz::datetime time;
-			int attributes{};
-		};
-
-		std::vector<entry> files;
-		std::vector<entry> dirs;
-		CLocalPath localPath;
-		CServerPath remotePath;
-	};
-
 	CLocalRecursiveOperation(CState& state);
 	virtual ~CLocalRecursiveOperation();
 
-	void AddRecursionRoot(local_recursion_root && root);
+	void StopRecursiveOperation() override;
+	void SetImmediate(bool immediate);
+	void SetQueue(CQueueView* pQueue) { m_pQueue = pQueue; }
+
 	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate = true, bool ignore_links = true);
-
-	virtual void StopRecursiveOperation() override;
-
 protected:
-	bool DoStartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate, bool ignore_links);
-
-	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2) override;
-
-	void entry();
-
-	void EnqueueEnumeratedListing(fz::scoped_lock& l, listing&& d);
-
-	std::deque<local_recursion_root> recursion_roots_;
-
-	fz::async_task thread_;
-	fz::mutex mutex_;
-
-	std::deque<listing> m_listedDirectories;
-	bool m_ignoreLinks{};
-
-	Site site_;
+	bool do_start_recursive_operation(OperationMode mode, ActiveFilters const& filters, bool ignore_links) override;
+	void on_listed_directory() override;
 
 	void OnListedDirectory();
+
+	bool m_immediate{true};
+	CQueueView* m_pQueue{};
+	CState& state_;
+	Site site_;
+	std::shared_ptr<CActionAfterBlocker> m_actionAfterBlocker;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -1,9 +1,10 @@
 #include "filezilla.h"
 #include "recentserverlist.h"
-#include "ipcmutex.h"
 #include "filezillaapp.h"
 #include "Options.h"
 #include "xmlfunctions.h"
+
+#include "../commonui/ipcmutex.h"
 
 const std::deque<Site> CRecentServerList::GetMostRecentServers(bool lockMutex)
 {
@@ -45,7 +46,7 @@ const std::deque<Site> CRecentServerList::GetMostRecentServers(bool lockMutex)
 	}
 
 	if (modified) {
-		xmlFile.Save(false);
+		xmlFile.Save();
 	}
 
 	return mostRecentServers;
@@ -108,7 +109,7 @@ void CRecentServerList::SetMostRecentServers(std::deque<Site> const& sites, bool
 		SetServer(node, site);
 	}
 
-	xmlFile.Save(true);
+	SaveWithErrorDialog(xmlFile);
 }
 
 void CRecentServerList::Clear()
@@ -117,5 +118,5 @@ void CRecentServerList::Clear()
 
 	CXmlFile xmlFile(wxGetApp().GetSettingsFile(_T("recentservers")));
 	xmlFile.CreateEmpty();
-	xmlFile.Save(true);
+	SaveWithErrorDialog(xmlFile);
 }

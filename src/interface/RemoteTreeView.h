@@ -3,7 +3,7 @@
 
 #include "systemimagelist.h"
 #include "state.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "option_change_event_handler.h"
 #include "treectrlex.h"
 

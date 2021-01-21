@@ -17,7 +17,7 @@
 #include "export.h"
 #include "filelist_statusbar.h"
 #include "filezillaapp.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "import.h"
 #include "inputdialog.h"
 #include "led.h"
@@ -1492,7 +1492,7 @@ void CMainFrame::OnTimer(wxTimerEvent& event)
 		QueueEvent(evt);
 	}
 #if FZ_MANUALUPDATECHECK
-	else if( event.GetId() == update_dialog_timer_.GetId() ) {
+	else if ( event.GetId() == update_dialog_timer_.GetId() ) {
 		TriggerUpdateDialog();
 	}
 #endif
@@ -1837,7 +1837,7 @@ void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 		wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId(), &m);
 		if (pItem && m) {
 			for (size_t i = 0; i != m_pMenuBar->GetMenuCount(); ++i) {
-				if( m_pMenuBar->GetMenu(i) == m ) {
+				if ( m_pMenuBar->GetMenu(i) == m ) {
 					m_pMenuBar->Remove(i);
 					delete m;
 					break;
@@ -1849,7 +1849,7 @@ void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 	else if (s != UpdaterState::newversion && s != UpdaterState::newversion_ready && s != UpdaterState::newversion_stale) {
 		return;
 	}
-	
+
 	wxString const name = v.version_.empty() ? _("Unknown version") : wxString::Format(_("&Version %s"), v.version_);
 
 	wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId());

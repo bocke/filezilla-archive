@@ -1,12 +1,13 @@
 #include "filezilla.h"
 #include "filezillaapp.h"
 #include "import.h"
-#include "ipcmutex.h"
 #include "sitemanager.h"
 #include "xmlfunctions.h"
 #include "Options.h"
 #include "queue.h"
 #include "xrc_helper.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <wx/filedlg.h>
 

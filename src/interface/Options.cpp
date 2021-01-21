@@ -2,10 +2,12 @@
 #include "Options.h"
 #include "filezillaapp.h"
 #include "file_utils.h"
-#include "ipcmutex.h"
 #include "locale_initializer.h"
 #include "sizeformatting.h"
 #include "xmlfunctions.h"
+
+#include "../commonui/fz_paths.h"
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/util.hpp>
@@ -387,7 +389,7 @@ void COptions::Save(bool processChanged)
 	}
 
 	CInterProcessMutex mutex(MUTEX_OPTIONS);
-	xmlFile_->Save(true);
+	SaveWithErrorDialog(*xmlFile_);
 }
 
 bool COptions::Cleanup()
@@ -414,7 +416,7 @@ bool COptions::Cleanup()
 		element.remove_child(child);
 		child = next;
 	}
-	
+
 	child = settings.first_child();
 
 	while (child) {
@@ -471,49 +473,8 @@ std::wstring TryDirectory(wxString path, wxString const& suffix, bool check_exis
 #endif
 }
 
-CLocalPath COptions::GetUnadjustedSettingsDir()
-{
-	CLocalPath ret;
-
-#ifdef FZ_WINDOWS
-	wchar_t buffer[MAX_PATH * 2 + 1];
-
-	if (SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, SHGFP_TYPE_CURRENT, buffer))) {
-		CLocalPath tmp(buffer);
-		if (!tmp.empty()) {
-			tmp.AddSegment(L"FileZilla");
-		}
-		ret = tmp;
-	}
-
-	if (ret.empty()) {
-		// Fall back to directory where the executable is
-		DWORD c = GetModuleFileName(0, buffer, MAX_PATH * 2);
-		if (c && c < MAX_PATH * 2) {
-			std::wstring tmp;
-			ret.SetPath(buffer, &tmp);
-		}
-	}
-#else
-	std::wstring cfg = TryDirectory(GetEnv("XDG_CONFIG_HOME"), L"filezilla/", true);
-	if (cfg.empty()) {
-		cfg = TryDirectory(wxGetHomeDir(), L".config/filezilla/", true);
-	}
-	if (cfg.empty()) {
-		cfg = TryDirectory(wxGetHomeDir(), L".filezilla/", true);
-	}
-	if (cfg.empty()) {
-		cfg = TryDirectory(GetEnv("XDG_CONFIG_HOME"), L"filezilla/", false);
-	}
-	if (cfg.empty()) {
-		cfg = TryDirectory(wxGetHomeDir(), L".config/filezilla/", false);
-	}
-	if (cfg.empty()) {
-		cfg = TryDirectory(wxGetHomeDir(), L".filezilla/", false);
-	}
-	ret.SetPath(cfg);
-#endif
-	return ret;
+CLocalPath COptions::GetUnadjustedSettingsDir() {
+	return ::GetUnadjustedSettingsDir();
 }
 
 CLocalPath COptions::GetCacheDirectory()
@@ -569,6 +530,7 @@ CLocalPath COptions::InitSettingsDir()
 	}
 
 	set(mapOption(OPTION_DEFAULT_SETTINGSDIR), p.GetPath(), true);
+	set_ipcmutex_lockfile_path(p.GetPath());
 
 	return p;
 }

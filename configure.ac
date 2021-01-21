@@ -758,6 +758,7 @@ AM_CONDITIONAL(ENABLE_STORJ, [test "x$enable_storj" = "xyes"])
 
 AC_CONFIG_FILES(Makefile src/Makefile src/engine/Makefile src/pugixml/Makefile
 src/dbus/Makefile
+src/commonui/Makefile
 src/interface/Makefile src/interface/resources/Makefile src/include/Makefile
 locales/Makefile
 data/Makefile

@@ -1,7 +1,6 @@
 #include "filezilla.h"
 #include "clearprivatedata.h"
 #include "commandqueue.h"
-#include "ipcmutex.h"
 #include "local_recursive_operation.h"
 #include "Mainfrm.h"
 #include "Options.h"
@@ -10,6 +9,8 @@
 #include "recentserverlist.h"
 #include "remote_recursive_operation.h"
 #include "state.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/file.hpp>
 

@@ -64,13 +64,13 @@ bool CRecursiveOperationStatus::Show(bool show)
 
 void CRecursiveOperationStatus::OnStateChange(t_statechange_notifications, std::wstring const&, const void*)
 {
-	CRecursiveOperation* op = m_local ? static_cast<CRecursiveOperation*>(m_state.GetLocalRecursiveOperation()) : static_cast<CRecursiveOperation*>(m_state.GetRemoteRecursiveOperation());
-	auto mode = CRecursiveOperation::recursive_none;
+	recursive_operation* op = m_local ? static_cast<recursive_operation*>(m_state.GetLocalRecursiveOperation()) : static_cast<recursive_operation*>(m_state.GetRemoteRecursiveOperation());
+	auto mode = recursive_operation::recursive_none;
 	if (op) {
 		mode = op->GetOperationMode();
 	}
 
-	bool show = mode != CRecursiveOperation::recursive_none && mode != CRecursiveOperation::recursive_list;
+	bool show = mode != recursive_operation::recursive_none && mode != recursive_operation::recursive_list;
 	if (IsShown() != show) {
 		Show(show);
 	}
@@ -88,28 +88,24 @@ void CRecursiveOperationStatus::OnStateChange(t_statechange_notifications, std::
 
 void CRecursiveOperationStatus::UpdateText()
 {
-	CRecursiveOperation* operation = m_local ? static_cast<CRecursiveOperation*>(m_state.GetLocalRecursiveOperation()) : static_cast<CRecursiveOperation*>(m_state.GetRemoteRecursiveOperation());
+	recursive_operation* operation = m_local ? static_cast<recursive_operation*>(m_state.GetLocalRecursiveOperation()) : static_cast<recursive_operation*>(m_state.GetRemoteRecursiveOperation());
 
 	m_changed = false;
 	wxString text;
 
 	auto const mode = operation->GetOperationMode();
-	bool show = mode != CRecursiveOperation::recursive_none && mode != CRecursiveOperation::recursive_list;
+	bool show = mode != recursive_operation::recursive_none && mode != recursive_operation::recursive_list;
 	if (show) {
 		switch (mode) {
-		case CRecursiveOperation::recursive_transfer:
-		case CRecursiveOperation::recursive_transfer_flatten:
+		case recursive_operation::recursive_transfer:
+		case recursive_operation::recursive_transfer_flatten:
 			text = _("Recursively adding files to queue.");
 			break;
-		case CRecursiveOperation::recursive_delete:
+		case recursive_operation::recursive_delete:
 			text = _("Recursively deleting files and directories.");
 			break;
-		case CRecursiveOperation::recursive_chmod:
+		case recursive_operation::recursive_chmod:
 			text = _("Recursively changing permissions.");
-			break;
-		case CRecursiveOperation::recursive_synchronize_download:
-		case CRecursiveOperation::recursive_synchronize_upload:
-			text = _("Synchronizing directories.");
 			break;
 		default:
 			break;

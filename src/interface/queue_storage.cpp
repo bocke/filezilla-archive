@@ -635,7 +635,7 @@ bool CQueueStorage::Impl::SaveServer(CServerItem const& item)
 	Bind(insertServerQuery_, server_table_column_names::type, static_cast<int>(site.server.GetType()));
 
 	ProtectedCredentials credentials = site.credentials;
-	credentials.Protect();
+	protect(credentials);
 
 	LogonType logonType = credentials.logonType_;
 	if (logonType != LogonType::anonymous) {

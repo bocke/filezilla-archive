@@ -2,9 +2,10 @@
 #include "osx_sandbox_userdirs.h"
 
 #include "filezillaapp.h"
-#include "ipcmutex.h"
 #include "Options.h"
 #include "xmlfunctions.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <wx/dirdlg.h>
 #include <wx/osx/core/cfstring.h>

@@ -1,87 +1,43 @@
 #ifndef FILEZILLA_REMOTE_RECURSIVE_OPERATION_HEADER
 #define FILEZILLA_REMOTE_RECURSIVE_OPERATION_HEADER
 
-#include <set>
-#include "recursive_operation.h"
-#include <libfilezilla/optional.hpp>
+#include "state.h"
+#include "../commonui/remote_recursive_operation.h"
 
-class ChmodData;
+class CQueueView;
+class CActionAfterBlocker;
 
-class recursion_root final
-{
-public:
-	recursion_root() = default;
-	recursion_root(CServerPath const& start_dir, bool allow_parent);
-
-	void add_dir_to_visit(CServerPath const& path, std::wstring const& subdir, CLocalPath const& localDir = CLocalPath(), bool is_link = false);
-
-	// Queue a directory but restrict processing to the named subdirectory
-	void add_dir_to_visit_restricted(CServerPath const& path, std::wstring const& restrict, bool recurse);
-
-	bool empty() const { return m_dirsToVisit.empty(); }
-
-private:
-	friend class CRemoteRecursiveOperation;
-
-	class new_dir final
-	{
-	public:
-		CServerPath parent;
-		std::wstring subdir;
-		CLocalPath localDir;
-		fz::sparse_optional<std::wstring> restrict;
-
-		// Symlink target might be outside actual start dir. Yet
-		// sometimes user wants to download symlink target contents
-		CServerPath start_dir;
-
-		// 0 = not a link
-		// 1 = link, added by class during the operation
-		// 2 = link, added by user of class
-		int link{};
-
-		bool doVisit{true};
-		bool recurse{true};
-		bool second_try{};
-	};
-
-	CServerPath m_remoteStartDir;
-	std::set<CServerPath> m_visitedDirs;
-	std::deque<new_dir> m_dirsToVisit;
-	bool m_allowParent{};
-};
-
-class CRemoteRecursiveOperation final : public CRecursiveOperation
+class CRemoteRecursiveOperation final : public remote_recursive_operation, public CStateEventHandler
 {
 public:
 	CRemoteRecursiveOperation(CState& state);
 	virtual ~CRemoteRecursiveOperation();
 
-	void AddRecursionRoot(recursion_root && root);
 	void StartRecursiveOperation(OperationMode mode, ActiveFilters const& filters, bool immediate = true);
+	void SetImmediate(bool immediate);
 
-	// Needed for recursive_chmod
-	void SetChmodData(std::unique_ptr<ChmodData> && chmodData);
+	void StopRecursiveOperation() override;
 
-	virtual void StopRecursiveOperation();
+	void SetQueue(CQueueView* pQueue) { m_pQueue = pQueue; }
 
 protected:
-	void LinkIsNotDir();
-	void ListingFailed(int error);
+	void do_start_recursive_operation(OperationMode mode, ActiveFilters const& filters) override;
+	void process_command(std::unique_ptr<CCommand>) override;
+	void operation_finished() override;
+	std::wstring sanitize_filename(std::wstring const& name) override;
 
-	// Processes the directory listing in case of a recursive operation
-	void ProcessDirectoryListing(const CDirectoryListing* pDirectoryListing);
+	void handle_file(std::wstring const& sourceFile, CLocalPath const& localPath, CServerPath const& remotePath, int64_t size) override;
+	void handle_empty_directory(CLocalPath const& localPath) override;
+	void handle_invalid_dir_link(std::wstring const& sourceFile, CLocalPath const& localPath, CServerPath const& remotePath) override;
+	void handle_dir_listing_end() override;
 
-	bool NextOperation();
+	void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data) override;
 
-	virtual void OnStateChange(t_statechange_notifications notification, std::wstring const&, const void* data2) override;
-
-	bool BelowRecursionRoot(const CServerPath& path, recursion_root::new_dir &dir);
-
-	std::deque<recursion_root> recursion_roots_;
-
-	// Needed for recursive_chmod
-	std::unique_ptr<ChmodData> chmodData_;
+	bool m_immediate{true};
+	bool added_to_queue_{};
+	CState& m_state;
+	CQueueView* m_pQueue{};
+	std::shared_ptr<CActionAfterBlocker> m_actionAfterBlocker;
 
 	friend class CCommandQueue;
 };

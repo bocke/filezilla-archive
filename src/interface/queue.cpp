@@ -639,7 +639,7 @@ CFileItem* DoGetIdleChild(std::deque<CFileItem*> const* fileList, TransferDirect
 CFileItem* CServerItem::GetIdleChild(bool immediateOnly, TransferDirection direction)
 {
 	CFileItem* item = DoGetIdleChild(m_fileList[1], direction);
-	if( !item && !immediateOnly ) {
+	if ( !item && !immediateOnly ) {
 		item = DoGetIdleChild(m_fileList[0], direction);
 	}
 	return item;
@@ -1568,7 +1568,7 @@ void CQueueViewBase::OnExport(wxCommandEvent&)
 
 	WriteToFile(exportRoot);
 
-	xml.Save(true);
+	SaveWithErrorDialog(xml);
 }
 
 // ------

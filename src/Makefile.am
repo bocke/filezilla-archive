@@ -15,8 +15,8 @@ if ENABLE_STORJ
   MAYBE_STORJ = storj
 endif
 
-SUBDIRS = include engine $(MAYBE_PUGIXML) $(MAYBE_DBUS) interface putty $(MAYBE_STORJ) $(MAYBE_FZSHELLEXT) .
-DIST_SUBDIRS = include engine pugixml dbus interface putty storj fzshellext/64 .
+SUBDIRS = include engine $(MAYBE_PUGIXML) $(MAYBE_DBUS) commonui interface putty $(MAYBE_STORJ) $(MAYBE_FZSHELLEXT) .
+DIST_SUBDIRS = include engine pugixml dbus commonui interface putty storj fzshellext/64 .
 
 dist_noinst_DATA = FileZilla.sln Dependencies.props.example
 

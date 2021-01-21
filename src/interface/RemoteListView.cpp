@@ -10,7 +10,7 @@
 #include "drop_target_ex.h"
 #include "edithandler.h"
 #include "filezillaapp.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "graphics.h"
 #include "infotext.h"
 #include "inputdialog.h"
@@ -752,7 +752,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 		std::wstring const path = m_pDirectoryListing->path.GetPath();
 
 		CFilterManager const& filter = m_state.GetStateFilterManager();
-		
+
 		for (unsigned int i = 0; i < m_pDirectoryListing->size(); ++i) {
 			const CDirentry& entry = (*m_pDirectoryListing)[i];
 			CGenericFileData data;
@@ -1302,7 +1302,7 @@ void CRemoteListView::TransferSelectedFiles(const CLocalPath& local_parent, bool
 	if (!root.empty()) {
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
+		pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
 	}
 }
 
@@ -1533,7 +1533,7 @@ void CRemoteListView::OnMenuDelete(wxCommandEvent&)
 
 		if (!root.empty()) {
 			pRecursiveOperation->AddRecursionRoot(std::move(root));
-			pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters());
+			pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_delete, filter.GetActiveFilters());
 		}
 	}
 }
@@ -1697,7 +1697,7 @@ void CRemoteListView::OnMenuChmod(wxCommandEvent&)
 {
 	Site const& site = m_state.GetSite();
 	auto protocol = site.server.GetProtocol();
-	
+
 	if (!m_state.IsRemoteConnected() || !m_state.IsRemoteIdle()) {
 		wxBell();
 		return;
@@ -1844,11 +1844,11 @@ void CRemoteListView::HandleGenericChmod(ChmodUICommand &command)
 		pRecursiveOperation->SetChmodData(std::move(chmodData));
 		pRecursiveOperation->AddRecursionRoot(std::move(root));
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters());
+		pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_chmod, filter.GetActiveFilters());
 
-		// Refresh listing. This gets done implicitely by the recursive operation, so
+		// Refresh listing. This gets done implicitly by the recursive operation, so
 		// only it if not recursing.
-		if (pRecursiveOperation->GetOperationMode() != CRecursiveOperation::recursive_chmod) {
+		if (pRecursiveOperation->GetOperationMode() != recursive_operation::recursive_chmod) {
 			m_state.ChangeRemoteDir(m_pDirectoryListing->path);
 		}
 	}
@@ -1895,7 +1895,7 @@ void CRemoteListView::ApplyCurrentFilter()
 			++hidden;
 			continue;
 		}
-	
+
 		if (entry.is_dir()) {
 			++totalDirCount;
 		}
@@ -1947,7 +1947,7 @@ std::vector<std::wstring> CRemoteListView::RememberSelectedItems(std::wstring& f
 			if (item < 0) {
 				break;
 			}
-			
+
 			if (!item) {
 				selectedNames.push_back(L"..");
 			}
@@ -2119,10 +2119,10 @@ void CRemoteListView::OnStateChange(t_statechange_notifications notification, st
 	}
 	else if (notification == STATECHANGE_SERVER) {
 		if (m_windowTinter) {
-			m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+			m_windowTinter->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 		}
 		if (m_pInfoText) {
-			m_pInfoText->SetBackgroundTint(m_state.GetSite().m_colour);
+			m_pInfoText->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 		}
 	}
 	else {

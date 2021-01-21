@@ -289,7 +289,7 @@ void CRemoteTreeView::OnStateChange(t_statechange_notifications notification, st
 		ApplyFilters(false);
 	}
 	else if (notification == STATECHANGE_SERVER) {
-		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+		m_windowTinter->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 	}
 }
 
@@ -604,7 +604,7 @@ void CRemoteTreeView::RefreshItem(wxTreeItemId parent, const CDirectoryListing& 
 	std::vector<wxTreeItemId> toDelete;
 
 	bool inserted = false;
-	
+
 	wxTreeItemIdValue unused;
 	child = GetFirstChild(parent, unused);
 
@@ -1056,7 +1056,7 @@ void CRemoteTreeView::OnMenuChmod(wxCommandEvent&)
 		pRecursiveOperation->SetChmodData(std::move(chmodData));
 
 		CFilterManager filter;
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_chmod, filter.GetActiveFilters());
+		pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_chmod, filter.GetActiveFilters());
 	}
 }
 
@@ -1092,7 +1092,7 @@ void CRemoteTreeView::OnMenuDownload(wxCommandEvent& event)
 
 	const bool addOnly = event.GetId() == XRCID("ID_ADDTOQUEUE");
 	CFilterManager filter;
-	pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !addOnly);
+	pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !addOnly);
 }
 
 void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
@@ -1155,7 +1155,7 @@ void CRemoteTreeView::OnMenuDelete(wxCommandEvent&)
 			m_state.ChangeRemoteDir(startDir);
 		}
 
-		pRecursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_delete, filter.GetActiveFilters());
+		pRecursiveOperation->StartRecursiveOperation(recursive_operation::recursive_delete, filter.GetActiveFilters());
 	}
 }
 

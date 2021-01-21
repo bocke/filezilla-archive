@@ -1,5 +1,5 @@
 #include "filezilla.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "listingcomparison.h"
 #include "Mainfrm.h"
 #include "Options.h"

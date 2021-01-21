@@ -4,7 +4,7 @@
 #include "dragdropmanager.h"
 #include "drop_target_ex.h"
 #include "filezillaapp.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include "file_utils.h"
 #include "graphics.h"
 #include "inputdialog.h"
@@ -924,7 +924,7 @@ void CLocalTreeView::OnStateChange(t_statechange_notifications notification, std
 		SetDir(m_state.GetLocalDir().GetPath());
 	}
 	else if (notification == STATECHANGE_SERVER) {
-		m_windowTinter->SetBackgroundTint(m_state.GetSite().m_colour);
+		m_windowTinter->SetBackgroundTint(site_colour_to_wx(m_state.GetSite().m_colour));
 	}
 	else {
 		wxASSERT(notification == STATECHANGE_APPLYFILTER);
@@ -1184,7 +1184,7 @@ void CLocalTreeView::OnMenuUpload(wxCommandEvent& event)
 	bool const queue_only = event.GetId() == XRCID("ID_ADDTOQUEUE");
 
 	CFilterManager filter;
-	recursiveOperation->StartRecursiveOperation(CRecursiveOperation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
+	recursiveOperation->StartRecursiveOperation(recursive_operation::recursive_transfer, filter.GetActiveFilters(), !queue_only);
 }
 
 // Create a new Directory
@@ -1570,7 +1570,7 @@ wxTreeItemId CLocalTreeView::AddDrive(wxChar letter)
 	drive += _T(":");
 
 	long drivesToHide = CVolumeDescriptionEnumeratorThread::GetDrivesToHide();
-	if( CVolumeDescriptionEnumeratorThread::IsHidden(drive.wc_str(), drivesToHide) ) {
+	if ( CVolumeDescriptionEnumeratorThread::IsHidden(drive.wc_str(), drivesToHide) ) {
 		return wxTreeItemId();
 	}
 

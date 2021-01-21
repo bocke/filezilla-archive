@@ -1,9 +1,9 @@
 #include "filezilla.h"
 #include "listingcomparison.h"
 #include "filelistctrl.h"
-#include "filter.h"
 #include "Options.h"
 #include "state.h"
+#include "../commonui/filter.h"
 
 CComparableListing::CComparableListing(wxWindow* pParent)
 {

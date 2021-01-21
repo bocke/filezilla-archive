@@ -1,0 +1,48 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
+lib_LTLIBRARIES = libfzclient-commonui-private.la
+
+libfzclient_commonui_private_la_CPPFLAGS = -I$(top_builddir)/config
+libfzclient_commonui_private_la_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzclient_commonui_private_la_CPPFLAGS += -DBUILDING_FZ_COMMONUI
+
+libfzclient_commonui_private_la_CXXFLAGS = -fvisibility=hidden
+libfzclient_commonui_private_la_LDFLAGS = -no-undefined -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_MICRO)
+libfzclient_commonui_private_la_LDFLAGS += $(LIBFILEZILLA_LIBS)
+
+
+libfzclient_commonui_private_la_SOURCES = \
+	cert_store.cpp \
+	chmod_data.cpp \
+	file_utils.cpp \
+	filter.cpp \
+	fz_paths.cpp \
+	ipcmutex.cpp \
+	local_recursive_operation.cpp \
+	login_manager.cpp \
+	remote_recursive_operation.cpp \
+	site.cpp \
+	site_manager.cpp \
+	xml_cert_store.cpp \
+	xml_file.cpp
+
+noinst_HEADERS = \
+	cert_store.h \
+	chmod_data.h \
+	file_utils.h \
+	filter.h \
+	fz_paths.h \
+	ipcmutex.h \
+	local_recursive_operation.h \
+	login_manager.h \
+	recursive_operation.h \
+	remote_recursive_operation.h \
+	site.h \
+	site_manager.h \
+	visibility.h \
+	xml_cert_store.h \
+	xml_file.h
+
+if MACAPPBUNDLE
+libfzclient_commonui_private_la_SOURCES += mac_fz_paths.mm
+endif

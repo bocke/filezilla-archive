@@ -1,7 +1,8 @@
 #include "filezilla.h"
 #include "verifyhostkeydialog.h"
 #include "dialogex.h"
-#include "ipcmutex.h"
+
+#include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/format.hpp>
 

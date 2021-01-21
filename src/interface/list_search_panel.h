@@ -1,7 +1,7 @@
 #ifndef FILEZILLA_INTERFACE_LIST_SEARCH_PANEL_HEADER
 #define FILEZILLA_INTERFACE_LIST_SEARCH_PANEL_HEADER
 
-#include "filter.h"
+#include "filter_manager.h"
 
 class wxBitmapButton;
 

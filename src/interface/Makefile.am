@@ -53,7 +53,7 @@ filezilla_SOURCES = \
 		filelistctrl.cpp \
 		filelist_statusbar.cpp \
 		FileZilla.cpp \
-		filter.cpp \
+		filter_manager.cpp \
 		filter_conditions_dialog.cpp \
 		filteredit.cpp \
 		file_utils.cpp \
@@ -62,7 +62,6 @@ filezilla_SOURCES = \
 		import.cpp \
 		infotext.cpp \
 		inputdialog.cpp \
-		ipcmutex.cpp \
 		led.cpp \
 		listctrlex.cpp \
 		listingcomparison.cpp \
@@ -88,7 +87,6 @@ filezilla_SOURCES = \
 		queueview_successful.cpp \
 		quickconnectbar.cpp \
 		recentserverlist.cpp \
-		recursive_operation.cpp \
 		recursive_operation_status.cpp \
 		remote_recursive_operation.cpp \
 		RemoteListView.cpp \
@@ -183,7 +181,7 @@ noinst_HEADERS = \
 		filelist_statusbar.h \
 		filezilla.h \
 		filezillaapp.h \
-		filter.h \
+		filter_manager.h \
 		filter_conditions_dialog.h \
 		filteredit.h \
 		file_utils.h \
@@ -192,7 +190,6 @@ noinst_HEADERS = \
 		import.h \
 		infotext.h \
 		inputdialog.h \
-		ipcmutex.h \
 		led.h \
 		listctrlex.h \
 		listingcomparison.h \
@@ -218,7 +215,6 @@ noinst_HEADERS = \
 		queueview_successful.h \
 		quickconnectbar.h \
 		recentserverlist.h \
-		recursive_operation.h \
 		recursive_operation_status.h \
 		remote_recursive_operation.h \
 		RemoteListView.h \
@@ -296,7 +292,7 @@ if USE_RESOURCEFILE
 RESOURCEFILE = resources/filezilla.o
 endif
 
-filezilla_DEPENDENCIES += ../engine/libfzclient-private.la
+filezilla_DEPENDENCIES += ../commonui/libfzclient-commonui-private.la ../engine/libfzclient-private.la
 
 filezilla_CPPFLAGS = -I$(top_builddir)/config
 filezilla_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
@@ -304,7 +300,8 @@ filezilla_CPPFLAGS += $(WX_CPPFLAGS)
 filezilla_CXXFLAGS = $(WX_CXXFLAGS_ONLY)
 filezilla_CFLAGS = $(WX_CFLAGS_ONLY)
 
-filezilla_LDFLAGS = ../engine/libfzclient-private.la $(LIBFILEZILLA_LIBS)
+filezilla_LDFLAGS = ../commonui/libfzclient-commonui-private.la ../engine/libfzclient-private.la $(LIBFILEZILLA_LIBS)
+
 filezilla_LDFLAGS += $(PUGIXML_LIBS)
 
 if HAVE_DBUS

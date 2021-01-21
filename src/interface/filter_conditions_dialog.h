@@ -2,7 +2,7 @@
 #define FILEZILLA_INTERFACE_CONDITIONS_DIALOG_HEADER
 
 #include "dialogex.h"
-#include "filter.h"
+#include "filter_manager.h"
 #include <set>
 
 class CFilterControls final
