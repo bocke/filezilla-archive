@@ -8,6 +8,7 @@
 #include <list>
 #include <set>
 #include <string>
+#include <tuple>
 #include <vector>
 
 class FZCUI_PUBLIC_SYMBOL cert_store
