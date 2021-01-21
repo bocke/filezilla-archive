@@ -7,7 +7,9 @@
 
 #include <vector>
 
-struct FZCUI_PUBLIC_SYMBOL app_paths final {
+class FZCUI_PUBLIC_SYMBOL app_paths final
+{
+public:
 	CLocalPath settings_path;
 	CLocalPath defaults_path;
 
