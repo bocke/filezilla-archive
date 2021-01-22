@@ -46,4 +46,5 @@ noinst_HEADERS = \
 
 if MACAPPBUNDLE
 libfzclient_commonui_private_la_SOURCES += mac_fz_paths.mm
+libfzclient_commonui_private_la_OBJCXXFLAGS = -std=c++17
 endif
