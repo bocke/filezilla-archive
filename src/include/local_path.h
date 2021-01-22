@@ -5,6 +5,8 @@
 
 #include <libfilezilla/shared.hpp>
 
+#include <string>
+
 // This class encapsulates local paths.
 // On Windows it uses the C:\foo\bar\ syntax and also supports
 // UNC paths.
