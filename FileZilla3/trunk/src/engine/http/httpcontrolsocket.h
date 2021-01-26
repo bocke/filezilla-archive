@@ -224,6 +224,8 @@ protected:
 
 	virtual void ResetSocket() override;
 
+	virtual void SetSocketBufferSizes() override;
+
 	friend class CProtocolOpData<CHttpControlSocket>;
 	friend class CHttpFileTransferOpData;
 	friend class CHttpInternalConnectOpData;

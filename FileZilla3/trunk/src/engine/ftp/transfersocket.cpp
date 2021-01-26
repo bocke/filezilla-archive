@@ -928,10 +928,12 @@ void CTransferSocket::operator()(fz::event_base const& ev)
 
 void CTransferSocket::OnTimer(fz::timer_id)
 {
+#if FZ_WINDOWS
 	if (socket_ && socket_->is_connected()) {
 		int const ideal_send_buffer = socket_->ideal_send_buffer_size();
 		if (ideal_send_buffer != -1) {
 			socket_->set_buffer_sizes(-1, ideal_send_buffer);
 		}
 	}
+#endif
 }

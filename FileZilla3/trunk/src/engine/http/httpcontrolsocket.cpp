@@ -6,6 +6,8 @@
 #include "internalconnect.h"
 #include "request.h"
 
+#include "../include/engine_options.h"
+
 #include "../controlsocket.h"
 #include "../engineprivate.h"
 
@@ -380,4 +382,19 @@ void CHttpControlSocket::operator()(fz::event_base const& ev)
 	{
 		CRealControlSocket::operator()(ev);
 	}
+}
+
+void CHttpControlSocket::SetSocketBufferSizes()
+{
+	if (!socket_) {
+		return;
+	}
+
+	const int size_read = engine_.GetOptions().get_int(OPTION_SOCKET_BUFFERSIZE_RECV);
+#if FZ_WINDOWS
+	const int size_write = -1;
+#else
+	const int size_write = engine_.GetOptions().get_int(OPTION_SOCKET_BUFFERSIZE_SEND);
+#endif
+	socket_->set_buffer_sizes(size_read, size_write);
 }

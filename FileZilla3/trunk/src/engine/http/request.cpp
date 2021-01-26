@@ -214,9 +214,16 @@ int CHttpRequestOpData::Send()
 					sendLogLevel_ = logmsg::debug_debug;
 
 					// Disable Nagle's algorithm if we have a beefy body
+					// Disable Nagle's algorithm if we have a beefy body
 					if (req.body_->size() > 536) { // TCPv4 minimum required MSS
 						controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, false);
 					}
+#if FZ_WINDOWS
+					// TCP send buffer autotuning
+					if (!buffer_tuning_timer_) {
+						buffer_tuning_timer_ = add_timer(fz::duration::from_seconds(1), false);
+					}
+#endif
 				}
 
 				auto result = controlSocket_.Send(command.c_str(), command.size());
@@ -288,6 +295,9 @@ int CHttpRequestOpData::Send()
 
 				log(logmsg::debug_info, "Finished sending request body");
 
+#if FZ_WINDOWS
+				stop_timer(buffer_tuning_timer_);
+#endif
 				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, true);
 
 				req.flags_ |= HttpRequest::flag_sent_body;
@@ -914,7 +924,7 @@ int CHttpRequestOpData::Reset(int result)
 
 void CHttpRequestOpData::operator()(fz::event_base const& ev)
 {
-	fz::dispatch<read_ready_event>(ev, this, &CHttpRequestOpData::OnLocalData);
+	fz::dispatch<read_ready_event, fz::timer_event>(ev, this, &CHttpRequestOpData::OnLocalData, &CHttpRequestOpData::OnTimer);
 }
 
 void CHttpRequestOpData::OnLocalData(reader_base * r)
@@ -932,3 +942,16 @@ void CHttpRequestOpData::OnLocalData(reader_base * r)
 		controlSocket_.SendNextCommand();
 	}
 }
+
+void CHttpRequestOpData::OnTimer(fz::timer_id)
+{
+#if FZ_WINDOWS
+	if (controlSocket_.socket_ && controlSocket_.socket_->is_connected()) {
+		int const ideal_send_buffer = controlSocket_.socket_->ideal_send_buffer_size();
+		if (ideal_send_buffer != -1) {
+			controlSocket_.socket_->set_buffer_sizes(-1, ideal_send_buffer);
+		}
+	}
+#endif
+}
+
