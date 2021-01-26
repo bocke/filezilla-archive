@@ -124,7 +124,7 @@ std::wstring GetOwnExecutableDir()
 	path.resize(4095);
 	DWORD res;
 	while (true) {
-		res = GetModuleFileNameW(0, &path[0], path.size() - 1);
+		res = GetModuleFileNameW(0, &path[0], static_cast<DWORD>(path.size() - 1));
 		if (!res) {
 			// Failure
 			return std::wstring();

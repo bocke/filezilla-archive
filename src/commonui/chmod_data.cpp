@@ -116,9 +116,9 @@ std::wstring ChmodData::GetPermissions(const char* previousPermissions, bool dir
 	memcpy(perms, permissions_, 9);
 
 	std::wstring permission = numeric_.substr(0, numeric_.size() - 3);
-	unsigned int k = 0;
-	for (unsigned int i = numeric_.size() - 3; i < numeric_.size(); ++i, ++k) {
-		for (unsigned int j = k * 3; j < k * 3 + 3; ++j) {
+	size_t k = 0;
+	for (size_t i = numeric_.size() - 3; i < numeric_.size(); ++i, ++k) {
+		for (size_t j = k * 3; j < k * 3 + 3; ++j) {
 			if (!perms[j]) {
 				if (previousPermissions[j]) {
 					perms[j] = previousPermissions[j];
