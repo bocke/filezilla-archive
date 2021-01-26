@@ -6,7 +6,7 @@
 #include "internalconnect.h"
 #include "request.h"
 
-#include "../include/engine_options.h"
+#include "../../include/engine_options.h"
 
 #include "../controlsocket.h"
 #include "../engineprivate.h"
