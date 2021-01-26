@@ -251,12 +251,12 @@ CLocalPath GetFZDataDir(std::vector<std::wstring> const& fileToFind, std::wstrin
 
 #ifdef FZ_MAC
 	(void)prefixSub;
-	(void)searchSelfDir;
-
-	CFBundleRef bundle = CFBundleGetMainBundle();
-	if (bundle) {
-		if (testPath(fromCFURLRef(CFBundleCopySharedSupportURL(bundle)))) {
-			return ret;
+	if (searchSelfDir) {
+		CFBundleRef bundle = CFBundleGetMainBundle();
+		if (bundle) {
+			if (testPath(fromCFURLRef(CFBundleCopySharedSupportURL(bundle)))) {
+				return ret;
+			}
 		}
 	}
 
