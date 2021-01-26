@@ -350,7 +350,8 @@ void CSftpFileTransferOpData::OnOpenRequested(uint64_t offset)
 #ifdef FZ_WINDOWS
 	HANDLE target;
 	if (!DuplicateHandle(GetCurrentProcess(), std::get<0>(info), controlSocket_.process_->handle(), &target, 0, false, DUPLICATE_SAME_ACCESS)) {
-		log(logmsg::debug_warning, L"DuplicateHandle failed");
+		DWORD error = GetLastError();
+		log(logmsg::debug_warning, L"DuplicateHandle failed with %u", error);
 		controlSocket_.ResetOperation(FZ_REPLY_ERROR);
 		return;
 	}
