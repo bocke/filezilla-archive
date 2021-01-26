@@ -7,7 +7,8 @@
 #include <cstring>
 
 #ifdef FZ_MAC
-	#include <mach-o/dyld.h>
+	#include <CoreFoundation/CFBundle.h>
+	#include <CoreFoundation/CFURL.h>
 #elif defined(FZ_WINDOWS)
 	#include <shlobj.h>
 
@@ -116,6 +117,35 @@ CLocalPath GetUnadjustedSettingsDir()
 	return ret;
 }
 
+#ifdef FZ_MAC
+namespace {
+std::wstring fromCFURLRef(CFURLRef url)
+{
+	std::wstring ret;
+	if (url) {
+		CFURLRef absolute = CFURLCopyAbsoluteURL(url);
+		if (absolute) {
+			CFStringRef path = CFURLCopyFileSystemPath(absolute, kCFURLPOSIXPathStyle);
+			if (path) {
+				CFIndex inlen = CFStringGetLength(path);
+				CFIndex outlen = 0;
+				CFStringGetBytes(path, CFRangeMake(0, inlen), kCFStringEncodingUTF32, 0, false, nullptr, 0, &outlen);
+				if (outlen) {
+					ret.resize((outlen + 3) / 4);
+					CFStringGetBytes(path, CFRangeMake(0, inlen), kCFStringEncodingUTF32, 0, false, reinterpret_cast<UInt8*>(ret.data()), outlen, &outlen);
+				}
+				CFRelease(path);
+			}
+			CFRelease(absolute);
+		}
+		CFRelease(url);
+	}
+
+	return ret;
+}
+}
+#endif
+
 std::wstring GetOwnExecutableDir()
 {
 #ifdef FZ_WINDOWS
@@ -142,21 +172,12 @@ std::wstring GetOwnExecutableDir()
 		return path.substr(0, pos + 1);
 	}
 #elif defined(FZ_MAC)
-	#warning untested implementation
-	//TODO: test this code!
-	std::uint32_t size = 0;
-	if (_NSGetExecutablePath(nullptr, &size) == -1) {
-		std::vector<char> buf;
-		buf.resize(size);
-		if (_NSGetExecutablePath(buf.data(), &size) == 0) {
-			char canonical[PATH_MAX];
-			if (realpath(buf.data(), canonical)) {
-				std::wstring executable = fz::to_wstring(std::string(canonical));
-				size_t pos = executable.rfind('/');
-				if (pos != std::wstring::npos) {
-					return executable.substr(0, pos + 1);
-				}
-			}
+	CFBundleRef bundle = CFBundleGetMainBundle();
+	if (bundle) {
+		std::wstring const executable = fromCFURLRef(CFBundleCopyExecutableURL(bundle));
+		size_t pos = executable.rfind('/');
+		if (pos != std::wstring::npos) {
+			return executable.substr(0, pos + 1);
 		}
 	}
 #else
@@ -230,9 +251,13 @@ CLocalPath GetFZDataDir(std::vector<std::wstring> const& fileToFind, std::wstrin
 
 #ifdef FZ_MAC
 	(void)prefixSub;
+	(void)searchSelfDir;
 
-	if (searchSelfDir && testPath(mac_data_path())) {
-		return ret;
+	CFBundleRef bundle = CFBundleGetMainBundle();
+	if (bundle) {
+		if (testPath(fromCFURLRef(CFBundleCopySharedSupportURL(bundle)))) {
+			return ret;
+		}
 	}
 
 	return CLocalPath();

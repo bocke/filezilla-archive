@@ -3,7 +3,7 @@
 set -e
 
 bundle="$1"
-searchdir="$2"
+searchdirs="$2"
 
 if [ ! -d "$bundle" ]; then
   echo "$bundle is not an application bundle"
@@ -44,16 +44,26 @@ process_dylib()
   if [ ! -f "${frameworks}/$name" ] && [ ! -f "${frameworks}/$name.processed" ]; then
     touch "${frameworks}/$name.processed"
 
-    if [ -f "$searchdir/.libs/$name" ]; then
-      echo "Found dependency $name"
-      cp "$searchdir/.libs/$name" "${frameworks}/$name"
-    elif [ -f "$searchdir/$name" ]; then
-      echo "Found dependency $name"
-      cp "$searchdir/$name" "${frameworks}/$name"
-    elif [ -f "$dylib" ]; then
-      echo "Found dependency $name"
-      cp "$dylib" "${frameworks}/$name"
-    else
+    local dirs=$searchdirs
+    while [ ! -z "$dirs" ]; do
+      local dir=${dirs%%:*}
+      dirs=${dirs#*:}
+      if [ -f "$dir/.libs/$name" ]; then
+        echo "Found dependency $name"
+        cp "$dir/.libs/$name" "${frameworks}/$name"
+        break
+      elif [ -f "$dir/$name" ]; then
+        echo "Found dependency $name"
+        cp "$dir/$name" "${frameworks}/$name"
+        break
+      elif [ -f "$dylib" ]; then
+        echo "Found dependency $name"
+        cp "$dylib" "${frameworks}/$name"
+        break
+      fi
+    done
+
+    if [ ! -f "${frameworks}/$name" ]; then
       echo "Dependency $name not found"
       exit 1
     fi
