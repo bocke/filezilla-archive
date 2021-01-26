@@ -40,6 +40,7 @@ public:
 private:
 	virtual void operator()(fz::event_base const& ev) override;
 	void OnLocalData(reader_base * r);
+	void OnTimer(fz::timer_id);
 
 	int ParseReceiveBuffer();
 	int ParseHeader();
@@ -83,6 +84,10 @@ private:
 	read_state read_state_;
 
 	uint64_t dataToSend_{};
+
+#if FZ_WINDOWS
+	fz::timer_id buffer_tuning_timer_{};
+#endif
 };
 
 #endif

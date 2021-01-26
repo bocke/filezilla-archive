@@ -362,6 +362,8 @@ protected:
 	virtual int OnSend();
 	virtual void OnSocketError(int error);
 
+	virtual void SetSocketBufferSizes() {};
+
 	int Send(unsigned char const* buffer, unsigned int len);
 	int Send(char const* buffer, unsigned int len) {
 		return Send(reinterpret_cast<unsigned char const*>(buffer), len);

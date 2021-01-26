@@ -894,6 +894,8 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 		}
 	}
 
+	SetSocketBufferSizes();
+
 	int res = active_layer_->connect(fz::to_native(ConvertDomainName(host)), port);
 
 	if (res) {
