@@ -80,7 +80,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\commonui\Debug\commonui.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\Debug/FileZilla_dbg.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +122,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;wsock32.lib;odbc32.lib;odbccp32.lib;comctl32.lib;..\engine\Release\engine.lib;x64_static_release\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;wsock32.lib;odbc32.lib;odbccp32.lib;comctl32.lib;..\commonui\Release\commonui.lib;..\engine\Release\engine.lib;x64_static_release\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/FileZilla.pdb</ProgramDatabaseFile>
@@ -166,15 +166,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="file_utils.cpp" />
-    <ClCompile Include="filter.cpp" />
     <ClCompile Include="filter_conditions_dialog.cpp" />
     <ClCompile Include="filteredit.cpp" />
+    <ClCompile Include="filter_manager.cpp" />
     <ClCompile Include="fzputtygen_interface.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="import.cpp" />
     <ClCompile Include="infotext.cpp" />
     <ClCompile Include="inputdialog.cpp" />
-    <ClCompile Include="ipcmutex.cpp" />
     <ClCompile Include="led.cpp" />
     <ClCompile Include="listctrlex.cpp" />
     <ClCompile Include="listingcomparison.cpp" />
@@ -192,7 +191,6 @@
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="option_change_event_handler.cpp" />
     <ClCompile Include="overlay.cpp" />
-    <ClCompile Include="recursive_operation.cpp" />
     <ClCompile Include="recursive_operation_status.cpp" />
     <ClCompile Include="serverdata.cpp" />
     <ClCompile Include="settings\optionspage.cpp" />
@@ -295,15 +293,14 @@
     <ClInclude Include="filelistctrl.h" />
     <ClInclude Include="filezillaapp.h" />
     <ClInclude Include="file_utils.h" />
-    <ClInclude Include="filter.h" />
     <ClInclude Include="filter_conditions_dialog.h" />
     <ClInclude Include="filteredit.h" />
+    <ClInclude Include="filter_manager.h" />
     <ClInclude Include="fzputtygen_interface.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="import.h" />
     <ClInclude Include="infotext.h" />
     <ClInclude Include="inputdialog.h" />
-    <ClInclude Include="ipcmutex.h" />
     <ClInclude Include="led.h" />
     <ClInclude Include="listctrlex.h" />
     <ClInclude Include="listingcomparison.h" />
@@ -321,7 +318,6 @@
     <ClInclude Include="Options.h" />
     <ClInclude Include="option_change_event_handler.h" />
     <ClInclude Include="overlay.h" />
-    <ClInclude Include="recursive_operation.h" />
     <ClInclude Include="recursive_operation_status.h" />
     <ClInclude Include="serverdata.h" />
     <ClInclude Include="settings\optionspage.h" />
