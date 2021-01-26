@@ -333,7 +333,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 		return false;
 	}
 
-	int port = GetTextElementInt(node, "Port");
+	unsigned int const port = node.child("Port").text().as_uint();
 	if (port < 1 || port > 65535) {
 		return false;
 	}
@@ -342,7 +342,7 @@ bool GetServer(pugi::xml_node node, Site & site)
 		return false;
 	}
 
-	int const protocol = GetTextElementInt(node, "Protocol");
+	int const protocol = node.child("Protocol").text().as_int();
 	if (protocol < 0 || protocol > ServerProtocol::MAX_VALUE) {
 		return false;
 	}

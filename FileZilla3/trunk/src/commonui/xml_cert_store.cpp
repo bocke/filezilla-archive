@@ -38,7 +38,7 @@ void xml_cert_store::LoadTrustedCerts()
 			}
 
 			data.host = cert.child_value("Host");
-			data.port = GetTextElementInt(cert, "Port");
+			data.port = cert.child("Port").text().as_uint();
 			if (data.host.empty() || data.port < 1 || data.port > 65535) {
 				return false;
 			}
