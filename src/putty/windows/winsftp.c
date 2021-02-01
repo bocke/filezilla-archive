@@ -109,7 +109,6 @@ enum read_state
 
 struct RFile {
 #if 1
-    HANDLE mapping_;
     uint8_t * memory_;
     size_t memory_size_;
     int state;
@@ -147,7 +146,6 @@ RFile *open_existing_file(const char *name, uint64_t offset,
 
     RFile *ret;
     ret = snew(RFile);
-    ret->mapping_ = mapping;
     ret->memory_ = memory;
     ret->memory_size_ = memory_size;
     ret->remaining_ = 0;
@@ -252,7 +250,6 @@ void close_rfile(RFile *f)
 
 struct WFile {
 #if 1
-    HANDLE mapping_;
     uint8_t * memory_;
     size_t memory_size_;
     int state;
@@ -282,14 +279,13 @@ WFile *open_new_file(const char *name, long perms)
     sfree(s);
 
     uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    CloseHandle(mapping);
     if (!memory) {
-        CloseHandle(mapping);
         return NULL;
     }
 
     WFile *ret;
     ret = snew(WFile);
-    ret->mapping_ = mapping;
     ret->memory_ = memory;
     ret->memory_size_ = memory_size;
     ret->remaining_ = 0;
@@ -340,14 +336,13 @@ WFile *open_existing_wfile(const char *name, uint64_t *size)
     sfree(s);
 
     uint8_t* memory = MapViewOfFile(mapping, FILE_MAP_ALL_ACCESS, 0, 0, memory_size);
+    CloseHandle(mapping);
     if (!memory) {
-        CloseHandle(mapping);
         return NULL;
     }
 
     WFile *ret;
     ret = snew(WFile);
-    ret->mapping_ = mapping;
     ret->memory_ = memory;
     ret->memory_size_ = memory_size;
     ret->remaining_ = 0;
