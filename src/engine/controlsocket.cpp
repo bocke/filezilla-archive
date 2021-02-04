@@ -794,13 +794,7 @@ void CRealControlSocket::OnSocketEvent(fz::socket_event_source*, fz::socket_even
 			OnSocketError(error);
 		}
 		else {
-			if (send_next_command_on_send_) {
-				send_next_command_on_send_ = false;
-				SendNextCommand();
-			}
-			else {
-				OnSend();
-			}
+			OnSend();
 		}
 		break;
 	default:
@@ -930,8 +924,6 @@ void CRealControlSocket::ResetSocket()
 	socket_.reset();
 
 	send_buffer_.clear();
-
-	send_next_command_on_send_ = false;
 }
 
 bool CControlSocket::SetFileExistsAction(CFileExistsNotification *pFileExistsNotification)

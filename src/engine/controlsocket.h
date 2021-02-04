@@ -375,8 +375,6 @@ protected:
 	fz::socket_layer* active_layer_{};
 
 	fz::buffer send_buffer_;
-
-	bool send_next_command_on_send_{};
 };
 
 #endif
