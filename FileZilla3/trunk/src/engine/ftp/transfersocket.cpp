@@ -398,6 +398,8 @@ void CTransferSocket::OnConnect()
 	if (m_bActive) {
 		TriggerPostponedEvents();
 	}
+
+	OnSend();
 }
 
 void CTransferSocket::OnReceive()
