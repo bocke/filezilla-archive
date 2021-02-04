@@ -202,7 +202,7 @@ void CFtpControlSocket::OnConnect()
 	}
 	else if ((currentServer_.GetProtocol() == FTPES || currentServer_.GetProtocol() == FTP) && tls_layer_) {
 		log(logmsg::status, _("TLS connection established."));
-		SendNextCommand();
+		send_next_command_on_send_ = true;
 		return;
 	}
 	else {
