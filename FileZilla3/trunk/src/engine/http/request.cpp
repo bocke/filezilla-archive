@@ -42,6 +42,10 @@ CHttpRequestOpData::~CHttpRequestOpData()
 			}
 		}
 	}
+	if (!requests_.empty() && requests_.front() && requests_.front()->response().writer_) {
+		requests_.front()->response().writer_->set_handler(nullptr);
+	}
+
 	remove_handler();
 }
 
@@ -480,8 +484,13 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 
 			if (res == FZ_REPLY_OK) {
 				log(logmsg::debug_info, L"Finished a response");
-				if (requests_.front() && requests_.front()->request().body_) {
-					requests_.front()->request().body_->set_handler(nullptr);
+				if (requests_.front()) {
+					if (requests_.front()->request().body_) {
+						requests_.front()->request().body_->set_handler(nullptr);
+					}
+					if (requests_.front()->response().writer_) {
+						requests_.front()->response().writer_->set_handler(nullptr);
+					}
 				}
 				requests_.pop_front();
 				--send_pos_;
@@ -722,6 +731,9 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 			if (res == FZ_REPLY_OK) {
 				if (!request.body_ || request.flags_ & HttpRequest::flag_sent_body) {
 					// Clear the pointer, we no longer need the request to finish, all needed information is in read_state_
+					if (request.body_) {
+						request.body_->set_handler(nullptr);
+					}
 					srr.reset();
 				}
 				else {
