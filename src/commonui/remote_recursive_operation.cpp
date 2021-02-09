@@ -68,12 +68,13 @@ void remote_recursive_operation::start_recursive_operation(OperationMode mode, A
 	m_processedFiles = 0;
 	m_processedDirectories = 0;
 
+	m_operationMode = mode;
+	
 	do_start_recursive_operation(mode, filters);
 }
 
 void remote_recursive_operation::do_start_recursive_operation(OperationMode mode, ActiveFilters const& filters)
 {
-	m_operationMode = mode;
 	m_filters = filters;
 	NextOperation();
 }
