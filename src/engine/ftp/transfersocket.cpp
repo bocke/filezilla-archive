@@ -414,7 +414,8 @@ void CTransferSocket::OnReceive()
 
 	if (m_transferEndReason == TransferEndReason::none) {
 		if (m_transferMode == TransferMode::list) {
-			for (;;) {
+			// See comment in download loop
+			for (int i = 0; i < 100; ++i) {
 				char *pBuffer = new char[4096];
 				int error;
 				int numread = active_layer_->read(pBuffer, 4096, error);
@@ -446,6 +447,7 @@ void CTransferSocket::OnReceive()
 					return;
 				}
 			}
+			send_event<fz::socket_event>(active_layer_, fz::socket_event_flag::read, 0);
 			return;
 		}
 		else if (m_transferMode == TransferMode::download) {
