@@ -5,14 +5,15 @@ namespace fz {
 class process;
 }
 
+#include <tuple>
+
 class CStorjKeyInterface final
 {
 public:
 	CStorjKeyInterface(wxWindow* parent);
 	virtual ~CStorjKeyInterface();
 
-	std::wstring GenerateKey();
-	bool ValidateKey(std::wstring const& key, bool silent);
+	std::tuple<bool, std::wstring> ValidateGrant(std::wstring const& grant, bool silent);
 
 	bool ProcessFailed() const;
 protected:
