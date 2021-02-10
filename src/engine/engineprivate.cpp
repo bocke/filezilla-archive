@@ -339,7 +339,7 @@ int CFileZillaEnginePrivate::List(CListCommand const& command)
 						server.GetProtocol() == SWIFT || server.GetProtocol() == GOOGLE_CLOUD ||
 						server.GetProtocol() == GOOGLE_DRIVE || server.GetProtocol() == DROPBOX ||
 						server.GetProtocol() == ONEDRIVE || server.GetProtocol() == B2 ||
-						server.GetProtocol() == BOX || server.GetProtocol() == RACKSPACE) {
+						server.GetProtocol() == BOX || server.GetProtocol() == RACKSPACE || server.GetProtocol() == STORJ_GRANT) {
 					path = command.GetPath();
 					path.ChangePath(command.GetSubDir());
 				}
@@ -534,6 +534,7 @@ int CFileZillaEnginePrivate::ContinueConnect()
 		break;
 #if ENABLE_STORJ
 	case STORJ:
+	case STORJ_GRANT:
 		controlSocket_ = std::make_unique<CStorjControlSocket>(*this);
 		break;
 #endif

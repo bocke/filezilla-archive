@@ -364,11 +364,13 @@ bool GetServer(pugi::xml_node node, Site & site)
 
 	if (site.credentials.logonType_ != LogonType::anonymous) {
 		std::wstring user;
-		if (ProtocolHasUser(site.server.GetProtocol())) {
+
+		bool const has_user = ProtocolHasUser(site.server.GetProtocol());
+		if (has_user) {
 			user = GetTextElement(node, "User");
-		}
-		if (user.empty() && site.credentials.logonType_ != LogonType::interactive && site.credentials.logonType_ != LogonType::ask) {
-			return false;
+			if (user.empty() && site.credentials.logonType_ != LogonType::interactive && site.credentials.logonType_ != LogonType::ask) {
+				return false;
+			}
 		}
 
 		std::wstring pass, key;
@@ -396,8 +398,16 @@ bool GetServer(pugi::xml_node node, Site & site)
 					pass = GetTextElement(passElement);
 				}
 			}
+
+			if (pass.empty() && !has_user) {
+				return false;
+			}
 		}
 		else if (site.credentials.logonType_ == LogonType::key) {
+			if (user.empty()) {
+				return false;
+			}
+
 			key = GetTextElement(node, "Keyfile");
 
 			// password should be empty if we're using a key file

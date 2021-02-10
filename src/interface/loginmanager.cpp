@@ -31,7 +31,7 @@ bool CLoginManager::query_unprotect_site(Site & site)
 		inner->Add(new wxStaticText(&pwdDlg, -1, LabelEscape(name)));
 	}
 
-	if (site.server.GetProtocol() == STORJ) {
+	if (site.server.GetProtocol() == STORJ || site.server.GetProtocol() == STORJ_GRANT) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("Satellite:")));
 	}
 	else {
@@ -114,7 +114,7 @@ bool CLoginManager::query_credentials(Site & site, std::wstring const& challenge
 
 	wxString title;
 	wxString header;
-	if (site.server.GetUser().empty()) {
+	if (site.server.GetUser().empty() && ProtocolHasUser(site.server.GetProtocol())) {
 		if (site.credentials.logonType_ == LogonType::interactive) {
 			title = _("Enter username");
 			header = _("Please enter a username for this server:");
@@ -176,7 +176,7 @@ bool CLoginManager::query_credentials(Site & site, std::wstring const& challenge
 	main->Add(inner);
 
 	wxTextCtrl* newUser{};
-	if (site.server.GetUser().empty()) {
+	if (site.server.GetUser().empty() && ProtocolHasUser(site.server.GetProtocol())) {
 		inner->Add(new wxStaticText(&pwdDlg, -1, _("&User:")), lay.valign);
 		newUser = new wxTextCtrlEx(&pwdDlg, -1, wxString());
 		newUser->SetMinSize(wxSize(150, -1));

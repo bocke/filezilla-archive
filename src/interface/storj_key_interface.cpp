@@ -15,37 +15,26 @@ CStorjKeyInterface::~CStorjKeyInterface()
 {
 }
 
-std::wstring CStorjKeyInterface::GenerateKey()
+namespace {
+std::wstring quote(std::wstring_view const& arg)
 {
-	LoadProcess(false);
-
-	if (!Send(L"genkey")) {
-		return std::wstring();
-	}
-
-	std::wstring reply;
-	ReplyCode code = GetReply(reply);
-	if (code != success) {
-		return std::wstring();
-	}
-
-	return reply;
+	return L"\"" + fz::replaced_substrings(arg, L"\"", L"\"\"") + L"\"";
 }
-
-bool CStorjKeyInterface::ValidateKey(std::wstring const& key, bool silent)
+}
+std::tuple<bool, std::wstring> CStorjKeyInterface::ValidateGrant(std::wstring const& grant, bool silent)
 {
-	if (key.empty()) {
-		return false;
+	if (grant.empty()) {
+		return {false, std::wstring()};
 	}
 	LoadProcess(silent);
 
-	if (!Send(L"validatekey " + key)) {
-		return false;
+	if (!Send(L"validate grant " + quote(grant))) {
+		return {false, std::wstring()};
 	}
 
 	std::wstring reply;
 	ReplyCode code = GetReply(reply);
-	return code == success;
+	return {code == success, reply};
 }
 
 bool CStorjKeyInterface::LoadProcess(bool silent)
@@ -114,7 +103,7 @@ CStorjKeyInterface::ReplyCode CStorjKeyInterface::GetReply(std::wstring & reply)
 		if (pos == std::string::npos) {
 			int read = m_process->read(buffer, 100);
 			if (read <= 0) {
-				wxMessageBoxEx(_("Could not get reply from fzputtygen."), _("Command failed"), wxICON_EXCLAMATION);
+				wxMessageBoxEx(_("Could not get reply from fzstorj."), _("Command failed"), wxICON_EXCLAMATION);
 				m_process.reset();
 				return error;
 			}

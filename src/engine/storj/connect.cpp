@@ -30,12 +30,22 @@ int CStorjConnectOpData::Send()
 		{
 			log(logmsg::status, _("Connecting to %s..."), currentServer_.Format(ServerFormat::with_optional_port, controlSocket_.credentials_));
 
-			// Since the encryption passphrase changes based on site content, add a disambiguation
-			auto const passphraseHash = fz::hex_encode<std::wstring>(fz::hmac_sha256(fz::to_utf8(controlSocket_.currentServer_.GetUser()), fz::to_utf8(controlSocket_.credentials_.GetPass())));
-			if (passphraseHash != controlSocket_.currentServer_.GetExtraParameter("passphrase_hash")) {
-				controlSocket_.currentServer_.SetExtraParameter("passphrase_hash", passphraseHash);
+			if (currentServer_.GetProtocol() == STORJ_GRANT) {
+				// The access grant changes site content, add a disambiguation.
+				auto const hash = fz::hex_encode<std::wstring>(fz::sha256(fz::to_utf8(controlSocket_.credentials_.GetPass())));
+				if (hash != currentServer_.GetExtraParameter("credentials_hash")) {
+					currentServer_.SetExtraParameter("credentials_hash", hash);
+					controlSocket_.engine_.AddNotification(std::make_unique<ServerChangeNotification>(controlSocket_.currentServer_));
+				}
 			}
-			controlSocket_.engine_.AddNotification(std::make_unique<ServerChangeNotification>(controlSocket_.currentServer_));
+			else {
+				// Since the encryption passphrase changes site content, add a disambiguation
+				auto const passphraseHash = fz::hex_encode<std::wstring>(fz::hmac_sha256(fz::to_utf8(controlSocket_.currentServer_.GetUser()), fz::to_utf8(controlSocket_.credentials_.GetPass())));
+				if (passphraseHash != controlSocket_.currentServer_.GetExtraParameter("passphrase_hash")) {
+					controlSocket_.currentServer_.SetExtraParameter("passphrase_hash", passphraseHash);
+					controlSocket_.engine_.AddNotification(std::make_unique<ServerChangeNotification>(controlSocket_.currentServer_));
+				}
+			}
 
 			auto executable = fz::to_native(engine_.GetOptions().get_string(OPTION_FZSTORJ_EXECUTABLE));
 			if (executable.empty()) {
@@ -119,7 +129,12 @@ int CStorjConnectOpData::ParseResponse()
 		opState = connect_host;
 		break;
 	case connect_host:
-		opState = connect_user;
+		if (currentServer_.GetProtocol() == STORJ_GRANT) {
+			opState = connect_pass;
+		}
+		else {
+			opState = connect_user;
+		}
 		break;
 	case connect_user:
 		opState = connect_pass;

@@ -11,6 +11,9 @@
 #include "textctrlex.h"
 #include "xrc_helper.h"
 #include "wxext/spinctrlex.h"
+#if ENABLE_STORJ
+#include "storj_key_interface.h"
+#endif
 
 #include "../include/s3sse.h"
 
@@ -310,8 +313,8 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 	xrc_call(parent_, "ID_ENCRYPTION_DESC", &wxStaticText::Show, group.first != protocolGroups().cend());
 	xrc_call(parent_, "ID_ENCRYPTION", &wxChoice::Show, group.first != protocolGroups().cend());
 
-	xrc_call(parent_, "ID_DOCS", &wxControl::Show, protocol == STORJ);
-	xrc_call(parent_, "ID_SIGNUP", &wxControl::Show, protocol == STORJ);
+	xrc_call(parent_, "ID_DOCS", &wxControl::Show, protocol == STORJ || protocol == STORJ_GRANT);
+	xrc_call(parent_, "ID_SIGNUP", &wxControl::Show, protocol == STORJ || protocol == STORJ_GRANT);
 
 	auto const supportedlogonTypes = GetSupportedLogonTypes(protocol);
 	assert(!supportedlogonTypes.empty());
@@ -355,6 +358,12 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 		userLabel = _("API &Key:");
 		// @translator: Keep short
 		passLabel = _("Encr&yption Passphrase:");
+		break;
+	case STORJ_GRANT:
+		// @translator: Keep short
+		hostLabel = _("S&atellite:");
+		// @translator: Keep short
+		passLabel = _("Access &Grant:");
 		break;
 	case S3:
 		// @translator: Keep short
@@ -527,8 +536,8 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 	std::wstring pw = xrc_call(parent_, "ID_PASS", &wxTextCtrl::GetValue).ToStdWstring();
 
 	{
-		std::wstring const host = xrc_call(parent_, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
-		std::wstring const port = xrc_call(parent_, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
+		std::wstring host = xrc_call(parent_, "ID_HOST", &wxTextCtrl::GetValue).ToStdWstring();
+		std::wstring port = xrc_call(parent_, "ID_PORT", &wxTextCtrl::GetValue).ToStdWstring();
 
 		if (host.empty()) {
 			if (!silent) {
@@ -692,6 +701,42 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		}
 
 	}
+
+#if ENABLE_STORJ
+		if (protocol == STORJ_GRANT && logon_type == LogonType::normal) {
+			if (pw.empty() && !site.credentials.encrypted_) {
+				wxMessageBoxEx(_("You need to enter an access grant."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+				xrc_call(parent_, "ID_PASS", &wxWindow::SetFocus);
+			}
+			else if (!pw.empty()) {
+				CStorjKeyInterface ki(wxGetTopLevelParent(&parent_));
+				auto [valid, satellite] = ki.ValidateGrant(pw, silent);
+				if (valid) {
+					if (!satellite.empty()) {
+						size_t pos = satellite.rfind('@');
+						if (pos != std::wstring::npos) {
+							satellite = satellite.substr(pos + 1);
+						}
+						pos = satellite.rfind(':');
+						std::wstring port = L"7777";
+						if (pos != std::wstring::npos) {
+							port = satellite.substr(pos + 1);
+							satellite = satellite.substr(0, pos);
+						}
+						site.server.SetHost(satellite, fz::to_integral<unsigned short>(port, 7777));
+					}
+				}
+				else {
+					if (!silent) {
+						XRCCTRL(parent_, "ID_PASS", wxWindow)->SetFocus();
+						wxString msg = wxString::Format(_("You have to enter a valid access grant.\nError: %s"), satellite);
+						wxMessageBoxEx(msg, _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
+					}
+					return false;
+				}
+			}
+		}
+#endif
 
 	if (site.credentials.encrypted_) {
 		if (!pw.empty()) {
