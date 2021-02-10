@@ -47,7 +47,9 @@ enum ServerProtocol
 
 	RACKSPACE,
 
-	MAX_VALUE = RACKSPACE
+	STORJ_GRANT,
+
+	MAX_VALUE = STORJ_GRANT
 };
 
 enum ServerType
