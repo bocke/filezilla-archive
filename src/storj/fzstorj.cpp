@@ -409,10 +409,9 @@ int main()
 {
 	fzprintf(storjEvent::Reply, "fzStorj started, protocol_version=%d", FZSTORJ_PROTOCOL_VERSION);
 
-	std::string satelliteURL;
 	std::string apiKey;
 	std::string encryptionPassPhrase;
-	std::string serializedAccessGrantKey;
+	std::string satelliteURL;
 
 	UplinkProjectResult project_result{};
 
@@ -426,26 +425,45 @@ int main()
 		if (project_result.project) {
 			return true;
 		}
-		UplinkAccessResult access_result;
-		if (!apiKey.empty()) {
-			access_result = uplink_config_request_access_with_passphrase(config, satelliteURL.c_str(), apiKey.c_str(), encryptionPassPhrase.c_str());
-			if (access_result.error) {
-				print_error("failed to parse access: %s", access_result.error);
-				uplink_free_access_result(access_result);
-				return false;
+		UplinkAccessResult access_result{};
+		if (apiKey.empty()) {
+			access_result = uplink_parse_access(encryptionPassPhrase.c_str());
+			if (!access_result.error) {
+				UplinkStringResult sr = uplink_access_satellite_address(access_result.access);
+				if (sr.error) {
+					print_error("No satellite URI in access grant: %s", sr.error);
+					uplink_free_string_result(sr);
+					uplink_free_access_result(access_result);
+					return false;
+				}
+
+				std::string sat = sr.string;
+				uplink_free_string_result(sr);
+
+				size_t pos = sat.rfind('@');
+				if (pos != std::string::npos) {
+					sat = sat.substr(pos + 1);
+				}
+				if (sat != satelliteURL) {
+					fzprintf(storjEvent::Error, "The passed access grant cannot be used on the the satellite '%s'", satelliteURL);
+					uplink_free_access_result(access_result);
+					return false;
+				}
 			}
 		}
 		else {
-			access_result = uplink_parse_access(serializedAccessGrantKey.c_str());
-			if (access_result.error) {
-				print_error("failed to parse access: %s", access_result.error);
-				uplink_free_access_result(access_result);
-				return false;
-			}
+			access_result = uplink_config_request_access_with_passphrase(config, satelliteURL.c_str(), apiKey.c_str(), encryptionPassPhrase.c_str());
+		}
+		if (access_result.error) {
+			print_error(apiKey.empty() ? "failed to parse access grant: %s" : "failed to parse API key: %s", access_result.error);
+			uplink_free_access_result(access_result);
+			return false;
 		}
 
 		project_result = uplink_config_open_project(config, access_result.access);
+
 		uplink_free_access_result(access_result);
+
 		if (project_result.error) {
 			print_error("failed to open project: %s", project_result.error);
 			uplink_free_project_result(project_result);
@@ -484,7 +502,7 @@ int main()
 		}
 
 		if (command == "host") {
-			serializedAccessGrantKey = satelliteURL = next_argument(arg);
+			satelliteURL = next_argument(arg);
 			fzprintf(storjEvent::Done);
 		}
 		else if (command == "key") {
@@ -494,6 +512,50 @@ int main()
 		else if (command == "pass") {
 			encryptionPassPhrase = next_argument(arg);
 			fzprintf(storjEvent::Done);
+		}
+		else if (command == "validate") {
+
+			bool ret = true;
+
+			std::string type = next_argument(arg);
+
+			std::string out;
+			UplinkAccessResult access_result{};
+			if (type == "grant") {
+				encryptionPassPhrase = next_argument(arg);
+
+				access_result = uplink_parse_access(encryptionPassPhrase.c_str());
+				if (access_result.error) {
+					print_error("failed to parse access grant: %s", access_result.error);
+					ret = false;
+				}
+				else {
+					UplinkStringResult sr = uplink_access_satellite_address(access_result.access);
+					if (sr.error) {
+						print_error("No satellite URI in access grant: %s", sr.error);
+						ret = false;
+					}
+					else {
+						out = sr.string;
+					}
+					uplink_free_string_result(sr);
+				}
+			}
+			else {
+				apiKey = next_argument(arg);
+				satelliteURL = next_argument(arg);
+
+				access_result = uplink_config_request_access_with_passphrase(config, satelliteURL.c_str(), apiKey.c_str(), "null");
+				if (access_result.error) {
+					print_error("failed to parse API key: %s", access_result.error);
+					ret = false;
+				}
+			}
+			uplink_free_access_result(access_result);
+
+			if (ret) {
+				fzprintf(storjEvent::Done, "%s", out);
+			}
 		}
 		else if (command == "list") {
 
