@@ -438,15 +438,6 @@ int CHttpRequestOpData::ParseReceiveBuffer()
 	return FZ_REPLY_INTERNALERROR;
 }
 
-int CHttpRequestOpData::OnReceive(writer_base* writer)
-{
-	if (requests_.empty() || requests_.back()->response().writer_.get() != writer) {
-		log(logmsg::debug_warning, L"Stale writer event");
-		return FZ_REPLY_WOULDBLOCK;;
-	}
-	return OnReceive(true);
-}
-
 int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 {
 	while (controlSocket_.socket_) {
@@ -723,7 +714,7 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 
 		if (res == FZ_REPLY_CONTINUE) {
 			if (response.writer_) {
-				response.writer_->set_handler(&controlSocket_);
+				response.writer_->set_handler(this);
 			}
 
 		}
@@ -936,10 +927,10 @@ int CHttpRequestOpData::Reset(int result)
 
 void CHttpRequestOpData::operator()(fz::event_base const& ev)
 {
-	fz::dispatch<read_ready_event, fz::timer_event>(ev, this, &CHttpRequestOpData::OnLocalData, &CHttpRequestOpData::OnTimer);
+	fz::dispatch<read_ready_event, write_ready_event, fz::timer_event>(ev, this, &CHttpRequestOpData::OnReaderReady, &CHttpRequestOpData::OnWriterReady, &CHttpRequestOpData::OnTimer);
 }
 
-void CHttpRequestOpData::OnLocalData(reader_base * r)
+void CHttpRequestOpData::OnReaderReady(reader_base * r)
 {
 	if (requests_.empty() || !requests_[send_pos_]) {
 		return;
@@ -952,6 +943,22 @@ void CHttpRequestOpData::OnLocalData(reader_base * r)
 	}
 	if (req.flags_ & HttpRequest::flag_sent_header && !(req.flags_ & HttpRequest::flag_sent_body)) {
 		controlSocket_.SendNextCommand();
+	}
+}
+
+void CHttpRequestOpData::OnWriterReady(writer_base* writer)
+{
+	if (requests_.empty() || requests_.back()->response().writer_.get() != writer) {
+		log(logmsg::debug_warning, L"Stale writer event");
+		return;
+	}
+
+	int res = OnReceive(true);
+	if (res == FZ_REPLY_CONTINUE) {
+		controlSocket_.SendNextCommand();
+	}
+	else if (res != FZ_REPLY_WOULDBLOCK) {
+		controlSocket_.ResetOperation(res);
 	}
 }
 

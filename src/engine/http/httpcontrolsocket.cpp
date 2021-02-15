@@ -359,31 +359,6 @@ int CHttpControlSocket::OnSend()
 	return res;
 }
 
-void CHttpControlSocket::OnWriteReady(writer_base* writer)
-{
-	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_request) {
-		log(logmsg::debug_warning, L"Stale writer event");
-		return;
-	}
-
-	int res = static_cast<CHttpRequestOpData&>(*operations_.back()).OnReceive(writer);
-	if (res == FZ_REPLY_CONTINUE) {
-		SendNextCommand();
-	}
-	else if (res != FZ_REPLY_WOULDBLOCK) {
-		ResetOperation(res);
-	}
-}
-
-void CHttpControlSocket::operator()(fz::event_base const& ev)
-{
-	if (!fz::dispatch<write_ready_event>(ev, this,
-		&CHttpControlSocket::OnWriteReady))
-	{
-		CRealControlSocket::operator()(ev);
-	}
-}
-
 void CHttpControlSocket::SetSocketBufferSizes()
 {
 	if (!socket_) {
