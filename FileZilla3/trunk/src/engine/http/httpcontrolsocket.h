@@ -219,9 +219,6 @@ protected:
 	virtual void OnReceive() override;
 	virtual int OnSend() override;
 
-	virtual void operator()(fz::event_base const& ev) override;
-	void OnWriteReady(writer_base* writer);
-
 	virtual void ResetSocket() override;
 
 	virtual void SetSocketBufferSizes() override;

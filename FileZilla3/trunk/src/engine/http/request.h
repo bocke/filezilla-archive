@@ -35,11 +35,11 @@ public:
 	void AddRequest(std::shared_ptr<HttpRequestResponseInterface> const& rr);
 
 	int OnReceive(bool repeatedProcessing);
-	int OnReceive(writer_base* writer);
 
 private:
 	virtual void operator()(fz::event_base const& ev) override;
-	void OnLocalData(reader_base * r);
+	void OnReaderReady(reader_base * r);
+	void OnWriterReady(writer_base * writer);
 	void OnTimer(fz::timer_id);
 
 	int ParseReceiveBuffer();
