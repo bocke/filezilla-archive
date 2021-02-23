@@ -24,6 +24,7 @@ libfzclient_commonui_private_la_SOURCES = \
 	remote_recursive_operation.cpp \
 	site.cpp \
 	site_manager.cpp \
+	updater_cert.cpp \
 	xml_cert_store.cpp \
 	xml_file.cpp
 
@@ -40,6 +41,7 @@ noinst_HEADERS = \
 	remote_recursive_operation.h \
 	site.h \
 	site_manager.h \
+	updater_cert.h \
 	visibility.h \
 	xml_cert_store.h \
 	xml_file.h

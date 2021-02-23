@@ -1,5 +1,3 @@
-#include "filezilla.h"
-
 #include "updater_cert.h"
 
 using namespace std::literals;
