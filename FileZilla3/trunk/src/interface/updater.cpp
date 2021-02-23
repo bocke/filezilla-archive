@@ -6,7 +6,7 @@
 #include "file_utils.h"
 #include "Options.h"
 #include "updater.h"
-#include "updater_cert.h"
+#include "../commonui/updater_cert.h"
 #include "serverdata.h"
 #include <string>
 

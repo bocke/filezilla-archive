@@ -140,6 +140,7 @@
     <ClInclude Include="remote_recursive_operation.h" />
     <ClInclude Include="site.h" />
     <ClInclude Include="site_manager.h" />
+    <ClInclude Include="updater_cert.h" />
     <ClInclude Include="visibility.h" />
     <ClInclude Include="xml_cert_store.h" />
     <ClInclude Include="xml_file.h" />
@@ -156,6 +157,7 @@
     <ClCompile Include="remote_recursive_operation.cpp" />
     <ClCompile Include="site.cpp" />
     <ClCompile Include="site_manager.cpp" />
+    <ClCompile Include="updater_cert.cpp" />
     <ClCompile Include="xml_cert_store.cpp" />
     <ClCompile Include="xml_file.cpp" />
   </ItemGroup>
