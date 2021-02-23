@@ -120,7 +120,7 @@ bool COptionsPageFtpProxy::LoadPage()
 		impl_->open_->SetValue(true);
 		break;
 	case 4:
-		impl_->open_->SetValue(true);
+		impl_->custom_->SetValue(true);
 		impl_->sequence_->ChangeValue(m_pOptions->get_string(OPTION_FTP_PROXY_CUSTOMLOGINSEQUENCE));
 		break;
 	}
