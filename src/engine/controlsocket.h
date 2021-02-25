@@ -180,20 +180,6 @@ public:
 
 };
 
-enum class TransferEndReason
-{
-	none,
-	successful,
-	timeout,
-	transfer_failure,					// Error during transfer, like lost connection. Retry automatically
-	transfer_failure_critical,			// Error during transfer like lack of diskspace. Needs user interaction
-	pre_transfer_command_failure,		// If a command fails prior to sending the transfer command
-	transfer_command_failure_immediate,	// Used if server does not send the 150 reply after the transfer command
-	transfer_command_failure,			// Used if the transfer command fails, but after receiving a 150 first
-	failure,							// Other unspecific failure
-	failed_resumetest
-};
-
 namespace fz {
 class socket_layer;
 }
