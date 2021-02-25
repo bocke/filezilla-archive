@@ -585,9 +585,11 @@ bool CWrapEngine::WrapRecursive(std::vector<wxWindow*>& windows, double ratio, c
 	wxSize size = minRequestedSize;
 
 	for (auto const& window : windows) {
+		window->Fit();
 		wxSizer* pSizer = window->GetSizer();
-		if (!pSizer)
+		if (!pSizer) {
 			return false;
+		}
 
 		pSizer->Layout();
 		size.IncTo(pSizer->GetMinSize());
