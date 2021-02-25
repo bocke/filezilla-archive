@@ -384,6 +384,18 @@ void CTransferSocket::OnConnect()
 	}
 
 	if (tls_layer_) {
+		if (tls_layer_->resumed_session()) {
+			CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
+		}
+		else {
+			auto cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
+			if (cap == yes) {
+				TransferEnd(TransferEndReason::failed_tls_resumption);
+				return;
+			}
+			else if (cap == unknown) {
+			}
+		}
 		// Re-enable Nagle algorithm
 		socket_->set_flags(fz::socket::flag_nodelay, false);
 	}

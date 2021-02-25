@@ -439,6 +439,12 @@ void CFtpControlSocket::TransferEnd()
 		data.pOldData->transferEndReason = reason;
 	}
 
+	if (reason == TransferEndReason::failed_tls_resumption) {
+		log(logmsg::error, _("TLS session resumption on data connection failed. Closing control connection to to start over."));
+		ResetOperation(FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED);
+		return;
+	}
+
 	switch (data.opState)
 	{
 	case rawtransfer_transfer:
