@@ -114,7 +114,7 @@ class CQueueView final : public CQueueViewBase, public COptionChangeEventHandler
 	friend class CActionAfterBlocker;
 
 public:
-	CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue* pAsyncRequestQueue);
+	CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue* pAsyncRequestQueue, cert_store & certStore);
 	virtual ~CQueueView();
 
 	bool QueueFile(bool const queueOnly, bool const download,
@@ -260,6 +260,7 @@ protected:
 
 	CMainFrame* m_pMainFrame;
 	CAsyncRequestQueue* m_pAsyncRequestQueue;
+	cert_store & cert_store_;
 
 	std::list<CFileZillaEngine*> m_waitingForPassword;
 

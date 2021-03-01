@@ -23,6 +23,7 @@
 #include "dragdropmanager.h"
 #include "drop_target_ex.h"
 
+#include "../commonui/cert_store.h"
 #include "../commonui/ipcmutex.h"
 
 #include <libfilezilla/glue/wxinvoker.hpp>
@@ -210,11 +211,12 @@ EVT_LIST_COL_CLICK(wxID_ANY, CQueueView::OnColumnClicked)
 
 END_EVENT_TABLE()
 
-CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue *pAsyncRequestQueue)
+CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue *pAsyncRequestQueue, cert_store & certStore)
 	: CQueueViewBase(parent, index, _("Queued files"))
 	, COptionChangeEventHandler(this)
 	, m_pMainFrame(pMainFrame)
 	, m_pAsyncRequestQueue(pAsyncRequestQueue)
+	, cert_store_(certStore)
 {
 	wxGetApp().AddStartupProfileRecord("CQueueView::CQueueView");
 
@@ -538,6 +540,11 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 			}
 		}
 		break;
+	case nId_ftp_tls_resumption: {
+		auto const& notification = static_cast<FtpTlsResumptionNotification const&>(*pNotification.get());
+		cert_store_.SetSessionResumptionSupport(notification.host_, notification.port_, true);
+		break;
+	}
 	default:
 		break;
 	}

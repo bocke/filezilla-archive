@@ -168,3 +168,12 @@ bool cert_store::DoSetTrusted(t_certData const& cert, fz::x509_certificate const
 
 	return true;
 }
+
+std::optional<bool> cert_store::GetSessionResumptionSupport(std::wstring const& host, unsigned short port)
+{
+	return {};
+}
+
+void cert_store::SetSessionResumptionSupport(std::wstring const& host, unsigned short port, bool secure)
+{
+}

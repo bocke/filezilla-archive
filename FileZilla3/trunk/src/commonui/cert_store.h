@@ -6,6 +6,7 @@
 #include <libfilezilla/tls_info.hpp>
 
 #include <list>
+#include <optional>
 #include <set>
 #include <string>
 #include <tuple>
@@ -20,6 +21,9 @@ public:
 
 	void SetTrusted(fz::tls_session_info const& info, bool permanent, bool trustAllHostnames);
 	void SetInsecure(std::string const& host, unsigned int port, bool permanent);
+
+	std::optional<bool> GetSessionResumptionSupport(std::wstring const& host, unsigned short port);
+	void SetSessionResumptionSupport(std::wstring const& host, unsigned short port, bool secure);
 
 protected:
 	virtual ~cert_store() = default;

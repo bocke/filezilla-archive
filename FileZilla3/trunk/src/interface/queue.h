@@ -393,10 +393,11 @@ class CQueueViewSuccessful;
 
 class CMainFrame;
 class CAsyncRequestQueue;
+class cert_store;
 class CQueue final : public wxAuiNotebookEx
 {
 public:
-	CQueue(wxWindow* parent, CMainFrame* pMainFrame, CAsyncRequestQueue* pAsyncRequestQueue);
+	CQueue(wxWindow* parent, CMainFrame* pMainFrame, CAsyncRequestQueue* pAsyncRequestQueue, cert_store & certStore);
 	virtual ~CQueue() {}
 
 	inline CQueueView* GetQueueView() { return m_pQueueView; }

@@ -37,21 +37,23 @@ enum NotificationId
 	nId_data,				// for memory downloads, indicates that new data is available.
 	nId_sftp_encryption,	// information about key exchange, encryption algorithms and so on for SFTP
 	nId_local_dir_created,	// local directory has been created
-	nId_serverchange		// With some protocols, actual server identity isn't known until after logon
+	nId_serverchange,		// With some protocols, actual server identity isn't known until after logon
+	nId_ftp_tls_resumption
 };
 
 // Async request IDs
 enum RequestId
 {
-	reqId_fileexists,         // Target file already exists, awaiting further instructions
-	reqId_interactiveLogin,   // gives a challenge prompt for a password
-	reqId_hostkey,            // used only by SSH/SFTP to indicate new host key
-	reqId_hostkeyChanged,     // used only by SSH/SFTP to indicate changed host key
-	reqId_certificate,        // sent after a successful TLS handshake to allow certificate
-	                          // validation.
-	reqId_insecure_connection // If using opportunistic FTP over TLS, or a completely
-	                          // unprotected protocol ask user whether he really wants
-	                          // to use a plaintext connection.
+	reqId_fileexists,          // Target file already exists, awaiting further instructions
+	reqId_interactiveLogin,    // gives a challenge prompt for a password
+	reqId_hostkey,             // used only by SSH/SFTP to indicate new host key
+	reqId_hostkeyChanged,      // used only by SSH/SFTP to indicate changed host key
+	reqId_certificate,         // sent after a successful TLS handshake to allow certificate
+	                           // validation.
+	reqId_insecure_connection, // If using opportunistic FTP over TLS, or a completely
+	                           // unprotected protocol ask user whether he really wants
+	                           // to use a plaintext connection.
+	reqId_tls_no_resumption
 };
 
 class FZC_PUBLIC_SYMBOL CNotification
@@ -363,6 +365,20 @@ public:
 	{}
 
 	CServer newServer_;
+};
+
+class FZC_PUBLIC_SYMBOL FtpTlsResumptionNotification final : public CNotificationHelper<nId_ftp_tls_resumption>
+{
+public:
+	FtpTlsResumptionNotification() = default;
+
+	explicit FtpTlsResumptionNotification(std::wstring const& host, unsigned short port)
+	    : host_(host)
+		, port_(port)
+	{}
+
+	std::wstring host_;
+	unsigned short port_;
 };
 
 #endif

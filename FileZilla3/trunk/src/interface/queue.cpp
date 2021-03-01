@@ -1575,12 +1575,12 @@ void CQueueViewBase::OnExport(wxCommandEvent&)
 // CQueue
 // ------
 
-CQueue::CQueue(wxWindow* parent, CMainFrame *pMainFrame, CAsyncRequestQueue *pAsyncRequestQueue)
+CQueue::CQueue(wxWindow* parent, CMainFrame *pMainFrame, CAsyncRequestQueue *pAsyncRequestQueue, cert_store & certStore)
 {
 	Create(parent, -1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxAUI_NB_BOTTOM);
 	SetExArtProvider();
 
-	m_pQueueView = new CQueueView(this, 0, pMainFrame, pAsyncRequestQueue);
+	m_pQueueView = new CQueueView(this, 0, pMainFrame, pAsyncRequestQueue, certStore);
 	AddPage(m_pQueueView, m_pQueueView->GetTitle());
 
 	m_pQueueView_Failed = new CQueueViewFailed(this, 1);
