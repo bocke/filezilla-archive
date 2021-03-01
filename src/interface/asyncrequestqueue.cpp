@@ -20,9 +20,9 @@ EVT_COMMAND(wxID_ANY, fzEVT_PROCESSASYNCREQUESTQUEUE, CAsyncRequestQueue::OnProc
 EVT_TIMER(wxID_ANY, CAsyncRequestQueue::OnTimer)
 END_EVENT_TABLE()
 
-CAsyncRequestQueue::CAsyncRequestQueue(wxTopLevelWindow *parent)
+CAsyncRequestQueue::CAsyncRequestQueue(wxTopLevelWindow *parent, cert_store & certStore)
 	: parent_(parent)
-	, certStore_(std::make_unique<CertStore>())
+	, certStore_(certStore)
 {
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOVECONTEXT, false);
 	m_timer.SetOwner(this);
@@ -96,7 +96,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 		{
 			auto & certNotification = static_cast<CCertificateNotification&>(*pNotification.get());
 
-			if (!certStore_->IsTrusted(certNotification.info_)) {
+			if (!certStore_.IsTrusted(certNotification.info_)) {
 				break;
 			}
 
@@ -109,7 +109,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 	case reqId_insecure_connection:
 		{
 			auto & insecureNotification = static_cast<CInsecureConnectionNotification&>(*pNotification.get());
-			if (!certStore_->IsInsecure(fz::to_utf8(insecureNotification.server_.GetHost()), insecureNotification.server_.GetPort())) {
+			if (!certStore_.IsInsecure(fz::to_utf8(insecureNotification.server_.GetHost()), insecureNotification.server_.GetPort())) {
 				break;
 			}
 
@@ -210,10 +210,8 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 			return false;
 		}
 
-		if (certStore_) {
-			auto & notification = static_cast<CCertificateNotification&>(*entry.pNotification.get());
-			CVerifyCertDialog::ShowVerificationDialog(*certStore_, notification);
-		}
+		auto & notification = static_cast<CCertificateNotification&>(*entry.pNotification.get());
+		CVerifyCertDialog::ShowVerificationDialog(certStore_, notification);
 
 		SendReply(entry);
 	}
@@ -224,7 +222,7 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 
 		auto & notification = static_cast<CInsecureConnectionNotification&>(*entry.pNotification.get());
 
-		ConfirmInsecureConection(parent_, *certStore_.get(), notification);
+		ConfirmInsecureConection(parent_, certStore_, notification);
 
 		SendReply(entry);
 	}

@@ -52,6 +52,7 @@
 #include "welcome_dialog.h"
 #include "window_state_manager.h"
 #include "../include/version.h"
+#include "verifycertdialog.h"
 
 #if FZ_MANUALUPDATECHECK
 #include "overlay.h"
@@ -422,7 +423,8 @@ CMainFrame::CMainFrame()
 		CreateQuickconnectBar();
 	}
 
-	m_pAsyncRequestQueue = new CAsyncRequestQueue(this);
+	cert_store_ = std::make_unique<CertStore>();
+	async_request_queue_ = std::make_unique<CAsyncRequestQueue>(this, *cert_store_);
 
 #ifdef __WXMSW__
 	long style = wxSP_NOBORDER | wxSP_LIVE_UPDATE;
@@ -445,7 +447,7 @@ CMainFrame::CMainFrame()
 	m_pQueueLogSplitter = new CSplitterWindowEx(m_pBottomSplitter, -1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER | wxSP_LIVE_UPDATE);
 	m_pQueueLogSplitter->SetMinimumPaneSize(50, 250);
 	m_pQueueLogSplitter->SetSashGravity(0.5);
-	m_pQueuePane = new CQueue(m_pQueueLogSplitter, this, m_pAsyncRequestQueue);
+	m_pQueuePane = new CQueue(m_pQueueLogSplitter, this, async_request_queue_.get(), *cert_store_);
 
 	if (message_log_position == 1) {
 		m_pStatusView = new CStatusView(m_pQueueLogSplitter, -1);
@@ -564,7 +566,7 @@ CMainFrame::~CMainFrame()
 	m_pContextControl = 0;
 
 	CContextManager::Get()->DestroyAllStates();
-	delete m_pAsyncRequestQueue;
+	async_request_queue_.reset();
 #if FZ_MANUALUPDATECHECK
 	delete m_pUpdater;
 #endif
@@ -1063,8 +1065,8 @@ void CMainFrame::OnEngineEvent(CFileZillaEngine* engine)
 					if (pAsyncRequest->GetRequestID() == reqId_certificate) {
 						pState->SetSecurityInfo(static_cast<CCertificateNotification&>(*pAsyncRequest));
 					}
-					if (m_pAsyncRequestQueue) {
-						m_pAsyncRequestQueue->AddRequest(pState->engine_.get(), std::move(pAsyncRequest));
+					if (async_request_queue_) {
+						async_request_queue_->AddRequest(pState->engine_.get(), std::move(pAsyncRequest));
 					}
 				}
 			}
@@ -1097,6 +1099,11 @@ void CMainFrame::OnEngineEvent(CFileZillaEngine* engine)
 				pState->ChangeServer(notification.newServer_);
 			}
 			break;
+		case nId_ftp_tls_resumption: {
+			auto const& notification = static_cast<FtpTlsResumptionNotification const&>(*pNotification.get());
+			cert_store_->SetSessionResumptionSupport(notification.host_, notification.port_, true);
+			break;
+		}
 		default:
 			break;
 		}
@@ -2165,7 +2172,7 @@ bool CMainFrame::ConnectToSite(Site & data, Bookmark const& bookmark, CState* pS
 
 void CMainFrame::CheckChangedSettings()
 {
-	m_pAsyncRequestQueue->RecheckDefaults();
+	async_request_queue_->RecheckDefaults();
 
 	CAutoAsciiFiles::SettingsChanged();
 
@@ -2418,8 +2425,8 @@ void CMainFrame::OnActivate(wxActivateEvent& event)
 		pEditHandler->CheckForModifications(true);
 	}
 
-	if (m_pAsyncRequestQueue) {
-		m_pAsyncRequestQueue->TriggerProcessing();
+	if (async_request_queue_) {
+		async_request_queue_->TriggerProcessing();
 	}
 }
 
@@ -2738,8 +2745,8 @@ void CMainFrame::OnIconize(wxIconizeEvent& event)
 		}
 		Show(true);
 
-		if (m_pAsyncRequestQueue) {
-			m_pAsyncRequestQueue->TriggerProcessing();
+		if (async_request_queue_) {
+			async_request_queue_->TriggerProcessing();
 		}
 
 		return;
@@ -2783,8 +2790,8 @@ void CMainFrame::OnTaskBarClick(wxTaskBarIconEvent&)
 	Show(true);
 	Iconize(false);
 
-	if (m_pAsyncRequestQueue)
-		m_pAsyncRequestQueue->TriggerProcessing();
+	if (async_request_queue_)
+		async_request_queue_->TriggerProcessing();
 
 #ifdef __WXGTK__
 	QueueEvent(new wxCommandEvent(fzEVT_TASKBAR_CLICK_DELAYED));

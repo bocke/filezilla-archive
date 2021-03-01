@@ -20,6 +20,7 @@
 
 class CAsyncRequestQueue;
 class CContextControl;
+class CertStore;
 class CLed;
 class CMainFrameStateEventHandler;
 class CMenuBar;
@@ -170,7 +171,8 @@ private:
 	wxEventType m_closeEvent{};
 	wxTimer m_closeEventTimer;
 
-	CAsyncRequestQueue* m_pAsyncRequestQueue{};
+	std::unique_ptr<CertStore> cert_store_;
+	std::unique_ptr<CAsyncRequestQueue> async_request_queue_;
 	CMainFrameStateEventHandler* m_pStateEventHandler{};
 
 	CWindowStateManager* m_pWindowStateManager{};

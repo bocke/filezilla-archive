@@ -384,11 +384,14 @@ void CTransferSocket::OnConnect()
 	}
 
 	if (tls_layer_) {
+		auto const cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
 		if (tls_layer_->resumed_session()) {
-			CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
+			if (cap != yes) {
+				engine_.AddNotification(std::make_unique<FtpTlsResumptionNotification>(controlSocket_.currentServer_.GetHost(), controlSocket_.currentServer_.GetPort()));
+				CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
+			}
 		}
 		else {
-			auto cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
 			if (cap == yes) {
 				TransferEnd(TransferEndReason::failed_tls_resumption);
 				return;

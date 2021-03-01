@@ -22,7 +22,7 @@ private:
 class CVerifyCertDialog final : protected wxDialogEx
 {
 public:
-	static void ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification);
+	static void ShowVerificationDialog(cert_store & certStore, CCertificateNotification& notification);
 
 	static void DisplayCertificate(CCertificateNotification const& notification);
 
@@ -50,6 +50,6 @@ private:
 	std::unique_ptr<impl> impl_;
 };
 
-void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecureConnectionNotification & notification);
+void ConfirmInsecureConection(wxWindow* parent, cert_store & certStore, CInsecureConnectionNotification & notification);
 
 #endif

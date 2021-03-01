@@ -178,7 +178,7 @@ void CVerifyCertDialog::AddAlgorithm(wxWindow* parent, wxGridBagSizer* sizer, st
 	}
 }
 
-void CVerifyCertDialog::ShowVerificationDialog(CertStore & certStore, CCertificateNotification& notification)
+void CVerifyCertDialog::ShowVerificationDialog(cert_store & certStore, CCertificateNotification& notification)
 {
 	CVerifyCertDialog dlg;
 	if (!dlg.CreateVerificationDialog(notification, false)) {
@@ -577,7 +577,7 @@ void CVerifyCertDialog::OnCertificateChoice(wxCommandEvent const& event)
 }
 
 
-void ConfirmInsecureConection(wxWindow* parent, CertStore & certStore, CInsecureConnectionNotification & notification)
+void ConfirmInsecureConection(wxWindow* parent, cert_store & certStore, CInsecureConnectionNotification & notification)
 {
 	wxDialogEx dlg;
 
