@@ -400,7 +400,6 @@ void CTransferSocket::OnConnect()
 				// Ask whether to allow this insecure connection
 				++activity_block_;
 				controlSocket_.SendAsyncRequest(std::make_unique<FtpTlsNoResumptionNotification>(controlSocket_.currentServer_));
-				return;
 			}
 		}
 		// Re-enable Nagle algorithm
