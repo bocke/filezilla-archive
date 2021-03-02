@@ -542,7 +542,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 		break;
 	case nId_ftp_tls_resumption: {
 		auto const& notification = static_cast<FtpTlsResumptionNotification const&>(*pNotification.get());
-		cert_store_.SetSessionResumptionSupport(notification.host_, notification.port_, true);
+		cert_store_.SetSessionResumptionSupport(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort(), true, true);
 		break;
 	}
 	default:

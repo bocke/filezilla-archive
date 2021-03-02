@@ -19,13 +19,13 @@ bool cert_store::IsTrusted(fz::tls_session_info const& info)
 bool cert_store::IsInsecure(std::string const& host, unsigned int port, bool permanentOnly)
 {
 	auto const t = std::make_tuple(host, port);
-	if (!permanentOnly && sessionInsecureHosts_.find(t) != sessionInsecureHosts_.cend()) {
+	if (!permanentOnly && data_[session].insecure_hosts_.find(t) != data_[session].insecure_hosts_.cend()) {
 		return true;
 	}
 
 	LoadTrustedCerts();
 
-	if (insecureHosts_.find(t) != insecureHosts_.cend()) {
+	if (data_[persistent].insecure_hosts_.find(t) != data_[persistent].insecure_hosts_.cend()) {
 		return true;
 	}
 
@@ -34,7 +34,7 @@ bool cert_store::IsInsecure(std::string const& host, unsigned int port, bool per
 
 bool cert_store::HasCertificate(std::string const& host, unsigned int port)
 {
-	for (auto const& cert : sessionTrustedCerts_) {
+	for (auto const& cert : data_[session].trusted_certs_) {
 		if (cert.host == host && cert.port == port) {
 			return true;
 		}
@@ -42,7 +42,7 @@ bool cert_store::HasCertificate(std::string const& host, unsigned int port)
 
 	LoadTrustedCerts();
 
-	for (auto const& cert : trustedCerts_) {
+	for (auto const& cert : data_[persistent].trusted_certs_) {
 		if (cert.host == host && cert.port == port) {
 			return true;
 		}
@@ -82,9 +82,9 @@ bool cert_store::DoIsTrusted(std::string const& host, unsigned int port, std::ve
 
 bool cert_store::IsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans)
 {
-	bool trusted = DoIsTrusted(host, port, data, trustedCerts_, allowSans);
+	bool trusted = DoIsTrusted(host, port, data, data_[persistent].trusted_certs_, allowSans);
 	if (!trusted && !permanentOnly) {
-		trusted = DoIsTrusted(host, port, data, sessionTrustedCerts_, allowSans);
+		trusted = DoIsTrusted(host, port, data, data_[session].trusted_certs_, allowSans);
 	}
 
 	return trusted;
@@ -93,13 +93,13 @@ bool cert_store::IsTrusted(std::string const& host, unsigned int port, std::vect
 void cert_store::SetInsecure(std::string const& host, unsigned int port, bool permanent)
 {
 	// A host can't be both trusted and insecure
-	sessionTrustedCerts_.erase(
-		std::remove_if(sessionTrustedCerts_.begin(), sessionTrustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
-		sessionTrustedCerts_.end()
+	data_[session].trusted_certs_.erase(
+		std::remove_if(data_[session].trusted_certs_.begin(), data_[session].trusted_certs_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
+		data_[session].trusted_certs_.end()
 	);
 
 	if (!permanent) {
-		sessionInsecureHosts_.emplace(std::make_tuple(host, port));
+		data_[session].insecure_hosts_.emplace(std::make_tuple(host, port));
 		return;
 	}
 
@@ -108,12 +108,12 @@ void cert_store::SetInsecure(std::string const& host, unsigned int port, bool pe
 	}
 
 	// A host can't be both trusted and insecure
-	trustedCerts_.erase(
-		std::remove_if(trustedCerts_.begin(), trustedCerts_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
-		trustedCerts_.end()
+	data_[persistent].trusted_certs_.erase(
+		std::remove_if(data_[persistent].trusted_certs_.begin(), data_[persistent].trusted_certs_.end(), [&host, &port](t_certData const& cert) { return cert.host == host && cert.port == port; }),
+		data_[persistent].trusted_certs_.end()
 	);
 
-	insecureHosts_.emplace(std::make_tuple(host, port));
+	data_[persistent].insecure_hosts_.emplace(std::make_tuple(host, port));
 }
 
 bool cert_store::DoSetInsecure(std::string const& host, unsigned int port)
@@ -121,6 +121,18 @@ bool cert_store::DoSetInsecure(std::string const& host, unsigned int port)
 	LoadTrustedCerts();
 
 	if (IsInsecure(host, port, true)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool cert_store::DoSetSessionResumptionSupport(std::string const& host, unsigned short port, bool secure)
+{
+	LoadTrustedCerts();
+
+	std::optional<bool> v = GetSessionResumptionSupport(host, port);
+	if (v && *v == secure) {
 		return false;
 	}
 
@@ -141,10 +153,10 @@ void cert_store::SetTrusted(fz::tls_session_info const& info, bool permanent, bo
 	}
 
 	// A host can't be both trusted and insecure
-	sessionInsecureHosts_.erase(std::make_tuple(cert.host, cert.port));
+	data_[session].insecure_hosts_.erase(std::make_tuple(cert.host, cert.port));
 
 	if (!permanent) {
-		sessionTrustedCerts_.emplace_back(std::move(cert));
+		data_[session].trusted_certs_.emplace_back(std::move(cert));
 		return;
 	}
 
@@ -153,9 +165,9 @@ void cert_store::SetTrusted(fz::tls_session_info const& info, bool permanent, bo
 	}
 
 	// A host can't be both trusted and insecure
-	insecureHosts_.erase(std::make_tuple(cert.host, cert.port));
+	data_[persistent].insecure_hosts_.erase({cert.host, cert.port});
 
-	trustedCerts_.emplace_back(std::move(cert));
+	data_[persistent].trusted_certs_.emplace_back(std::move(cert));
 }
 
 bool cert_store::DoSetTrusted(t_certData const& cert, fz::x509_certificate const&)
@@ -169,11 +181,31 @@ bool cert_store::DoSetTrusted(t_certData const& cert, fz::x509_certificate const
 	return true;
 }
 
-std::optional<bool> cert_store::GetSessionResumptionSupport(std::wstring const& host, unsigned short port)
+std::optional<bool> cert_store::GetSessionResumptionSupport(std::string const& host, unsigned short port)
 {
+	LoadTrustedCerts();
+
+	for (size_t i = 0; i < 2; ++i) {
+		auto it = data_[i].ftp_tls_resumption_support_.find({host, port});
+		if (it != data_[i].ftp_tls_resumption_support_.cend()) {
+			return it->second;
+		}
+	}
+
 	return {};
 }
 
-void cert_store::SetSessionResumptionSupport(std::wstring const& host, unsigned short port, bool secure)
+void cert_store::SetSessionResumptionSupport(std::string const& host, unsigned short port, bool secure, bool permanent)
 {
+	if (!permanent) {
+		data_[session].ftp_tls_resumption_support_.emplace(std::make_tuple(host, port), secure);
+		return;
+	}
+
+	if (!DoSetSessionResumptionSupport(host, port, secure)) {
+		return;
+	}
+
+	data_[persistent].ftp_tls_resumption_support_.emplace(std::make_tuple(host, port), secure);
+	data_[session].ftp_tls_resumption_support_.erase({host, port});
 }

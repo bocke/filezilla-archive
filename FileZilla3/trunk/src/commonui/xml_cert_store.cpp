@@ -19,8 +19,7 @@ void xml_cert_store::LoadTrustedCerts()
 		return;
 	}
 
-	insecureHosts_.clear();
-	trustedCerts_.clear();
+	data_[persistent] = data{};
 
 	pugi::xml_node element;
 
@@ -61,7 +60,7 @@ void xml_cert_store::LoadTrustedCerts()
 				return false;
 			}
 
-			trustedCerts_.emplace_back(std::move(data));
+			data_[persistent].trusted_certs_.emplace_back(std::move(data));
 
 			return true;
 		};
@@ -88,14 +87,14 @@ void xml_cert_store::LoadTrustedCerts()
 				return false;
 			}
 
-			for (auto const& cert : trustedCerts_) {
+			for (auto const& cert : data_[persistent].trusted_certs_) {
 				// A host can't be both trusted and insecure
 				if (cert.host == host && cert.port == port) {
 					return false;
 				}
 			}
 
-			insecureHosts_.emplace(std::make_tuple(host, port));
+			data_[persistent].insecure_hosts_.emplace(std::make_tuple(host, port));
 
 			return true;
 		};
@@ -104,6 +103,39 @@ void xml_cert_store::LoadTrustedCerts()
 		while (host) {
 
 			auto nextHost = host.next_sibling("Host");
+			if (!processEntry(host)) {
+				modified = true;
+				element.remove_child(host);
+			}
+			host = nextHost;
+		}
+	}
+
+	if ((element = root.child("FtpSessionResumption"))) {
+
+		auto const processEntry = [&](pugi::xml_node const& node)
+		{
+			std::string host = node.attribute("Host").value();
+			unsigned int port = node.attribute("Port").as_uint();
+			if (host.empty() || port < 1 || port > 65535) {
+				return false;
+			}
+
+			for (auto const& cert : data_[persistent].trusted_certs_) {
+				// A host can't be both trusted and insecure
+				if (cert.host == host && cert.port == port) {
+					return false;
+				}
+			}
+
+			data_[persistent].ftp_tls_resumption_support_.emplace(std::make_tuple(host, port), node.text().as_bool());
+
+			return true;
+		};
+
+		auto host = element.child("Entry");
+		while (host) {
+			auto nextHost = host.next_sibling("Entry");
 			if (!processEntry(host)) {
 				modified = true;
 				element.remove_child(host);
@@ -155,7 +187,7 @@ bool xml_cert_store::DoSetInsecure(std::string const& host, unsigned int port)
 		return false;
 	}
 
-	if (StoreToXml()) {
+	if (AllowedToSave()) {
 		auto root = m_xmlFile.GetElement();
 		if (root) {
 			SetInsecureToXml(root, host, port);
@@ -210,10 +242,53 @@ bool xml_cert_store::DoSetTrusted(t_certData const& cert, fz::x509_certificate c
 		return false;
 	}
 
-	if (StoreToXml()) {
+	if (AllowedToSave()) {
 		auto root = m_xmlFile.GetElement();
 		if (root) {
 			SetTrustedInXml(root, cert, certificate);
+			if (!m_xmlFile.Save()) {
+				SavingFileFailed(m_xmlFile.GetFileName(), m_xmlFile.GetError());
+			}
+		}
+	}
+
+	return true;
+}
+
+void xml_cert_store::SetSessionResumptionSupportInXml(pugi::xml_node& root, std::string const& host, unsigned short port, bool secure)
+{
+	auto xhosts = root.child("FtpSessionResumption");
+	if (!xhosts) {
+		xhosts = root.append_child("FtpSessionResumption");
+	}
+
+	// Remember host as insecure
+	auto xhost = xhosts.child("Entry");
+	for (; xhost; xhost = xhost.next_sibling("Entry")) {
+		if (xhost.attribute("Host").value() == host && xhost.attribute("Port").as_uint() == port) {
+			break;
+		}
+	}
+	if (!xhost) {
+		xhost = xhosts.append_child("Entry");
+		xhost.append_attribute("Host").set_value(host.c_str());
+		xhost.append_attribute("Port").set_value(port);		
+	}
+	xhost.text().set(secure);
+}
+
+bool xml_cert_store::DoSetSessionResumptionSupport(std::string const& host, unsigned short port, bool secure)
+{
+	CReentrantInterProcessMutexLocker mutex(MUTEX_TRUSTEDCERTS);
+
+	if (!cert_store::DoSetSessionResumptionSupport(host, port, secure)) {
+		return false;
+	}
+
+	if (AllowedToSave()) {
+		auto root = m_xmlFile.GetElement();
+		if (root) {
+			SetSessionResumptionSupportInXml(root, host, port, secure);
 			if (!m_xmlFile.Save()) {
 				SavingFileFailed(m_xmlFile.GetFileName(), m_xmlFile.GetError());
 			}

@@ -372,13 +372,24 @@ class FZC_PUBLIC_SYMBOL FtpTlsResumptionNotification final : public CNotificatio
 public:
 	FtpTlsResumptionNotification() = default;
 
-	explicit FtpTlsResumptionNotification(std::wstring const& host, unsigned short port)
-	    : host_(host)
-		, port_(port)
+	explicit FtpTlsResumptionNotification(CServer const& server)
+	    : server_(server)
 	{}
 
-	std::wstring host_;
-	unsigned short port_;
+	CServer const server_;
+};
+
+class FZC_PUBLIC_SYMBOL FtpTlsNoResumptionNotification final : public CAsyncRequestNotification
+{
+public:
+	FtpTlsNoResumptionNotification(CServer const& server)
+	    : server_(server)
+	{}
+
+	virtual RequestId GetRequestID() const { return reqId_tls_no_resumption; }
+
+	CServer const server_;
+	bool allow_{};
 };
 
 #endif
