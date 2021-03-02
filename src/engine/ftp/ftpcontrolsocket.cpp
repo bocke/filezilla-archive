@@ -530,6 +530,21 @@ bool CFtpControlSocket::SetAsyncRequestReply(CAsyncRequestNotification *pNotific
 				return true;
 			}
 		}
+	case reqId_tls_no_resumption:
+		{
+			auto & notification = static_cast<FtpTlsNoResumptionNotification&>(*pNotification);
+			if (!notification.allow_) {
+				ResetOperation(FZ_REPLY_CANCELED);
+				return false;
+			}
+			else {
+				CServerCapabilities::SetCapability(currentServer_, tls_resumption, no);
+				if (!operations_.empty() && operations_.back()->opId == PrivCommand::rawtransfer && m_pTransferSocket) {
+					m_pTransferSocket->ContinueWithoutSesssionResumption();
+				}	
+				return true;
+			}
+		}
 	default:
 		log(logmsg::debug_warning, L"Unknown request %d", pNotification->GetRequestID());
 		ResetOperation(FZ_REPLY_INTERNALERROR);

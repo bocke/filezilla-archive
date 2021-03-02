@@ -387,7 +387,7 @@ void CTransferSocket::OnConnect()
 		auto const cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
 		if (tls_layer_->resumed_session()) {
 			if (cap != yes) {
-				engine_.AddNotification(std::make_unique<FtpTlsResumptionNotification>(controlSocket_.currentServer_.GetHost(), controlSocket_.currentServer_.GetPort()));
+				engine_.AddNotification(std::make_unique<FtpTlsResumptionNotification>(controlSocket_.currentServer_));
 				CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
 			}
 		}
@@ -397,6 +397,10 @@ void CTransferSocket::OnConnect()
 				return;
 			}
 			else if (cap == unknown) {
+				// Ask whether to allow this insecure connection
+				++activity_block_;
+				controlSocket_.SendAsyncRequest(std::make_unique<FtpTlsNoResumptionNotification>(controlSocket_.currentServer_));
+				return;
 			}
 		}
 		// Re-enable Nagle algorithm
@@ -410,7 +414,7 @@ void CTransferSocket::OnConnect()
 	}
 #endif
 
-	if (m_bActive) {
+	if (!activity_block_) {
 		TriggerPostponedEvents();
 	}
 
@@ -421,7 +425,7 @@ void CTransferSocket::OnReceive()
 {
 	controlSocket_.log(logmsg::debug_debug, L"CTransferSocket::OnReceive(), m_transferMode=%d", m_transferMode);
 
-	if (!m_bActive) {
+	if (activity_block_) {
 		controlSocket_.log(logmsg::debug_verbose, L"Postponing receive, m_bActive was false.");
 		m_postponedReceive = true;
 		return;
@@ -571,7 +575,7 @@ void CTransferSocket::OnSend()
 		return;
 	}
 
-	if (!m_bActive) {
+	if (activity_block_) {
 		controlSocket_.log(logmsg::debug_verbose, L"Postponing send");
 		m_postponedSend = true;
 		return;
@@ -729,7 +733,10 @@ void CTransferSocket::SetActive()
 		return;
 	}
 
-	m_bActive = true;
+	if (!activity_block_) {
+		return;
+	}
+	--activity_block_;
 	if (!socket_) {
 		return;
 	}
@@ -866,7 +873,7 @@ bool CTransferSocket::CheckGetNextReadBuffer()
 
 void CTransferSocket::OnInput(reader_base*)
 {
-	if (!m_bActive || m_transferEndReason != TransferEndReason::none) {
+	if (activity_block_ || m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
 
@@ -877,7 +884,7 @@ void CTransferSocket::OnInput(reader_base*)
 
 void CTransferSocket::OnWrite(writer_base*)
 {
-	if (!m_bActive || m_transferEndReason != TransferEndReason::none) {
+	if (activity_block_ || m_transferEndReason != TransferEndReason::none) {
 		return;
 	}
 
@@ -908,7 +915,9 @@ void CTransferSocket::FinalizeWrite()
 
 void CTransferSocket::TriggerPostponedEvents()
 {
-	assert(m_bActive);
+	if (activity_block_) {
+		return;
+	}
 
 	if (m_postponedReceive) {
 		controlSocket_.log(logmsg::debug_verbose, L"Executing postponed receive");
@@ -955,4 +964,12 @@ void CTransferSocket::OnTimer(fz::timer_id)
 		}
 	}
 #endif
+}
+
+void CTransferSocket::ContinueWithoutSesssionResumption()
+{
+	if (activity_block_) {
+		--activity_block_;
+		TriggerPostponedEvents();
+	}
 }

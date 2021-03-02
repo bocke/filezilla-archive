@@ -118,8 +118,19 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 
 			return true;
 		}
-	default:
-		break;
+	case reqId_tls_no_resumption:
+		{
+			auto & notification = static_cast<FtpTlsNoResumptionNotification&>(*pNotification.get());
+
+			auto v = certStore_.GetSessionResumptionSupport(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
+			if (!v || *v) {
+				break;
+			}
+			
+			notification.allow_ = true;
+			pEngine->SetAsyncRequestReply(std::move(pNotification));
+			return true;
+		}
 	}
 
 	return false;
@@ -223,6 +234,23 @@ bool CAsyncRequestQueue::ProcessNextRequest()
 		auto & notification = static_cast<CInsecureConnectionNotification&>(*entry.pNotification.get());
 
 		ConfirmInsecureConection(parent_, certStore_, notification);
+
+		SendReply(entry);
+	}
+	else if (entry.pNotification->GetRequestID() == reqId_tls_no_resumption) {
+		if (!CheckWindowState()) {
+			return false;
+		}
+
+		auto & notification = static_cast<FtpTlsNoResumptionNotification&>(*entry.pNotification.get());
+
+		auto v = certStore_.GetSessionResumptionSupport(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
+		if (v && !*v) {
+			notification.allow_ = true;
+		}
+		else {
+			ConfirmFtpTlsNoResumptionNotification(parent_, certStore_, notification);
+		}
 
 		SendReply(entry);
 	}

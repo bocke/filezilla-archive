@@ -29,7 +29,7 @@ void CertStore::SavingFileFailed(std::wstring const& file, std::wstring const& e
 	wxMessageBoxEx(msg + _T("\n") + error, _("Error writing xml file"), wxICON_ERROR);
 }
 
-bool CertStore::StoreToXml() const
+bool CertStore::AllowedToSave() const
 {
 	return COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2;
 }
@@ -599,11 +599,7 @@ void ConfirmInsecureConection(wxWindow* parent, cert_store & certStore, CInsecur
 	dlg.Create(parent, nullID, wxString::Format(_("Insecure %s connection"), name));
 
 	auto const& lay = dlg.layout();
-	auto outer = new wxBoxSizer(wxVERTICAL);
-	dlg.SetSizer(outer);
-
-	auto main = lay.createFlex(1);
-	outer->Add(main, 0, wxALL, lay.border);
+	auto main = lay.createMain(&dlg, 1);
 
 	bool const warning = certStore.HasCertificate(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
 
@@ -664,12 +660,78 @@ void ConfirmInsecureConection(wxWindow* parent, cert_store & certStore, CInsecur
 
 	dlg.GetSizer()->Fit(&dlg);
 
-
-
 	bool allow = dlg.ShowModal() == wxID_OK;
 	if (allow) {
 		notification.allow_ = true;
 
 		certStore.SetInsecure(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort(), always->GetValue());
+	}
+}
+
+
+void ConfirmFtpTlsNoResumptionNotification(wxWindow* parent, cert_store & certStore, FtpTlsNoResumptionNotification & notification)
+{
+	wxDialogEx dlg;
+
+	dlg.Create(parent, nullID, _("Insecure FTP data connection"));
+
+	auto const& lay = dlg.layout();
+	auto main = lay.createMain(&dlg, 1);
+	
+	auto v = certStore.GetSessionResumptionSupport(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort());
+	bool const warning = v && *v;
+
+	if (warning) {
+		main->Add(new wxStaticText(&dlg, nullID, _("Warning! You have previously connected to this server and it has supported TLS session resumption on the data connection.")));
+		main->Add(new wxStaticText(&dlg, nullID, _("Only continue after you have spoken to the server administrator or server hosting provider.")));
+	}
+	else {
+		main->Add(new wxStaticText(&dlg, nullID, _("This server does not support TLS session resumption on the data connection.")));
+	}
+	main->Add(new wxStaticText(&dlg, nullID, _("TLS session resumption on the data connection is an important security feature to protect against data connection stealing attacks.")));
+	main->Add(new wxStaticText(&dlg, nullID, _("If you continue, transferred files may be intercepted or their contents replaced by an attacker.")));
+
+	auto flex = lay.createFlex(2);
+	main->Add(flex, 0, wxALL, lay.border);
+	flex->Add(new wxStaticText(&dlg, nullID, _("Host:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, LabelEscape(notification.server_.GetHost())), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, _("Port:")), lay.valign);
+	flex->Add(new wxStaticText(&dlg, nullID, fz::to_wstring(notification.server_.GetPort())), lay.valign);
+
+	auto always = new wxCheckBox(&dlg, nullID, wxString::Format(_("&Always allow insecure data connections for this server in future sessions.")));
+	main->Add(always);
+
+	auto buttons = lay.createButtonSizer(&dlg, main, true);
+
+	auto ok = new wxButton(&dlg, wxID_OK, _("&OK"));
+	if (!warning) {
+		ok->SetFocus();
+		ok->SetDefault();
+	}
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(&dlg, wxID_CANCEL, _("Cancel"));
+	if (warning) {
+		cancel->SetFocus();
+		cancel->SetDefault();
+	}
+	buttons->AddButton(cancel);
+
+	auto onButton = [&dlg](wxEvent & evt) {dlg.EndModal(evt.GetId()); };
+	ok->Bind(wxEVT_BUTTON, onButton);
+	cancel->Bind(wxEVT_BUTTON, onButton);
+
+	buttons->Realize();
+
+	dlg.WrapRecursive(&dlg, 2);
+	dlg.Layout();
+
+	dlg.GetSizer()->Fit(&dlg);
+
+	bool allow = dlg.ShowModal() == wxID_OK;
+	if (allow) {
+		notification.allow_ = true;
+
+		certStore.SetSessionResumptionSupport(fz::to_utf8(notification.server_.GetHost()), notification.server_.GetPort(), false, always->GetValue());
 	}
 }

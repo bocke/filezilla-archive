@@ -16,7 +16,7 @@ public:
 
 private:
 	void SavingFileFailed(std::wstring const& file, std::wstring const& msg) override;
-	bool StoreToXml() const;
+	bool AllowedToSave() const;
 };
 
 class CVerifyCertDialog final : protected wxDialogEx
@@ -51,5 +51,7 @@ private:
 };
 
 void ConfirmInsecureConection(wxWindow* parent, cert_store & certStore, CInsecureConnectionNotification & notification);
+
+void ConfirmFtpTlsNoResumptionNotification(wxWindow* parent, cert_store & certStore, FtpTlsNoResumptionNotification & notification);
 
 #endif

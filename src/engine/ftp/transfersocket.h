@@ -39,6 +39,8 @@ public:
 	void set_reader(std::unique_ptr<reader_base> && reader, bool ascii);
 	void set_writer(std::unique_ptr<writer_base> && writer, bool ascii);
 
+	void ContinueWithoutSesssionResumption();
+
 protected:
 	bool CheckGetNextWriteBuffer();
 	bool CheckGetNextReadBuffer();
@@ -74,7 +76,7 @@ protected:
 	CFileZillaEnginePrivate & engine_;
 	CFtpControlSocket & controlSocket_;
 
-	bool m_bActive{};
+	int activity_block_{1};
 	TransferEndReason m_transferEndReason{TransferEndReason::none};
 
 	TransferMode const m_transferMode;

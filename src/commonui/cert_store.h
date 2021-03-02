@@ -7,6 +7,7 @@
 
 #include <list>
 #include <optional>
+#include <map>
 #include <set>
 #include <string>
 #include <tuple>
@@ -22,8 +23,8 @@ public:
 	void SetTrusted(fz::tls_session_info const& info, bool permanent, bool trustAllHostnames);
 	void SetInsecure(std::string const& host, unsigned int port, bool permanent);
 
-	std::optional<bool> GetSessionResumptionSupport(std::wstring const& host, unsigned short port);
-	void SetSessionResumptionSupport(std::wstring const& host, unsigned short port, bool secure);
+	std::optional<bool> GetSessionResumptionSupport(std::string const& host, unsigned short port);
+	void SetSessionResumptionSupport(std::string const& host, unsigned short port, bool secure, bool permanent);
 
 protected:
 	virtual ~cert_store() = default;
@@ -37,16 +38,25 @@ protected:
 
 	virtual bool DoSetTrusted(t_certData const& cert, fz::x509_certificate const&);
 	virtual bool DoSetInsecure(std::string const& host, unsigned int port);
+	virtual bool DoSetSessionResumptionSupport(std::string const& host, unsigned short port, bool secure);
 	virtual void LoadTrustedCerts() {}
 
 protected:
 	bool IsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, bool permanentOnly, bool allowSans);
 	bool DoIsTrusted(std::string const& host, unsigned int port, std::vector<uint8_t> const& data, std::list<t_certData> const& trustedCerts, bool allowSans);
 
-	std::list<t_certData> trustedCerts_;
-	std::list<t_certData> sessionTrustedCerts_;
-	std::set<std::tuple<std::string, unsigned int>> insecureHosts_;
-	std::set<std::tuple<std::string, unsigned int>> sessionInsecureHosts_;
+	enum : size_t {
+		persistent,
+		session
+	};
+
+	struct data final {
+		std::list<t_certData> trusted_certs_;
+		std::set<std::tuple<std::string, unsigned int>> insecure_hosts_;
+		std::map<std::tuple<std::string, unsigned short>, bool> ftp_tls_resumption_support_;
+	};
+
+	data data_[2];
 };
 
 #endif
