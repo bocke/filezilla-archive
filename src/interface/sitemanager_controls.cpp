@@ -704,6 +704,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 
 #if ENABLE_STORJ
 		if (protocol == STORJ_GRANT && logon_type == LogonType::normal) {
+			fz::trim(pw);
 			if (pw.empty() && !site.credentials.encrypted_) {
 				wxMessageBoxEx(_("You need to enter an access grant."), _("Site Manager - Invalid data"), wxICON_EXCLAMATION, wxGetTopLevelParent(&parent_));
 				xrc_call(parent_, "ID_PASS", &wxWindow::SetFocus);
