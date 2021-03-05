@@ -201,7 +201,6 @@ bool CFileZillaApp::OnInit()
 		wxSetEnv("PUTTYDIR", home + L".config/putty");
 	}
 #endif
-	InitDefaultsDir();
 
 	COptions::Init();
 
@@ -325,13 +324,6 @@ bool CFileZillaApp::LoadResourceFiles()
 	wxFileSystem::AddHandler(new wxFileSystemBlobHandler);
 
 	return true;
-}
-
-bool CFileZillaApp::InitDefaultsDir()
-{
-	AddStartupProfileRecord("InitDefaultsDir");
-	m_defaultsDir = GetDefaultsDir();
-	return !m_defaultsDir.empty();
 }
 
 bool CFileZillaApp::LoadLocales()

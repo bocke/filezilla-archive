@@ -17,6 +17,7 @@
 #include "xmlfunctions.h"
 #include "xrc_helper.h"
 
+#include "../commonui/fz_paths.h"
 #include "../commonui/ipcmutex.h"
 
 #include <wx/dirdlg.h>
@@ -1513,7 +1514,7 @@ void CSiteManagerDialog::OnCopySite(wxCommandEvent&)
 
 bool CSiteManagerDialog::LoadDefaultSites()
 {
-	CLocalPath const defaultsDir = wxGetApp().GetDefaultsDir();
+	CLocalPath const defaultsDir = GetDefaultsDir();
 	if (defaultsDir.empty()) {
 		return false;
 	}
