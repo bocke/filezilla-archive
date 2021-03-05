@@ -10,6 +10,15 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.53.0-rc1 (2021-03-05)
+
++ Require explicit confirmation on FTP servers not supporting TLS session esumption on the data connection
++ Access Grant support for Tardigrade
+- MSW: Fixed handle leak if using SFTP
+- FTP: Fixed cancelling listings on very slow computers with extremely fast network connection
+- Fixed loading of custom FTP proxy setting when opening the settings dialog
+- Internal restructuring
+
 3.52.2 (2021-01-18)
 
 - When restoring the main window position at startup, detect if the title bar would become hidden behind taskbars or global menu bars and reposition it appropriately
