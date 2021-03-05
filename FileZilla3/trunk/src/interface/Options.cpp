@@ -341,7 +341,7 @@ void COptions::Load(pugi::xml_node & settings, bool predefined, bool importing)
 
 void COptions::LoadGlobalDefaultOptions()
 {
-	CLocalPath const defaultsDir = wxGetApp().GetDefaultsDir();
+	CLocalPath const defaultsDir = GetDefaultsDir();
 	if (defaultsDir.empty()) {
 		return;
 	}
@@ -484,7 +484,7 @@ CLocalPath COptions::GetCacheDirectory()
 	std::wstring dir(get_string(OPTION_DEFAULT_CACHE_DIR));
 	if (!dir.empty()) {
 		dir = ExpandPath(dir);
-		ret.SetPath(wxGetApp().GetDefaultsDir().GetPath());
+		ret.SetPath(GetDefaultsDir().GetPath());
 		if (!ret.ChangePath(dir)) {
 			ret.clear();
 		}
@@ -518,7 +518,7 @@ CLocalPath COptions::InitSettingsDir()
 	std::wstring dir = get_string(OPTION_DEFAULT_SETTINGSDIR);
 	if (!dir.empty()) {
 		dir = ExpandPath(dir);
-		p.SetPath(wxGetApp().GetDefaultsDir().GetPath());
+		p.SetPath(GetDefaultsDir().GetPath());
 		p.ChangePath(dir);
 	}
 	else {

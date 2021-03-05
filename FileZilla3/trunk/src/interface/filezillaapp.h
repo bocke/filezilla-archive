@@ -21,7 +21,6 @@ public:
 
 	// Always (back)slash-terminated
 	CLocalPath GetResourceDir() const { return m_resourceDir; }
-	CLocalPath GetDefaultsDir() const { return m_defaultsDir; }
 	CLocalPath GetLocalesDir() const { return m_localesDir; }
 
 	std::wstring GetSettingsFile(std::wstring const& name) const;
@@ -48,7 +47,6 @@ public:
 protected:
 	void CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env, engineOptions setting, std::wstring const& description);
 
-	bool InitDefaultsDir();
 	bool LoadResourceFiles();
 	bool LoadLocales();
 	int ProcessCommandLine();
@@ -56,7 +54,6 @@ protected:
 	std::unique_ptr<wxLocale> m_pLocale;
 
 	CLocalPath m_resourceDir;
-	CLocalPath m_defaultsDir;
 	CLocalPath m_localesDir;
 
 #if wxUSE_DEBUGREPORT && wxUSE_ON_FATAL_EXCEPTION

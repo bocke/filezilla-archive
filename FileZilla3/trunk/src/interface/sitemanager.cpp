@@ -222,7 +222,7 @@ void CSiteManager::ClearIdMap()
 
 bool CSiteManager::LoadPredefined(CSiteManagerXmlHandler& handler)
 {
-	return site_manager::LoadPredefined(wxGetApp().GetDefaultsDir(), handler);
+	return site_manager::LoadPredefined(GetDefaultsDir(), handler);
 }
 
 std::unique_ptr<wxMenu> CSiteManager::GetSitesMenu_Predefined(std::map<int, std::unique_ptr<Site>> &idMap)
@@ -259,7 +259,7 @@ std::pair<std::unique_ptr<Site>, Bookmark> CSiteManager::GetSiteByPath(std::wstr
 	std::wstring error;
 
 	CLocalPath settings_path{COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR)};
-	app_paths paths{settings_path, wxGetApp().GetDefaultsDir()};
+	app_paths paths{settings_path, GetDefaultsDir()};
 	auto ret = site_manager::GetSiteByPath(paths, sitePath, error);
 	if (!ret.first && printErrors) {
 		wxMessageBoxEx(_("Site does not exist."), error);
