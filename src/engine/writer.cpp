@@ -211,6 +211,9 @@ aio_result writer_base::finalize(fz::nonowning_buffer & last_written)
 	if (error_) {
 		return aio_result::error;
 	}
+	if (finalized_) {
+		return aio_result::ok;
+	}
 	if (processing_ && last_written) {
 		buffers_[(ready_pos_ + ready_count_) % buffers_.size()] = last_written;
 		last_written.reset();
