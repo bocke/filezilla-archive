@@ -78,6 +78,7 @@ private:
 
 		fz::nonowning_buffer writer_buffer_;
 
+		bool done_{};
 		bool keep_alive_{};
 		bool eof_{};
 	};
