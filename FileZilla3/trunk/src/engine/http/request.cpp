@@ -323,11 +323,11 @@ int CHttpRequestOpData::Send()
 			}
 		}
 	}
-	
+
 	if (opState & request_reading) {
 		return FZ_REPLY_WOULDBLOCK;
 	}
-	
+
 	return FZ_REPLY_INTERNALERROR;
 }
 
@@ -404,6 +404,7 @@ int CHttpRequestOpData::ParseReceiveBuffer()
 			log(logmsg::error, _("Connection closed by server"));
 			return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 		}
+		return res;
 	}
 	else {
 		size_t size = recv_buffer_.size();
@@ -654,7 +655,7 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 		log(logmsg::error, _("Malformed response header: %s"), _("Unknown transfer encoding"));
 		return FZ_REPLY_ERROR;
 	}
-	
+
 	auto retry = response.get_header("Retry-After");
 	if (response.code_ >= 400 && !retry.empty()) {
 		// TODO: Retry-After for redirects
