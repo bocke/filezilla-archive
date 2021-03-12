@@ -77,6 +77,10 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 
 int CHttpRequestOpData::Send()
 {
+	if (!controlSocket_.send_buffer_.empty()) {
+		return FZ_REPLY_WOULDBLOCK;
+	}
+
 	if (opState & request_init) {
 		if (send_pos_ >= requests_.size()) {
 			opState &= ~request_init;
@@ -172,30 +176,42 @@ int CHttpRequestOpData::Send()
 		else {
 			auto & req = requests_[send_pos_]->request();
 			if (!(req.flags_ & HttpRequest::flag_sent_header)) {
-				dataToSend_ = req.update_content_length();
+				if (!(req.flags_ & HttpRequest::flag_sending_header)) {
+					dataToSend_ = req.update_content_length();
 
-				if (dataToSend_ == aio_base::nosize) {
-					log(logmsg::error, _("Malformed request header: %s"), _("Invalid Content-Length"));
-					return FZ_REPLY_INTERNALERROR;
-				}
-
-				// Assemble request and headers
-				std::string command = fz::sprintf("%s %s HTTP/1.1", req.verb_, req.uri_.get_request());
-				log(logmsg::command, "%s", command);
-				command += "\r\n";
-
-				for (auto const& header : req.headers_) {
-					std::string line = fz::sprintf("%s: %s", header.first, header.second);
-					if (header.first == "Authorization") {
-						log(logmsg::command, "%s: %s", header.first, std::string(header.second.size(), '*'));
+					if (dataToSend_ == aio_base::nosize) {
+						log(logmsg::error, _("Malformed request header: %s"), _("Invalid Content-Length"));
+						return FZ_REPLY_INTERNALERROR;
 					}
-					else {
-						log(logmsg::command, "%s", line);
-					}
-					command += line + "\r\n";
-				}
 
-				command += "\r\n";
+					req.flags_ |= HttpRequest::flag_sending_header;
+
+					// Assemble request and headers
+					std::string command = fz::sprintf("%s %s HTTP/1.1", req.verb_, req.uri_.get_request());
+					log(logmsg::command, "%s", command);
+					command += "\r\n";
+
+					for (auto const& header : req.headers_) {
+						std::string line = fz::sprintf("%s: %s", header.first, header.second);
+						if (header.first == "Authorization") {
+							log(logmsg::command, "%s: %s", header.first, std::string(header.second.size(), '*'));
+						}
+						else {
+							log(logmsg::command, "%s", line);
+						}
+						command += line + "\r\n";
+					}
+
+					command += "\r\n";
+
+					auto result = controlSocket_.Send(command.c_str(), command.size());
+					if (result == FZ_REPLY_WOULDBLOCK && !controlSocket_.send_buffer_) {
+						result = FZ_REPLY_CONTINUE;
+					}
+					if (result != FZ_REPLY_CONTINUE) {
+						return result;
+					}
+				}
 
 				req.flags_ |= HttpRequest::flag_sent_header;
 				if (!req.body_) {
@@ -211,116 +227,91 @@ int CHttpRequestOpData::Send()
 							opState |= request_init;
 						}
 					}
+					return FZ_REPLY_CONTINUE;
+				}
+
+				log(logmsg::debug_info, "Finished sending request header.");
+				sendLogLevel_ = logmsg::debug_debug;
+
+				// Enable Nagle's algorithm if we have a beefy body
+				if (req.body_->size() > 536) { // TCPv4 minimum required MSS
+					controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, false);
+				}
+#if FZ_WINDOWS
+				// TCP send buffer autotuning
+				if (!buffer_tuning_timer_) {
+					buffer_tuning_timer_ = add_timer(fz::duration::from_seconds(1), false);
+				}
+#endif
+			}
+
+			while (dataToSend_) {
+
+				if (req.body_buffer_.empty()) {
+					read_result r = req.body_->read();
+					if (r.type_ == aio_result::wait) {
+						return FZ_REPLY_WOULDBLOCK;
+					}
+					else if (r.type_ == aio_result::error) {
+						return FZ_REPLY_ERROR;
+					}
+					req.body_buffer_ = r.buffer_;
+
+					if (req.body_buffer_.empty() && dataToSend_) {
+						log(logmsg::error, _("Unexpected end-of-file on '%s'"), req.body_->name());
+						return FZ_REPLY_ERROR;
+					}
+					else if (req.body_buffer_.size() > dataToSend_) {
+						log(logmsg::error, _("Excess data read from '%s'"), req.body_->name());
+						return FZ_REPLY_ERROR;
+					}
+				}
+
+				int error;
+				int written = controlSocket_.active_layer_->write(req.body_buffer_.get(), req.body_buffer_.size(), error);
+				if (written < 0) {
+					if (error != EAGAIN) {
+						log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
+						log(logmsg::error, _("Disconnected from server"));
+						return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
+					}
+					return FZ_REPLY_WOULDBLOCK;
+				}
+				else if (written) {
+					controlSocket_.SetActive(CFileZillaEngine::send);
+					req.body_buffer_.consume(static_cast<size_t>(written));
+					dataToSend_ -= written;
+					if (req.flags_ & HttpRequest::flag_update_transferstatus) {
+						engine_.transfer_status_.Update(written);
+					}
+				}
+			}
+
+			log(logmsg::debug_info, "Finished sending request body");
+
+#if FZ_WINDOWS
+			stop_timer(buffer_tuning_timer_);
+#endif
+			controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, true);
+
+			req.flags_ |= HttpRequest::flag_sent_body;
+
+			sendLogLevel_ = logmsg::debug_verbose;
+
+			opState &= ~request_send;
+			++send_pos_;
+
+			if (send_pos_ < requests_.size()) {
+				if (!req.keep_alive()) {
+					opState |= request_send_wait_for_read;
+					log(logmsg::debug_info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
 				}
 				else {
-					log(logmsg::debug_info, "Finished sending request header.");
-					sendLogLevel_ = logmsg::debug_debug;
-
-					// Disable Nagle's algorithm if we have a beefy body
-					// Disable Nagle's algorithm if we have a beefy body
-					if (req.body_->size() > 536) { // TCPv4 minimum required MSS
-						controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, false);
-					}
-#if FZ_WINDOWS
-					// TCP send buffer autotuning
-					if (!buffer_tuning_timer_) {
-						buffer_tuning_timer_ = add_timer(fz::duration::from_seconds(1), false);
-					}
-#endif
+					opState |= request_init;
 				}
-
-				auto result = controlSocket_.Send(command.c_str(), command.size());
-				if (result == FZ_REPLY_WOULDBLOCK && !controlSocket_.send_buffer_) {
-					result = FZ_REPLY_CONTINUE;
-				}
-
-				return result;
 			}
-			else {
-				while (controlSocket_.send_buffer_) {
-					int error;
-					int written = controlSocket_.active_layer_->write(controlSocket_.send_buffer_.get(), controlSocket_.send_buffer_.size(), error);
-					if (written < 0) {
-						if (error != EAGAIN) {
-							log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
-							log(logmsg::error, _("Disconnected from server"));
-							return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-						}
-						return FZ_REPLY_WOULDBLOCK;
-					}
-					else if (written) {
-						controlSocket_.SetActive(CFileZillaEngine::send);
-						controlSocket_.send_buffer_.consume(static_cast<size_t>(written));
-					}
-				}
+			return FZ_REPLY_CONTINUE;
 
-				while (dataToSend_) {
-
-					if (req.body_buffer_.empty()) {
-						read_result r = req.body_->read();
-						if (r.type_ == aio_result::wait) {
-							return FZ_REPLY_WOULDBLOCK;
-						}
-						else if (r.type_ == aio_result::error) {
-							return FZ_REPLY_ERROR;
-						}
-						req.body_buffer_ = r.buffer_;
-
-						if (req.body_buffer_.empty() && dataToSend_) {
-							log(logmsg::error, _("Unexpected end-of-file on '%s'"), req.body_->name());
-							return FZ_REPLY_ERROR;
-						}
-						else if (req.body_buffer_.size() > dataToSend_) {
-							log(logmsg::error, _("Excess data read from '%s'"), req.body_->name());
-							return FZ_REPLY_ERROR;
-						}
-					}
-
-					int error;
-					int written = controlSocket_.active_layer_->write(req.body_buffer_.get(), req.body_buffer_.size(), error);
-					if (written < 0) {
-						if (error != EAGAIN) {
-							log(logmsg::error, _("Could not write to socket: %s"), fz::socket_error_description(error));
-							log(logmsg::error, _("Disconnected from server"));
-							return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
-						}
-						return FZ_REPLY_WOULDBLOCK;
-					}
-					else if (written) {
-						controlSocket_.SetActive(CFileZillaEngine::send);
-						req.body_buffer_.consume(static_cast<size_t>(written));
-						dataToSend_ -= written;
-						if (req.flags_ & HttpRequest::flag_update_transferstatus) {
-							engine_.transfer_status_.Update(written);
-						}
-					}
-				}
-
-				log(logmsg::debug_info, "Finished sending request body");
-
-#if FZ_WINDOWS
-				stop_timer(buffer_tuning_timer_);
-#endif
-				controlSocket_.socket_->set_flags(fz::socket::flag_nodelay, true);
-
-				req.flags_ |= HttpRequest::flag_sent_body;
-
-				sendLogLevel_ = logmsg::debug_verbose;
-
-				opState &= ~request_send;
-				++send_pos_;
-
-				if (send_pos_ < requests_.size()) {
-					if (!req.keep_alive()) {
-						opState |= request_send_wait_for_read;
-						log(logmsg::debug_info, L"Request did not ask for keep-alive. Waiting for response to finish before sending next request a new connection.");
-					}
-					else {
-						opState |= request_init;
-					}
-				}
-				return FZ_REPLY_CONTINUE;
-			}
 		}
 	}
 
@@ -375,7 +366,7 @@ int CHttpRequestOpData::ParseReceiveBuffer()
 		auto & request = shared_response->request();
 		if (!(request.flags_ & HttpRequest::flag_sent_header)) {
 			if (read_state_.eof_) {
-				log(logmsg::debug_verbose, L"Socket closed before request got sent");
+				log(logmsg::debug_verbose, L"Socket closed before request headers got sent");
 				log(logmsg::error, _("Connection closed by server"));
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
@@ -581,8 +572,11 @@ int CHttpRequestOpData::ParseHeader()
 				return FZ_REPLY_ERROR;
 			}
 
-			response.code_ = (recv_buffer_[9] - '0') * 100 + (recv_buffer_[10] - '0') * 10 + recv_buffer_[11] - '0';
-			response.flags_ |= HttpResponse::flag_got_code;
+			unsigned int code = response.code_ = (recv_buffer_[9] - '0') * 100 + (recv_buffer_[10] - '0') * 10 + recv_buffer_[11] - '0';
+			if (code != 100) {
+				response.code_ = code;
+				response.flags_ |= HttpResponse::flag_got_code;
+			}
 		}
 		else {
 			if (!i) {
@@ -633,11 +627,6 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 	auto & srr = requests_.front();
 	auto & request = srr->request();
 	auto & response = srr->response();
-	if (response.code_ == 100) {
-		// 100 Continue header. Ignore it and start over.
-		response.reset();
-		return FZ_REPLY_CONTINUE;
-	}
 
 	response.flags_ |= HttpResponse::flag_got_header;
 	if (request.verb_ == "HEAD" || response.code_prohobits_body()) {
