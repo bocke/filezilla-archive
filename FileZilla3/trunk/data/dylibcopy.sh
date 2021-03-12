@@ -48,6 +48,10 @@ process_dylib()
     while [ ! -z "$dirs" ]; do
       local dir=${dirs%%:*}
       dirs=${dirs#*:}
+      if [ "$dir" = "$dirs" ]; then
+        dirs=
+      fi
+
       if [ -f "$dir/.libs/$name" ]; then
         echo "Found dependency $name"
         cp "$dir/.libs/$name" "${frameworks}/$name"
