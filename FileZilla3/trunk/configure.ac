@@ -393,7 +393,7 @@ if test "$buildmain" = "yes"; then
   # ------------------------
 
   # Create application bundle on OS X
-  if echo $WX_CPPFLAGS | grep __WXMAC__; then
+  if echo $WX_CPPFLAGS | grep __WXMAC__ > /dev/null 2>&1; then
     macappbundle="yes"
   else
     macappbundle="no"
