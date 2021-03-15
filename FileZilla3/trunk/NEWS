@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.53.0 (2021-03-15)
+
+- HTTP: Handle servers sending early replies
+
 3.53.0-rc1 (2021-03-05)
 
 + Require explicit confirmation on FTP servers not supporting TLS session esumption on the data connection
