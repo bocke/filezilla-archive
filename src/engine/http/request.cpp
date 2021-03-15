@@ -310,6 +310,7 @@ int CHttpRequestOpData::Send()
 					opState |= request_init;
 				}
 			}
+
 			return FZ_REPLY_CONTINUE;
 
 		}
@@ -375,6 +376,7 @@ int CHttpRequestOpData::ParseReceiveBuffer()
 				return FZ_REPLY_ERROR;
 			}
 		}
+
 		auto & response = shared_response->response();
 
 		if (!response.got_header()) {
@@ -469,14 +471,23 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 						requests_.front()->response().writer_->set_handler(nullptr);
 					}
 				}
-				requests_.pop_front();
-				--send_pos_;
 
-				bool const socket_done = read_state_.eof_ || !read_state_.keep_alive_;
+				requests_.pop_front();
+
+				bool premature{};
+				if (!send_pos_) {
+					premature = true;
+				}
+				else {
+					--send_pos_;
+				}
+
+				bool const socket_done = read_state_.eof_ || !read_state_.keep_alive_ || premature;
 				if (socket_done) {
+					controlSocket_.active_layer_->shutdown();
 					if (!recv_buffer_.empty()) {
-						log(logmsg::error, _("Malformed response: %s"), _("Server sent too much data."));
-						return FZ_REPLY_ERROR;
+						log(logmsg::debug_verbose, "Discarding %u bytes from receive buffer", recv_buffer_.size());
+						recv_buffer_.clear();
 					}
 
 					controlSocket_.ResetSocket();
@@ -576,6 +587,16 @@ int CHttpRequestOpData::ParseHeader()
 			if (code != 100) {
 				response.code_ = code;
 				response.flags_ |= HttpResponse::flag_got_code;
+			}
+
+			if (!send_pos_) {
+				if (response.success()) {
+					log(logmsg::error, _("Broken server, it claims to have processed a request before it got fully set"));
+					return FZ_REPLY_ERROR;
+				}
+				else {
+					log(logmsg::debug_info, "Premature error response");
+				}
 			}
 		}
 		else {
@@ -700,21 +721,17 @@ int CHttpRequestOpData::ProcessCompleteHeader()
 			if (response.writer_) {
 				response.writer_->set_handler(this);
 			}
-
 		}
 		else {
 			if (res == FZ_REPLY_OK) {
-				if (!request.body_ || request.flags_ & HttpRequest::flag_sent_body) {
+				if (send_pos_) {
 					// Clear the pointer, we no longer need the request to finish, all needed information is in read_state_
 					if (request.body_) {
 						request.body_->set_handler(nullptr);
 					}
 					srr.reset();
+					res = FZ_REPLY_CONTINUE;
 				}
-				else {
-					response.flags_ |= HttpResponse::flag_ignore_body;
-				}
-				res = FZ_REPLY_CONTINUE;
 			}
 		}
 	}
