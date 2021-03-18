@@ -1,28 +1,35 @@
 #include "filezilla.h"
 #include "chmoddialog.h"
-#include "xrc_helper.h"
+#include "textctrlex.h"
 
-BEGIN_EVENT_TABLE(CChmodDialog, wxDialogEx)
-EVT_BUTTON(XRCID("wxID_OK"), CChmodDialog::OnOK)
-EVT_BUTTON(XRCID("wxID_CANCEL"), CChmodDialog::OnCancel)
-EVT_TEXT(XRCID("ID_NUMERIC"), CChmodDialog::OnNumericChanged)
-EVT_CHECKBOX(XRCID("ID_RECURSE"), CChmodDialog::OnRecurseChanged)
-END_EVENT_TABLE()
+#include <wx/statbox.h>
+
+struct CChmodDialog::impl
+{
+	wxCheckBox* checkBoxes[9]{};
+
+	wxString oldNumeric_;
+	bool lastChangedNumeric_{};
+
+	wxCheckBox* recursive_{};
+	wxTextCtrlEx* numeric_{};
+
+	wxRadioButton* applyAll_{};
+	wxRadioButton* applyFiles_{};
+	wxRadioButton* applyDirs_{};
+};
 
 CChmodDialog::CChmodDialog(ChmodData & data)
-	: data_(data)
+	: impl_(std::make_unique<impl>())
+	, data_(data)
 {
-	for (int i = 0; i < 9; ++i) {
-		m_checkBoxes[i] = 0;
-	}
 }
 
-bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
-						  const wxString& name, const char permissions[9])
-{
-	m_noUserTextChange = false;
-	lastChangedNumeric = false;
+CChmodDialog::~CChmodDialog() = default;
 
+bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
+	wxString const& name, const char permissions[9])
+{
 	memcpy(data_.permissions_, permissions, 9);
 
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
@@ -51,78 +58,110 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 		}
 	}
 
-	if (!Load(parent, _T("ID_CHMODDIALOG"))) {
+	if (!wxDialogEx::Create(parent, nullID, _("Change file attributes"), wxDefaultPosition, wxDefaultSize)) {
 		return false;
 	}
 
-	if (!SetChildLabel(XRCID("ID_DESC"), title, 300)) {
-		wxFAIL_MSG(_T("Could not set ID_DESC"));
+	auto& lay = layout();
+	auto main = lay.createMain(this, 1);
+
+	WrapText(this, title, lay.dlgUnits(160));
+	main->Add(new wxStaticText(this, nullID, title));
+
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Owner permissions"), 3);
+		impl_->checkBoxes[0] = new wxCheckBox(box, nullID, _("&Read"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[0]);
+		impl_->checkBoxes[1] = new wxCheckBox(box, nullID, _("&Write"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[1]);
+		impl_->checkBoxes[2] = new wxCheckBox(box, nullID, _("&Execute"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[2]);
+	}
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Group permissions"), 3);
+		impl_->checkBoxes[3] = new wxCheckBox(box, nullID, _("Re&ad"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[3]);
+		impl_->checkBoxes[4] = new wxCheckBox(box, nullID, _("W&rite"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[4]);
+		impl_->checkBoxes[5] = new wxCheckBox(box, nullID, _("E&xecute"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[5]);
+	}
+	{
+		auto [box, inner] = lay.createStatBox(main, _("Public permissions"), 3);
+		impl_->checkBoxes[6] = new wxCheckBox(box, nullID, _("Rea&d"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[6]);
+		impl_->checkBoxes[7] = new wxCheckBox(box, nullID, _("Wr&ite"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[7]);
+		impl_->checkBoxes[8] = new wxCheckBox(box, nullID, _("Exe&cute"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE | wxCHK_ALLOW_3RD_STATE_FOR_USER);
+		inner->Add(impl_->checkBoxes[8]);
 	}
 
-	if (!XRCCTRL(*this, "wxID_OK", wxButton)) {
-		return false;
+	auto row = lay.createFlex(2);
+	main->Add(row);
+
+	row->Add(new wxStaticText(this, nullID, _("&Numeric value:")), lay.valign);
+	impl_->numeric_ = new wxTextCtrlEx(this, nullID);
+	row->Add(impl_->numeric_, lay.valign);
+	impl_->numeric_->SetFocus();
+	impl_->numeric_->Bind(wxEVT_TEXT, &CChmodDialog::OnNumericChanged, this);
+
+	wxString desc = _("You can use an x at any position to keep the permission the original files have.");
+	WrapText(this, desc, lay.dlgUnits(160));
+	main->Add(new wxStaticText(this, nullID, desc), lay.valign);
+
+	if (dirCount) {
+		main->AddSpacer(0);
+
+		impl_->recursive_ = new wxCheckBox(this, nullID, _("Rec&urse into subdirectories"));
+		impl_->recursive_->Bind(wxEVT_CHECKBOX, &CChmodDialog::OnRecurseChanged, this);
+		main->Add(impl_->recursive_);
+
+		auto inner = lay.createFlex(1);
+		main->Add(inner, 0, wxLEFT, lay.indent);
+
+		impl_->applyAll_ = new wxRadioButton(this, nullID, _("A&pply to all files and directories"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+		inner->Add(impl_->applyAll_);
+		impl_->applyFiles_ = new wxRadioButton(this, nullID, _("Apply to &files only"));
+		inner->Add(impl_->applyFiles_);
+		impl_->applyDirs_ = new wxRadioButton(this, nullID, _("App&ly to directories only"));
+		inner->Add(impl_->applyDirs_);
+
+		impl_->applyAll_->SetValue(true);
+		impl_->applyAll_->Disable();
+		impl_->applyFiles_->Disable();
+		impl_->applyDirs_->Disable();
 	}
-
-	if (!XRCCTRL(*this, "wxID_CANCEL", wxButton)) {
-		return false;
-	}
-
-	if (!XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl)) {
-		return false;
-	}
-
-	if (!WrapText(this, XRCID("ID_NUMERICTEXT"), 300)) {
-		wxFAIL_MSG(_T("Wrapping of ID_NUMERICTEXT failed"));
-	}
-
-	wxCheckBox* pRecurse = XRCCTRL(*this, "ID_RECURSE", wxCheckBox);
-	wxRadioButton* pApplyAll = XRCCTRL(*this, "ID_APPLYALL", wxRadioButton);
-	wxRadioButton* pApplyFiles = XRCCTRL(*this, "ID_APPLYFILES", wxRadioButton);
-	wxRadioButton* pApplyDirs = XRCCTRL(*this, "ID_APPLYDIRS", wxRadioButton);
-	if (!pRecurse || !pApplyAll || !pApplyFiles || !pApplyDirs) {
-		return false;
-	}
-
-	if (!dirCount) {
-		pRecurse->Hide();
-		pApplyAll->Hide();
-		pApplyFiles->Hide();
-		pApplyDirs->Hide();
-	}
-
-	pApplyAll->Enable(false);
-	pApplyFiles->Enable(false);
-	pApplyDirs->Enable(false);
-
-	const wxChar* IDs[9] = { _T("ID_OWNERREAD"), _T("ID_OWNERWRITE"), _T("ID_OWNEREXECUTE"),
-						   _T("ID_GROUPREAD"), _T("ID_GROUPWRITE"), _T("ID_GROUPEXECUTE"),
-						   _T("ID_PUBLICREAD"), _T("ID_PUBLICWRITE"), _T("ID_PUBLICEXECUTE")
-						 };
 
 	for (int i = 0; i < 9; ++i) {
-		int id = wxXmlResource::GetXRCID(IDs[i]);
-		m_checkBoxes[i] = dynamic_cast<wxCheckBox*>(FindWindow(id));
-
-		if (!m_checkBoxes[i]) {
-			return false;
-		}
-
-		Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CChmodDialog::OnCheckboxClick));
+		impl_->checkBoxes[i]->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &CChmodDialog::OnCheckboxClick, this);
 
 		switch (permissions[i])
 		{
 		default:
 		case 0:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_UNDETERMINED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_UNDETERMINED);
 			break;
 		case 1:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_UNCHECKED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_UNCHECKED);
 			break;
 		case 2:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_CHECKED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_CHECKED);
 			break;
 		}
 	}
+
+	auto buttons = lay.createButtonSizer(this, main, true);
+
+	auto ok = new wxButton(this, wxID_OK, _("&OK"));
+	ok->SetDefault();
+	ok->Bind(wxEVT_BUTTON, &CChmodDialog::OnOK, this);
+	buttons->AddButton(ok);
+
+	auto cancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
+	cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent const&) { EndModal(wxID_CANCEL); });
+	buttons->AddButton(cancel);
+
+	buttons->Realize();
 
 	GetSizer()->Fit(this);
 	GetSizer()->SetSizeHints(this);
@@ -135,33 +174,25 @@ bool CChmodDialog::Create(wxWindow* parent, int fileCount, int dirCount,
 
 void CChmodDialog::OnOK(wxCommandEvent&)
 {
-	wxCheckBox* pRecurse = XRCCTRL(*this, "ID_RECURSE", wxCheckBox);
-	m_recursive = pRecurse->GetValue();
-	wxRadioButton* pApplyFiles = XRCCTRL(*this, "ID_APPLYFILES", wxRadioButton);
-	wxRadioButton* pApplyDirs = XRCCTRL(*this, "ID_APPLYDIRS", wxRadioButton);
-	if (pApplyFiles->GetValue()) {
-		data_.applyType_ = 1;
+	data_.applyType_ = 0;
+	if (impl_->recursive_) {
+		if (impl_->applyFiles_->GetValue()) {
+			data_.applyType_ = 1;
+		}
+		else if (impl_->applyDirs_->GetValue()) {
+			data_.applyType_ = 2;
+		}
 	}
-	else if (pApplyDirs->GetValue()) {
-		data_.applyType_ = 2;
-	}
-	else {
-		data_.applyType_ = 0;
-	}
-	data_.numeric_ = xrc_call(*this, "ID_NUMERIC", &wxTextCtrl::GetValue).ToStdWstring();
-	EndModal(wxID_OK);
-}
 
-void CChmodDialog::OnCancel(wxCommandEvent&)
-{
-	EndModal(wxID_CANCEL);
+	data_.numeric_ = impl_->numeric_->GetValue().ToStdWstring();
+	EndModal(wxID_OK);
 }
 
 void CChmodDialog::OnCheckboxClick(wxCommandEvent&)
 {
-	lastChangedNumeric = false;
+	impl_->lastChangedNumeric_ = false;
 	for (int i = 0; i < 9; ++i) {
-		wxCheckBoxState state = m_checkBoxes[i]->Get3StateValue();
+		wxCheckBoxState state = impl_->checkBoxes[i]->Get3StateValue();
 		switch (state)
 		{
 		default:
@@ -187,22 +218,16 @@ void CChmodDialog::OnCheckboxClick(wxCommandEvent&)
 		numericValue += wxString::Format(_T("%d"), (data_.permissions_[i * 3] - 1) * 4 + (data_.permissions_[i * 3 + 1] - 1) * 2 + (data_.permissions_[i * 3 + 2] - 1) * 1);
 	}
 
-	wxTextCtrl *pTextCtrl = XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl);
-	wxString oldValue = pTextCtrl->GetValue();
+	
+	wxString oldValue = impl_->numeric_->GetValue();
 
-	m_noUserTextChange = true;
-	pTextCtrl->SetValue(oldValue.Left(oldValue.size() - 3) + numericValue);
-	m_noUserTextChange = false;
-	oldNumeric = numericValue;
+	impl_->numeric_->ChangeValue(oldValue.Left(oldValue.size() - 3) + numericValue);
+	impl_->oldNumeric_ = numericValue;
 }
 
 void CChmodDialog::OnNumericChanged(wxCommandEvent&)
 {
-	if (m_noUserTextChange) {
-		return;
-	}
-
-	lastChangedNumeric = true;
+	impl_->lastChangedNumeric_ = true;
 
 	wxTextCtrl *pTextCtrl = XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl);
 	wxString numeric = pTextCtrl->GetValue();
@@ -217,7 +242,7 @@ void CChmodDialog::OnNumericChanged(wxCommandEvent&)
 		}
 	}
 	for (int i = 0; i < 3; ++i) {
-		if (!oldNumeric.empty() && numeric[i] == oldNumeric[i]) {
+		if (!impl_->oldNumeric_.empty() && numeric[i] == impl_->oldNumeric_[i]) {
 			continue;
 		}
 		if (numeric[i] == 'x') {
@@ -233,20 +258,20 @@ void CChmodDialog::OnNumericChanged(wxCommandEvent&)
 		}
 	}
 
-	oldNumeric = numeric;
+	impl_->oldNumeric_ = numeric;
 
 	for (int i = 0; i < 9; ++i) {
 		switch (data_.permissions_[i])
 		{
 		default:
 		case 0:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_UNDETERMINED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_UNDETERMINED);
 			break;
 		case 1:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_UNCHECKED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_UNCHECKED);
 			break;
 		case 2:
-			m_checkBoxes[i]->Set3StateValue(wxCHK_CHECKED);
+			impl_->checkBoxes[i]->Set3StateValue(wxCHK_CHECKED);
 			break;
 		}
 	}
@@ -254,16 +279,12 @@ void CChmodDialog::OnNumericChanged(wxCommandEvent&)
 
 bool CChmodDialog::Recursive() const
 {
-	return m_recursive;
+	return impl_ && impl_->recursive_ && impl_->recursive_->GetValue();
 }
 
 void CChmodDialog::OnRecurseChanged(wxCommandEvent&)
 {
-	wxCheckBox* pRecurse = XRCCTRL(*this, "ID_RECURSE", wxCheckBox);
-	wxRadioButton* pApplyAll = XRCCTRL(*this, "ID_APPLYALL", wxRadioButton);
-	wxRadioButton* pApplyFiles = XRCCTRL(*this, "ID_APPLYFILES", wxRadioButton);
-	wxRadioButton* pApplyDirs = XRCCTRL(*this, "ID_APPLYDIRS", wxRadioButton);
-	pApplyAll->Enable(pRecurse->GetValue());
-	pApplyFiles->Enable(pRecurse->GetValue());
-	pApplyDirs->Enable(pRecurse->GetValue());
+	impl_->applyAll_->Enable(impl_->recursive_->GetValue());
+	impl_->applyFiles_->Enable(impl_->recursive_->GetValue());
+	impl_->applyDirs_->Enable(impl_->recursive_->GetValue());
 }

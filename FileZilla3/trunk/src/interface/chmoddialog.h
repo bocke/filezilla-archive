@@ -8,17 +8,16 @@ class CChmodDialog final : public wxDialogEx
 {
 public:
 	CChmodDialog(ChmodData & data);
+	~CChmodDialog();
 
 	bool Create(wxWindow* parent, int fileCount, int dirCount,
-				const wxString& name, const char permissions[9]);
+				wxString const& name, const char permissions[9]);
 
-	bool Recursive() const ;
+	bool Recursive() const;
 
 protected:
 
-	DECLARE_EVENT_TABLE()
 	void OnOK(wxCommandEvent&);
-	void OnCancel(wxCommandEvent&);
 	void OnRecurseChanged(wxCommandEvent&);
 
 	void OnCheckboxClick(wxCommandEvent&);
@@ -26,13 +25,8 @@ protected:
 
 	ChmodData & data_;
 
-	wxCheckBox* m_checkBoxes[9];
-
-	bool m_noUserTextChange{};
-	wxString oldNumeric;
-	bool lastChangedNumeric{};
-
-	bool m_recursive{};
+	struct impl;
+	std::unique_ptr<impl> impl_;
 };
 
 #endif
