@@ -4,7 +4,6 @@
 
 #include <libfilezilla/translate.hpp>
 
-#include <cassert>
 #include <cstring>
 
 bool site_manager::Load(std::wstring const& settings_file, CSiteManagerXmlHandler& handler, std::wstring& error)
@@ -26,7 +25,9 @@ bool site_manager::Load(std::wstring const& settings_file, CSiteManagerXmlHandle
 
 bool site_manager::Load(pugi::xml_node element, CSiteManagerXmlHandler& handler)
 {
-	assert(element);
+	if (!element) {
+		return false;
+	}
 
 	for (auto child = element.first_child(); child; child = child.next_sibling()) {
 		if (!strcmp(child.name(), "Folder")) {

@@ -2,8 +2,6 @@
 
 #include <libfilezilla/local_filesys.hpp>
 
-#include <cassert>
-
 local_recursive_operation::local_recursive_operation()
 {}
 
@@ -46,7 +44,6 @@ bool local_recursive_operation::do_start_recursive_operation(OperationMode mode,
 	fz::scoped_lock l(mutex_);
 
 	if (m_operationMode != recursive_none) {
-		assert(!"StartRecursiveOperation called with m_operationMode != recursive_none");
 		return false;
 	}
 
