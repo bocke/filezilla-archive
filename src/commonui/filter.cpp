@@ -9,7 +9,6 @@
 #endif
 
 #include <array>
-#include <cassert>
 
 std::array<std::wstring, 4> const matchTypeXmlNames =
 	{ L"All", L"Any", L"None", L"Not all" };
@@ -321,7 +320,6 @@ bool filter_manager::FilenameFilteredByFilter(CFilter const& filter, std::wstrin
 			}
 			break;
 		default:
-			assert(!"Unhandled filter type");
 			break;
 		}
 		if (match) {
@@ -375,8 +373,7 @@ bool load_filter(pugi::xml_node& element, CFilter& filter)
 
 	for (auto xCondition = xConditions.child("Condition"); xCondition; xCondition = xCondition.next_sibling("Condition")) {
 		t_filterType type;
-		int const t = GetTextElementInt(xCondition, "Type", 0);
-		switch (t) {
+		switch (GetTextElementInt(xCondition, "Type", -1)) {
 		case 0:
 			type = filter_name;
 			break;
@@ -551,7 +548,6 @@ void save_filter(pugi::xml_node& element, const CFilter& filter)
 			type = 5;
 			break;
 		default:
-			assert(!"Unhandled filter type");
 			continue;
 		}
 

@@ -5,8 +5,6 @@
 #include <libfilezilla/string.hpp>
 
 #include <algorithm>
-#include <cassert>
-
 
 #ifndef FZ_WINDOWS
 #include <errno.h>
@@ -75,7 +73,10 @@ CInterProcessMutex::~CInterProcessMutex()
 
 bool CInterProcessMutex::Lock()
 {
-	assert(!m_locked);
+	if (m_locked) {
+		return true;
+	}
+
 #ifdef FZ_WINDOWS
 	if (hMutex) {
 		::WaitForSingleObject(hMutex, INFINITE);
@@ -109,7 +110,9 @@ bool CInterProcessMutex::Lock()
 
 int CInterProcessMutex::TryLock()
 {
-	assert(!m_locked);
+	if (m_locked) {
+		return 1;
+	}
 
 #ifdef FZ_WINDOWS
 	if (!hMutex) {
@@ -213,7 +216,6 @@ CReentrantInterProcessMutexLocker::~CReentrantInterProcessMutexLocker()
 			return v.pMutex->GetType() == m_type;
 		});
 
-	assert(it != m_mutexes.cend());
 	if (it == m_mutexes.cend()) {
 		return;
 	}

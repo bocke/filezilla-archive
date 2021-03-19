@@ -28,7 +28,7 @@ public:
 	// Queue a directory but restrict processing to the named subdirectory
 	void add_dir_to_visit_restricted(CServerPath const& path, std::wstring const& restricted, bool recurse);
 
-	bool empty() const { return m_dirsToVisit.empty(); }
+	bool empty() const { return m_dirsToVisit.empty() || m_remoteStartDir.empty(); }
 
 private:
 	friend class remote_recursive_operation;
@@ -107,14 +107,14 @@ protected:
 	void ListingFailed(int error);
 
 	// Processes the directory listing in case of a recursive operation
-	void ProcessDirectoryListing(const CDirectoryListing* pDirectoryListing);
+	void ProcessDirectoryListing(CDirectoryListing const* pDirectoryListing);
 
 protected:
 	void process_entries(recursion_root& root, const CDirectoryListing* pDirectoryListing
 		, recursion_root::new_dir const& dir, std::wstring const& remotePath);
 
 	bool NextOperation();
-	bool BelowRecursionRoot(const CServerPath& path, recursion_root::new_dir &dir);
+	bool BelowRecursionRoot(CServerPath const& path, recursion_root::new_dir &dir);
 
 	std::deque<recursion_root> recursion_roots_;
 

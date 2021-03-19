@@ -5,7 +5,6 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/translate.hpp>
 
-#include <cassert>
 #include <cstring>
 
 //TODO: move these file functions to libfilezilla
@@ -60,7 +59,6 @@ CXmlFile::CXmlFile(std::wstring const& fileName, std::string const& root)
 
 void CXmlFile::SetFileName(std::wstring const& name)
 {
-	assert(!name.empty());
 	m_fileName = name;
 	m_modificationTime = fz::datetime();
 }
@@ -70,7 +68,6 @@ pugi::xml_node CXmlFile::Load(bool overwriteInvalid)
 	Close();
 	m_error.clear();
 
-	assert(!m_fileName.empty());
 	if (m_fileName.empty()) {
 		return m_element;
 	}
@@ -134,7 +131,6 @@ pugi::xml_node CXmlFile::Load(bool overwriteInvalid)
 
 bool CXmlFile::Modified() const
 {
-	assert(!m_fileName.empty());
 	if (m_fileName.empty()) {
 		return false;
 	}
@@ -180,8 +176,6 @@ bool CXmlFile::Save(bool updateMetadata)
 {
 	m_error.clear();
 
-	assert(!m_fileName.empty());
-	assert(m_document);
 	if (m_fileName.empty() || !m_document) {
 		return false;
 	}
@@ -326,8 +320,6 @@ bool CXmlFile::SaveXmlFile()
 
 bool GetServer(pugi::xml_node node, Site & site)
 {
-	assert(node);
-
 	std::wstring host = GetTextElement(node, "Host");
 	if (host.empty()) {
 		return false;

@@ -5,13 +5,10 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/recursive_remove.hpp>
 
-#include <cassert>
-
 recursion_root::recursion_root(CServerPath const& start_dir, bool allow_parent)
 	: m_remoteStartDir(start_dir)
 	, m_allowParent(allow_parent)
 {
-	assert(!start_dir.empty() && "Empty startDir in recursion_root constructor");
 }
 
 void recursion_root::add_dir_to_visit(CServerPath const& path, std::wstring const& subdir, CLocalPath const& localDir, bool is_link)
@@ -54,7 +51,6 @@ void remote_recursive_operation::AddRecursionRoot(recursion_root && root)
 void remote_recursive_operation::start_recursive_operation(OperationMode mode, ActiveFilters const& filters)
 {
 	if (m_operationMode != recursive_none) {
-		assert(!"StartRecursiveOperation called with m_operationMode != recursive_none");
 		return;
 	}
 	if (mode == recursive_chmod && !chmodData_) {
@@ -109,7 +105,7 @@ bool remote_recursive_operation::NextOperation()
 	return false;
 }
 
-bool remote_recursive_operation::BelowRecursionRoot(const CServerPath& path, recursion_root::new_dir &dir)
+bool remote_recursive_operation::BelowRecursionRoot(CServerPath const& path, recursion_root::new_dir &dir)
 {
 	if (!dir.start_dir.empty()) {
 		if (path.IsSubdirOf(dir.start_dir, false)) {
@@ -139,7 +135,7 @@ bool remote_recursive_operation::BelowRecursionRoot(const CServerPath& path, rec
 	return false;
 }
 
-void remote_recursive_operation::process_entries(recursion_root& root, const CDirectoryListing* pDirectoryListing
+void remote_recursive_operation::process_entries(recursion_root& root, CDirectoryListing const* pDirectoryListing
 	, recursion_root::new_dir const& dir, std::wstring const& remotePath)
 {
 	std::vector<std::wstring> filesToDelete;
@@ -216,7 +212,7 @@ void remote_recursive_operation::process_entries(recursion_root& root, const CDi
 	}
 }
 
-void remote_recursive_operation::ProcessDirectoryListing(const CDirectoryListing* pDirectoryListing)
+void remote_recursive_operation::ProcessDirectoryListing(CDirectoryListing const* pDirectoryListing)
 {
 	if (!pDirectoryListing) {
 		StopRecursiveOperation();
@@ -234,8 +230,6 @@ void remote_recursive_operation::ProcessDirectoryListing(const CDirectoryListing
 	}
 
 	auto & root = recursion_roots_.front();
-	assert(!root.m_dirsToVisit.empty());
-
 	if (root.m_dirsToVisit.empty()) {
 		StopRecursiveOperation();
 		return;
@@ -310,7 +304,7 @@ void remote_recursive_operation::ListingFailed(int error)
 
 	auto & root = recursion_roots_.front();
 	if (root.m_dirsToVisit.empty()) {
-		assert(!"Empty dirs to visit");
+		StopRecursiveOperation();
 		return;
 	}
 
@@ -343,7 +337,7 @@ void remote_recursive_operation::LinkIsNotDir(Site const& site)
 
 	auto & root = recursion_roots_.front();
 	if (root.m_dirsToVisit.empty()) {
-		assert(!"Empty dirs to visit");
+		StopRecursiveOperation();
 		return;
 	}
 
