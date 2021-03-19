@@ -17,8 +17,6 @@
 
 #include <algorithm>
 
-#include <assert.h>
-
 fz::mutex CFileZillaEnginePrivate::global_mutex_{false};
 std::vector<CFileZillaEnginePrivate*> CFileZillaEnginePrivate::m_engineList;
 std::atomic_int CFileZillaEnginePrivate::m_activeStatus[2] = {{0}, {0}};
@@ -288,8 +286,6 @@ int CFileZillaEnginePrivate::Connect(CConnectCommand const& command)
 		return FZ_REPLY_ALREADYCONNECTED;
 	}
 
-	assert(!controlSocket_);
-
 	m_retryCount = 0;
 
 	auto const& server = command.GetServer();
@@ -490,7 +486,6 @@ void CFileZillaEnginePrivate::OnTimer(fz::timer_id)
 
 	int res = ContinueConnect();
 	if (res == FZ_REPLY_CONTINUE) {
-		assert(controlSocket_);
 		controlSocket_->SendNextCommand();
 	}
 	else if (res != FZ_REPLY_WOULDBLOCK) {
@@ -673,8 +668,12 @@ void CFileZillaEnginePrivate::OnCommandEvent()
 		}
 
 		if (res == FZ_REPLY_CONTINUE) {
-			assert(controlSocket_);
-			controlSocket_->SendNextCommand();
+			if (controlSocket_) {
+				controlSocket_->SendNextCommand();
+			}
+			else {
+				ResetOperation(FZ_REPLY_INTERNALERROR);
+			}
 		}
 		else if (res != FZ_REPLY_WOULDBLOCK) {
 			ResetOperation(res);
@@ -690,8 +689,6 @@ void CFileZillaEnginePrivate::DoCancel()
 	}
 
 	if (m_retryTimer) {
-		assert(currentCommand_ && currentCommand_->GetId() == Command::connect);
-
 		controlSocket_.reset();
 
 		currentCommand_.reset();
@@ -830,7 +827,9 @@ int CFileZillaEnginePrivate::CacheLookup(const CServerPath& path, CDirectoryList
 		return FZ_REPLY_ERROR;
 	}
 
-	assert(controlSocket_->GetCurrentServer());
+	if (!controlSocket_->GetCurrentServer()) {
+		return FZ_REPLY_INTERNALERROR;
+	}
 
 	bool is_outdated = false;
 	if (!directory_cache_.Lookup(listing, controlSocket_->GetCurrentServer(), path, true, is_outdated)) {
