@@ -110,9 +110,6 @@ void CClearPrivateDataDialog::Run()
 	if (pQueueCheck->GetValue()) {
 		m_pMainFrame->GetQueue()->SetActive(false);
 		m_pMainFrame->GetQueue()->RemoveAll();
-
-		CInterProcessMutex mutex(MUTEX_QUEUE);
-		RemoveXmlFile(L"queue");
 	}
 }
 

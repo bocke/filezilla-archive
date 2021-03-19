@@ -140,7 +140,6 @@ public:
 	void RemoveAll();
 
 	void LoadQueue();
-	void LoadQueueFromXML();
 	void ImportQueue(pugi::xml_node element, bool updateSelections);
 
 	virtual void InsertItem(CServerItem* pServerItem, CQueueItem* pItem) override;

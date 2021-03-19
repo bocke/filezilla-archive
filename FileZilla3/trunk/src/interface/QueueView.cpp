@@ -1575,45 +1575,12 @@ void CQueueView::SaveQueue(bool silent)
 	}
 }
 
-void CQueueView::LoadQueueFromXML()
-{
-	CXmlFile xml(wxGetApp().GetSettingsFile(_T("queue")));
-	auto document = xml.Load();
-	if (!document) {
-		if (!xml.GetError().empty()) {
-			wxString msg = xml.GetError() + _T("\n\n") + _("The queue will not be saved.");
-			wxMessageBoxEx(msg, _("Error loading xml file"), wxICON_ERROR);
-		}
-		return;
-	}
-
-	auto queue = document.child("Queue");
-	if (!queue) {
-		return;
-	}
-
-	ImportQueue(queue, false);
-
-	document.remove_child(queue);
-
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
-		return;
-	}
-
-	if (!xml.Save()) {
-		wxString msg = wxString::Format(_("Could not write \"%s\", the queue could not be saved.\n%s"), xml.GetFileName(), xml.GetError());
-		wxMessageBoxEx(msg, _("Error writing xml file"), wxICON_ERROR);
-	}
-}
-
 void CQueueView::LoadQueue()
 {
 	wxGetApp().AddStartupProfileRecord("CQueueView::LoadQueue");
 	// We have to synchronize access to queue.xml so that multiple processed don't write
 	// to the same file or one is reading while the other one writes.
 	CInterProcessMutex mutex(MUTEX_QUEUE);
-
-	LoadQueueFromXML();
 
 	bool error = false;
 
