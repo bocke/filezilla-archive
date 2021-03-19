@@ -18,8 +18,7 @@ bool site_manager::Load(std::wstring const& settings_file, CSiteManagerXmlHandle
 
 	auto element = document.child("Servers");
 	if (!element) {
-		error = fz::translate("Invalid xml file");
-		return false;
+		return true;
 	}
 
 	return Load(element, handler);
