@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.53.1 (2021-03-22)
+
+- Removed an error message on new installation where there is no sitemanager.xml yet
+- Fixed SOCKS5 proxy support
+
 3.53.0 (2021-03-15)
 
 - HTTP: Handle servers sending early replies
