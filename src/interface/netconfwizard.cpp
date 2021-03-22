@@ -271,6 +271,7 @@ void CNetConfWizard::DoOnSocketEvent(fz::socket_event_source* s, fz::socket_even
 			break;
 		case fz::socket_event_flag::connection:
 			OnConnect();
+			OnSend();
 			break;
 		default:
 			break;
