@@ -125,6 +125,9 @@ void CExternalIPResolver::OnConnect(int error)
 	if (error) {
 		Close(false);
 	}
+	else {
+		OnSend();
+	}
 }
 
 void CExternalIPResolver::OnReceive()

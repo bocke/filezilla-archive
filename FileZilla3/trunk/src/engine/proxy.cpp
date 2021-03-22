@@ -216,6 +216,7 @@ void CProxySocket::OnSocketEvent(socket_event_source* s, fz::socket_event_flag t
 	switch (t) {
 	case fz::socket_event_flag::connection:
 		m_pOwner->log(logmsg::status, _("Connection with proxy established, performing handshake..."));
+		OnSend();
 		break;
 	case fz::socket_event_flag::read:
 		OnReceive();
