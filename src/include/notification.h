@@ -34,7 +34,6 @@ enum NotificationId
 	nId_listing,			// directory listings
 	nId_asyncrequest,		// asynchronous request
 	nId_active,				// sent if data gets either received or sent
-	nId_data,				// for memory downloads, indicates that new data is available.
 	nId_sftp_encryption,	// information about key exchange, encryption algorithms and so on for SFTP
 	nId_local_dir_created,	// local directory has been created
 	nId_serverchange,		// With some protocols, actual server identity isn't known until after logon
