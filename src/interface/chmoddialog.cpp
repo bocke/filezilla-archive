@@ -229,8 +229,7 @@ void CChmodDialog::OnNumericChanged(wxCommandEvent&)
 {
 	impl_->lastChangedNumeric_ = true;
 
-	wxTextCtrl *pTextCtrl = XRCCTRL(*this, "ID_NUMERIC", wxTextCtrl);
-	wxString numeric = pTextCtrl->GetValue();
+	wxString numeric = impl_->numeric_->GetValue();
 	if (numeric.size() < 3) {
 		return;
 	}
