@@ -125,10 +125,12 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 		log_raw(logmsg::status, message.text[0]);
 		break;
 	case storjEvent::Recv:
-		SetActive(CFileZillaEngine::recv);
+		// FIXME
+		RecordActivity(activity_logger::recv, 1);
 		break;
 	case storjEvent::Send:
-		SetActive(CFileZillaEngine::send);
+		// FIXME
+		RecordActivity(activity_logger::send, 1);
 		break;
 	case storjEvent::Listentry:
 		if (operations_.empty() || operations_.back()->opId != Command::list) {
@@ -149,9 +151,10 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 			if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
 				auto & data = static_cast<CStorjFileTransferOpData &>(*operations_.back());
 
-				SetActive(data.download() ? CFileZillaEngine::recv : CFileZillaEngine::send);
+				//FIXME
+				//RecordActivity(data.download() ? CFileZillaEngine::recv : CFileZillaEngine::send);
 
-				bool tmp;
+				bool tmp{};
 				CTransferStatus status = engine_.transfer_status_.Get(tmp);
 				if (!status.empty() && !status.madeProgress) {
 					if (data.download()) {

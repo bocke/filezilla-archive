@@ -19,7 +19,6 @@
 
 fz::mutex CFileZillaEnginePrivate::global_mutex_{false};
 std::vector<CFileZillaEnginePrivate*> CFileZillaEnginePrivate::m_engineList;
-std::atomic_int CFileZillaEnginePrivate::m_activeStatus[2] = {{0}, {0}};
 std::list<CFileZillaEnginePrivate::t_failedLogins> CFileZillaEnginePrivate::m_failedLogins;
 
 struct invalid_current_working_dir_event_type{};
@@ -40,6 +39,7 @@ CFileZillaEnginePrivate::CFileZillaEnginePrivate(CFileZillaEngineContext& contex
 	: event_handler(context.GetEventLoop())
 	, transfer_status_(*this)
 	, opLockManager_(context.GetOpLockManager())
+	, activity_logger_(context.GetActivityLogger())
 	, notification_cb_(notification_cb)
 	, m_engine_id(get_next_engine_id())
 	, options_(context.GetOptions())
@@ -791,26 +791,6 @@ bool CFileZillaEnginePrivate::IsPendingAsyncRequestReply(std::unique_ptr<CAsyncR
 	}
 
 	return pNotification->requestNumber == asyncRequestCounter_;
-}
-
-void CFileZillaEnginePrivate::SetActive(int direction)
-{
-	int const old_status = m_activeStatus[direction].fetch_or(0x1);
-	if (!old_status) {
-		AddNotification(std::make_unique<CActiveNotification>(direction));
-	}
-}
-
-bool CFileZillaEnginePrivate::IsActive(CFileZillaEngine::_direction direction)
-{
-	int const old = m_activeStatus[direction].exchange(0x2);
-	if (!(old & 0x1)) {
-		// Race: We might lose updates between the first exchange and this assignment.
-		// It is harmless though
-		m_activeStatus[direction] = 0;
-		return false;
-	}
-	return true;
 }
 
 CTransferStatus CFileZillaEnginePrivate::GetTransferStatus(bool &changed)

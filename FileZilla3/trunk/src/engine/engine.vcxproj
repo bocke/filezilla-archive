@@ -128,6 +128,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="activity_logger.cpp" />
     <ClCompile Include="aio.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="controlsocket.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="..\include\commands.h" />
     <ClInclude Include="..\include\engine_options.h" />
+    <ClInclude Include="..\include\httpheaders.h" />
     <ClInclude Include="..\include\reader.h" />
     <ClInclude Include="..\include\version.h" />
     <ClInclude Include="..\include\writer.h" />

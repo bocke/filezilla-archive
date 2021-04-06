@@ -1,4 +1,5 @@
 #include "filezilla.h"
+#include "led.h"
 #include "Options.h"
 #include "sftp_crypt_info_dlg.h"
 #include "sizeformatting.h"
@@ -6,6 +7,10 @@
 #include "statusbar.h"
 #include "themeprovider.h"
 #include "verifycertdialog.h"
+
+#include "../include/activity_logger.h"
+
+#include <libfilezilla/glue/wxinvoker.hpp>
 
 #include <wx/dcclient.h>
 #include <wx/menu.h>
@@ -312,9 +317,10 @@ EVT_MENU(XRCID("ID_SPEEDLIMITCONTEXT_CONFIGURE"), CStatusBar::OnSpeedLimitsConfi
 EVT_TIMER(wxID_ANY, CStatusBar::OnTimer)
 END_EVENT_TABLE()
 
-CStatusBar::CStatusBar(wxTopLevelWindow* pParent)
+CStatusBar::CStatusBar(wxTopLevelWindow* pParent, activity_logger& al)
 	: CWidgetsStatusBar(pParent)
 	, COptionChangeEventHandler(this)
+	, activity_logger_(al)
 {
 	// Speedlimits
 	COptions::Get()->watch(OPTION_SPEEDLIMIT_ENABLE, this);
@@ -347,11 +353,23 @@ CStatusBar::CStatusBar(wxTopLevelWindow* pParent)
 
 	UpdateSizeFormat();
 
+	activityLeds_[0] = new CLed(this, 0);
+	activityLeds_[1] = new CLed(this, 1);
+	activityLeds_[0]->Bind(wxEVT_ENTER_WINDOW, [this](wxMouseEvent&) { UpdateActivityTooltip(); });
+	activityLeds_[1]->Bind(wxEVT_ENTER_WINDOW, [this](wxMouseEvent&) { UpdateActivityTooltip(); });
+
+	AddField(-1, widget_led_recv, activityLeds_[1]);
+	AddField(-1, widget_led_send, activityLeds_[0]);
+
 	UpdateSpeedLimitsIcon();
 	DisplayDataType();
 	DisplayEncrypted();
 
 	m_queue_size_timer.SetOwner(this);
+
+	activity_logger_.set_notifier(fz::make_invoker(*this, [this]() { OnActivity(); }));
+
+	activityTimer_.Bind(wxEVT_TIMER, [this](wxTimerEvent &) { OnActivity(); });
 }
 
 CStatusBar::~CStatusBar()
@@ -693,4 +711,60 @@ void CStatusBar::OnTimer(wxTimerEvent&)
 		DoDisplayQueueSize();
 		m_queue_size_timer.Start(200, true);
 	}
+}
+
+void CStatusBar::OnActivity()
+{
+	auto activity = activity_logger_.extract_amounts();
+	activityLeds_[0]->Set(activity.first != 0);
+	activityLeds_[1]->Set(activity.second != 0);
+	if (activity.first || activity.second) {
+		past_activity_[past_activity_index_++] = std::make_pair(fz::datetime::now(), activity);
+		if (past_activity_index_ >= past_activity_.size()) {
+			past_activity_index_ = 0;
+		}
+		if (!activityTimer_.IsRunning()) {
+			activityTimer_.Start(100);
+		}
+	}
+	else {
+		activityTimer_.Stop();
+	}
+}
+
+
+void CStatusBar::UpdateActivityTooltip()
+{
+	uint64_t speeds[2]{};
+
+	auto const now = fz::datetime::now();
+	for (size_t i = 0; i < past_activity_.size(); ++i) {
+		if ((now - past_activity_[i].first) <= fz::duration::from_seconds(2)) {
+			speeds[0] += past_activity_[i].second.first;
+			speeds[1] += past_activity_[i].second.second;
+		}
+	}
+	speeds[0] /= 2;
+	speeds[1] /= 2;
+
+	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->get_int(OPTION_SIZE_FORMAT));
+	if (format == CSizeFormat::bytes) {
+		format = CSizeFormat::iec;
+	}
+
+
+	std::wstring const upSpeed = CSizeFormat::Format(speeds[0], true, format,
+													 COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+													 COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
+
+	std::wstring const dlSpeed = CSizeFormat::Format(speeds[1], true, format,
+													 COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+													 COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
+
+
+	wxString tooltipText;
+	tooltipText.Printf(_("Network activity:") + L"\n    " + _("Download: %s/s") + L"\n    " + _("Upload: %s/s"), dlSpeed, upSpeed);
+
+	activityLeds_[0]->SetToolTip(tooltipText);
+	activityLeds_[1]->SetToolTip(tooltipText);
 }

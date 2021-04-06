@@ -79,6 +79,7 @@ struct NetSocket {
 
     // Remember last notification time to avoid spamming FZ
     _fztimer send_timer, recv_timer;
+    int written, received;
 };
 
 struct SockAddr {
@@ -870,6 +871,7 @@ static Socket *sk_net_accept(accept_ctx_t ctx, Plug *plug)
     ret->addr = NULL;
     fz_timer_init(&ret->send_timer);
     fz_timer_init(&ret->recv_timer);
+    ret->written = ret->received = 0;
 
     ret->s = (SOCKET)ctx.p;
 
@@ -1132,6 +1134,7 @@ Socket *sk_new(SockAddr *addr, int port, bool privport, bool oobinline,
     ret->s = INVALID_SOCKET;
     fz_timer_init(&ret->send_timer);
     fz_timer_init(&ret->recv_timer);
+    ret->written = ret->received = 0;
 
     err = 0;
     do {
@@ -1176,6 +1179,7 @@ Socket *sk_newlistener(const char *srcaddr, int port, Plug *plug,
     ret->addr = NULL;
     fz_timer_init(&ret->send_timer);
     fz_timer_init(&ret->recv_timer);
+    ret->written = ret->received = 0;
 
     /*
      * Translate address_family from platform-independent constants
@@ -1451,10 +1455,12 @@ void try_send(NetSocket *s)
                 return;
             }
         } else {
+            s->written += nsent;
             UpdateQuota(1, nsent);
             if (fz_timer_check(&s->send_timer)) {
                 update_tcp_send_buffer_size(s->s);
-                fznotify(sftpSend);
+                fznotify1(sftpSend, s->written);
+                s->written = 0;
             }
             if (s->sending_oob) {
                 if (nsent < len) {
@@ -1633,9 +1639,11 @@ void select_result(WPARAM wParam, LPARAM lParam)
         } else if (0 == ret) {
             plug_closing(s->plug, NULL, 0, 0);
         } else {
+            s->received += ret;
             UpdateQuota(0, ret);
             if (fz_timer_check(&s->recv_timer)) {
-                fznotify(sftpRecv);
+                fznotify1(sftpRecv, s->received);
+                s->received = 0;
             }
             plug_receive(s->plug, atmark ? 0 : 1, buf, ret);
         }
@@ -1654,9 +1662,11 @@ void select_result(WPARAM wParam, LPARAM lParam)
             int err = p_WSAGetLastError();
             plug_closing(s->plug, winsock_error_string(err), err, 0);
         } else {
+            s->received += ret;
             UpdateQuota(0, ret);
             if (fz_timer_check(&s->recv_timer)) {
-                fznotify(sftpRecv);
+                fznotify1(sftpRecv, s->received);
+                s->received = 0;
             }
             plug_receive(s->plug, 2, buf, ret);
         }

@@ -33,7 +33,6 @@ enum NotificationId
 	nId_transferstatus,		// transfer information: bytes transferred, transfer speed and such
 	nId_listing,			// directory listings
 	nId_asyncrequest,		// asynchronous request
-	nId_active,				// sent if data gets either received or sent
 	nId_sftp_encryption,	// information about key exchange, encryption algorithms and so on for SFTP
 	nId_local_dir_created,	// local directory has been created
 	nId_serverchange,		// With some protocols, actual server identity isn't known until after logon
@@ -225,17 +224,6 @@ protected:
 	type const m_type;
 
 	bool const m_repeated;
-};
-
-// Indicate network action.
-class FZC_PUBLIC_SYMBOL CActiveNotification final : public CNotificationHelper<nId_active>
-{
-public:
-	explicit CActiveNotification(int direction);
-
-	int GetDirection() const { return m_direction; }
-protected:
-	const int m_direction;
 };
 
 class FZC_PUBLIC_SYMBOL CTransferStatus final

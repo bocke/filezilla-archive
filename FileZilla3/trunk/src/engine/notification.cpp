@@ -22,11 +22,6 @@ RequestId CInteractiveLoginNotification::GetRequestID() const
 	return reqId_interactiveLogin;
 }
 
-CActiveNotification::CActiveNotification(int direction)
-	: m_direction(direction)
-{
-}
-
 CTransferStatusNotification::CTransferStatusNotification(CTransferStatus const& status)
 	: status_(status)
 {

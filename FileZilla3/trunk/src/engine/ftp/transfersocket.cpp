@@ -452,7 +452,7 @@ void CTransferSocket::OnReceive()
 						return;
 					}
 
-					controlSocket_.SetActive(CFileZillaEngine::recv);
+					controlSocket_.RecordActivity(activity_logger::recv, numread);
 					if (!m_madeProgress) {
 						m_madeProgress = 2;
 						engine_.transfer_status_.SetMadeProgress();
@@ -486,7 +486,7 @@ void CTransferSocket::OnReceive()
 					break;
 				}
 
-				controlSocket_.SetActive(CFileZillaEngine::recv);
+				controlSocket_.RecordActivity(activity_logger::recv, numread);
 				if (!m_madeProgress) {
 					m_madeProgress = 2;
 					engine_.transfer_status_.SetMadeProgress();
@@ -600,7 +600,7 @@ void CTransferSocket::OnSend()
 			break;
 		}
 
-		controlSocket_.SetActive(CFileZillaEngine::send);
+		controlSocket_.RecordActivity(activity_logger::recv, written);
 		if (m_madeProgress == 1) {
 			controlSocket_.log(logmsg::debug_debug, L"Made progress in CTransferSocket::OnSend()");
 			m_madeProgress = 2;

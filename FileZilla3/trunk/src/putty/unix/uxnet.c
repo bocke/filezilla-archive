@@ -86,6 +86,7 @@ struct NetSocket {
     SockAddr *addr;
     SockAddrStep step;
     _fztimer send_timer, recv_timer;
+    int written, received;
     /*
      * We sometimes need pairs of Socket structures to be linked:
      * if we are listening on the same IPv6 and v4 port, for
@@ -548,6 +549,7 @@ static Socket *sk_net_accept(accept_ctx_t ctx, Plug *plug)
     ret->s = sockfd;
     fz_timer_init(&ret->recv_timer);
     fz_timer_init(&ret->send_timer);
+    ret->written = ret->received = 0;
 
     if (ret->s < 0) {
         ret->error = strerror(errno);
@@ -808,6 +810,7 @@ Socket *sk_new(SockAddr *addr, int port, bool privport, bool oobinline,
     ret->port = port;
     fz_timer_init(&ret->recv_timer);
     fz_timer_init(&ret->send_timer);
+    ret->written = ret->received = 0;
 
     do {
         err = try_connect(ret);
@@ -857,6 +860,7 @@ Socket *sk_newlistener(const char *srcaddr, int port, Plug *plug,
     ret->s = -1;
     fz_timer_init(&ret->recv_timer);
     fz_timer_init(&ret->send_timer);
+    ret->written = ret->received = 0;
 
     /*
      * Translate address_family from platform-independent constants
@@ -1132,7 +1136,7 @@ void try_send(NetSocket *s)
         const void *data;
         size_t len;
         int urgentflag;
-		int toSend;
+        int toSend;
 
         if (s->sending_oob) {
             urgentflag = MSG_OOB;
@@ -1144,8 +1148,8 @@ void try_send(NetSocket *s)
             data = bufdata.ptr;
             len = bufdata.len;
         }
-		toSend = RequestQuota(1, len);
-		nsent = send(s->s, data, toSend, urgentflag);
+        toSend = RequestQuota(1, len);
+        nsent = send(s->s, data, toSend, urgentflag);
         noise_ultralight(NOISE_SOURCE_IOLEN, nsent);
         if (nsent <= 0) {
             err = (nsent < 0 ? errno : 0);
@@ -1180,9 +1184,11 @@ void try_send(NetSocket *s)
                 return;
             }
         } else {
+            s->written += nsent;
             UpdateQuota(1, nsent);
             if (fz_timer_check(&s->send_timer)) {
-                fznotify(sftpSend);
+                fznotify1(sftpSend, s->written);
+                s->written = 0;
             }
             if (s->sending_oob) {
                 if (nsent < len) {
@@ -1324,9 +1330,11 @@ static void net_select_result(int fd, int event)
                              ret == 0 ? "Internal networking trouble" :
                              strerror(errno), errno, 0);
             } else {
+                s->received += ret;
                 UpdateQuota(0, ret);
                 if (fz_timer_check(&s->recv_timer)) {
-                    fznotify(sftpRecv);
+                    fznotify1(sftpRecv, s->received);
+                    s->received = 0;
                 }
                 /*
                  * Receiving actual data on a socket means we can
@@ -1419,9 +1427,11 @@ static void net_select_result(int fd, int event)
             uxsel_tell(s);
             plug_closing(s->plug, NULL, 0, 0);
         } else {
+            s->received += ret;
             UpdateQuota(0, ret);
             if (fz_timer_check(&s->recv_timer)) {
-                fznotify(sftpRecv);
+                fznotify1(sftpRecv, s->received);
+                s->received = 0;
             }
             /*
              * Receiving actual data on a socket means we can

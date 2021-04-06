@@ -106,10 +106,10 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		log_raw(logmsg::status, message.text[0]);
 		break;
 	case sftpEvent::Recv:
-		SetActive(CFileZillaEngine::recv);
+		RecordActivity(activity_logger::recv, fz::to_integral<uint64_t>(message.text[0]));
 		break;
 	case sftpEvent::Send:
-		SetActive(CFileZillaEngine::send);
+		RecordActivity(activity_logger::send, fz::to_integral<uint64_t>(message.text[0]));
 		break;
 	case sftpEvent::Transfer:
 		{

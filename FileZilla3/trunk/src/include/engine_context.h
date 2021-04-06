@@ -5,6 +5,7 @@
 
 #include <memory>
 
+class activity_logger;
 class CDirectoryCache;
 class COptionsBase;
 class CPathCache;
@@ -43,6 +44,7 @@ public:
 	CustomEncodingConverterBase const& GetCustomEncodingConverter() { return customEncodingConverter_; }
 	OpLockManager& GetOpLockManager();
 	fz::tls_system_trust_store& GetTlsSystemTrustStore();
+	activity_logger& GetActivityLogger();
 
 protected:
 	COptionsBase& options_;

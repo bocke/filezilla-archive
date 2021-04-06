@@ -737,7 +737,7 @@ int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 		}
 
 		if (written) {
-			SetActive(CFileZillaEngine::send);
+			RecordActivity(activity_logger::send, written);
 		}
 
 		if (static_cast<unsigned int>(written) < len) {
@@ -838,7 +838,7 @@ int CRealControlSocket::OnSend()
 		}
 
 		if (written) {
-			SetActive(CFileZillaEngine::send);
+			RecordActivity(activity_logger::send, written);
 
 			send_buffer_.consume(static_cast<size_t>(written));
 		}
@@ -1131,10 +1131,10 @@ void CControlSocket::operator()(fz::event_base const& ev)
 		&CControlSocket::OnObtainLock);
 }
 
-void CControlSocket::SetActive(CFileZillaEngine::_direction direction)
+void CControlSocket::RecordActivity(activity_logger::_direction direction, uint64_t amount)
 {
 	SetAlive();
-	engine_.SetActive(direction);
+	engine_.activity_logger_.record(direction, amount);
 }
 
 void CControlSocket::SendDirectoryListingNotification(CServerPath const& path, bool failed)

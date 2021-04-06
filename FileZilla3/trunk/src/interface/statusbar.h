@@ -87,10 +87,12 @@ protected:
 	void OnSize(wxSizeEvent& event);
 };
 
+class activity_logger;
+class CLed;
 class CStatusBar final : public CWidgetsStatusBar, public COptionChangeEventHandler, protected CGlobalStateEventHandler
 {
 public:
-	CStatusBar(wxTopLevelWindow* parent);
+	CStatusBar(wxTopLevelWindow* parent, activity_logger& al);
 	virtual ~CStatusBar();
 
 	void DisplayQueueSize(int64_t totalSize, bool hasUnknown);
@@ -99,6 +101,8 @@ public:
 	void OnHandleRightClick(wxWindow* wnd);
 
 protected:
+	void OnActivity();
+	void UpdateActivityTooltip();
 	void UpdateSizeFormat();
 	void DisplayDataType();
 	void DisplayEncrypted();
@@ -119,12 +123,19 @@ protected:
 	int64_t m_size{};
 	bool m_hasUnknownFiles{};
 
+	activity_logger& activity_logger_;
+
+	CLed* activityLeds_[2]{};
 	wxStaticBitmap* m_pDataTypeIndicator{};
 	wxStaticBitmap* m_pEncryptionIndicator{};
 	wxStaticBitmap* m_pSpeedLimitsIndicator{};
 
 	wxTimer m_queue_size_timer;
+	wxTimer activityTimer_;
 	bool m_queue_size_changed{};
+
+	std::array<std::pair<fz::datetime, std::pair<uint64_t, uint64_t>>, 20> past_activity_;
+	size_t past_activity_index_{};
 
 	DECLARE_EVENT_TABLE()
 	void OnSpeedLimitsEnable(wxCommandEvent& event);

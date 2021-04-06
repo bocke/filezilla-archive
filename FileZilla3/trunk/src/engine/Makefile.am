@@ -8,6 +8,7 @@ libfzclient_private_la_CPPFLAGS += -DBUILDING_FILEZILLA
 
 
 libfzclient_private_la_SOURCES = \
+		activity_logger.cpp \
 		aio.cpp \
 		commands.cpp \
 		controlsocket.cpp \

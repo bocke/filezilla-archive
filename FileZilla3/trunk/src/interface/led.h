@@ -4,31 +4,25 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 
-wxDECLARE_EVENT(fzEVT_UPDATE_LED_TOOLTIP, wxCommandEvent);
-
 class CLed final : public wxWindow
 {
 public:
 	CLed(wxWindow *parent, unsigned int index);
 
-	void Ping();
-
-protected:
 	void Set();
+	void Set(bool lit);
 	void Unset();
 
+protected:
+
 	int const m_index;
-	int m_ledState;
+	bool lit_{};
 
 	wxBitmap m_leds[2];
 	bool m_loaded{};
 
-	wxTimer m_timer;
-
 	DECLARE_EVENT_TABLE()
 	void OnPaint(wxPaintEvent& event);
-	void OnTimer(wxTimerEvent& event);
-	void OnEnterWindow(wxMouseEvent& event);
 };
 
 #endif
