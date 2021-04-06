@@ -317,22 +317,25 @@ CLocalPath GetFZDataDir(std::vector<std::wstring> const& fileToFind, std::wstrin
 
 CLocalPath GetDefaultsDir()
 {
-	CLocalPath path;
+	static CLocalPath path = [] {
+		CLocalPath path;
 #ifdef FZ_UNIX
-	path = GetUnadjustedSettingsDir();
-	if (path.empty() || !FileExists(path.GetPath() + L"fzdefaults.xml")) {
-		if (FileExists(L"/etc/filezilla/fzdefaults.xml")) {
-			path.SetPath(L"/etc/filezilla");
+		path = GetUnadjustedSettingsDir();
+		if (path.empty() || !FileExists(path.GetPath() + L"fzdefaults.xml")) {
+			if (FileExists(L"/etc/filezilla/fzdefaults.xml")) {
+				path.SetPath(L"/etc/filezilla");
+			}
+			else {
+				path.clear();
+			}
 		}
-		else {
-			path.clear();
-		}
-	}
 
 #endif
-	if (path.empty()) {
-		path = GetFZDataDir({L"fzdefaults.xml"}, L"share/filezilla");
-	}
+		if (path.empty()) {
+			path = GetFZDataDir({ L"fzdefaults.xml" }, L"share/filezilla");
+		}
+		return path;
+	}();
 
 	return path;
 }
