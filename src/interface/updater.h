@@ -70,7 +70,7 @@ class CFileZillaEngineContext;
 class CUpdater final : public wxEvtHandler
 {
 public:
-	CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context, std::function<void(CActiveNotification const&)> const& activityNotificationHandler);
+	CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context);
 	virtual ~CUpdater();
 
 	// 2-Stage initialization
@@ -152,8 +152,6 @@ protected:
 	wxTimer update_timer_;
 
 	std::deque<std::unique_ptr<CCommand>> pending_commands_;
-
-	std::function<void(CActiveNotification const&)> activityNotificationHandler_;
 
 	bool manual_{};
 };

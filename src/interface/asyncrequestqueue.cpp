@@ -131,6 +131,8 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 			pEngine->SetAsyncRequestReply(std::move(pNotification));
 			return true;
 		}
+	default:
+		break;
 	}
 
 	return false;

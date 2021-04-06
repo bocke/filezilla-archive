@@ -152,14 +152,6 @@ public:
 
 	static std::wstring ReplaceInvalidCharacters(std::wstring const& filename, bool includeQuotesAndBreaks = false);
 
-	// Get the current download speed as the sum of all active downloads.
-	// Unit is byte/s.
-	wxFileOffset GetCurrentDownloadSpeed();
-
-	// Get the current upload speed as the sum of all active uploads.
-	// Unit is byte/s.
-	wxFileOffset GetCurrentUploadSpeed();
-
 	std::shared_ptr<CActionAfterBlocker> GetActionAfterBlocker();
 
 protected:
@@ -282,10 +274,6 @@ protected:
 #endif
 
 	CQueueStorage m_queue_storage;
-
-	// Get the current transfer speed.
-	// Unit is byte/s.
-	wxFileOffset GetCurrentSpeed(bool countDownload, bool countUpload);
 
 	void OnEngineEvent(CFileZillaEngine* engine);
 

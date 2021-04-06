@@ -278,7 +278,7 @@ int CHttpRequestOpData::Send()
 					return FZ_REPLY_WOULDBLOCK;
 				}
 				else if (written) {
-					controlSocket_.SetActive(CFileZillaEngine::send);
+					controlSocket_.RecordActivity(activity_logger::send, written);
 					req.body_buffer_.consume(static_cast<size_t>(written));
 					dataToSend_ -= written;
 					if (req.flags_ & HttpRequest::flag_update_transferstatus) {
@@ -445,9 +445,10 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 				}
 				return FZ_REPLY_WOULDBLOCK;
 			}
-			recv_buffer_.add(static_cast<size_t>(read));
-
-			controlSocket_.SetActive(CFileZillaEngine::recv);
+			else if (read) {
+				recv_buffer_.add(static_cast<size_t>(read));
+				controlSocket_.RecordActivity(activity_logger::recv, read);
+			}
 
 			read_state_.eof_ = read == 0;
 		}

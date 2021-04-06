@@ -1,6 +1,7 @@
 # these are the headers for your project
 
 noinst_HEADERS = \
+	activity_logger.h \
 	aio.h \
 	commands.h \
 	directorylisting.h \

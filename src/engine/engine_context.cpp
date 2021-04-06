@@ -1,5 +1,6 @@
 #include "filezilla.h"
 
+#include "../include/activity_logger.h"
 #include "../include/engine_context.h"
 #include "../include/engine_options.h"
 
@@ -110,6 +111,7 @@ public:
 	CPathCache path_cache_;
 	OpLockManager opLockManager_;
 	fz::tls_system_trust_store tlsSystemTrustStore_;
+	activity_logger activity_logger_;
 };
 
 CFileZillaEngineContext::CFileZillaEngineContext(COptionsBase & options, CustomEncodingConverterBase const& customEncodingConverter)
@@ -156,4 +158,9 @@ OpLockManager& CFileZillaEngineContext::GetOpLockManager()
 fz::tls_system_trust_store& CFileZillaEngineContext::GetTlsSystemTrustStore()
 {
 	return impl_->tlsSystemTrustStore_;
+}
+
+activity_logger& CFileZillaEngineContext::GetActivityLogger()
+{
+	return impl_->activity_logger_;
 }

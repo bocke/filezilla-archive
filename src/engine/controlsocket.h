@@ -1,6 +1,7 @@
 #ifndef FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 #define FILEZILLA_ENGINE_CONTROLSOCKET_HEADER
 
+#include "../include/activity_logger.h"
 #include "../include/directorylisting.h"
 #include "../include/server.h"
 #include "../include/serverpath.h"
@@ -225,7 +226,13 @@ public:
 	std::wstring ConvToLocal(char const* buffer, size_t len);
 	std::string ConvToServer(std::wstring const&, bool force_utf8 = false);
 
-	void SetActive(CFileZillaEngine::_direction direction);
+	void RecordActivity(activity_logger::_direction direction, uint64_t amount);
+	template<typename T, std::enable_if_t<std::is_signed_v<T>, int> = 0>
+	inline void RecordActivity(activity_logger::_direction direction, int64_t amount) {
+		if (amount > 0) {
+			RecordActivity(direction, static_cast<uint64_t>(amount));
+		}
+	}
 
 	void SetHandle(ServerHandle const& handle) { handle_ = handle; }
 	ServerHandle const& GetHandle() const { return handle_; }
@@ -234,7 +241,7 @@ public:
 	// The following two functions control the timeout behaviour:
 	// ---
 
-	// Call this if data could be sent or retrieved
+	// Call this on activity that precludes a timeout
 	void SetAlive();
 
 	// Set to true if waiting for data

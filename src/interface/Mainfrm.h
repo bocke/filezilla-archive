@@ -21,7 +21,6 @@
 class CAsyncRequestQueue;
 class CContextControl;
 class CertStore;
-class CLed;
 class CMainFrameStateEventHandler;
 class CMenuBar;
 class CQueue;
@@ -43,8 +42,6 @@ class CMainFrame final : public wxNavigationEnabled<wxFrame>, public COptionChan
 public:
 	CMainFrame();
 	virtual ~CMainFrame();
-
-	void UpdateActivityLed(int direction);
 
 	CStatusView* GetStatusView() { return m_pStatusView; }
 	CQueueView* GetQueue() { return m_pQueueView; }
@@ -84,6 +81,8 @@ private:
 
 	void FocusNextEnabled(std::list<wxWindow*>& windowOrder, std::list<wxWindow*>::iterator iter, bool skipFirst, bool forward);
 
+	CFileZillaEngineContext m_engineContext;
+
 	CStatusBar* m_pStatusBar{};
 	CMenuBar* m_pMenuBar{};
 	CToolBar* m_pToolBar{};
@@ -93,12 +92,11 @@ private:
 	CSplitterWindowEx* m_pBottomSplitter{}; // Top contains view splitter, bottom queue (or queuelog splitter if in position 1)
 	CSplitterWindowEx* m_pQueueLogSplitter{};
 
-	CFileZillaEngineContext m_engineContext;
 	CContextControl* m_pContextControl{};
 
 	CStatusView* m_pStatusView{};
 	CQueueView* m_pQueueView{};
-	CLed* m_pActivityLed[2];
+
 #if FZ_MANUALUPDATECHECK
 	CUpdater* m_pUpdater{};
 	virtual void UpdaterStateChanged( UpdaterState s, build const& v );
@@ -124,7 +122,6 @@ private:
 	DECLARE_EVENT_TABLE()
 	void OnSize(wxSizeEvent& event);
 	void OnMenuHandler(wxCommandEvent& event);
-	void OnUpdateLedTooltip(wxCommandEvent&);
 	void OnDisconnect(wxCommandEvent&);
 	void OnCancel(wxCommandEvent&);
 	void OnClose(wxCloseEvent& event);

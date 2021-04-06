@@ -76,9 +76,6 @@ public:
 
 	int CacheLookup(CServerPath const& path, CDirectoryListing& listing);
 
-	static bool IsActive(CFileZillaEngine::_direction direction);
-	void SetActive(int direction);
-
 	// Add new pending notification
 	void AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification); // note: Unlocks the mutex!
 	void AddNotification(std::unique_ptr<CNotification> && notification);
@@ -111,6 +108,7 @@ public:
 	OpLockManager & opLockManager_;
 
 	fz::logger_interface& GetLogger();
+	activity_logger& activity_logger_;
 
 protected:
 	void OnOptionsChanged(watched_options const& options);
@@ -162,9 +160,6 @@ protected:
 	unsigned int const m_engine_id;
 
 	static std::vector<CFileZillaEnginePrivate*> m_engineList;
-
-	// Indicicates if data has been received/sent and whether to send any notifications
-	static std::atomic_int m_activeStatus[2];
 
 	std::unique_ptr<CControlSocket> controlSocket_;
 

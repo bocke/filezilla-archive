@@ -20,7 +20,6 @@
 #include "filter_manager.h"
 #include "import.h"
 #include "inputdialog.h"
-#include "led.h"
 #include "list_search_panel.h"
 #include "local_recursive_operation.h"
 #include "LocalListView.h"
@@ -128,7 +127,6 @@ bool HandleKeyboardCommand(wxCommandEvent& event, wxWindow& parent)
 BEGIN_EVENT_TABLE(CMainFrame, wxNavigationEnabled<wxFrame>)
 	EVT_SIZE(CMainFrame::OnSize)
 	EVT_MENU(wxID_ANY, CMainFrame::OnMenuHandler)
-	EVT_COMMAND(wxID_ANY, fzEVT_UPDATE_LED_TOOLTIP, CMainFrame::OnUpdateLedTooltip)
 	EVT_TOOL(XRCID("ID_TOOLBAR_DISCONNECT"), CMainFrame::OnDisconnect)
 	EVT_MENU(XRCID("ID_MENU_SERVER_DISCONNECT"), CMainFrame::OnDisconnect)
 	EVT_TOOL(XRCID("ID_TOOLBAR_CANCEL"), CMainFrame::OnCancel)
@@ -364,8 +362,6 @@ CMainFrame::CMainFrame()
 	, m_engineContext(*COptions::Get(), CustomEncodingConverter::Get())
 	, m_comparisonToggleAcceleratorId(wxNewId())
 {
-	m_pActivityLed[0] = m_pActivityLed[1] = 0;
-
 	wxGetApp().AddStartupProfileRecord("CMainFrame::CMainFrame");
 	wxRect screen_size = CWindowStateManager::GetScreenDimensions();
 
@@ -398,14 +394,8 @@ CMainFrame::CMainFrame()
 	// so that contextchange events can be processed in the right order.
 	m_pContextControl = new CContextControl(*this);
 
-	m_pStatusBar = new CStatusBar(this);
+	m_pStatusBar = new CStatusBar(this, m_engineContext.GetActivityLogger());
 	if (m_pStatusBar) {
-		m_pActivityLed[0] = new CLed(m_pStatusBar, 0);
-		m_pActivityLed[1] = new CLed(m_pStatusBar, 1);
-
-		m_pStatusBar->AddField(-1, widget_led_recv, m_pActivityLed[1]);
-		m_pStatusBar->AddField(-1, widget_led_send, m_pActivityLed[0]);
-
 		SetStatusBar(m_pStatusBar);
 	}
 
@@ -1071,12 +1061,6 @@ void CMainFrame::OnEngineEvent(CFileZillaEngine* engine)
 				}
 			}
 			break;
-		case nId_active:
-			{
-				CActiveNotification const& activeNotification = static_cast<CActiveNotification const&>(*pNotification.get());
-				UpdateActivityLed(activeNotification.GetDirection());
-			}
-			break;
 		case nId_transferstatus:
 			if (m_pQueueView) {
 				m_pQueueView->ProcessNotification(pState->engine_.get(), std::move(pNotification));
@@ -1110,30 +1094,6 @@ void CMainFrame::OnEngineEvent(CFileZillaEngine* engine)
 
 		pNotification = pState->engine_.get()->GetNextNotification();
 	}
-}
-
-void CMainFrame::OnUpdateLedTooltip(wxCommandEvent&)
-{
-	wxString tooltipText;
-
-	wxFileOffset downloadSpeed = m_pQueueView ? m_pQueueView->GetCurrentDownloadSpeed() : 0;
-	wxFileOffset uploadSpeed = m_pQueueView ? m_pQueueView->GetCurrentUploadSpeed() : 0;
-
-	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->get_int(OPTION_SIZE_FORMAT));
-	if (format == CSizeFormat::bytes) {
-		format = CSizeFormat::iec;
-	}
-
-	const wxString downloadSpeedStr = CSizeFormat::Format(downloadSpeed, true, format,
-														  COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
-														  COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
-	const wxString uploadSpeedStr = CSizeFormat::Format(uploadSpeed, true, format,
-														COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
-														COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
-	tooltipText.Printf(_("Download speed: %s/s\nUpload speed: %s/s"), downloadSpeedStr, uploadSpeedStr);
-
-	m_pActivityLed[0]->SetToolTip(tooltipText);
-	m_pActivityLed[1]->SetToolTip(tooltipText);
 }
 
 bool CMainFrame::CreateMainToolBar()
@@ -1376,10 +1336,6 @@ void CMainFrame::OnClose(wxCloseEvent &event)
 		return;
 	}
 
-	// Getting deleted by wxWidgets
-	for (int i = 0; i < 2; ++i) {
-		m_pActivityLed[i] = 0;
-	}
 	m_pStatusBar = 0;
 	m_pMenuBar = 0;
 	m_pToolBar = 0;
@@ -1590,13 +1546,6 @@ void CMainFrame::OnSiteManager(wxCommandEvent& e)
 #endif
 	(void)e;
 	OpenSiteManager();
-}
-
-void CMainFrame::UpdateActivityLed(int direction)
-{
-	if (m_pActivityLed[direction]) {
-		m_pActivityLed[direction]->Ping();
-	}
 }
 
 void CMainFrame::OnProcessQueue(wxCommandEvent& event)
@@ -2833,11 +2782,7 @@ void CMainFrame::PostInitialize()
 	// Need to do this after welcome screen to avoid simultaneous display of multiple dialogs
 	if (!m_pUpdater) {
 		update_dialog_timer_.SetOwner(this);
-		m_pUpdater = new CUpdater(*this, m_engineContext,
-			[this](CActiveNotification const& notification) {
-			UpdateActivityLed(notification.GetDirection());
-		}
-		);
+		m_pUpdater = new CUpdater(*this, m_engineContext);
 		m_pUpdater->Init();
 		ShowOverlay(m_pUpdater->GetResources(resource_type::overlay), this, m_pTopSplitter, wxPoint(-40, 30));
 	}

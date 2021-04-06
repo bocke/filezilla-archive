@@ -78,7 +78,7 @@ void CFtpControlSocket::OnReceive()
 		size_t i = receiveBuffer_.size();
 		receiveBuffer_.add(read);
 
-		SetActive(CFileZillaEngine::recv);
+		RecordActivity(activity_logger::recv, read);
 
 		while (i < receiveBuffer_.size()) {
 			auto const& p = receiveBuffer_[i];

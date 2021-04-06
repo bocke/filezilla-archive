@@ -499,12 +499,6 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 			}
 		}
 		break;
-	case nId_active:
-		{
-			auto const& activeNotification = static_cast<CActiveNotification const&>(*pNotification.get());
-			m_pMainFrame->UpdateActivityLed(activeNotification.GetDirection());
-		}
-		break;
 	case nId_transferstatus:
 		if (pEngineData->pItem && pEngineData->pStatusLineCtrl) {
 			auto const& transferStatusNotification = static_cast<CTransferStatusNotification const&>(*pNotification.get());
@@ -2981,37 +2975,6 @@ std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename, 
 		}
 	}
 	return ret;
-}
-
-wxFileOffset CQueueView::GetCurrentDownloadSpeed()
-{
-	wxFileOffset speed = GetCurrentSpeed(true, false);
-	return speed;
-}
-
-wxFileOffset CQueueView::GetCurrentUploadSpeed()
-{
-	wxFileOffset speed = GetCurrentSpeed(false, true);
-	return speed;
-}
-
-wxFileOffset CQueueView::GetCurrentSpeed(bool countDownload, bool countUpload)
-{
-	wxFileOffset totalSpeed = 0;
-
-	for (auto pCtrl : m_statusLineList) {
-		const CFileItem *pItem = pCtrl->GetItem();
-		bool isDownload = pItem->Download();
-
-		if ((isDownload && countDownload) || (!isDownload && countUpload)) {
-			wxFileOffset speed = pCtrl->GetMomentarySpeed();
-			if (speed > 0) {
-				totalSpeed += speed;
-			}
-		}
-	}
-
-	return totalSpeed;
 }
 
 void CQueueView::ReleaseExclusiveEngineLock(CFileZillaEngine* pEngine)

@@ -136,12 +136,12 @@ void CSftpInputThread::processEvent(sftpEvent eventType, std::wstring & error)
 	case sftpEvent::Unknown:
 		error = fz::sprintf(L"Unknown eventType");
 		return;
-	case sftpEvent::Recv:
-	case sftpEvent::Send:
 	case sftpEvent::UsedQuotaRecv:
 	case sftpEvent::UsedQuotaSend:
 	case sftpEvent::io_size:
 		break;
+	case sftpEvent::Recv:
+	case sftpEvent::Send:
 	case sftpEvent::Reply:
 	case sftpEvent::Done:
 	case sftpEvent::Error:
