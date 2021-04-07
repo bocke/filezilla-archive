@@ -512,13 +512,13 @@ template<class CFileData> void CFileListCtrl<CFileData>::OnColumnClicked(wxListE
 
 #ifdef __WXMSW__
 namespace {
-wxString GetExt(const wxString& file)
+std::wstring GetExt(std::wstring const& file)
 {
-	wxString ret;
+	std::wstring ret;
 
-	int pos = file.Find('.', true);
-	if (pos > 0 && (static_cast<size_t>(pos) + 1) < file.size()) { // Does neither starts nor end with dot
-		ret = file.Mid(pos + 1);
+	size_t pos = file.rfind('.');
+	if (pos != std::wstring::npos && pos > 0 && pos + 1 < file.size()) { // Does neither starts nor end with dot
+		ret = file.substr(pos + 1);
 	}
 
 	return ret;
@@ -526,10 +526,11 @@ wxString GetExt(const wxString& file)
 }
 #endif
 
-template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::wstring name, bool dir, std::wstring const& path)
+template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::wstring const& name, bool dir, std::wstring const& path)
 {
+	static std::wstring const generic_suffix = L"-" + _("file").ToStdWstring();
 #ifdef __WXMSW__
-	wxString ext;
+	std::wstring ext;
 	if (dir) {
 		if (!path.empty()) {
 			ext = '/';
@@ -537,28 +538,34 @@ template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::ws
 	}
 	else {
 		ext = GetExt(name);
-		ext.MakeLower();
+		fz::str_tolower_inplace(ext);
 	}
 	auto typeIter = m_fileTypeMap.find(ext);
 	if (typeIter != m_fileTypeMap.end()) {
 		return typeIter->second;
 	}
 
-	wxString type;
+	std::wstring type;
+
+	std::wstring fullname;
 	int flags = SHGFI_TYPENAME;
 	if (path.empty()) {
 		flags |= SHGFI_USEFILEATTRIBUTES;
 	}
 	else if (path == _T("\\")) {
-		name += _T("\\");
+		fullname.reserve(name.size() + 1);
+		fullname = name;
+		fullname += '\\';
 	}
 	else {
-		name = path + name;
+		fullname.reserve(name.size() + path.size());
+		fullname = path;
+		fullname += name;
 	}
 
 	SHFILEINFO shFinfo;
 	memset(&shFinfo, 0, sizeof(SHFILEINFO));
-	if (SHGetFileInfo(name.c_str(),
+	if (SHGetFileInfo(path.empty() ? name.c_str() : fullname.c_str(),
 		dir ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL,
 		&shFinfo,
 		sizeof(shFinfo),
@@ -566,10 +573,10 @@ template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::ws
 	{
 		if (!*shFinfo.szTypeName) {
 			if (!ext.empty()) {
+				type.reserve(ext.size() + generic_suffix.size());
 				type = ext;
-				type.MakeUpper();
-				type += _T("-");
-				type += _("file");
+				fz::str_toupper_inplace(ext);
+				type += generic_suffix;
 			}
 			else {
 				type = m_genericTypes[genericTypes::file];
@@ -578,22 +585,22 @@ template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::ws
 		else {
 			type = shFinfo.szTypeName;
 			if (!ext.empty()) {
-				m_fileTypeMap[ext.MakeLower()] = type.ToStdWstring();
+				m_fileTypeMap[ext] = type;
 			}
 		}
 	}
 	else {
 		if (!ext.empty()) {
+			type.reserve(ext.size() + generic_suffix.size());
 			type = ext;
-			type.MakeUpper();
-			type += _T("-");
-			type += _("file");
+			fz::str_toupper_inplace(ext);
+			type += generic_suffix;
 		}
 		else {
 			type = m_genericTypes[genericTypes::file];
 		}
 	}
-	return type.ToStdWstring();
+	return type;
 #else
 	(void)path;
 
@@ -605,36 +612,38 @@ template<class CFileData> std::wstring CFileListCtrl<CFileData>::GetType(std::ws
 	if (pos == std::wstring::npos || pos < 1 || !name[pos + 1]) { // No dot or starts or ends with dot
 		return m_genericTypes[genericTypes::file];
 	}
-	wxString ext = name.substr(pos + 1);
-	wxString lower_ext = ext.Lower();
+	std::wstring ext = name.substr(pos + 1);
+	std::wstring lower_ext = fz::str_tolower(ext);
 
 	auto typeIter = m_fileTypeMap.find(lower_ext);
 	if (typeIter != m_fileTypeMap.end()) {
 		return typeIter->second;
 	}
 
+	std::wstring type;
+
 	wxFileType *pType = wxTheMimeTypesManager->GetFileTypeFromExtension(ext);
 	if (!pType) {
-		wxString desc = ext;
-		desc += _T("-");
-		desc += _("file");
-		m_fileTypeMap[ext] = desc.ToStdWstring();
-		return desc.ToStdWstring();
+		type.reserve(ext.size() + generic_suffix.size());
+		type = ext;
+		type += generic_suffix;
+		m_fileTypeMap[ext] = type;
+		return type;
 	}
 
 	wxString desc;
 	if (pType->GetDescription(&desc) && !desc.empty()) {
 		delete pType;
-		m_fileTypeMap[ext] = desc.ToStdWstring();
-		return desc.ToStdWstring();
+		type = desc.ToStdWstring();
+		m_fileTypeMap[lower_ext] = type;
+		return type;
 	}
 	delete pType;
-
-	desc = ext;
-	desc += _T("-");
-	desc += _("file");
-	m_fileTypeMap[lower_ext] = desc.ToStdWstring();
-	return desc.ToStdWstring();
+	type.reserve(ext.size() + generic_suffix.size());
+	type = ext;
+	type += generic_suffix;
+	m_fileTypeMap[lower_ext] = type;
+	return type;
 #endif
 }
 
