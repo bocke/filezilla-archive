@@ -251,9 +251,9 @@ public:
 		}
 	}
 
-	inline int CmpStringNoCase(const wxString &data1, const wxString &data2) const
+	inline int CmpStringNoCase(std::wstring_view const& data1, std::wstring_view const& data2) const
 	{
-		return data1.CmpNoCase(data2);
+		return fz::stricmp(data1, data2);
 	}
 
 	inline int CmpTime(const value_type &data1, const value_type &data2) const
@@ -525,7 +525,7 @@ protected:
 	virtual bool ItemIsDir(int index) const = 0;
 	virtual int64_t ItemGetSize(int index) const = 0;
 
-	std::map<wxString, std::wstring> m_fileTypeMap;
+	std::map<std::wstring, std::wstring> m_fileTypeMap;
 
 	// The .. item
 	bool m_hasParent{true};
@@ -540,7 +540,7 @@ protected:
 	virtual std::unique_ptr<CFileListCtrlSortBase> GetSortComparisonObject() = 0;
 
 	// An empty path denotes a virtual file
-	std::wstring GetType(std::wstring name, bool dir, std::wstring const& path = std::wstring());
+	std::wstring GetType(std::wstring const& name, bool dir, std::wstring const& path = std::wstring());
 
 	// Comparison related
 	virtual void ScrollTopItem(int item);
