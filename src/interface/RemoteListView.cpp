@@ -768,7 +768,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 				}
 #endif
 			}
-			m_fileData.push_back(data);
+			m_fileData.emplace_back(std::move(data));
 
 			if (filter.FilenameFiltered(entry.name, path, entry.is_dir(), entry.size, false, 0, entry.time)) {
 				++hidden;
@@ -793,7 +793,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 
 		CGenericFileData data;
 		data.icon = m_dirIcon;
-		m_fileData.push_back(data);
+		m_fileData.emplace_back(std::move(data));
 	}
 	else {
 		eraseBackground = true;
