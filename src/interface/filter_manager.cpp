@@ -369,7 +369,7 @@ void CFilterDialog::OnDeleteSet(wxCommandEvent&)
 		return;
 	}
 
-	if (!pos) {
+	if (!pos || pos >= m_filterSets.size()) {
 		wxMessageBoxEx(_("This filter set cannot be removed."));
 		return;
 	}
@@ -378,7 +378,6 @@ void CFilterDialog::OnDeleteSet(wxCommandEvent&)
 
 	pChoice->Delete(pos);
 	m_filterSets.erase(m_filterSets.begin() + pos);
-	wxASSERT(!m_filterSets.empty());
 
 	pChoice->SetSelection(0);
 	m_currentFilterSet = 0;
@@ -457,8 +456,6 @@ bool CFilterManager::HasActiveFilters(bool ignore_disabled)
 		return false;
 	}
 
-	wxASSERT(global_filters_.current_filter_set < global_filters_.filter_sets.size());
-
 	if (m_filters_disabled && !ignore_disabled) {
 		return false;
 	}
@@ -490,8 +487,6 @@ bool CFilterManager::FilenameFiltered(std::wstring const& name, std::wstring con
 	if (m_filters_disabled) {
 		return false;
 	}
-
-	wxASSERT(global_filters_.current_filter_set < global_filters_.filter_sets.size());
 
 	CFilterSet const& set = global_filters_.filter_sets[global_filters_.current_filter_set];
 	auto const& active = local ? set.local : set.remote;
