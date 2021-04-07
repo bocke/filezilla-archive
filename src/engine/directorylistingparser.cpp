@@ -35,6 +35,16 @@ struct ObjectCache
 		return *it;
 	}
 
+	fz::shared_value<std::wstring> const& get(std::wstring && v)
+	{
+		auto it = std::lower_bound(cache.begin(), cache.end(), v);
+
+		if (it == cache.end() || !(*it == v)) {
+			it = cache.emplace(it, std::move(v));
+		}
+		return *it;
+	}
+
 	// Vector coupled with binary search and sorted insertion is fastest
 	// alternative as we expect a relatively low amount of inserts.
 	// Note that we cannot use set, as it it cannot search based on a different type.
@@ -102,6 +112,11 @@ public:
 		else {
 			return std::wstring(data_.data(), data_.size());
 		}
+	}
+
+	std::wstring_view get_view() const
+	{
+		return data_;
 	}
 
 	bool IsNumeric(t_numberBase base = decimal)
@@ -2698,7 +2713,7 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 		return 0;
 	}
 
-	std::wstring const facts = token.GetString();
+	std::wstring_view const facts = token.get_view();
 	if (facts.empty()) {
 		return 0;
 	}
@@ -2708,7 +2723,7 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 	entry.time.clear();
 	entry.target.clear();
 
-	std::wstring owner, ownername, group, groupname, user, uid, gid;
+	std::wstring_view owner, ownername, group, groupname, user, uid, gid;
 	std::wstring ownerGroup;
 	std::wstring permissions;
 
@@ -2728,7 +2743,7 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 		}
 
 		std::wstring factname = fz::str_tolower_ascii(facts.substr(start, pos - start));
-		std::wstring value = facts.substr(pos + 1, delim - pos - 1);
+		std::wstring_view value = facts.substr(pos + 1, delim - pos - 1);
 		if (factname == L"type") {
 			auto colonPos = value.find(':');
 			std::wstring valuePrefix;
@@ -2745,7 +2760,8 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 			else if (valuePrefix == L"os.unix=slink" || valuePrefix == L"os.unix=symlink") {
 				entry.flags |= CDirentry::flag_dir | CDirentry::flag_link;
 				if (colonPos != std::wstring::npos) {
-					entry.target = fz::sparse_optional<std::wstring>(value.substr(colonPos));
+					std::wstring_view target = value.substr(colonPos);
+					entry.target = fz::sparse_optional<std::wstring>(std::wstring(target.begin(), target.end()));
 				}
 			}
 			else if ((valuePrefix == L"cdir" || valuePrefix == L"pdir") && colonPos == std::wstring::npos) {
@@ -2775,7 +2791,12 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 		else if (factname == L"perm") {
 			if (!value.empty()) {
 				if (!permissions.empty()) {
-					permissions = value + L" (" + permissions + L")";
+					std::wstring tmp;
+					tmp = value;
+					tmp += L" (";
+					tmp += permissions;
+					tmp += L")";
+					permissions = std::move(tmp);
 				}
 				else {
 					permissions = value;
@@ -2784,7 +2805,9 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 		}
 		else if (factname == L"unix.mode") {
 			if (!permissions.empty()) {
-				permissions = permissions + L" (" + value + L")";
+				permissions += L" (";
+				permissions += value;
+				permissions += L")";
 			}
 			else {
 				permissions = value;
@@ -2831,13 +2854,16 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 	}
 
 	if (!groupname.empty()) {
-		ownerGroup += L" " + groupname;
+		ownerGroup += ' ';
+		ownerGroup += groupname;
 	}
 	else if (!group.empty()) {
-		ownerGroup += L" " + group;
+		ownerGroup += ' ';
+		ownerGroup += group;
 	}
 	else if (!gid.empty()) {
-		ownerGroup += L" " + gid;
+		ownerGroup += ' ';
+		ownerGroup += gid;
 	}
 
 	CToken nameToken = line.GetEndToken(1, true);
@@ -2846,8 +2872,8 @@ int CDirectoryListingParser::ParseAsMlsd(CLine &line, CDirentry &entry)
 	}
 
 	entry.name = nameToken.GetString();
-	entry.ownerGroup = objcache.get(ownerGroup);
-	entry.permissions = objcache.get(permissions);
+	entry.ownerGroup = objcache.get(std::move(ownerGroup));
+	entry.permissions = objcache.get(std::move(permissions));
 
 	return 1;
 }
