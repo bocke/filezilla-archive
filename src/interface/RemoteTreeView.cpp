@@ -537,7 +537,7 @@ void CRemoteTreeView::DisplayItem(wxTreeItemId parent, const CDirectoryListing& 
 
 	std::wstring const path = listing.path.GetPath();
 
-	CFilterDialog filter;
+	CFilterManager const& filter = m_state.GetStateFilterManager();
 
 	wxTreeItemId last;
 	for (size_t i = 0; i < listing.size(); ++i) {
