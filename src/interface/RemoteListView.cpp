@@ -747,11 +747,15 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 	if (m_pDirectoryListing) {
 		SetInfoText();
 
+		CFilterManager const& filter = m_state.GetStateFilterManager();
+		if (!filter.HasActiveRemoteFilters()) {
+			m_indexMapping.reserve(m_pDirectoryListing->size() + 1);
+			m_fileData.reserve(m_pDirectoryListing->size() + 1);
+		}
+
 		m_indexMapping.push_back(m_pDirectoryListing->size());
 
 		std::wstring const path = m_pDirectoryListing->path.GetPath();
-
-		CFilterManager const& filter = m_state.GetStateFilterManager();
 
 		for (unsigned int i = 0; i < m_pDirectoryListing->size(); ++i) {
 			const CDirentry& entry = (*m_pDirectoryListing)[i];
