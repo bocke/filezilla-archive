@@ -79,8 +79,8 @@ class FZCUI_PUBLIC_SYMBOL CFilterSet final
 {
 public:
 	std::wstring name;
-	std::vector<bool> local;
-	std::vector<bool> remote;
+	std::vector<unsigned char> local;
+	std::vector<unsigned char> remote;
 };
 
 class FZCUI_PUBLIC_SYMBOL filter_manager {
