@@ -401,7 +401,7 @@ void CFilterDialog::OnChangeAll(wxCommandEvent& event)
 	}
 
 	bool local;
-	std::vector<bool>* pValues;
+	std::vector<unsigned char>* pValues;
 	wxCheckListBox* pListBox;
 	if (event.GetId() == XRCID("ID_LOCAL_ENABLEALL") || event.GetId() == XRCID("ID_LOCAL_DISABLEALL")) {
 		pListBox = XRCCTRL(*this, "ID_LOCALFILTERS", wxCheckListBox);
