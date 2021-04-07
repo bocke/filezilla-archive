@@ -26,7 +26,11 @@ fz::native_string FZC_PUBLIC_SYMBOL GetSystemErrorDescription(int err);
 namespace fz {
 
 // Poor-man's tolower. Consider to eventually use libicu or similar
-std::wstring FZC_PUBLIC_SYMBOL str_tolower(std::wstring const& source);
+std::wstring FZC_PUBLIC_SYMBOL str_tolower(std::wstring_view const& source);
+void FZC_PUBLIC_SYMBOL str_tolower_inplace(std::wstring & source);
+
+std::wstring FZC_PUBLIC_SYMBOL str_toupper(std::wstring_view const& source);
+void FZC_PUBLIC_SYMBOL str_toupper_inplace(std::wstring& source);
 }
 
 #endif

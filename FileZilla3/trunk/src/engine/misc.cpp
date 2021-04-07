@@ -69,7 +69,7 @@ std::string GetSystemErrorDescription(int err)
 
 namespace fz {
 
-std::wstring str_tolower(std::wstring const& source)
+std::wstring str_tolower(std::wstring_view const& source)
 {
 	std::wstring ret;
 	ret.reserve(source.size());
@@ -77,6 +77,30 @@ std::wstring str_tolower(std::wstring const& source)
 		ret.push_back(std::towlower(c));
 	}
 	return ret;
+}
+
+void str_tolower_inplace(std::wstring & source)
+{
+	for (auto & c : source) {
+		c = std::towlower(c);
+	}
+}
+
+std::wstring str_toupper(std::wstring_view const& source)
+{
+	std::wstring ret;
+	ret.reserve(source.size());
+	for (auto const& c : source) {
+		ret.push_back(std::towupper(c));
+	}
+	return ret;
+}
+
+void str_toupper_inplace(std::wstring & source)
+{
+	for (auto & c : source) {
+		c = std::towupper(c);
+	}
 }
 
 }
