@@ -17,7 +17,7 @@
 #include "marshal.h"
 
 #define SCC_BUFSIZE 64
-#define LINE_LIMIT 77
+#define LINE_LIMIT 1000 /* GUI program with scrollbars */
 
 typedef struct StripCtrlCharsImpl StripCtrlCharsImpl;
 struct StripCtrlCharsImpl {
@@ -138,7 +138,9 @@ static inline void stripctrl_check_line_limit(
         return;                        /* nothing to do */
 
     if (scc->line_start) {
+        /* GUI adds context.
         put_datapl(scc->bs_out, PTRLEN_LITERAL("| "));
+        */
         scc->line_start = false;
         scc->line_chars_remaining = LINE_LIMIT;
     }
@@ -149,7 +151,7 @@ static inline void stripctrl_check_line_limit(
     }
 
     if (scc->line_chars_remaining < width) {
-        put_datapl(scc->bs_out, PTRLEN_LITERAL("\r\n> "));
+        put_datapl(scc->bs_out, PTRLEN_LITERAL("\r\n")); /* GUI adds context */
         scc->line_chars_remaining = LINE_LIMIT;
     }
 
