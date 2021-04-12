@@ -158,7 +158,7 @@ bool CLoginManager::query_credentials(Site & site, std::wstring const& challenge
 	}
 
 	if (!challenge.empty()) {
-		std::wstring displayChallenge = LabelEscape(fz::trimmed(challenge));
+		std::wstring displayChallenge = fz::trimmed(challenge);
 #ifdef FZ_WINDOWS
 		fz::replace_substrings(displayChallenge, L"\n", L"\r\n");
 #endif
