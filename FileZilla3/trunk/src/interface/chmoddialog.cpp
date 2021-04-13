@@ -20,8 +20,8 @@ struct CChmodDialog::impl
 };
 
 CChmodDialog::CChmodDialog(ChmodData & data)
-	: impl_(std::make_unique<impl>())
-	, data_(data)
+	: data_(data)
+	, impl_(std::make_unique<impl>())
 {
 }
 
