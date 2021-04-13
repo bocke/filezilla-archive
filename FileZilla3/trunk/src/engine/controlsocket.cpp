@@ -1,4 +1,5 @@
 #include "filezilla.h"
+#include "activity_logger_layer.h"
 #include "controlsocket.h"
 #include "directorycache.h"
 #include "engineprivate.h"
@@ -874,7 +875,8 @@ int CRealControlSocket::DoConnect(std::wstring const& host, unsigned int port)
 
 	ResetSocket();
 	socket_ = std::make_unique<fz::socket>(engine_.GetThreadPool(), nullptr);
-	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(this, *socket_, &engine_.GetRateLimiter());
+	activity_logger_layer_ = std::make_unique<activity_logger_layer>(nullptr, *socket_, engine_.activity_logger_);
+	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(this, *activity_logger_layer_, &engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	const int proxy_type = engine_.GetOptions().get_int(OPTION_PROXY_TYPE);
@@ -926,6 +928,7 @@ void CRealControlSocket::ResetSocket()
 	// Destroy in reverse order
 	proxy_layer_.reset();
 	ratelimit_layer_.reset();
+	activity_logger_layer_.reset();
 	socket_.reset();
 
 	send_buffer_.clear();

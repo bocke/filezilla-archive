@@ -326,6 +326,7 @@ protected:
 	void OnObtainLock();
 };
 
+class activity_logger_layer;
 class CProxySocket;
 
 namespace fz {
@@ -363,6 +364,7 @@ protected:
 	}
 
 	std::unique_ptr<fz::socket> socket_;
+	std::unique_ptr<activity_logger_layer> activity_logger_layer_;
 	std::unique_ptr<fz::rate_limited_layer> ratelimit_layer_;
 	std::unique_ptr<CProxySocket> proxy_layer_;
 	fz::socket_layer* active_layer_{};

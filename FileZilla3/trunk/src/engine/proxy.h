@@ -17,7 +17,7 @@ class CControlSocket;
 class CProxySocket final : protected fz::event_handler, public fz::socket_layer
 {
 public:
-	CProxySocket(event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner,
+	CProxySocket(fz::event_handler* pEvtHandler, fz::socket_interface & next_layer, CControlSocket* pOwner,
 		ProxyType t, fz::native_string const& proxy_host, unsigned int proxy_port, std::wstring const& user, std::wstring const& pass);
 	virtual ~CProxySocket();
 

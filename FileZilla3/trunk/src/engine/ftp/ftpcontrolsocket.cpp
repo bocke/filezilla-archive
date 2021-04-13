@@ -56,7 +56,7 @@ void CFtpControlSocket::OnReceive()
 		int error;
 
 		size_t const toRead = max - receiveBuffer_.size();
-		int read = active_layer_->read(receiveBuffer_.get(toRead), toRead, error);
+		int read = active_layer_->read(receiveBuffer_.get(toRead), static_cast<unsigned int>(toRead), error);
 		if (read < 0) {
 			if (error != EAGAIN) {
 				log(logmsg::error, _("Could not read from socket: %s"), fz::socket_error_description(error));
@@ -78,7 +78,7 @@ void CFtpControlSocket::OnReceive()
 		size_t i = receiveBuffer_.size();
 		receiveBuffer_.add(read);
 
-		RecordActivity(activity_logger::recv, read);
+		SetAlive();
 
 		while (i < receiveBuffer_.size()) {
 			auto const& p = receiveBuffer_[i];
