@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="activity_logger.cpp" />
+    <ClCompile Include="activity_logger_layer.cpp" />
     <ClCompile Include="aio.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="controlsocket.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="xmlutils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\activity_logger.h" />
     <ClInclude Include="..\include\aio.h" />
     <ClInclude Include="..\include\engine_context.h" />
     <ClInclude Include="..\include\commands.h" />
@@ -210,6 +212,7 @@
     <ClInclude Include="..\include\reader.h" />
     <ClInclude Include="..\include\version.h" />
     <ClInclude Include="..\include\writer.h" />
+    <ClInclude Include="activity_logger_layer.h" />
     <ClInclude Include="controlsocket.h" />
     <ClInclude Include="directorycache.h" />
     <ClInclude Include="..\include\directorylisting.h" />

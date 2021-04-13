@@ -278,7 +278,7 @@ int CHttpRequestOpData::Send()
 					return FZ_REPLY_WOULDBLOCK;
 				}
 				else if (written) {
-					controlSocket_.RecordActivity(activity_logger::send, written);
+					controlSocket_.SetAlive();
 					req.body_buffer_.consume(static_cast<size_t>(written));
 					dataToSend_ -= written;
 					if (req.flags_ & HttpRequest::flag_update_transferstatus) {
@@ -447,7 +447,7 @@ int CHttpRequestOpData::OnReceive(bool repeatedProcessing)
 			}
 			else if (read) {
 				recv_buffer_.add(static_cast<size_t>(read));
-				controlSocket_.RecordActivity(activity_logger::recv, read);
+				controlSocket_.SetAlive();
 			}
 
 			read_state_.eof_ = read == 0;

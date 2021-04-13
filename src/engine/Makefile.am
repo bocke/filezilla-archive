@@ -9,6 +9,7 @@ libfzclient_private_la_CPPFLAGS += -DBUILDING_FILEZILLA
 
 libfzclient_private_la_SOURCES = \
 		activity_logger.cpp \
+		activity_logger_layer.cpp \
 		aio.cpp \
 		commands.cpp \
 		controlsocket.cpp \
@@ -70,6 +71,7 @@ libfzclient_private_la_SOURCES = \
 		xmlutils.cpp
 
 noinst_HEADERS = \
+		activity_logger_layer.h \
 		controlsocket.h \
 		directorycache.h \
 		directorylistingparser.h \

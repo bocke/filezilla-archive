@@ -1,4 +1,5 @@
 #include "../filezilla.h"
+#include "../activity_logger_layer.h"
 #include "../directorylistingparser.h"
 #include "../engineprivate.h"
 #include "../proxy.h"
@@ -246,6 +247,7 @@ void CTransferSocket::ResetSocket()
 	tls_layer_.reset();
 	proxy_layer_.reset();
 	ratelimit_layer_.reset();
+	activity_logger_layer_.reset();
 	socket_.reset();
 	buffer_.reset();
 }
@@ -452,7 +454,7 @@ void CTransferSocket::OnReceive()
 						return;
 					}
 
-					controlSocket_.RecordActivity(activity_logger::recv, numread);
+					controlSocket_.SetAlive();
 					if (!m_madeProgress) {
 						m_madeProgress = 2;
 						engine_.transfer_status_.SetMadeProgress();
@@ -486,7 +488,7 @@ void CTransferSocket::OnReceive()
 					break;
 				}
 
-				controlSocket_.RecordActivity(activity_logger::recv, numread);
+				controlSocket_.SetAlive();
 				if (!m_madeProgress) {
 					m_madeProgress = 2;
 					engine_.transfer_status_.SetMadeProgress();
@@ -600,7 +602,7 @@ void CTransferSocket::OnSend()
 			break;
 		}
 
-		controlSocket_.RecordActivity(activity_logger::recv, written);
+		controlSocket_.SetAlive();
 		if (m_madeProgress == 1) {
 			controlSocket_.log(logmsg::debug_debug, L"Made progress in CTransferSocket::OnSend()");
 			m_madeProgress = 2;
@@ -692,7 +694,8 @@ bool CTransferSocket::SetupPassiveTransfer(std::wstring const& host, int port)
 
 bool CTransferSocket::InitLayers(bool active)
 {
-	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(nullptr, *socket_, &engine_.GetRateLimiter());
+	activity_logger_layer_ = std::make_unique<activity_logger_layer>(nullptr, *socket_, engine_.activity_logger_);
+	ratelimit_layer_ = std::make_unique<fz::rate_limited_layer>(nullptr, *activity_logger_layer_, &engine_.GetRateLimiter());
 	active_layer_ = ratelimit_layer_.get();
 
 	if (controlSocket_.proxy_layer_ && !active) {
