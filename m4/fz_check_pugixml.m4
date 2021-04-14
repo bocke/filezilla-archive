@@ -12,11 +12,7 @@ AC_DEFUN([FZ_CHECK_PUGIXML], [
       fi
     ],
     [
-      if echo $host_os | grep -i "cygwin\|mingw\|mac\|apple" > /dev/null 2>&1 ; then
-        with_pugixml=auto
-      else
-        with_pugixml=system
-      fi
+      with_pugixml=system
     ])
 
 
