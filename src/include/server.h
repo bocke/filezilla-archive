@@ -103,11 +103,9 @@ enum class ProtocolFeature
 	EnterCommand,
 	DirectoryRename,
 	PostLoginCommands,
-	S3Lifecycle,
 	RecursiveDelete,
 	ServerAssignedHome,
 	TemporaryUrl,
-	S3Sse,
 	Security, // Encryption, integrity protection and authentication
 	UnixChmod
 };

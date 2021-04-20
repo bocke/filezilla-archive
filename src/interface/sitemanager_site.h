@@ -27,6 +27,8 @@ private:
 	wxNotebookPage *charsetPage_{};
 	wxNotebookPage *transferPage_{};
 	wxNotebookPage *s3Page_{};
+	wxNotebookPage *dropboxPage_{};
+	wxNotebookPage *swiftPage_{};
 
 	std::vector<std::unique_ptr<SiteControls>> controls_;
 	wxString m_charsetPageText;

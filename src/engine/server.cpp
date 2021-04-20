@@ -585,11 +585,6 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 			return true;
 		}
 		break;
-	case ProtocolFeature::S3Lifecycle:
-		if (protocol == S3) {
-			return true;
-		}
-		break;
 	case ProtocolFeature::RecursiveDelete:
 		if (protocol == GOOGLE_DRIVE || protocol == DROPBOX || protocol == ONEDRIVE || protocol == B2) {
 			return true;
@@ -602,12 +597,7 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		}
 		break;
 	case ProtocolFeature::TemporaryUrl:
-		if (protocol == S3 || protocol == DROPBOX || protocol == AZURE_BLOB || protocol == AZURE_FILE) {
-			return true;
-		}
-		break;
-	case ProtocolFeature::S3Sse:
-		if (protocol == S3) {
+		if (protocol == B2 || protocol == S3 || protocol == DROPBOX || protocol == AZURE_BLOB || protocol == AZURE_FILE) {
 			return true;
 		}
 		break;
@@ -892,6 +882,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 				ret.emplace_back(ParameterTraits{"ssecustomerkey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"stsrolearn", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"stsmfaserial", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"region", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;

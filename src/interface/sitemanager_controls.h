@@ -87,11 +87,31 @@ public:
 	virtual bool UpdateSite(Site & site, bool silent) override;
 };
 
-
 class S3SiteControls final : public SiteControls
 {
 public:
 	S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
+
+	virtual void SetSite(Site const& site) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
+
+private:
+	virtual void SetControlState() override;
+};
+
+class DropboxSiteControls final : public SiteControls
+{
+public:
+	DropboxSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
+
+	virtual void SetSite(Site const& site) override;
+	virtual bool UpdateSite(Site & site, bool silent) override;
+};
+
+class SwiftSiteControls final : public SiteControls
+{
+public:
+	SwiftSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer);
 
 	virtual void SetSite(Site const& site) override;
 	virtual bool UpdateSite(Site & site, bool silent) override;
