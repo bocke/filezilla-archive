@@ -101,6 +101,20 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		controls_.emplace_back(std::make_unique<S3SiteControls>(*s3Page_, lay, *main));
 	}
 
+	{
+		dropboxPage_ = new wxPanel(this);
+		AddPage(dropboxPage_, L"Dropbox");
+		auto * main = lay.createMain(dropboxPage_, 1);
+		controls_.emplace_back(std::make_unique<DropboxSiteControls>(*dropboxPage_, lay, *main));
+	}
+
+	{
+		swiftPage_ = new wxPanel(this);
+		AddPage(swiftPage_, L"Swift");
+		auto * main = lay.createMain(swiftPage_, 1);
+		controls_.emplace_back(std::make_unique<SwiftSiteControls>(*swiftPage_, lay, *main));
+	}
+
 	m_totalPages = GetPageCount();
 
 	GetPage(0)->GetSizer()->Fit(GetPage(0));
@@ -185,16 +199,43 @@ void CSiteManagerSite::SetControlVisibility(ServerProtocol protocol, LogonType t
 			}
 		}
 		else {
-			int const s3pageIndex = FindPage(s3Page_);
-			if (s3pageIndex != wxNOT_FOUND) {
-				RemovePage(s3pageIndex);
+			int const s3PageIndex = FindPage(s3Page_);
+			if (s3PageIndex != wxNOT_FOUND) {
+				RemovePage(s3PageIndex);
+			}
+		}
+	}
+
+	if (swiftPage_) {
+		if (protocol == SWIFT) {
+			if (FindPage(swiftPage_) == wxNOT_FOUND) {
+				AddPage(swiftPage_, L"Swift");
+			}
+		}
+		else {
+			int const swiftPageIndex = FindPage(swiftPage_);
+			if (swiftPageIndex != wxNOT_FOUND) {
+				RemovePage(swiftPageIndex);
+			}
+		}
+	}
+
+	if (dropboxPage_) {
+		if (protocol == DROPBOX) {
+			if (FindPage(dropboxPage_) == wxNOT_FOUND) {
+				AddPage(dropboxPage_, L"Dropbox");
+			}
+		}
+		else {
+			int const dropboxPageIndex = FindPage(dropboxPage_);
+			if (dropboxPageIndex != wxNOT_FOUND) {
+				RemovePage(dropboxPageIndex);
 			}
 		}
 	}
 
 	GetPage(0)->GetSizer()->Fit(GetPage(0));
 }
-
 
 bool CSiteManagerSite::UpdateSite(Site &site, bool silent)
 {

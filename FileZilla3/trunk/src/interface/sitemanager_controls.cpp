@@ -85,7 +85,7 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	bag->SetEmptyCellSize(wxSize(-bag->GetHGap(), -bag->GetVGap()));
 
 	lay.gbNewRow(bag);
-	lay.gbAdd(bag, new wxStaticText(&parent, -1, _("Pro&tocol:")), lay.valign);
+	lay.gbAdd(bag, new wxStaticText(&parent, nullID, _("Pro&tocol:")), lay.valign);
 	auto protocols = new wxChoice(&parent, XRCID("ID_PROTOCOL"));
 	lay.gbAdd(bag, protocols, lay.valigng);
 
@@ -95,7 +95,7 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	row->AddGrowableCol(0);
 	lay.gbAdd(bag, row, lay.valigng);
 	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_HOST")), lay.valigng);
-	row->Add(new wxStaticText(&parent, -1, _("&Port:")), lay.valign);
+	row->Add(new wxStaticText(&parent, nullID, _("&Port:")), lay.valign);
 	auto* port = new wxTextCtrlEx(&parent, XRCID("ID_PORT"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(27), -1));
 	port->SetMaxLength(5);
 	row->Add(port, lay.valign);
@@ -116,7 +116,7 @@ GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& 
 	lay.gbAddRow(bag, new wxStaticLine(&parent), lay.grow);
 
 	lay.gbNewRow(bag);
-	lay.gbAdd(bag, new wxStaticText(&parent, -1, _("&Logon Type:")), lay.valign);
+	lay.gbAdd(bag, new wxStaticText(&parent, nullID, _("&Logon Type:")), lay.valign);
 	auto logonTypes = new wxChoice(&parent, XRCID("ID_LOGONTYPE"));
 	lay.gbAdd(bag, logonTypes, lay.valigng);
 
@@ -381,6 +381,7 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 		userLabel = _("Pro&ject ID:");
 		break;
 	case SWIFT:
+	case RACKSPACE:
 		// @translator: Keep short
 		hostLabel = _("Identity &host:");
 		// @translator: Keep short
@@ -547,7 +548,6 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 			return false;
 		}
 
-
 		Site parsedSite;
 		std::wstring error;
 		site.m_default_bookmark.m_remoteDir = CServerPath();
@@ -699,7 +699,6 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 				break;
 			}
 		}
-
 	}
 
 #if ENABLE_STORJ
@@ -895,7 +894,7 @@ AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const
 
 	sizer.Add(new wxStaticLine(&parent), lay.grow);
 
-	sizer.Add(new wxStaticText(&parent, -1, _("Default &local directory:")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("Default &local directory:")));
 
 	row = lay.createFlex(0, 1);
 	sizer.Add(row, lay.grow);
@@ -913,7 +912,7 @@ AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const
 	});
 
 	sizer.AddSpacer(0);
-	sizer.Add(new wxStaticText(&parent, -1, _("Default r&emote directory:")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("Default r&emote directory:")));
 	sizer.Add(new wxTextCtrlEx(&parent, XRCID("ID_REMOTEDIR")), lay.grow);
 	sizer.AddSpacer(0);
 	sizer.Add(new wxCheckBox(&parent, XRCID("ID_SYNC"), _("&Use synchronized browsing")));
@@ -921,19 +920,19 @@ AdvancedSiteControls::AdvancedSiteControls(wxWindow & parent, DialogLayout const
 
 	sizer.Add(new wxStaticLine(&parent), lay.grow);
 
-	sizer.Add(new wxStaticText(&parent, -1, _("&Adjust server time, offset by:")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("&Adjust server time, offset by:")));
 	row = lay.createFlex(0, 1);
 	sizer.Add(row);
 	auto* hours = new wxSpinCtrlEx(&parent, XRCID("ID_TIMEZONE_HOURS"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 	hours->SetRange(-24, 24);
 	hours->SetMaxLength(3);
 	row->Add(hours, lay.valign);
-	row->Add(new wxStaticText(&parent, -1, _("Hours,")), lay.valign);
+	row->Add(new wxStaticText(&parent, nullID, _("Hours,")), lay.valign);
 	auto* minutes = new wxSpinCtrlEx(&parent, XRCID("ID_TIMEZONE_MINUTES"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 	minutes->SetRange(-59, 59);
 	minutes->SetMaxLength(3);
 	row->Add(minutes, lay.valign);
-	row->Add(new wxStaticText(&parent, -1, _("Minutes")), lay.valign);
+	row->Add(new wxStaticText(&parent, nullID, _("Minutes")), lay.valign);
 }
 
 void AdvancedSiteControls::SetSite(Site const& site)
@@ -1047,10 +1046,10 @@ bool AdvancedSiteControls::UpdateSite(Site & site, bool silent)
 CharsetSiteControls::CharsetSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)
 {
-	sizer.Add(new wxStaticText(&parent, -1, _("The server uses following charset encoding for filenames:")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("The server uses following charset encoding for filenames:")));
 	auto rbAuto = new wxRadioButton(&parent, XRCID("ID_CHARSET_AUTO"), _("&Autodetect"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	sizer.Add(rbAuto);
-	sizer.Add(new wxStaticText(&parent, -1, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
+	sizer.Add(new wxStaticText(&parent, nullID, _("Uses UTF-8 if the server supports it, else uses local charset.")), 0, wxLEFT, 18);
 
 	auto rbUtf8 = new wxRadioButton(&parent, XRCID("ID_CHARSET_UTF8"), _("Force &UTF-8"));
 	sizer.Add(rbUtf8);
@@ -1058,12 +1057,12 @@ CharsetSiteControls::CharsetSiteControls(wxWindow & parent, DialogLayout const& 
 	sizer.Add(rbCustom);
 
 	auto * row = lay.createFlex(0, 1);
-	row->Add(new wxStaticText(&parent, -1, _("&Encoding:")), lay.valign);
+	row->Add(new wxStaticText(&parent, nullID, _("&Encoding:")), lay.valign);
 	auto * encoding = new wxTextCtrlEx(&parent, XRCID("ID_ENCODING"));
 	row->Add(encoding, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 18);
 	sizer.Add(row);
 	sizer.AddSpacer(lay.dlgUnits(6));
-	sizer.Add(new wxStaticText(&parent, -1, _("Using the wrong charset can result in filenames not displaying properly.")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("Using the wrong charset can result in filenames not displaying properly.")));
 
 	rbAuto->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Disable(); });
 	rbUtf8->Bind(wxEVT_RADIOBUTTON, [encoding](wxEvent const&){ encoding->Disable(); });
@@ -1145,7 +1144,7 @@ TransferSettingsSiteControls::TransferSettingsSiteControls(wxWindow & parent, Di
 	sizer.Add(limit);
 	row = lay.createFlex(0, 1);
 	sizer.Add(row, 0, wxLEFT, lay.dlgUnits(10));
-	row->Add(new wxStaticText(&parent, -1, _("&Maximum number of connections:")), lay.valign);
+	row->Add(new wxStaticText(&parent, nullID, _("&Maximum number of connections:")), lay.valign);
 	auto * spin = new wxSpinCtrlEx(&parent, XRCID("ID_MAXMULTIPLE"), wxString(), wxDefaultPosition, wxSize(lay.dlgUnits(26), -1));
 	spin->SetMaxLength(2);
 	spin->SetRange(1, 10);
@@ -1234,7 +1233,6 @@ void TransferSettingsSiteControls::SetControlVisibility(ServerProtocol protocol,
 	transferModeLabel->GetContainingSizer()->Layout();
 }
 
-
 S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
     : SiteControls(parent)
 {
@@ -1242,7 +1240,15 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 		sizer.AddGrowableCol(0);
 	}
 
-	sizer.Add(new wxStaticText(&parent, -1, _("Server Side Encryption:")));
+	sizer.Add(new wxStaticText(&parent, nullID, _("Options:")));
+	auto * options_row = lay.createFlex(2);
+	options_row->AddGrowableCol(1);
+	sizer.Add(options_row, 0, wxLEFT|wxGROW, lay.indent);
+	options_row->Add(new wxStaticText(&parent, nullID, _("Re&gion:")), lay.valign);
+	options_row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_REGION")), lay.valigng);
+
+	sizer.Add(new wxStaticLine(&parent), lay.grow);
+	sizer.Add(new wxStaticText(&parent, nullID, _("Server Side Encryption:")));
 
 	auto none = new wxRadioButton(&parent, XRCID("ID_S3_NOENCRYPTION"), _("N&o encryption"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	sizer.Add(none);
@@ -1253,24 +1259,35 @@ S3SiteControls::S3SiteControls(wxWindow & parent, DialogLayout const& lay, wxFle
 	auto kms = new wxRadioButton(&parent, XRCID("ID_S3_AWSKMS"), _("AWS &KMS encryption"));
 	sizer.Add(kms);
 
-	auto * row = lay.createFlex(2);
-	row->AddGrowableCol(1);
-	sizer.Add(row, 0, wxLEFT|wxGROW, lay.indent);
-	row->Add(new wxStaticText(&parent, -1, _("&Select a key:")), lay.valign);
+	auto * key_row = lay.createFlex(2);
+	key_row->AddGrowableCol(1);
+	sizer.Add(key_row, 0, wxLEFT|wxGROW, lay.indent);
+	key_row->Add(new wxStaticText(&parent, nullID, _("&Select a key:")), lay.valign);
 	auto * choice = new wxChoice(&parent, XRCID("ID_S3_KMSKEY"));
 	choice->Append(_("Default (AWS/S3)"));
 	choice->Append(_("Custom KMS ARN"));
-	row->Add(choice, lay.valigng);
-	row->Add(new wxStaticText(&parent, -1, _("C&ustom KMS ARN:")), lay.valign);
-	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
+	key_row->Add(choice, lay.valigng);
+	key_row->Add(new wxStaticText(&parent, nullID, _("C&ustom KMS ARN:")), lay.valign);
+	key_row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOM_KMS")), lay.valigng);
 
-	auto customer = new wxRadioButton(&parent, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cu&stomer encryption"));
+	auto customer = new wxRadioButton(&parent, XRCID("ID_S3_CUSTOMER_ENCRYPTION"), _("Cus&tomer encryption"));
 	sizer.Add(customer);
-	row = lay.createFlex(2);
-	row->AddGrowableCol(1);
-	sizer.Add(row, 0, wxLEFT | wxGROW, lay.indent);
-	row->Add(new wxStaticText(&parent, -1, _("Cus&tomer Key:")), lay.valign);
-	row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
+	key_row = lay.createFlex(2);
+	key_row->AddGrowableCol(1);
+	sizer.Add(key_row, 0, wxLEFT | wxGROW, lay.indent);
+	key_row->Add(new wxStaticText(&parent, nullID, _("Customer Ke&y:")), lay.valign);
+	key_row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_CUSTOMER_KEY")), lay.valigng);
+
+	sizer.Add(new wxStaticLine(&parent), lay.grow);
+	sizer.Add(new wxStaticText(&parent, nullID, _("Security Token Service:")));
+
+	auto * sts_row = lay.createFlex(2);
+	sts_row->AddGrowableCol(1);
+	sizer.Add(sts_row, 0, wxLEFT|wxGROW, lay.indent);
+	sts_row->Add(new wxStaticText(&parent, nullID, _("Ro&le ARN:")), lay.valign);
+	sts_row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_ROLE_ARN")), lay.valigng);
+	sts_row->Add(new wxStaticText(&parent, nullID, _("MFA D&evice Serial:")), lay.valign);
+	sts_row->Add(new wxTextCtrlEx(&parent, XRCID("ID_S3_MFA_SERIAL")), lay.valigng);
 
 	auto l = [this](wxEvent const&) { SetControlState(); };
 	none->Bind(wxEVT_RADIOBUTTON, l);
@@ -1308,30 +1325,38 @@ void S3SiteControls::SetSite(Site const& site)
 	xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxWindow::Enable, !predefined_);
 
 	if (site.server.GetProtocol() == S3) {
+		auto region = site.server.GetExtraParameter("region");
+		xrc_call(parent_, "ID_S3_REGION", &wxTextCtrl::ChangeValue, region);
+
 		xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
-		auto ssealgorithm = site.server.GetExtraParameter("ssealgorithm");
-		if (ssealgorithm.empty()) {
+		auto sse_algorithm = site.server.GetExtraParameter("ssealgorithm");
+		if (sse_algorithm.empty()) {
 			xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxRadioButton::SetValue, true);
 		}
-		else if (ssealgorithm == "AES256") {
+		else if (sse_algorithm == "AES256") {
 			xrc_call(parent_, "ID_S3_AES256", &wxRadioButton::SetValue, true);
 		}
-		else if (ssealgorithm == "aws:kms") {
+		else if (sse_algorithm == "aws:kms") {
 			xrc_call(parent_, "ID_S3_AWSKMS", &wxRadioButton::SetValue, true);
-			auto sseKmsKey = site.server.GetExtraParameter("ssekmskey");
-			if (!sseKmsKey.empty()) {
+			auto sse_kms_key = site.server.GetExtraParameter("ssekmskey");
+			if (!sse_kms_key.empty()) {
 				xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::CUSTOM));
-				xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sseKmsKey);
+				xrc_call(parent_, "ID_S3_CUSTOM_KMS", &wxTextCtrl::ChangeValue, sse_kms_key);
 			}
 			else {
 				xrc_call(parent_, "ID_S3_KMSKEY", &wxChoice::SetSelection, static_cast<int>(s3_sse::KmsKey::DEFAULT));
 			}
 		}
-		else if (ssealgorithm == "customer") {
+		else if (sse_algorithm == "customer") {
 			xrc_call(parent_, "ID_S3_CUSTOMER_ENCRYPTION", &wxRadioButton::SetValue, true);
-			auto customerKey = site.server.GetExtraParameter("ssecustomerkey");
-			xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customerKey);
+			auto customer_key = site.server.GetExtraParameter("ssecustomerkey");
+			xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::ChangeValue, customer_key);
 		}
+
+		auto value = site.server.GetExtraParameter("stsrolearn");
+		xrc_call(parent_, "ID_S3_ROLE_ARN", &wxTextCtrl::ChangeValue, value);
+		value = site.server.GetExtraParameter("stsmfaserial");
+		xrc_call(parent_, "ID_S3_MFA_SERIAL", &wxTextCtrl::ChangeValue, value);
 	}
 }
 
@@ -1339,6 +1364,8 @@ bool S3SiteControls::UpdateSite(Site & site, bool silent)
 {
 	CServer & server = site.server;
 	if (server.GetProtocol() == S3) {
+		server.SetExtraParameter("region", fz::to_wstring(xrc_call(parent_, "ID_S3_REGION", &wxTextCtrl::GetValue)));
+
 		if (xrc_call(parent_, "ID_S3_NOENCRYPTION", &wxRadioButton::GetValue)) {
 			server.ClearExtraParameter("ssealgorithm");
 		}
@@ -1385,6 +1412,124 @@ bool S3SiteControls::UpdateSite(Site & site, bool silent)
 
 			server.SetExtraParameter("ssealgorithm", L"customer");
 			server.SetExtraParameter("ssecustomerkey", fz::to_wstring(xrc_call(parent_, "ID_S3_CUSTOMER_KEY", &wxTextCtrl::GetValue)));
+		}
+
+		auto value = fz::to_wstring(xrc_call(parent_, "ID_S3_ROLE_ARN", &wxTextCtrl::GetValue));
+		if (!value.empty()) {
+			server.SetExtraParameter("stsrolearn", value);
+			value = fz::to_wstring(xrc_call(parent_, "ID_S3_MFA_SERIAL", &wxTextCtrl::GetValue));
+			if (!value.empty()) {
+				server.SetExtraParameter("stsmfaserial", value);
+			}
+		}
+	}
+
+	return true;
+}
+
+SwiftSiteControls::SwiftSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
+	: SiteControls(parent)
+{
+	if (!sizer.IsColGrowable(0)) {
+		sizer.AddGrowableCol(0);
+	}
+
+	sizer.Add(new wxStaticText(&parent, nullID, _("Identity (Keystone):")));
+
+	auto keystone3 = new wxCheckBox(&parent, XRCID("ID_SWIFT_KEYSTONE_V3"), _("&Version 3"));
+	sizer.Add(keystone3);
+
+	auto *keyRow = lay.createFlex(2);
+	keyRow->AddGrowableCol(1);
+	sizer.Add(keyRow, 0, wxLEFT|wxGROW, lay.indent);
+	keyRow->Add(new wxStaticText(&parent, nullID, _("&Domain:")), lay.valign);
+	keyRow->Add(new wxTextCtrlEx(&parent, XRCID("ID_SWIFT_DOMAIN")), lay.valigng);
+
+	auto l = [this](wxEvent const&) { SetControlState(); };
+	keystone3->Bind(wxEVT_CHECKBOX, l);
+}
+
+void SwiftSiteControls::SetControlState()
+{
+	auto v3 = xrc_call(parent_, "ID_SWIFT_KEYSTONE_V3", &wxCheckBox::GetValue);
+
+	xrc_call(parent_, "ID_SWIFT_DOMAIN", &wxWindow::Enable, v3);
+}
+
+void SwiftSiteControls::SetSite(Site const& site)
+{
+	if (site.server.GetProtocol() == SWIFT) {
+		bool v3{};
+		auto pv3 = site.server.GetExtraParameter("keystone_version");
+		if (pv3.empty()) {
+			v3 = fz::starts_with(site.server.GetExtraParameter("identpath"), std::wstring(L"/v3"));
+		}
+		else {
+			v3 = pv3 == L"3";
+		}
+		xrc_call(parent_, "ID_SWIFT_KEYSTONE_V3", &wxCheckBox::SetValue, v3);
+		auto domain = site.server.GetExtraParameter("domain");
+		if (domain.empty()) {
+			domain = L"Default";
+		}
+		xrc_call(parent_, "ID_SWIFT_DOMAIN", &wxTextCtrl::ChangeValue, domain);
+	}
+}
+
+bool SwiftSiteControls::UpdateSite(Site & site, bool)
+{
+	CServer &server = site.server;
+	if (server.GetProtocol() == SWIFT) {
+		auto v3 = xrc_call(parent_, "ID_SWIFT_KEYSTONE_V3", &wxCheckBox::GetValue);
+		if (v3) {
+			server.SetExtraParameter("keystone_version", L"3");
+		}
+		else {
+			server.SetExtraParameter("keystone_version", L"2");
+		}
+
+		if (v3) {
+			auto domain = fz::to_wstring(xrc_call(parent_, "ID_SWIFT_DOMAIN", &wxTextCtrl::GetValue));
+			server.SetExtraParameter("domain", domain);
+		}
+		else {
+			server.ClearExtraParameter("domain");
+		}
+	}
+
+	return true;
+}
+
+DropboxSiteControls::DropboxSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
+	: SiteControls(parent)
+{
+	if (!sizer.IsColGrowable(0)) {
+		sizer.AddGrowableCol(0);
+	}
+
+	sizer.Add(new wxStaticText(&parent, nullID, _("Dropbox for Business:")));
+
+	auto root_ns = new wxCheckBox(&parent, XRCID("ID_USE_ROOT_NS"), _("Use &team root namespace"));
+	sizer.Add(root_ns);
+}
+
+void DropboxSiteControls::SetSite(Site const& site)
+{
+	if (site.server.GetProtocol() == DROPBOX) {
+		auto root_ns = site.server.GetExtraParameter("root_namespace");
+		xrc_call(parent_, "ID_USE_ROOT_NS", &wxCheckBox::SetValue, root_ns == L"1");
+	}
+}
+
+bool DropboxSiteControls::UpdateSite(Site & site, bool silent)
+{
+	CServer & server = site.server;
+	if (server.GetProtocol() == DROPBOX) {
+		if (xrc_call(parent_, "ID_USE_ROOT_NS", &wxCheckBox::GetValue)) {
+			server.SetExtraParameter("root_namespace", L"1");
+		}
+		else {
+			server.ClearExtraParameter("root_namespace");
 		}
 	}
 
