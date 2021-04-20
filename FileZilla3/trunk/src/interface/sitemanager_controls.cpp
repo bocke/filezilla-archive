@@ -1500,7 +1500,7 @@ bool SwiftSiteControls::UpdateSite(Site & site, bool)
 	return true;
 }
 
-DropboxSiteControls::DropboxSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer)
+DropboxSiteControls::DropboxSiteControls(wxWindow & parent, DialogLayout const&, wxFlexGridSizer & sizer)
 	: SiteControls(parent)
 {
 	if (!sizer.IsColGrowable(0)) {
@@ -1521,7 +1521,7 @@ void DropboxSiteControls::SetSite(Site const& site)
 	}
 }
 
-bool DropboxSiteControls::UpdateSite(Site & site, bool silent)
+bool DropboxSiteControls::UpdateSite(Site & site, bool)
 {
 	CServer & server = site.server;
 	if (server.GetProtocol() == DROPBOX) {
