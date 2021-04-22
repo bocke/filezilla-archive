@@ -228,9 +228,9 @@ public:
 	}
 
 	template<typename T>
-	void change_count(T opt)
+	uint64_t change_count(T opt)
 	{
-		change_count(mapOption(opt));
+		return change_count(mapOption(opt));
 	}
 
 	struct option_value final
