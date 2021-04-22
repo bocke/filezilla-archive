@@ -227,10 +227,17 @@ public:
 		unwatch_all(get_option_watcher_notifier(handler));
 	}
 
+	template<typename T>
+	void change_count(T opt)
+	{
+		change_count(mapOption(opt));
+	}
+
 	struct option_value final
 	{
 		std::wstring str_;
 		std::unique_ptr<pugi::xml_document> xml_{};
+		uint64_t change_counter_{};
 		int v_{};
 		bool predefined_{};
 	};
@@ -256,6 +263,8 @@ protected:
 	void watch_all(std::tuple<void*, watcher_notifier> handler);
 	void unwatch(optionsIndex opt, std::tuple<void*, watcher_notifier> handler);
 	void unwatch_all(std::tuple<void*, watcher_notifier> handler);
+
+	uint64_t change_count(optionsIndex opt);
 
 	void set_default_value(optionsIndex opt);
 

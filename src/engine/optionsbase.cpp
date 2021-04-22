@@ -325,6 +325,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 
 	val.v_ = value;
 	val.str_ = fz::to_wstring(value);
+	++val.change_counter_;
 
 	set_changed(opt);
 }
@@ -364,6 +365,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 		val.v_ = fz::to_integral<int>(value);
 		val.str_ = value;
 	}
+	++val.change_counter_;
 
 	set_changed(opt);
 }
@@ -383,6 +385,7 @@ void COptionsBase::set(optionsIndex opt, option_def const& def, option_value& va
 		}
 	}
 	*val.xml_ = std::move(value);
+	++val.change_counter_;
 
 	set_changed(opt);
 }
@@ -551,4 +554,15 @@ void COptionsBase::unwatch_all(std::tuple<void*, watcher_notifier> handler)
 void COptionsBase::set_default_value(optionsIndex opt)
 {
 	::set_default_value(static_cast<size_t>(opt), options_, values_);
+}
+
+uint64_t COptionsBase::change_count(optionsIndex opt)
+{
+	fz::scoped_read_lock l(mtx_);
+	if (opt == optionsIndex::invalid || static_cast<size_t>(opt) >= values_.size()) {
+		return 0;
+	}
+
+	auto& val = values_[static_cast<size_t>(opt)];
+	return val.change_counter_;
 }
