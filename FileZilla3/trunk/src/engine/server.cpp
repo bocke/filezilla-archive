@@ -843,7 +843,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	switch (protocol) {
 	case GOOGLE_CLOUD:
 		{
-			static std::vector<ParameterTraits> ret = []() {
+			static std::vector<ParameterTraits> const ret = []() {
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
 				ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -853,7 +853,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		}
 	case SWIFT:
 		{
-			static std::vector<ParameterTraits> ret = []() {
+			static std::vector<ParameterTraits> const ret = []() {
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"identpath", ParameterSection::host, 0, std::wstring(), _("Path of identity service")});
 				ret.emplace_back(ParameterTraits{"identuser", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -865,7 +865,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		}
 	case RACKSPACE:
 		{
-			static std::vector<ParameterTraits> ret = []() {
+			static std::vector<ParameterTraits> const ret = []() {
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"identpath", ParameterSection::host, 0, L"/v2.0/tokens", _("Path of identity service")});
 				ret.emplace_back(ParameterTraits{"identuser", ParameterSection::user, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -875,7 +875,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 		}
 	case S3:
 		{
-			static std::vector<ParameterTraits> ret = []() {
+			static std::vector<ParameterTraits> const ret = []() {
 				std::vector<ParameterTraits> ret;
 				ret.emplace_back(ParameterTraits{"ssealgorithm", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"ssekmskey", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -890,7 +890,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	case GOOGLE_DRIVE:
 	case ONEDRIVE:
 	{
-		static std::vector<ParameterTraits> ret = []() {
+		static std::vector<ParameterTraits> const ret = []() {
 			std::vector<ParameterTraits> ret;
 			ret.emplace_back(ParameterTraits{"login_hint", ParameterSection::user, ParameterTraits::optional, std::wstring(), _("Name or email address")});
 			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -900,7 +900,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	}
 	case DROPBOX:
 	{
-		static std::vector<ParameterTraits> ret = []() {
+		static std::vector<ParameterTraits> const ret = []() {
 			std::vector<ParameterTraits> ret;
 			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			ret.emplace_back(ParameterTraits{"root_namespace", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
@@ -910,7 +910,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	}
 	case BOX:
 	{
-		static std::vector<ParameterTraits> ret = []() {
+		static std::vector<ParameterTraits> const ret = []() {
 			std::vector<ParameterTraits> ret;
 			ret.emplace_back(ParameterTraits{"oauth_identity", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			return ret;
@@ -919,7 +919,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	}
 	case STORJ:
 	{
-		static std::vector<ParameterTraits> ret = []() {
+		static std::vector<ParameterTraits> const ret = []() {
 			std::vector<ParameterTraits> ret;
 			ret.emplace_back(ParameterTraits{"passphrase_hash", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			return ret;
@@ -928,7 +928,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 	}
 	case STORJ_GRANT:
 	{
-		static std::vector<ParameterTraits> ret = []() {
+		static std::vector<ParameterTraits> const ret = []() {
 			std::vector<ParameterTraits> ret;
 			ret.emplace_back(ParameterTraits{"credentials_hash", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 			return ret;
@@ -987,10 +987,23 @@ bool CServer::SameResource(CServer const& other) const
 	// We include post-login commands as it may be used for things like the HOST command.
 	// We include proxy parameters as a hostname may resolve to different servers depending on whether a proxy is used.
 
-	auto l = std::tie(m_protocol, m_host, m_port, m_user, m_postLoginCommands, m_bypassProxy, extraParameters_);
-	auto r = std::tie(other.m_protocol, other.m_host, other.m_port, other.m_user, other.m_postLoginCommands, other.m_bypassProxy, other.extraParameters_);
+	auto l = std::tie(m_protocol, m_host, m_port, m_user, m_postLoginCommands);
+	auto r = std::tie(other.m_protocol, other.m_host, other.m_port, other.m_user, other.m_postLoginCommands);
+	if (l != r) {
+		return false;
+	}
 
-	return l == r;
+	auto const& traits = ExtraServerParameterTraits(m_protocol);
+	for (auto const& trait : traits) {
+		if (trait.flags_ & ParameterTraits::content_transparent) {
+			continue;
+		}
+		if (GetExtraParameter(trait.name_) != other.GetExtraParameter(trait.name_)) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 bool CServer::SameContent(CServer const& other) const
