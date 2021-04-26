@@ -267,7 +267,8 @@ struct ParameterTraits
 
 	enum flags : unsigned char {
 		optional = 0x01,
-		numeric = 0x02
+		numeric = 0x02,
+		content_transparent = 0x04, // Parameter used for any purpose that does not affect site content
 	};
 	unsigned char flags_;
 	std::wstring default_;
