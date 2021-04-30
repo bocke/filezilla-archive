@@ -5,7 +5,7 @@
 ${StrLoc}
 ${StrTrimNewLines}
 
-!define OfferDataUrl "https://offers.filezilla-project.org/offer_test.php?v=1&c=${OFFER_CAMPAIGN}"
+!define OfferDataUrl "https://offers.filezilla-project.org/offer.php?v=1&c=${OFFER_CAMPAIGN}"
 
 Var OfferDlg
 Var OfferAccept
@@ -109,6 +109,11 @@ Function OfferInit
 
   ; Do not present offers during automated updates
   ${If} $PERFORM_UPDATE == 1
+    StrCpy $OfferSkip 1
+  ${EndIf}
+
+  ; Require Windows 10
+  ${Unless} ${AtLeastWin10}
     StrCpy $OfferSkip 1
   ${EndIf}
 
