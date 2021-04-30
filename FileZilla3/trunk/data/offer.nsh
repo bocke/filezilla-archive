@@ -19,6 +19,7 @@ Var OfferInstallArgs
 Var OfferSkip
 Var OfferControl
 Var OfferReadLineTemp
+Var OfferInitialized
 
 ; Read a line and trim newlines
 !define ReadLine `!insertmacro DoReadLine`
@@ -102,6 +103,11 @@ Var OfferReadLineTemp
 
 Function OfferInit
 
+  ${If} $OfferInitialized == 1
+    Return
+  ${EndIf}
+  StrCpy $OfferInitialized 1
+
   ; Do not present offers when installer is silent
   ${If} ${Silent}
     StrCpy $OfferSkip 1
@@ -166,7 +172,46 @@ Function OfferPageOnLink
 
 FunctionEnd
 
+Function OfferPageInitTimer
+
+  GetFunctioNAddress $R0 OfferPageinitTimer
+  nsDialogs::KillTimer $R0
+
+  Call OfferInit
+
+  ShowWindow $mui.Button.Next ${SW_SHOW}
+  ShowWindow $mui.Button.Back ${SW_SHOW}
+
+  SendMessage $HWNDPARENT ${WM_COMMAND} 1 0
+ 
+FunctionEnd
+
+Function OfferInitPage
+
+  ${If} $OfferInitialized == 1
+    Abort
+  ${EndIf}
+
+  ShowWindow $mui.Button.Next ${SW_HIDE}
+  ShowWindow $mui.Button.Back ${SW_HIDE}
+
+  nsDialogs::Create /NOUNLOAD 1018
+  Pop $R0
+
+  !insertmacro MUI_HEADER_TEXT "Loading data" "Please be patient"
+
+  nsDialogs::CreateItem /NOUNLOAD STATIC ${WS_VISIBLE}|${WS_CHILD}|${WS_CLIPSIBLINGS} 0 0 0 100% 40 "Loading data. This will only take a brief moment."
+
+  GetFunctioNAddress $R0 OfferPageInitTimer
+  nsDialogs::CreateTimer $R0 1
+  Pop $R0
+  nsDialogs::Show  
+
+FunctionEnd
+
 Function OfferPage
+
+  Call OfferInit
 
   ${If} $OfferSkip == 1
     Abort
