@@ -3,10 +3,9 @@
 
 !include "StrFunc.nsh"
 ${StrLoc}
-${StrRep}
 ${StrTrimNewLines}
 
-!define OfferDataUrl "https://offers.filezilla-project.org/offer.php?v=1&c=${OFFER_CAMPAIGN}"
+!define OfferDataUrl "https://offers.filezilla-project.org/offer_test.php?v=1&c=${OFFER_CAMPAIGN}"
 
 Var OfferDlg
 Var OfferAccept
@@ -157,6 +156,7 @@ Function OfferPageOnLink
   Pop $R0
   nsDialogs::GetUserData $R0
   Pop $R1
+  MessageBox MB_YESNO|MB_ICONQUESTION "Open $R1 in your browser?" IDNO +2
   ExecShell "open" "$R1" 
 
 FunctionEnd
