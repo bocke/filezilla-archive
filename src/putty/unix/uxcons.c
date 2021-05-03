@@ -494,7 +494,6 @@ int console_get_userpass_input(prompts_t *p)
     for (curr_prompt = 0; curr_prompt < p->n_prompts; curr_prompt++) {
 
         struct termios oldmode, newmode;
-        int len;
         prompt_t *pr = p->prompts[curr_prompt];
 
         tcgetattr(infd, &oldmode);
@@ -508,21 +507,21 @@ int console_get_userpass_input(prompts_t *p)
 
         fzprintf_raw_untrusted(sftpAskPassword, "%s", pr->prompt);
 
-        len = 0;
+        bool failed = false;
         while (1) {
-            int ret;
+            size_t toread = 65536;
+            size_t prev_result_len = pr->result->len;
+            void *ptr = strbuf_append(pr->result, toread);
+            int ret = read(infd, ptr, toread);
 
-            prompt_ensure_result_size(pr, len * 5 / 4 + 512);
-            ret = read(infd, pr->result + len, pr->resultsize - len - 1);
             if (ret <= 0) {
-                len = -1;
+                failed = true;
                 break;
             }
-            len += ret;
-            if (pr->result[len - 1] == '\n') {
-                len--;
+
+            strbuf_shrink_to(pr->result, prev_result_len + ret);
+            if (strbuf_chomp(pr->result, '\n'))
                 break;
-            }
         }
 
         tcsetattr(infd, TCSANOW, &oldmode);
@@ -530,14 +529,10 @@ int console_get_userpass_input(prompts_t *p)
         //if (!pr->echo)
         //    console_prompt_text(outfp, "\n", 1);
 
-        if (len < 0) {
+        if (failed) {
             console_close(outfp, infd);
             return 0;                  /* failure due to read error */
         }
-
-        pr->result[len--] = 0;
-        while (len >= 0 && (pr->result[len] == '\r' || pr->result[len] == '\n'))
-            pr->result[len--] = '\0';
     }
 
     console_close(outfp, infd);

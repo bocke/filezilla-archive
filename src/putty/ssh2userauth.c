@@ -18,6 +18,10 @@
 
 #define BANNER_LIMIT 131072
 
+typedef struct agent_key {
+    strbuf *blob, *comment;
+    ptrlen algorithm;
+} agent_key;
 
 typedef struct Loaded_keyfile_list Loaded_keyfile_list;
 struct Loaded_keyfile_list
@@ -72,9 +76,8 @@ struct ssh2_userauth_state {
     bool kbd_inter_refused;
     prompts_t *cur_prompt;
     uint32_t num_prompts;
-    //fz const char *username;
+    /*fz const*/ char *username;
     char *locally_allocated_username;
-    char *username;
     char *password;
     bool got_username;
     strbuf *publickey_blob;
@@ -84,9 +87,9 @@ struct ssh2_userauth_state {
     void *agent_response_to_free;
     ptrlen agent_response;
     BinarySource asrc[1];          /* for reading SSH agent response */
-    size_t pkblob_pos_in_agent;
-    int keyi, nkeys;
-    ptrlen pk, alg, comment;
+    size_t agent_keys_len;
+    agent_key *agent_keys;
+    size_t agent_key_index, agent_key_limit;
     int len;
     PktOut *pktout;
     bool want_user_input;
@@ -142,7 +145,7 @@ static void free_loaded_keyfile(Loaded_keyfile_list* item)
 }
 
 /* Purge duplicate keys from loaded_keyfile_list */
-static void remove_duplicate_keys(PacketProtocolLayer* ppl, Loaded_keyfile_list** list, unsigned char* blob, size_t bloblen)
+static void remove_duplicate_keys(PacketProtocolLayer* ppl, Loaded_keyfile_list** list, ptrlen blob)
 {
     Loaded_keyfile_list* cur, * prev = NULL;
     if (!list)
@@ -150,7 +153,7 @@ static void remove_duplicate_keys(PacketProtocolLayer* ppl, Loaded_keyfile_list*
 
     cur = *list;
     while (cur) {
-        if (bloblen == cur->publickey_blob->len && !memcmp(blob, cur->publickey_blob->u, bloblen)) {
+        if (blob.len == cur->publickey_blob->len && !memcmp(blob.ptr, cur->publickey_blob->u, blob.len)) {
             Loaded_keyfile_list* next;
             ppl_logevent("Key matched loaded keyfile, remove duplicate");
             next = cur->next;
@@ -365,6 +368,13 @@ static void ssh2_userauth_free(PacketProtocolLayer *ppl)
     if (s->successor_layer)
         ssh_ppl_free(s->successor_layer);
 
+    if (s->agent_keys) {
+        for (size_t i = 0; i < s->agent_keys_len; i++) {
+            strbuf_free(s->agent_keys[i].blob);
+            strbuf_free(s->agent_keys[i].comment);
+        }
+        sfree(s->agent_keys);
+    }
     sfree(s->agent_response_to_free);
     if (s->auth_agent_query)
         agent_cancel_query(s->auth_agent_query);
@@ -409,8 +419,10 @@ static void ssh2_userauth_filter_queue(struct ssh2_userauth_state *s)
             if (!s->banner_scc_initialised) {
                 s->banner_scc = seat_stripctrl_new(
                     s->ppl.seat, BinarySink_UPCAST(&s->banner_bs), SIC_BANNER);
+                /* FZ GUI does it
                 if (s->banner_scc)
                     stripctrl_enable_line_limiting(s->banner_scc);
+                */
                 s->banner_scc_initialised = true;
             }
             if (s->banner_scc)
@@ -497,8 +509,6 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
      * Find out about any keys Pageant has (but if there's a public
      * key configured, filter out all others).
      */
-    s->nkeys = 0;
-    s->pkblob_pos_in_agent = 0;
     if (s->tryagent && agent_exists()) {
         ppl_logevent("Pageant is running. Requesting keys.");
 
@@ -514,48 +524,75 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
 
         get_uint32(s->asrc); /* skip length field */
         if (get_byte(s->asrc) == SSH2_AGENT_IDENTITIES_ANSWER) {
-            int keyi;
-
-            s->nkeys = toint(get_uint32(s->asrc));
+            size_t nkeys = get_uint32(s->asrc);
+            size_t origpos = s->asrc->pos;
 
             /*
-             * Vet the Pageant response to ensure that the key count
-             * and blob lengths make sense.
+             * Check that the agent response is well formed.
              */
-            if (s->nkeys < 0) {
-                ppl_logevent("Pageant response contained a negative"
-                             " key count %d", s->nkeys);
-                s->nkeys = 0;
-                goto done_agent_query;
-            } else {
-                ppl_logevent("Pageant has %d SSH-2 keys", s->nkeys);
+            for (size_t i = 0; i < nkeys; i++) {
+                get_string(s->asrc);   /* blob */
+                get_string(s->asrc);   /* comment */
+                if (get_err(s->asrc)) {
+                    ppl_logevent("Pageant's response was truncated");
+                    goto done_agent_query;
+                }
+            }
 
-                /* See if configured key is in agent. */
-                for (keyi = 0; keyi < s->nkeys; keyi++) {
-                    size_t pos = s->asrc->pos;
-                    ptrlen blob = get_string(s->asrc);
-                    get_string(s->asrc); /* skip comment */
-                    if (get_err(s->asrc)) {
-                        ppl_logevent("Pageant response was truncated");
-                        s->nkeys = 0;
-                        goto done_agent_query;
-                    }
+            /*
+             * Copy the list of public-key blobs out of the Pageant
+             * response.
+             */
+            BinarySource_REWIND_TO(s->asrc, origpos);
+            s->agent_keys_len = nkeys;
+            s->agent_keys = snewn(s->agent_keys_len, agent_key);
+            for (size_t i = 0; i < nkeys; i++) {
+                s->agent_keys[i].blob = strbuf_new();
+                put_datapl(s->agent_keys[i].blob, get_string(s->asrc));
+                s->agent_keys[i].comment = strbuf_new();
+                put_datapl(s->agent_keys[i].comment, get_string(s->asrc));
 
-                    if (s->publickey_blob &&
-                        blob.len == s->publickey_blob->len &&
-                        !memcmp(blob.ptr, s->publickey_blob->s,
-                                s->publickey_blob->len)) {
-                        ppl_logevent("Pageant key #%d matches "
-                                     "configured key file", keyi);
-                        s->keyi = keyi;
-                        s->pkblob_pos_in_agent = pos;
+                /* Also, extract the algorithm string from the start
+                 * of the public-key blob. */
+                BinarySource src[1];
+                BinarySource_BARE_INIT_PL(src, ptrlen_from_strbuf(
+                    s->agent_keys[i].blob));
+                s->agent_keys[i].algorithm = get_string(src);
+            }
+
+            ppl_logevent("Pageant has %"SIZEu" SSH-2 keys", nkeys);
+
+            if (s->publickey_blob) {
+                /*
+                 * If we've been given a specific public key blob,
+                 * filter the list of keys to try from the agent down
+                 * to only that one, or none if it's not there.
+                 */
+                ptrlen our_blob = ptrlen_from_strbuf(s->publickey_blob);
+                size_t i;
+
+                for (i = 0; i < nkeys; i++) {
+                    if (ptrlen_eq_ptrlen(our_blob, ptrlen_from_strbuf(
+                                             s->agent_keys[i].blob)))
                         break;
-                    }
                 }
-                if (s->publickey_blob && !s->pkblob_pos_in_agent) {
+
+                if (i < nkeys) {
+                    ppl_logevent("Pageant key #%"SIZEu" matches "
+                                 "configured key file", i);
+                    s->agent_key_index = i;
+                    s->agent_key_limit = i+1;
+                } else {
                     ppl_logevent("Configured key file not in Pageant");
-                    s->nkeys = 0;
+                    s->agent_key_index = 0;
+                    s->agent_key_limit = 0;
                 }
+            } else {
+                /*
+                 * Otherwise, try them all.
+                 */
+                s->agent_key_index = 0;
+                s->agent_key_limit = nkeys;
             }
         } else {
             ppl_logevent("Failed to get reply from Pageant");
@@ -633,7 +670,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
             }
             sfree(s->locally_allocated_username); /* for change_username */
             s->username = s->locally_allocated_username =
-                dupstr(s->cur_prompt->prompts[0]->result);
+                prompt_get_result(s->cur_prompt->prompts[0]);
             free_prompts(s->cur_prompt);
         } else {
             if ((flags & FLAG_VERBOSE) || (flags & FLAG_INTERACTIVE))
@@ -657,17 +694,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
 
         s->tried_pubkey_config = false;
         s->kbd_inter_refused = false;
-
-        /* Reset agent request state. */
         s->done_agent = false;
-        if (s->agent_response.ptr) {
-            if (s->pkblob_pos_in_agent) {
-                s->asrc->pos = s->pkblob_pos_in_agent;
-            } else {
-                s->asrc->pos = 9;      /* skip length + type + key count */
-                s->keyi = 0;
-            }
-        }
 
         while (1) {
             /*
@@ -821,7 +848,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                 /*
                  * Save the methods string for use in error messages.
                  */
-                s->last_methods_string->len = 0;
+                strbuf_clear(s->last_methods_string);
                 put_datapl(s->last_methods_string, methods);
 
                 /*
@@ -888,7 +915,8 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
             } else
 #endif /* NO_GSSAPI */
 
-            if (s->can_pubkey && !s->done_agent && s->nkeys) {
+            if (s->can_pubkey && !s->done_agent &&
+                s->agent_key_index < s->agent_key_limit) {
 
                 /*
                  * Attempt public-key authentication using a key from Pageant.
@@ -896,18 +924,10 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
 
                 s->ppl.bpp->pls->actx = SSH2_PKTCTX_PUBLICKEY;
 
-                ppl_logevent("Trying Pageant key #%d", s->keyi);
+                ppl_logevent("Trying Pageant key #%"SIZEu, s->agent_key_index);
 
-                /* Unpack key from agent response */
-                s->pk = get_string(s->asrc);
-                s->comment = get_string(s->asrc);
-                {
-                    BinarySource src[1];
-                    BinarySource_BARE_INIT_PL(src, s->pk);
-                    s->alg = get_string(src);
-                }
-
-                remove_duplicate_keys(ppl, &s->loaded_keyfile_list, (unsigned char*)s->pk.ptr, s->pk.len);
+                remove_duplicate_keys(ppl, &s->loaded_keyfile_list, ptrlen_from_strbuf(
+                          s->agent_keys[s->agent_key_index].blob));
 
                 /* See if server will accept it */
                 s->pktout = ssh_bpp_new_pktout(
@@ -917,8 +937,10 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                 put_stringz(s->pktout, "publickey");
                                                     /* method */
                 put_bool(s->pktout, false); /* no signature included */
-                put_stringpl(s->pktout, s->alg);
-                put_stringpl(s->pktout, s->pk);
+                put_stringpl(s->pktout,
+                             s->agent_keys[s->agent_key_index].algorithm);
+                put_stringpl(s->pktout, ptrlen_from_strbuf(
+                            s->agent_keys[s->agent_key_index].blob));
                 pq_push(s->ppl.out_pq, s->pktout);
                 s->type = AUTH_TYPE_PUBLICKEY_OFFER_QUIET;
 
@@ -931,11 +953,13 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
 
                 } else {
                     strbuf *agentreq, *sigdata;
+                    ptrlen comment = ptrlen_from_strbuf(
+                        s->agent_keys[s->agent_key_index].comment);
 
                     if (flags & FLAG_VERBOSE)
                         ppl_printf("Authenticating with public key "
                                    "\"%.*s\" from agent\r\n",
-                                   PTRLEN_PRINTF(s->comment));
+                                   PTRLEN_PRINTF(comment));
 
                     /*
                      * Server is willing to accept the key.
@@ -948,13 +972,16 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                     put_stringz(s->pktout, "publickey");
                                                         /* method */
                     put_bool(s->pktout, true);  /* signature included */
-                    put_stringpl(s->pktout, s->alg);
-                    put_stringpl(s->pktout, s->pk);
+                    put_stringpl(s->pktout,
+                                 s->agent_keys[s->agent_key_index].algorithm);
+                    put_stringpl(s->pktout, ptrlen_from_strbuf(
+                            s->agent_keys[s->agent_key_index].blob));
 
                     /* Ask agent for signature. */
                     agentreq = strbuf_new_for_agent_query();
                     put_byte(agentreq, SSH2_AGENTC_SIGN_REQUEST);
-                    put_stringpl(agentreq, s->pk);
+                    put_stringpl(agentreq, ptrlen_from_strbuf(
+                            s->agent_keys[s->agent_key_index].blob));
                     /* Now the data to be signed... */
                     sigdata = strbuf_new();
                     ssh2_userauth_add_session_id(s, sigdata);
@@ -976,8 +1003,11 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                         if (get_byte(src) == SSH2_AGENT_SIGN_RESPONSE &&
                             (sigblob = get_string(src), !get_err(src))) {
                             ppl_logevent("Sending Pageant's response");
-                            ssh2_userauth_add_sigblob(s, s->pktout,
-                                                      s->pk, sigblob);
+                            ssh2_userauth_add_sigblob(
+                                s, s->pktout,
+                                ptrlen_from_strbuf(
+                                    s->agent_keys[s->agent_key_index].blob),
+                                sigblob);
                             pq_push(s->ppl.out_pq, s->pktout);
                             s->type = AUTH_TYPE_PUBLICKEY;
                         } else {
@@ -985,19 +1015,21 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                             ppl_printf("Pageant failed to "
                                        "provide a signature\r\n");
                             s->suppress_wait_for_response_packet = true;
+                            ssh_free_pktout(s->pktout);
                         }
+                    } else {
+                        ppl_logevent("Pageant failed to respond to "
+                                     "signing request");
+                        ppl_printf("Pageant failed to "
+                                   "respond to signing request\r\n");
+                        s->suppress_wait_for_response_packet = true;
+                        ssh_free_pktout(s->pktout);
                     }
                 }
 
                 /* Do we have any keys left to try? */
-                if (s->pkblob_pos_in_agent) {
+                if (++s->agent_key_index >= s->agent_key_limit)
                     s->done_agent = true;
-                    s->tried_pubkey_config = true;
-                } else {
-                    s->keyi++;
-                    if (s->keyi >= s->nkeys)
-                        s->done_agent = true;
-                }
 
             } else if (s->can_pubkey && s->publickey_blob &&
                        s->privatekey_available && !s->tried_pubkey_config) {
@@ -1087,7 +1119,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                             return;
                         }
                         passphrase =
-                            dupstr(s->cur_prompt->prompts[0]->result);
+                            prompt_get_result(s->cur_prompt->prompts[0]);
                         free_prompts(s->cur_prompt);
                     } else {
                         passphrase = NULL; /* no passphrase needed */
@@ -1588,8 +1620,10 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                 if (!s->ki_scc_initialised) {
                     s->ki_scc = seat_stripctrl_new(
                         s->ppl.seat, NULL, SIC_KI_PROMPTS);
+                    /* FZ GUI does it
                     if (s->ki_scc)
                         stripctrl_enable_line_limiting(s->ki_scc);
+                    */
                     s->ki_scc_initialised = true;
                 }
 
@@ -1717,6 +1751,8 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                     }
                     if (sb->len)
                         s->cur_prompt->instruction = strbuf_to_str(sb);
+                    else
+                        strbuf_free(sb);
 
                     /*
                      * Our prompts_t is fully constructed now. Get the
@@ -1757,8 +1793,8 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                         s->ppl.bpp, SSH2_MSG_USERAUTH_INFO_RESPONSE);
                     put_uint32(s->pktout, s->num_prompts);
                     for (uint32_t i = 0; i < s->num_prompts; i++) {
-                        put_stringz(s->pktout,
-                                    s->cur_prompt->prompts[i]->result);
+                        put_stringz(s->pktout, prompt_get_result_ref(
+                                        s->cur_prompt->prompts[i]));
                     }
                     s->pktout->minlen = 256;
                     pq_push(s->ppl.out_pq, s->pktout);
@@ -1840,7 +1876,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                  * Squirrel away the password. (We may need it later if
                  * asked to change it.)
                  */
-                s->password = dupstr(s->cur_prompt->prompts[0]->result);
+                s->password = prompt_get_result(s->cur_prompt->prompts[0]);
                 free_prompts(s->cur_prompt);
 
                 /*
@@ -1966,20 +2002,20 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                          * (A side effect is that the user doesn't have to
                          * re-enter it if they louse up the new password.)
                          */
-                        if (s->cur_prompt->prompts[0]->result[0]) {
+                        if (s->cur_prompt->prompts[0]->result->s[0]) {
                             smemclr(s->password, strlen(s->password));
                                 /* burn the evidence */
                             sfree(s->password);
-                            s->password =
-                                dupstr(s->cur_prompt->prompts[0]->result);
+                            s->password = prompt_get_result(
+                                s->cur_prompt->prompts[0]);
                         }
 
                         /*
                          * Check the two new passwords match.
                          */
-                        got_new = (strcmp(s->cur_prompt->prompts[1]->result,
-                                          s->cur_prompt->prompts[2]->result)
-                                   == 0);
+                        got_new = !strcmp(
+                            prompt_get_result_ref(s->cur_prompt->prompts[1]),
+                            prompt_get_result_ref(s->cur_prompt->prompts[2]));
                         if (!got_new)
                             /* They don't. Silly user. */
                             ppl_printf("Passwords do not match\r\n");
@@ -1997,8 +2033,8 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                     put_stringz(s->pktout, "password");
                     put_bool(s->pktout, true);
                     put_stringz(s->pktout, s->password);
-                    put_stringz(s->pktout,
-                                       s->cur_prompt->prompts[1]->result);
+                    put_stringz(s->pktout, prompt_get_result_ref(
+                                    s->cur_prompt->prompts[1]));
                     free_prompts(s->cur_prompt);
                     s->pktout->minlen = 256;
                     pq_push(s->ppl.out_pq, s->pktout);
@@ -2160,7 +2196,7 @@ static void ssh2_userauth_add_sigblob(
         /* debug("modulus length is %d\n", len); */
         /* debug("signature length is %d\n", siglen); */
 
-        if (mod_mp.len != sig_mp.len) {
+        if (mod_mp.len > sig_mp.len) {
             strbuf *substr = strbuf_new();
             put_data(substr, sigblob.ptr, sig_prefix_len);
             put_uint32(substr, mod_mp.len);

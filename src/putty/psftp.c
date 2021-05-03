@@ -1636,6 +1636,16 @@ struct sftp_command *sftp_getcmd()
     return cmd;
 }
 
+static void sftp_cmd_free(struct sftp_command *cmd)
+{
+    if (cmd->words) {
+        for (size_t i = 0; i < cmd->nwords; i++)
+            sfree(cmd->words[i]);
+        sfree(cmd->words);
+    }
+    sfree(cmd);
+}
+
 static int do_sftp_init(void)
 {
     struct sftp_packet *pktin;
@@ -1705,13 +1715,7 @@ int do_sftp()
             break;
         pending_reply = true;
         ret = cmd->obey(cmd);
-        if (cmd->words) {
-            int i;
-            for(i = 0; i < cmd->nwords; i++)
-                sfree(cmd->words[i]);
-            sfree(cmd->words);
-        }
-        sfree(cmd);
+        sftp_cmd_free(cmd);
         if (pending_reply) {
             fznotify1(sftpDone, ret);
         }

@@ -89,9 +89,13 @@ static ChanopenResult chan_open_forwarded_tcpip(
 static ChanopenResult chan_open_auth_agent(
     struct ssh2_connection_state *s, SshChannel *sc)
 {
+    /*FZif (!s->agent_fwd_enabled)*/ {
         CHANOPEN_RETURN_FAILURE(
             SSH2_OPEN_ADMINISTRATIVELY_PROHIBITED,
             ("Agent forwarding is not enabled"));
+    }
+
+    /*CHANOPEN_RETURN_SUCCESS(agentf_new(sc));*/
 }
 
 ChanopenResult ssh2_connection_parse_channel_open(
@@ -311,7 +315,11 @@ SshChannel *ssh2_serverside_agent_open(ConnectionLayer *cl, Channel *chan)
 static void ssh2_channel_response(
     struct ssh2_channel *c, PktIn *pkt, void *ctx)
 {
-    chan_request_response(c->chan, pkt->type == SSH2_MSG_CHANNEL_SUCCESS);
+    /* If pkt==NULL (because this handler has been called in response
+     * to CHANNEL_CLOSE arriving while the request was still
+     * outstanding), we treat that the same as CHANNEL_FAILURE. */
+    chan_request_response(c->chan,
+                          pkt && pkt->type == SSH2_MSG_CHANNEL_SUCCESS);
 }
 
 void ssh2channel_start_shell(SshChannel *sc, bool want_reply)
