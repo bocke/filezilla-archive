@@ -705,8 +705,8 @@ static void share_remove_forwarding(struct ssh_sharing_connstate *cs,
     sfree(fwd);
 }
 
-static void log_downstream(struct ssh_sharing_connstate *cs,
-                           const char *logfmt, ...)
+static PRINTF_LIKE(2, 3) void log_downstream(struct ssh_sharing_connstate *cs,
+                                             const char *logfmt, ...)
 {
     va_list ap;
     char *buf;
@@ -719,8 +719,8 @@ static void log_downstream(struct ssh_sharing_connstate *cs,
     sfree(buf);
 }
 
-static void log_general(struct ssh_sharing_state *sharestate,
-                        const char *logfmt, ...)
+static PRINTF_LIKE(2, 3) void log_general(struct ssh_sharing_state *sharestate,
+                                          const char *logfmt, ...)
 {
     va_list ap;
     char *buf;
@@ -1794,8 +1794,9 @@ static void share_receive(Plug *plug, int urgent, const char *data, size_t len)
     }
     if (cs->recvlen > 0 && cs->recvbuf[cs->recvlen-1] == '\015')
         cs->recvlen--;                 /* trim off \r before \n */
+    ptrlen verstring = make_ptrlen(cs->recvbuf, cs->recvlen);
     log_downstream(cs, "Downstream version string: %.*s",
-                   cs->recvlen, cs->recvbuf);
+                   PTRLEN_PRINTF(verstring));
     cs->got_verstring = true;
 
     /*
