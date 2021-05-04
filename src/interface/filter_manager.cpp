@@ -365,11 +365,11 @@ void CFilterDialog::OnDeleteSet(wxCommandEvent&)
 {
 	wxChoice* pChoice = XRCCTRL(*this, "ID_SETS", wxChoice);
 	int pos = pChoice->GetSelection();
-	if (pos == -1) {
+	if (pos < 0) {
 		return;
 	}
 
-	if (!pos || pos >= m_filterSets.size()) {
+	if (!pos || static_cast<size_t>(pos) >= m_filterSets.size()) {
 		wxMessageBoxEx(_("This filter set cannot be removed."));
 		return;
 	}
