@@ -10,6 +10,13 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.54.0-rc1 (2021-05-04)
+
+- Refactored network activity handling, the activity indicators tooltips now display more accurate data
+- Updated SFTP components
+- Small performance improvement sorting very last directory listings
+- Fixed a crash changing numeric permissions value in chmod dialog
+
 3.53.1 (2021-03-22)
 
 - Removed an error message on new installation where there is no sitemanager.xml yet
