@@ -25,7 +25,7 @@ static const t_protocolInfo protocolInfos[] = {
 	{ FTPES,           L"ftpes",     true,  21,  true,  fztranslate_mark("FTPES - FTP over explicit TLS"),                         L"" },
 	{ INSECURE_FTP,    L"ftp",       false, 21,  true,  fztranslate_mark("FTP - Insecure File Transfer Protocol"),                 L"" },
 	{ S3,              L"s3",        true, 443,  false, "S3 - Amazon Simple Storage Service",                                      L"" },
-	{ STORJ,           L"storj",     true, 7777, true,  fztranslate_mark("Tardigrade (using legacy API key)"),                     L"" },
+	{ STORJ,           L"storj",     true, 7777, true,  fztranslate_mark("Storj (using legacy API key)"),                          L"" },
 	{ WEBDAV,          L"webdav",    true, 443,  true,  fztranslate_mark("WebDAV using HTTPS"),                                    L"https" },
 	{ AZURE_FILE,      L"azfile",    true, 443,  false, "Microsoft Azure File Storage Service",                                    L"https" },
 	{ AZURE_BLOB,      L"azblob",    true, 443,  false, "Microsoft Azure Blob Storage Service",                                    L"https" },
@@ -38,7 +38,7 @@ static const t_protocolInfo protocolInfos[] = {
 	{ BOX,             L"box",       true, 443,  false, "Box",                                                                     L"https" },
 	{ INSECURE_WEBDAV, L"webdav",    true,  80,  true,  fztranslate_mark("WebDAV using HTTP (insecure)"),                          L"http" },
 	{ RACKSPACE,       L"rackspace", true, 443,  false, "Rackspace Cloud Storage",                                                 L"https" },
-	{ STORJ_GRANT,     L"storj",     true, 7777, true,  fztranslate_mark("Tardigrade - Decentralized Cloud Storage"),              L"" },
+	{ STORJ_GRANT,     L"storj",     true, 7777, true,  fztranslate_mark("Storj - Decentralized Cloud Storage"),                   L"" },
 	{ UNKNOWN,         L"",          false, 21,  false, "",                                                                        L"" }
 };
 
