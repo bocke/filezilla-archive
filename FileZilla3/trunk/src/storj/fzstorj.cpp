@@ -264,14 +264,9 @@ void downloadObject(UplinkProject *project, std::string bucket, std::string cons
 	fzprintf(storjEvent::Done);
 }
 
-void uploadObject(UplinkProject *project, std::string const& bucket, std::string const& prefix, std::string const& objectName, uint8_t * const memory)
+void uploadObject(UplinkProject *project, std::string const& bucket, std::string const& key, uint8_t * const memory)
 {
-	std::string object_key = bucket;
-	if (!prefix.empty()) {
-		object_key += "/" + prefix;
-	}
-
-	UplinkUploadResult upload_result = uplink_upload_object(project, object_key.c_str(), objectName.c_str(), nullptr);
+	UplinkUploadResult upload_result = uplink_upload_object(project, bucket.c_str(), key.c_str(), nullptr);
 
 	if (upload_result.error) {
 		print_error("upload failed: %s", upload_result.error);
@@ -287,43 +282,45 @@ void uploadObject(UplinkProject *project, std::string const& bucket, std::string
 
 	UplinkUpload *upload = upload_result.upload;
 
-	size_t remaining{};
-	uint8_t * buffer{};
-	while (true) {
-		if (!remaining) {
-			fzprintf(storjEvent::io_nextbuf, "0");
-			std::string line;
-			if (!getLine(line) || line.empty() || line[0] != '-' || line[1] == '-') {
-				fzprintf(storjEvent::Error, "Could not get next buffer");
+	if (memory) {
+		size_t remaining{};
+		uint8_t * buffer{};
+		while (true) {
+			if (!remaining) {
+				fzprintf(storjEvent::io_nextbuf, "0");
+				std::string line;
+				if (!getLine(line) || line.empty() || line[0] != '-' || line[1] == '-') {
+					fzprintf(storjEvent::Error, "Could not get next buffer");
+					uplink_free_upload_result(upload_result);
+					return;
+				}
+				line = line.substr(1);
+				buffer = memory + fz::to_integral<uintptr_t>(next_argument(line));
+				remaining = fz::to_integral<size_t>(next_argument(line));
+				if (!remaining) {
+					break;
+				}
+			}
+			UplinkWriteResult result = uplink_upload_write(upload, buffer, remaining);
+
+			if (result.error) {
+				print_error("upload failed: %s", result.error);
+				uplink_free_write_result(result);
 				uplink_free_upload_result(upload_result);
 				return;
 			}
-			line = line.substr(1);
-			buffer = memory + fz::to_integral<uintptr_t>(next_argument(line));
-			remaining = fz::to_integral<size_t>(next_argument(line));
-			if (!remaining) {
-				break;
+
+			if (!result.bytes_written) {
+				fzprintf(storjEvent::Error, "upload_write did not write anything");
+				uplink_free_write_result(result);
+				uplink_free_upload_result(upload_result);
+				return;
 			}
-		}
-		UplinkWriteResult result = uplink_upload_write(upload, buffer, remaining);
+			remaining -= result.bytes_written;
 
-		if (result.error) {
-			print_error("upload failed: %s", result.error);
+			fzprintf(storjEvent::Transfer, "%u", result.bytes_written);
 			uplink_free_write_result(result);
-			uplink_free_upload_result(upload_result);
-			return;
 		}
-
-		if (!result.bytes_written) {
-			fzprintf(storjEvent::Error, "upload_write did not write anything");
-			uplink_free_write_result(result);
-			uplink_free_upload_result(upload_result);
-			return;
-		}
-		remaining -= result.bytes_written;
-
-		fzprintf(storjEvent::Transfer, "%u", result.bytes_written);
-		uplink_free_write_result(result);
 	}
 
 	UplinkError *commit_err = uplink_upload_commit(upload);
@@ -339,18 +336,20 @@ void uploadObject(UplinkProject *project, std::string const& bucket, std::string
 	fzprintf(storjEvent::Done);
 }
 
-void deleteObject(UplinkProject *project, std::string bucketName, std::string objectKey)
+bool deleteObject(UplinkProject *project, std::string bucketName, std::string objectKey)
 {
+	bool ret = true;
+
 	UplinkObjectResult object_result = uplink_delete_object(project, bucketName.c_str(), objectKey.c_str());
 	if (object_result.error) {
-		print_error("failed to create bucket: %s", object_result.error);
-		uplink_free_object_result(object_result);
-		return;
+		if (object_result.error->code != UPLINK_ERROR_OBJECT_NOT_FOUND) {
+			ret = false;
+			print_error("failed to create bucket: %s", object_result.error);
+		}
 	}
-
-	fzprintf(storjEvent::Status, "deleted object %s", objectKey);
 	uplink_free_object_result(object_result);
-	fzprintf(storjEvent::Done);
+
+	return ret;
 }
 
 void createBucket(UplinkProject *project, std::string bucketName)
@@ -646,28 +645,31 @@ int main()
 				continue;
 			}
 
-			if (file == "null" ) {
-				file.clear();
-			}
-
-			std::string prefix;
-			std::string objectName;
-
-			size_t pos = key.rfind('/');
-			if (pos != std::string::npos) {
-				prefix = key.substr(0, pos);
-				objectName = key.substr(pos + 1);
-			}
-			else {
-				objectName = key;
-			}
-
 			if (!openStorjProject()) {
 				unmap(memory, memory_size);
 				continue;
 			}
-			uploadObject(project_result.project, bucket, prefix, objectName, memory);
+
+			uploadObject(project_result.project, bucket, key, memory);
 			unmap(memory, memory_size);
+		}
+		else if (command == "mkd") {
+			auto path = next_argument(arg);
+			auto [bucket, key] = SplitPath(path);
+
+			if (bucket.empty() || key.empty()) {
+				fzprintf(storjEvent::Error, "Bad arguments");
+				continue;
+			}
+			if (key.back() != '/') {
+				key += '/';
+			}
+
+			if (!openStorjProject()) {
+				continue;
+			}
+
+			uploadObject(project_result.project, bucket, key + '.', nullptr);
 		}
 		else if (command == "rm") {
 			auto [bucket, key] = SplitPath(next_argument(arg));
@@ -680,7 +682,32 @@ int main()
 				continue;
 			}
 
-			deleteObject(project_result.project, bucket, key);
+			if (deleteObject(project_result.project, bucket, key)) {
+				fzprintf(storjEvent::Status, "Deleted /%s/%s", bucket, key);
+				fzprintf(storjEvent::Done);
+			}
+		}
+		else if (command == "rmd") {
+			auto [bucket, key] = SplitPath(next_argument(arg));
+			if (bucket.empty() || key.empty()) {
+				fzprintf(storjEvent::Error, "Bad arguments");
+				continue;
+			}
+
+			if (key.back() != '/') {
+				key += '/';
+			}
+
+			if (!openStorjProject()) {
+				continue;
+			}
+
+			if (deleteObject(project_result.project, bucket, key)) {
+				if (deleteObject(project_result.project, bucket, key + '.')) {
+					fzprintf(storjEvent::Status, "Deleted /%s/%s", bucket, key);
+					fzprintf(storjEvent::Done);
+				}
+			}
 		}
 		else if (command == "mkbucket") {
 			std::string bucketName = next_argument(arg);

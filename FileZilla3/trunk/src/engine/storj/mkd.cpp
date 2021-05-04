@@ -28,7 +28,7 @@ int CStorjMkdirOpData::Send()
 	case mkd_mkbucket:
 		return controlSocket_.SendCommand(L"mkbucket " + controlSocket_.QuoteFilename(path_.GetFirstSegment()));
 	case mkd_put:
-		return controlSocket_.SendCommand(L"put \"null\" " + controlSocket_.QuoteFilename(path_.FormatFilename(L".")));
+		return controlSocket_.SendCommand(L"mkd " + controlSocket_.QuoteFilename(path_.GetPath()));
 	}
 
 	log(logmsg::debug_warning, L"Unknown opState in CStorjMkdirOpData::Send()");

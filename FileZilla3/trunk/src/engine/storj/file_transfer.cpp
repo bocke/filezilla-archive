@@ -227,6 +227,7 @@ void CStorjFileTransferOpData::OnNextBufferRequested(uint64_t processed)
 		controlSocket_.AddToStream(fz::sprintf("-%d %d\n", r.buffer_.get() - base_address_, r.buffer_.size()));
 	}
 	else if (writer_) {
+		controlSocket_.RecordActivity(activity_logger::recv, processed);
 		buffer_.resize(processed);
 		auto r = writer_->get_write_buffer(buffer_);
 		if (r == aio_result::wait) {

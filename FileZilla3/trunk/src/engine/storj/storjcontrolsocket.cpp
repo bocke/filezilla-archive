@@ -124,14 +124,14 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 	case storjEvent::Status:
 		log_raw(logmsg::status, message.text[0]);
 		break;
+/* Unused
 	case storjEvent::Recv:
-		// FIXME
-		RecordActivity(activity_logger::recv, 1);
+		RecordActivity(activity_logger::recv, fz::to_integral<uint64_t>(message.text[0]);
 		break;
 	case storjEvent::Send:
-		// FIXME
-		RecordActivity(activity_logger::send, 1);
+		RecordActivity(activity_logger::send, fz::to_integral<uint64_t>(message.text[0]);
 		break;
+*/
 	case storjEvent::Listentry:
 		if (operations_.empty() || operations_.back()->opId != Command::list) {
 			log(logmsg::debug_warning, L"storjEvent::Listentry outside list operation, ignoring.");
@@ -151,8 +151,7 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 			if (!operations_.empty() && operations_.back()->opId == Command::transfer) {
 				auto & data = static_cast<CStorjFileTransferOpData &>(*operations_.back());
 
-				//FIXME
-				//RecordActivity(data.download() ? CFileZillaEngine::recv : CFileZillaEngine::send);
+				RecordActivity(data.download() ? activity_logger::recv : activity_logger::send, value);
 
 				bool tmp{};
 				CTransferStatus status = engine_.transfer_status_.Get(tmp);
@@ -168,6 +167,9 @@ void CStorjControlSocket::OnStorjEvent(storj_message const& message)
 						}
 					}
 				}
+			}
+			else {
+				SetAlive();
 			}
 
 			engine_.transfer_status_.Update(value);

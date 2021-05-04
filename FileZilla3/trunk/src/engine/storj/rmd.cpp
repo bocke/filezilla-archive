@@ -36,7 +36,7 @@ int CStorjRemoveDirOpData::Send()
 		return controlSocket_.SendCommand(L"rmbucket " + controlSocket_.QuoteFilename(path_.GetFirstSegment()));
 	case rmd_rmdir:
 		engine_.GetDirectoryCache().InvalidateFile(currentServer_, path_.GetParent(), path_.GetLastSegment());
-		return controlSocket_.SendCommand(L"rm " + controlSocket_.QuoteFilename(path_.FormatFilename(L".")));
+		return controlSocket_.SendCommand(L"rmd " + controlSocket_.QuoteFilename(path_.GetPath()));
 	}
 
 	log(logmsg::debug_warning, L"Unknown opState in CStorjRemoveDirOpData::Send()");
