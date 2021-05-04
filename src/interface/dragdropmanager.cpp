@@ -11,8 +11,9 @@ CDragDropManager::CDragDropManager()
 
 CDragDropManager* CDragDropManager::Init()
 {
-	wxASSERT(!m_pDragDropManager);
-	m_pDragDropManager = new CDragDropManager;
+	if (!m_pDragDropManager) {
+		m_pDragDropManager = new CDragDropManager;
+	}
 	return m_pDragDropManager;
 }
 
