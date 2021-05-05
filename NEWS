@@ -14,7 +14,7 @@ Legend:
 
 - Refactored network activity handling, the activity indicators tooltips now display more accurate data
 - Updated SFTP components
-- Small performance improvement sorting very last directory listings
+- Small performance improvement sorting very large directory listings
 - Fixed a crash changing numeric permissions value in chmod dialog
 
 3.53.1 (2021-03-22)
