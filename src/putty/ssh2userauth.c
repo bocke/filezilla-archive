@@ -31,7 +31,7 @@ struct Loaded_keyfile_list
     Filename* file;
     char* publickey_comment;
     char* publickey_algorithm;
-    
+
     Loaded_keyfile_list* next;
 };
 
@@ -1304,7 +1304,7 @@ static void ssh2_userauth_process_queue(PacketProtocolLayer *ppl)
                             return;
                         }
                         passphrase =
-                            dupstr(s->cur_prompt->prompts[0]->result);
+                            prompt_get_result(s->cur_prompt->prompts[0]);
                         free_prompts(s->cur_prompt);
                     } else {
                         passphrase = NULL; /* no passphrase needed */
