@@ -134,7 +134,7 @@ protected:
 	wxTimer activityTimer_;
 	bool m_queue_size_changed{};
 
-	std::array<std::pair<fz::datetime, std::pair<uint64_t, uint64_t>>, 20> past_activity_;
+	std::array<std::pair<fz::monotonic_clock, std::pair<uint64_t, uint64_t>>, 20> past_activity_;
 	size_t past_activity_index_{};
 
 	DECLARE_EVENT_TABLE()
