@@ -719,7 +719,7 @@ void CStatusBar::OnActivity()
 	activityLeds_[0]->Set(activity.first != 0);
 	activityLeds_[1]->Set(activity.second != 0);
 	if (activity.first || activity.second) {
-		past_activity_[past_activity_index_++] = std::make_pair(fz::datetime::now(), activity);
+		past_activity_[past_activity_index_++] = std::make_pair(fz::monotonic_clock::now(), activity);
 		if (past_activity_index_ >= past_activity_.size()) {
 			past_activity_index_ = 0;
 		}
@@ -737,7 +737,7 @@ void CStatusBar::UpdateActivityTooltip()
 {
 	uint64_t speeds[2]{};
 
-	auto const now = fz::datetime::now();
+	auto const now = fz::monotonic_clock::now();
 	for (size_t i = 0; i < past_activity_.size(); ++i) {
 		if ((now - past_activity_[i].first) <= fz::duration::from_seconds(2)) {
 			speeds[0] += past_activity_[i].second.first;
