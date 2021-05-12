@@ -238,6 +238,7 @@ enum class LogonType
 	interactive,
 	account,
 	key,
+	profile,
 
 	count
 };

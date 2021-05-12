@@ -337,8 +337,8 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 
 	xrc_call(parent_, "ID_USER_DESC", &wxStaticText::Show, hasUser);
 	xrc_call(parent_, "ID_USER", &wxTextCtrl::Show, hasUser);
-	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::Show, type != LogonType::anonymous && type != LogonType::interactive  && (protocol != SFTP || type != LogonType::key));
-	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key));
+	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key) && (protocol == S3 && type != LogonType::profile));
+	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key) && (protocol == S3 && type != LogonType::profile));
 	xrc_call(parent_, "ID_ACCOUNT_DESC", &wxStaticText::Show, isFtp && type == LogonType::account);
 	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Show, isFtp && type == LogonType::account);
 	xrc_call(parent_, "ID_KEYFILE_DESC", &wxStaticText::Show, protocol == SFTP && type == LogonType::key);
@@ -368,6 +368,9 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 	case S3:
 		// @translator: Keep short
 		userLabel = _("&Access key ID:");
+		if (type == LogonType::profile) {
+			userLabel = _("&Profile");
+		}
 		// @translator: Keep short
 		passLabel = _("Secret Access &Key:");
 		break;
@@ -701,6 +704,10 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		}
 	}
 
+	if (protocol == S3 && logon_type == LogonType::profile) {
+		pw.clear();
+	}
+
 #if ENABLE_STORJ
 		if (protocol == STORJ_GRANT && logon_type == LogonType::normal) {
 			fz::trim(pw);
@@ -833,7 +840,6 @@ ServerProtocol GeneralSiteControls::GetProtocol() const
 
 	return protocol;
 }
-
 
 void GeneralSiteControls::UpdateHostFromDefaults(ServerProtocol const newProtocol)
 {

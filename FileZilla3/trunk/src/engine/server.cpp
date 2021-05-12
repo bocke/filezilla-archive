@@ -573,6 +573,14 @@ bool CServer::ProtocolHasFeature(ServerProtocol const protocol, ProtocolFeature 
 		}
 		break;
 	case ProtocolFeature::PreserveTimestamp:
+		if (protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP ||
+			protocol == SFTP ||
+			protocol == AZURE_BLOB || protocol == AZURE_FILE || protocol == B2 || protocol == BOX ||
+			protocol == DROPBOX || protocol == GOOGLE_CLOUD || protocol == GOOGLE_DRIVE ||
+			protocol == ONEDRIVE || protocol == S3 || protocol == SWIFT || protocol == WEBDAV) {
+			return true;
+		}
+		break;
 	case ProtocolFeature::ServerType:
 	case ProtocolFeature::UnixChmod:
 		if (protocol == FTP || protocol == FTPS || protocol == FTPES || protocol == INSECURE_FTP ||
@@ -703,6 +711,9 @@ LogonType GetLogonTypeFromName(std::wstring const& name)
 	else if (name == _("Account")) {
 		return LogonType::account;
 	}
+	else if (name == _("Profile")) {
+		return LogonType::profile;
+	}
 	else {
 		return LogonType::anonymous;
 	}
@@ -724,6 +735,8 @@ std::wstring GetNameFromLogonType(LogonType type)
 		return _("Interactive");
 	case LogonType::account:
 		return _("Account");
+	case LogonType::profile:
+		return _("Profile");
 	default:
 		return _("Anonymous");
 	}
@@ -812,7 +825,7 @@ std::vector<LogonType> GetSupportedLogonTypes(ServerProtocol protocol)
 	case SFTP:
 		return {LogonType::anonymous, LogonType::normal, LogonType::ask, LogonType::interactive, LogonType::key};
 	case S3:
-		return {LogonType::anonymous, LogonType::normal, LogonType::ask};
+		return {LogonType::anonymous, LogonType::normal, LogonType::ask, LogonType::profile};
 	case STORJ:
 	case STORJ_GRANT:
 	case AZURE_FILE:
@@ -883,6 +896,7 @@ std::vector<ParameterTraits> const& ExtraServerParameterTraits(ServerProtocol pr
 				ret.emplace_back(ParameterTraits{"stsrolearn", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"stsmfaserial", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				ret.emplace_back(ParameterTraits{"region", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
+				ret.emplace_back(ParameterTraits{"original_profile", ParameterSection::custom, ParameterTraits::optional, std::wstring(), std::wstring()});
 				return ret;
 			}();
 			return ret;
