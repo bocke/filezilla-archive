@@ -111,8 +111,6 @@ unsigned int register_interface_options();
 
 optionsIndex mapOption(interfaceOptions opt);
 
-std::wstring GetEnv(char const* name);
-
 class CXmlFile;
 class COptions final : public wxEvtHandler, public COptionsBase
 {

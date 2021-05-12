@@ -164,18 +164,6 @@ optionsIndex mapOption(interfaceOptions opt)
 	return ret;
 }
 
-std::wstring GetEnv(char const* name)
-{
-	std::wstring ret;
-	if (name) {
-		auto* v = getenv(name);
-		if (v) {
-			ret = fz::to_wstring(v);
-		}
-	}
-	return ret;
-}
-
 BEGIN_EVENT_TABLE(COptions, wxEvtHandler)
 EVT_TIMER(wxID_ANY, COptions::OnTimer)
 END_EVENT_TABLE()

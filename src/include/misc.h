@@ -33,4 +33,8 @@ std::wstring FZC_PUBLIC_SYMBOL str_toupper(std::wstring_view const& source);
 void FZC_PUBLIC_SYMBOL str_toupper_inplace(std::wstring& source);
 }
 
+std::wstring FZC_PUBLIC_SYMBOL GetEnv(char const *name);
+
+bool FZC_PUBLIC_SYMBOL FileExists(std::wstring const& file);
+
 #endif
