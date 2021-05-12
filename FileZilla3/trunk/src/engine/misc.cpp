@@ -1,6 +1,7 @@
 #include "filezilla.h"
 
 #include <libfilezilla/format.hpp>
+#include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_layer.hpp>
 
@@ -103,4 +104,21 @@ void str_toupper_inplace(std::wstring & source)
 	}
 }
 
+}
+
+std::wstring GetEnv(char const *name)
+{
+	std::wstring ret;
+	if (name) {
+		auto *v = getenv(name);
+		if (v) {
+			ret = fz::to_wstring(v);
+		}
+	}
+	return ret;
+}
+
+bool FileExists(std::wstring const &file)
+{
+	return fz::local_filesys::get_file_type(fz::to_native(file), true) == fz::local_filesys::file;
 }

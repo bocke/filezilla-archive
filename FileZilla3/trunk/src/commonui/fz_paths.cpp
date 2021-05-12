@@ -20,18 +20,6 @@
 	#include <unistd.h>
 #endif
 
-static std::wstring GetEnv(char const* name)
-{
-	std::wstring ret;
-	if (name) {
-		auto* v = getenv(name);
-		if (v) {
-			ret = fz::to_wstring(v);
-		}
-	}
-	return ret;
-}
-
 #ifndef FZ_WINDOWS
 namespace {
 static std::wstring TryDirectory(std::wstring path, std::wstring const& suffix, bool check_exists)
@@ -207,9 +195,6 @@ std::wstring mac_data_path();
 #endif
 
 namespace {
-static bool FileExists(std::wstring const& file) {
-	return fz::local_filesys::get_file_type(fz::to_native(file), true) == fz::local_filesys::file;
-}
 
 #if FZ_WINDOWS
 std::wstring const PATH_SEP = L";";

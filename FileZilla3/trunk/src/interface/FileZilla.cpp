@@ -299,11 +299,6 @@ int CFileZillaApp::OnExit()
 	return wxApp::OnExit();
 }
 
-bool CFileZillaApp::FileExists(std::wstring const& file) const
-{
-	return fz::local_filesys::get_file_type(fz::to_native(file), true) == fz::local_filesys::file;
-}
-
 bool CFileZillaApp::LoadResourceFiles()
 {
 	AddStartupProfileRecord("CFileZillaApp::LoadResourceFiles");

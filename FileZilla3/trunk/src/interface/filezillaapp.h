@@ -60,8 +60,6 @@ protected:
 	virtual void OnFatalException();
 #endif
 
-	bool FileExists(std::wstring const& file) const;
-
 	std::unique_ptr<CWrapEngine> m_pWrapEngine;
 
 	std::unique_ptr<CCommandLine> m_pCommandLine;
