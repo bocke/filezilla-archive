@@ -334,11 +334,13 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 	}
 
 	bool const hasUser = ProtocolHasUser(protocol) && type != LogonType::anonymous;
+	bool const hasPw = type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key) && (protocol != S3 || type != LogonType::profile);
+
 
 	xrc_call(parent_, "ID_USER_DESC", &wxStaticText::Show, hasUser);
 	xrc_call(parent_, "ID_USER", &wxTextCtrl::Show, hasUser);
-	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key) && (protocol == S3 && type != LogonType::profile));
-	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Show, type != LogonType::anonymous && type != LogonType::interactive && (protocol != SFTP || type != LogonType::key) && (protocol == S3 && type != LogonType::profile));
+	xrc_call(parent_, "ID_PASS_DESC", &wxStaticText::Show, hasPw);
+	xrc_call(parent_, "ID_PASS", &wxTextCtrl::Show, hasPw);
 	xrc_call(parent_, "ID_ACCOUNT_DESC", &wxStaticText::Show, isFtp && type == LogonType::account);
 	xrc_call(parent_, "ID_ACCOUNT", &wxTextCtrl::Show, isFtp && type == LogonType::account);
 	xrc_call(parent_, "ID_KEYFILE_DESC", &wxStaticText::Show, protocol == SFTP && type == LogonType::key);
