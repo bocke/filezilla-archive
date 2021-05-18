@@ -641,26 +641,28 @@ std::wstring CLocalTreeView::GetDirFromItem(wxTreeItemId item)
 	while (item) {
 #ifdef __WXMSW__
 		if (item == m_desktop) {
-			wxChar path[MAX_PATH + 1];
-			if (SHGetFolderPath(0, CSIDL_DESKTOPDIRECTORY, 0, SHGFP_TYPE_CURRENT, path) != S_OK) {
-				if (SHGetFolderPath(0, CSIDL_DESKTOP, 0, SHGFP_TYPE_CURRENT, path) != S_OK) {
-					wxMessageBoxEx(_("Failed to get desktop path"));
-					return L"/";
-				}
+			wchar_t* out{};
+			if (SHGetKnownFolderPath(FOLDERID_Desktop, 0, 0, &out) != S_OK) {
+				wxMessageBoxEx(_("Failed to get desktop path"));
+				return L"/";
 			}
-			dir = path;
+			dir = out;
+			CoTaskMemFree(out);
+
 			if (dir.empty() || dir.back() != separator) {
 				dir += separator;
 			}
 			return dir;
 		}
 		else if (item == m_documents) {
-			wxChar path[MAX_PATH + 1];
-			if (SHGetFolderPath(0, CSIDL_PERSONAL, 0, SHGFP_TYPE_CURRENT, path) != S_OK) {
+			wchar_t* out{};
+			if (SHGetKnownFolderPath(FOLDERID_Documents, 0, 0, &out) != S_OK) {
 				wxMessageBoxEx(_("Failed to get 'My Documents' path"));
 				return L"/";
 			}
-			dir = path;
+			dir = out;
+			CoTaskMemFree(out);
+
 			if (dir.empty() || dir.back() != separator) {
 				dir += separator;
 			}

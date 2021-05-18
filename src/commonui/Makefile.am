@@ -45,3 +45,7 @@ noinst_HEADERS = \
 	visibility.h \
 	xml_cert_store.h \
 	xml_file.h
+
+if MINGW
+libfzclient_commonui_private_la_LDFLAGS += -lole32 -Wl,-luuid
+endif

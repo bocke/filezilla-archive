@@ -62,12 +62,15 @@ bool CSystemImageList::CreateSystemImageList(int size)
 	};
 
 	HIMAGELIST imageList{};
-	wchar_t buffer[MAX_PATH + 10];
-	if (SHGetFolderPath(0, CSIDL_WINDOWS, 0, SHGFP_TYPE_CURRENT, buffer) == S_OK) {
-		imageList = getImageList(buffer);
+
+	wchar_t* out{};
+	if (SHGetKnownFolderPath(FOLDERID_Windows, 0, 0, &out) == S_OK) {
+		imageList = getImageList(out);
+		CoTaskMemFree(out);
 	}
-	if (!imageList && SHGetFolderPath(0, CSIDL_PROFILE, 0, SHGFP_TYPE_CURRENT, buffer) == S_OK) {
-		imageList = getImageList(buffer);
+	if (!imageList && SHGetKnownFolderPath(FOLDERID_Profile, 0, 0, &out) == S_OK) {
+		imageList = getImageList(out);
+		CoTaskMemFree(out);
 	}
 	if (!imageList) {
 		imageList = getImageList(L"C:\\");

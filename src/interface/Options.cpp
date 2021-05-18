@@ -479,13 +479,13 @@ CLocalPath COptions::GetCacheDirectory()
 	}
 	else {
 #ifdef FZ_WINDOWS
-		wchar_t buffer[MAX_PATH * 2 + 1];
-
-		if (SUCCEEDED(SHGetFolderPath(0, CSIDL_LOCAL_APPDATA, 0, SHGFP_TYPE_CURRENT, buffer))) {
-			ret.SetPath(buffer);
-			if (!ret.empty()) {
-				ret.AddSegment(L"FileZilla");
-			}
+		wchar_t* out{};
+		if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, 0, &out) == S_OK) {
+			ret.SetPath(out);
+			CoTaskMemFree(out);
+		}
+		if (!ret.empty()) {
+			ret.AddSegment(L"FileZilla");
 		}
 #else
 		std::wstring cfg = TryDirectory(GetEnv("XDG_CACHE_HOME"), L"filezilla/", false);

@@ -11,6 +11,7 @@
 	#include <CoreFoundation/CFURL.h>
 #elif defined(FZ_WINDOWS)
 	#include <shlobj.h>
+	#include <objbase.h>
 
 	// Needed for MinGW:
 	#ifndef SHGFP_TYPE_CURRENT
@@ -50,9 +51,10 @@ CLocalPath GetHomeDir()
 	CLocalPath ret;
 
 #ifdef FZ_WINDOWS
-	wchar_t buffer[MAX_PATH * 2 + 1];
-	if (SUCCEEDED(SHGetFolderPath(0, CSIDL_PROFILE, 0, SHGFP_TYPE_CURRENT, buffer))) {
-		ret.SetPath(buffer);
+	wchar_t* out{};
+	if (SHGetKnownFolderPath(FOLDERID_Profile, 0, 0, &out) == S_OK) {
+		ret.SetPath(out);
+		CoTaskMemFree(out);
 	}
 #else
 	ret.SetPath(GetEnv("HOME"));
@@ -65,23 +67,19 @@ CLocalPath GetUnadjustedSettingsDir()
 	CLocalPath ret;
 
 #ifdef FZ_WINDOWS
-	wchar_t buffer[MAX_PATH * 2 + 1];
-
-	if (SUCCEEDED(SHGetFolderPath(0, CSIDL_APPDATA, 0, SHGFP_TYPE_CURRENT, buffer))) {
-		CLocalPath tmp(buffer);
-		if (!tmp.empty()) {
-			tmp.AddSegment(L"FileZilla");
-		}
-		ret = tmp;
+	wchar_t* out{};
+	if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, 0, &out) == S_OK) {
+		ret.SetPath(out);
+		CoTaskMemFree(out);
+	}
+	if (!ret.empty()) {
+		ret.AddSegment(L"FileZilla");
 	}
 
 	if (ret.empty()) {
 		// Fall back to directory where the executable is
-		DWORD c = GetModuleFileName(0, buffer, MAX_PATH * 2);
-		if (c && c < MAX_PATH * 2) {
-			std::wstring tmp;
-			ret.SetPath(buffer, &tmp);
-		}
+		std::wstring const& dir = GetOwnExecutableDir();
+		ret.SetPath(dir);
 	}
 #else
 	std::wstring cfg = TryDirectory(GetEnv("XDG_CONFIG_HOME"), L"filezilla/", true);
