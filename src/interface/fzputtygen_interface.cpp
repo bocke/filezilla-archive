@@ -148,6 +148,10 @@ bool CFZPuttyGenInterface::LoadKeyFile(std::wstring& keyFile, bool silent, std::
 	code = GetReply(data);
 	if (code != success) {
 		comment = fztranslate("Could not load key file");
+		if (!silent && !data.empty()) {
+			wxString msg = wxString::Format(_("Failed to load private key: %s"), data);
+			wxMessageBoxEx(msg, _("Could not load private key"), wxICON_EXCLAMATION);
+		}
 		data.clear();
 		return false;
 	}
