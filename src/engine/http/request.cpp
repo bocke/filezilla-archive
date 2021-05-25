@@ -13,7 +13,7 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 {
 	opState = request_init | request_reading;
 
-	request->request().flags_ &= HttpRequest::flag_update_transferstatus;
+	request->request().flags_ &= (HttpRequest::flag_update_transferstatus | HttpRequest::flag_confidential_querystring);
 	request->response().flags_ = 0;
 
 	requests_.emplace_back(request);
@@ -26,7 +26,7 @@ CHttpRequestOpData::CHttpRequestOpData(CHttpControlSocket & controlSocket, std::
 	, requests_(requests)
 {
 	for (auto & rr : requests_) {
-		rr->request().flags_ &= HttpRequest::flag_update_transferstatus;
+		rr->request().flags_ &= (HttpRequest::flag_update_transferstatus | HttpRequest::flag_confidential_querystring);
 		rr->response().flags_ = 0;
 	}
 	opState = request_init | request_reading;
@@ -70,7 +70,7 @@ void CHttpRequestOpData::AddRequest(std::shared_ptr<HttpRequestResponseInterface
 			}
 		}
 	}
-	rr->request().flags_ &= HttpRequest::flag_update_transferstatus;
+	rr->request().flags_ &= (HttpRequest::flag_update_transferstatus | HttpRequest::flag_confidential_querystring);
 	rr->response().flags_ = 0;
 	requests_.push_back(rr);
 }
@@ -188,7 +188,12 @@ int CHttpRequestOpData::Send()
 
 					// Assemble request and headers
 					std::string command = fz::sprintf("%s %s HTTP/1.1", req.verb_, req.uri_.get_request());
-					log(logmsg::command, "%s", command);
+					if (!(req.flags_ & HttpRequest::flag_confidential_querystring)) {
+						log(logmsg::command, "%s", command);
+					}
+					else {
+						log(logmsg::command, "%s %s HTTP/1.1", req.verb_, req.uri_.get_request(false));
+					}
 					command += "\r\n";
 
 					for (auto const& header : req.headers_) {

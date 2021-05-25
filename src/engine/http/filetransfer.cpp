@@ -23,14 +23,17 @@ CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSoc
 
 }
 
-CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, fz::uri const& uri, std::string const& verb, reader_factory_holder const& reader, writer_factory_holder const& writer)
+CHttpFileTransferOpData::CHttpFileTransferOpData(CHttpControlSocket & controlSocket, CHttpRequestCommand const& cmd)
 	: CFileTransferOpData(L"CHttpFileTransferOpData", CFileTransferCommand(writer_factory_holder(), CServerPath(), std::wstring(), transfer_flags::download))
 	, CHttpOpData(controlSocket)
 {
-	reader_factory_ = reader;
-	writer_factory_ = writer;
-	rr_.request_.uri_ = uri;
-	rr_.request_.verb_ = verb;
+	reader_factory_ = cmd.body_;
+	writer_factory_ = cmd.output_;
+	rr_.request_.uri_ = cmd.uri_;
+	rr_.request_.verb_ = cmd.verb_;
+	if (cmd.confidential_qs_) {
+		rr_.request_.flags_ |= HttpRequest::flag_confidential_querystring;
+	}
 }
 
 
@@ -69,7 +72,7 @@ int CHttpFileTransferOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
 		if (resume_) {
-			rr_.request_.headers_["Range"] = fz::sprintf("bytes=%d-", localFileSize_);
+			rr_.request_.headers_.set("Range", fz::sprintf("bytes=%d-", localFileSize_));
 		}
 
 		rr_.response_.on_header_ = [this](auto const&) { return this->OnHeader(); };
@@ -111,7 +114,7 @@ int CHttpFileTransferOpData::OnHeader()
 			return FZ_REPLY_ERROR;
 		}
 
-		fz::uri location = fz::uri(rr_.response_.get_header("Location"));
+		fz::uri location = fz::uri(rr_.response_.headers_["Location"]);
 		if (!location.empty()) {
 			location.resolve(rr_.request_.uri_);
 		}
@@ -153,7 +156,7 @@ int CHttpFileTransferOpData::OnHeader()
 		rr_.response_.writer_ = std::move(writer);
 	}
 
-	int64_t totalSize = fz::to_integral<int64_t>(rr_.response_.get_header("Content-Length"), -1);
+	int64_t totalSize = fz::to_integral<int64_t>(rr_.response_.headers_["Content-Length"], -1);
 	if (totalSize == -1) {
 		if (remoteFileSize_ != -1) {
 			totalSize = remoteFileSize_;
