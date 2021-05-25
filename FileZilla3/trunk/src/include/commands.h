@@ -246,11 +246,12 @@ protected:
 class FZC_PUBLIC_SYMBOL CHttpRequestCommand final : public CCommandHelper<CHttpRequestCommand, Command::httprequest>
 {
 public:
-	CHttpRequestCommand(fz::uri const& uri, writer_factory_holder const& output, std::string const& verb = std::string("GET"), reader_factory_holder const& body = reader_factory_holder())
+	CHttpRequestCommand(fz::uri const& uri, writer_factory_holder const& output, std::string const& verb = std::string("GET"), reader_factory_holder const& body = reader_factory_holder(), bool confidential_qs = false)
 		: uri_(uri)
 		, verb_(verb)
 		, body_(body)
 		, output_(output)
+		, confidential_qs_(confidential_qs)
 	{}
 
 	fz::uri const uri_;
@@ -258,6 +259,8 @@ public:
 
 	reader_factory_holder body_;
 	writer_factory_holder output_;
+
+	bool confidential_qs_{};
 };
 
 class FZC_PUBLIC_SYMBOL CRawCommand final : public CCommandHelper<CRawCommand, Command::raw>

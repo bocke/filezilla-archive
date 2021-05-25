@@ -45,7 +45,7 @@ uint64_t HttpRequest::update_content_length()
 
 int HttpRequest::reset()
 {
-	flags_ &= flag_update_transferstatus;
+	flags_ &= (flag_update_transferstatus | flag_confidential_querystring);
 
 	if (body_) {
 		aio_result res = body_->rewind();
@@ -250,13 +250,13 @@ void CHttpControlSocket::FileTransfer(CFileTransferCommand const& cmd)
 	Push(std::make_unique<CHttpFileTransferOpData>(*this, cmd));
 }
 
-void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& command)
+void CHttpControlSocket::FileTransfer(CHttpRequestCommand const& cmd)
 {
 	log(logmsg::debug_verbose, L"CHttpControlSocket::FileTransfer()");
 
-	log(logmsg::status, _("Requesting %s"), command.uri_.to_string());
+	log(logmsg::status, _("Requesting %s"), cmd.uri_.to_string(!cmd.confidential_qs_));
 
-	Push(std::make_unique<CHttpFileTransferOpData>(*this, command.uri_, command.verb_, command.body_, command.output_));
+	Push(std::make_unique<CHttpFileTransferOpData>(*this, cmd));
 }
 
 void CHttpControlSocket::Request(std::shared_ptr<HttpRequestResponseInterface> const& request)
