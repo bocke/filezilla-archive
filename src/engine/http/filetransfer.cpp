@@ -72,7 +72,7 @@ int CHttpFileTransferOpData::Send()
 		return FZ_REPLY_CONTINUE;
 	case filetransfer_transfer:
 		if (resume_) {
-			rr_.request_.headers_.set("Range", fz::sprintf("bytes=%d-", localFileSize_));
+			rr_.request_.headers_["Range"] = fz::sprintf("bytes=%d-", localFileSize_);
 		}
 
 		rr_.response_.on_header_ = [this](auto const&) { return this->OnHeader(); };
@@ -114,11 +114,11 @@ int CHttpFileTransferOpData::OnHeader()
 			return FZ_REPLY_ERROR;
 		}
 
-		fz::uri location = fz::uri(rr_.response_.headers_["Location"]);
+		fz::uri location = fz::uri(rr_.response_.get_header("Location"));
 		if (!location.empty()) {
 			location.resolve(rr_.request_.uri_);
 		}
-		
+
 		if (location.scheme_.empty() || location.host_.empty() || !location.is_absolute()) {
 			log(logmsg::error, _("Redirection to invalid or unsupported URI: %s"), location.to_string());
 			return FZ_REPLY_ERROR;
@@ -156,7 +156,7 @@ int CHttpFileTransferOpData::OnHeader()
 		rr_.response_.writer_ = std::move(writer);
 	}
 
-	int64_t totalSize = fz::to_integral<int64_t>(rr_.response_.headers_["Content-Length"], -1);
+	int64_t totalSize = fz::to_integral<int64_t>(rr_.response_.get_header("Content-Length"), -1);
 	if (totalSize == -1) {
 		if (remoteFileSize_ != -1) {
 			totalSize = remoteFileSize_;
