@@ -35,7 +35,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 		}
 
 		if (!greetingVersion.empty() &&
-			CBuildInfo::ConvertToVersionNumber(ownVersion.c_str()) <= CBuildInfo::ConvertToVersionNumber(greetingVersion.c_str()))
+			ConvertToVersionNumber(ownVersion.c_str()) <= ConvertToVersionNumber(greetingVersion.c_str()))
 		{
 			// Been there done that
 			return true;
