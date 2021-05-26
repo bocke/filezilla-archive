@@ -87,16 +87,10 @@ bool CAboutDialog::Create(wxWindow* parent)
 			inner->Add(new wxStaticText(box, -1, os));
 		}
 
-		int major, minor;
-		if (GetRealOsVersion(major, minor)) {
+		auto sysver = GetSystemVersion();
+		if (sysver) {
 			inner->Add(new wxStaticText(box, -1, _("OS version:")));
-
-			wxString osVersion = wxString::Format(_T("%d.%d"), major, minor);
-			int fakeMajor, fakeMinor;
-			if (wxGetOsVersion(&fakeMajor, &fakeMinor) != wxOS_UNKNOWN && (fakeMajor != major || fakeMinor != minor)) {
-				osVersion += ' ';
-				osVersion += wxString::Format(_("(app-compat is set to %d.%d)"), fakeMajor, fakeMinor);
-			}
+			wxString osVersion = wxString::Format(_T("%u.%u"), sysver.major, sysver.minor);
 			inner->Add(new wxStaticText(box, -1, osVersion));
 		}
 #ifdef __WXMSW__
@@ -192,15 +186,9 @@ void CAboutDialog::OnCopy()
 		text += _T("  Name:           ") + os + _T("\n");
 	}
 
-	int major, minor;
-	if (GetRealOsVersion(major, minor)) {
-		wxString version = wxString::Format(_T("%d.%d"), major, minor);
-		int fakeMajor, fakeMinor;
-		if (wxGetOsVersion(&fakeMajor, &fakeMinor) != wxOS_UNKNOWN && (fakeMajor != major || fakeMinor != minor)) {
-			version += _T(" ");
-			version += wxString::Format(_("(app-compat is set to %d.%d)"), fakeMajor, fakeMinor);
-		}
-		text += wxString::Format(_T("  Version:        %s\n"), version);
+	auto sysver = GetSystemVersion();
+	if (sysver) {
+		text += wxString::Format(_T("  Version:        %u.%u\n"), sysver.major, sysver.minor);
 	}
 
 #ifdef __WXMSW__
