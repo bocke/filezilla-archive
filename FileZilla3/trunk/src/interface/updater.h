@@ -4,7 +4,6 @@
 #if FZ_MANUALUPDATECHECK
 
 #include "../include/notification.h"
-#include <wx/timer.h>
 
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/uri.hpp>
@@ -67,46 +66,45 @@ public:
 
 class memory_writer_factory;
 class CFileZillaEngineContext;
-class CUpdater final : public wxEvtHandler
+class CUpdater final : protected fz::event_handler
 {
 public:
-	CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context);
+	CUpdater(CFileZillaEngineContext& engine_context);
 	virtual ~CUpdater();
-
-	// 2-Stage initialization
-	void Init();
 
 	void AddHandler(CUpdateHandler& handler);
 	void RemoveHandler(CUpdateHandler& handler);
 
-	UpdaterState GetState() const { return state_; }
-	build AvailableBuild() const { return version_information_.available_; }
-	std::wstring GetChangelog() const { return version_information_.changelog_; }
+	void Run(bool manual);
+	void Reset();
+
+	UpdaterState GetState() const;
+	build AvailableBuild() const;
+	std::wstring GetChangelog() const;
 	std::wstring GetResources(resource_type t) const;
 
 	std::wstring DownloadedFile() const;
 
 	int64_t BytesDownloaded() const; // Returns -1 on error
 
-	std::wstring GetLog() const { return log_; }
+	std::wstring GetLog() const;
 
 	static CUpdater* GetInstance();
 
 	bool UpdatableBuild() const;
 
-	void RunIfNeeded();
-
 	bool Busy() const;
 
-protected:
+private:
 	bool LongTimeSinceLastCheck() const;
 
 	int Download(std::wstring const& url, std::wstring const& local_file = std::wstring());
 	int Request(fz::uri const& uri);
 	int ContinueDownload();
 
-	void AutoRunIfNeeded();
-	bool Run(bool manual);
+	void OnRun(bool manual);
+	UpdaterState LoadLocalData();
+	bool ShouldCheck(UpdaterState & s);
 
 	bool CreateConnectCommand(std::wstring const& url);
 	bool CreateTransferCommand(std::wstring const& url, std::wstring const& local_file);
@@ -129,11 +127,23 @@ protected:
 
 	void OnEngineEvent(CFileZillaEngine* engine);
 
-	DECLARE_EVENT_TABLE()
-	void OnTimer(wxTimerEvent& ev);
+	void operator()(fz::event_base const& ev);
+	void on_timer(fz::timer_id const&);
+	void on_run(bool manual);
+
+	// Begin what needs to be mutexed
+	mutable fz::mutex mtx_;
 
 	UpdaterState state_;
 	std::wstring local_file_;
+
+	version_information version_information_;
+
+	std::list<CUpdateHandler*> handlers_;
+
+	std::wstring log_;
+	// End mutexed data
+
 	fz::buffer output_buffer_;
 
 	CFileZillaEngineContext& engine_context_;
@@ -143,13 +153,7 @@ protected:
 
 	std::wstring raw_version_information_;
 
-	version_information version_information_;
-
-	std::list<CUpdateHandler*> handlers_;
-
-	std::wstring log_;
-
-	wxTimer update_timer_;
+	fz::timer_id update_timer_{};
 
 	std::deque<std::unique_ptr<CCommand>> pending_commands_;
 

@@ -138,7 +138,7 @@ void COptionsPageUpdateCheck::OnRunUpdateCheck(wxCommandEvent &)
 
 	CUpdater* updater = CUpdater::GetInstance();
 	if (updater) {
-		updater->Init();
+		updater->Run(true);
 		CUpdateDialog dlg(this, *updater);
 		dlg.ShowModal();
 	}

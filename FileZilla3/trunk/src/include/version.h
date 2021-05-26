@@ -18,4 +18,15 @@ std::wstring FZC_PUBLIC_SYMBOL GetFileZillaVersion();
 
 int64_t FZC_PUBLIC_SYMBOL ConvertToVersionNumber(wchar_t const* version);
 
+#if FZ_WINDOWS || FZ_MAC
+struct FZC_PUBLIC_SYMBOL SystemVersion
+{
+	unsigned int major{};
+	unsigned int minor{};
+
+	explicit operator bool() const { return major != 0; }
+};
+SystemVersion FZC_PUBLIC_SYMBOL GetSystemVersion();
+#endif
+
 #endif

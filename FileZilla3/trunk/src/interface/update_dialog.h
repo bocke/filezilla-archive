@@ -5,6 +5,8 @@
 #include "dialogex.h"
 #include "updater.h"
 
+#include <wx/timer.h>
+
 class wxPanel;
 class wxWindow;
 
