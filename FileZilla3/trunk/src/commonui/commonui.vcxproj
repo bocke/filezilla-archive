@@ -137,6 +137,7 @@
     <ClInclude Include="local_recursive_operation.h" />
     <ClInclude Include="login_manager.h" />
     <ClInclude Include="recursive_operation.h" />
+    <ClInclude Include="registry.h" />
     <ClInclude Include="remote_recursive_operation.h" />
     <ClInclude Include="site.h" />
     <ClInclude Include="site_manager.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="ipcmutex.cpp" />
     <ClCompile Include="local_recursive_operation.cpp" />
     <ClCompile Include="login_manager.cpp" />
+    <ClCompile Include="registry.cpp" />
     <ClCompile Include="remote_recursive_operation.cpp" />
     <ClCompile Include="site.cpp" />
     <ClCompile Include="site_manager.cpp" />
