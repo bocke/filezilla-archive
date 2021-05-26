@@ -4,7 +4,6 @@
 
 #include "buildinfo.h"
 #include "file_utils.h"
-#include "Options.h"
 #include "updater.h"
 #include "../commonui/fz_paths.h"
 #include "../commonui/updater_cert.h"
@@ -16,6 +15,7 @@
 #endif
 
 #include "../include/engine_context.h"
+#include "../include/engine_options.h"
 #include "../include/version.h"
 #include "../include/writer.h"
 
@@ -29,24 +29,25 @@
 #include <string>
 
 namespace {
-	struct run_event_type;
-	typedef fz::simple_event<run_event_type, bool> run_event;
+struct run_event_type;
+typedef fz::simple_event<run_event_type, bool> run_event;
+
+option_registrator r(&register_updater_options);
 }
 
-void version_information::update_available()
+unsigned int register_updater_options()
 {
-	if (!nightly_.url_.empty() && COptions::Get()->get_int(OPTION_UPDATECHECK_CHECKBETA) == 2) {
-		available_ = nightly_;
-	}
-	else if (!beta_.version_.empty() && COptions::Get()->get_int(OPTION_UPDATECHECK_CHECKBETA) != 0) {
-		available_ = beta_;
-	}
-	else if (!stable_.version_.empty()) {
-		available_ = stable_;
-	}
-	else {
-		available_ = build();
-	}
+	static int const value = register_options({
+		{ "Disable update check", false, option_flags::predefined_only },
+
+		{ "Update Check", 1, option_flags::normal, 0, 1 },
+		{ "Update Check Interval", 7, option_flags::normal, 1, 7 },
+		{ "Last automatic update check", L"", option_flags::normal, 100 },
+		{ "Last automatic update version", L"", option_flags::normal },
+		{ "Update Check New Version", L"", option_flags::platform },
+		{ "Update Check Check Beta", 0, option_flags::normal, 0, 2 },
+	});
+	return value;
 }
 
 static CUpdater* instance = 0;
@@ -70,8 +71,9 @@ UpdaterState CUpdater::LoadLocalData()
 		fz::scoped_lock l(mtx_);
 		log_.clear();
 		raw_version_information_.clear();
-		if (!LongTimeSinceLastCheck() || COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0) {
-			raw_version_information_ = COptions::Get()->get_string(OPTION_UPDATECHECK_NEWVERSION);
+		auto& options = engine_context_.GetOptions();
+		if (!LongTimeSinceLastCheck() || options.get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0) {
+			raw_version_information_ = options.get_string(OPTION_UPDATECHECK_NEWVERSION);
 		}
 	}
 
@@ -99,7 +101,8 @@ CUpdater* CUpdater::GetInstance()
 
 bool CUpdater::LongTimeSinceLastCheck() const
 {
-	std::wstring const lastCheckStr = COptions::Get()->get_string(OPTION_UPDATECHECK_LASTDATE);
+	auto& options = engine_context_.GetOptions();
+	std::wstring const lastCheckStr = options.get_string(OPTION_UPDATECHECK_LASTDATE);
 	if (lastCheckStr.empty()) {
 		return true;
 	}
@@ -118,7 +121,7 @@ bool CUpdater::LongTimeSinceLastCheck() const
 
 	int days = 1;
 	if (!CBuildInfo::IsUnstable()) {
-		days = COptions::Get()->get_int(OPTION_UPDATECHECK_INTERVAL);
+		days = options.get_int(OPTION_UPDATECHECK_INTERVAL);
 	}
 	return span.get_days() >= days;
 }
@@ -191,7 +194,7 @@ fz::uri CUpdater::GetUrl()
 		qs["cpuid"] = cpuCaps;
 	}
 
-	std::wstring const lastVersion = COptions::Get()->get_string(OPTION_UPDATECHECK_LASTVERSION);
+	std::wstring const lastVersion = engine_context_.GetOptions().get_string(OPTION_UPDATECHECK_LASTVERSION);
 	if (lastVersion != GetFileZillaVersion()) {
 		qs["initial"] = "1";
 	}
@@ -227,7 +230,7 @@ void CUpdater::OnRun(bool manual)
 	}
 
 	auto const t = fz::datetime::now();
-	COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
+	engine_context_.GetOptions().set(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
 
 	{
 		fz::scoped_lock l(mtx_);
@@ -482,7 +485,7 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 			SetState(UpdaterState::failed);
 			return;
 		}
-		COptions::Get()->set(OPTION_UPDATECHECK_LASTVERSION, GetFileZillaVersion());
+		engine_context_.GetOptions().set(OPTION_UPDATECHECK_LASTVERSION, GetFileZillaVersion());
 		s = ProcessFinishedData(true);
 	}
 	else {
@@ -587,6 +590,8 @@ void CUpdater::ParseData()
 
 	log_ += fz::sprintf(_("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
 
+	auto & options = engine_context_.GetOptions();
+
 	while (!raw_version_information.empty()) {
 		std::wstring line;
 		size_t pos = raw_version_information.find('\n');
@@ -605,7 +610,7 @@ void CUpdater::ParseData()
 			version_information_.changelog_ = raw_version_information;
 			fz::trim(version_information_.changelog_);
 
-			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Changelog: %s\n", version_information_.changelog_);
 			}
 			break;
@@ -613,7 +618,7 @@ void CUpdater::ParseData()
 
 		std::wstring const& type = tokens[0];
 		if (tokens.size() < 2) {
-			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Skipping line with one token of type %s\n", type);
 			}
 			continue;
@@ -675,7 +680,7 @@ void CUpdater::ParseData()
 		if (type == L"nightly") {
 			fz::datetime nightlyDate(versionOrDate, fz::datetime::utc);
 			if (nightlyDate.empty()) {
-				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += L"Could not parse nightly date\n";
 				}
 				continue;
@@ -683,7 +688,7 @@ void CUpdater::ParseData()
 
 			fz::datetime buildDate = CBuildInfo::GetBuildDate();
 			if (buildDate.empty() || nightlyDate.empty() || nightlyDate <= buildDate) {
-				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += L"Nightly isn't newer\n";
 				}
 				continue;
@@ -696,7 +701,7 @@ void CUpdater::ParseData()
 			}
 		}
 		else {
-			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Skipping line with unknown type %s\n", type);
 			}
 			continue;
@@ -706,7 +711,7 @@ void CUpdater::ParseData()
 		b.version_ = versionOrDate;
 
 		if (tokens.size() < 6) {
-			if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+			if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 				log_ += fz::sprintf(L"Not parsing build line with only %d tokens", tokens.size());
 			}
 		}
@@ -717,7 +722,7 @@ void CUpdater::ParseData()
 			std::wstring const& hash = tokens[5];
 
 			if (GetFilename(url).empty()) {
-				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += fz::sprintf(L"Could not extract filename from URL: %s\n", url);
 				}
 				continue;
@@ -729,7 +734,7 @@ void CUpdater::ParseData()
 
 			auto const size = fz::to_integral<uint64_t>(sizestr);
 			if (!size) {
-				if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
+				if (options.get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
 					log_ += fz::sprintf(L"Could not parse size: %s\n", sizestr);
 				}
 				continue;
@@ -788,9 +793,17 @@ void CUpdater::ParseData()
 		}
 	}
 
-	version_information_.update_available();
+	if (!version_information_.nightly_.url_.empty() && options.get_int(OPTION_UPDATECHECK_CHECKBETA) == 2) {
+		version_information_.available_ = version_information_.nightly_;
+	}
+	else if (!version_information_.beta_.version_.empty() && options.get_int(OPTION_UPDATECHECK_CHECKBETA) != 0) {
+		version_information_.available_ = version_information_.beta_;
+	}
+	else {
+		version_information_.available_ = version_information_.stable_;
+	}
 
-	COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
+	options.set(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
 }
 
 void CUpdater::operator()(fz::event_base const& ev)
@@ -1003,7 +1016,8 @@ bool CUpdater::ShouldCheck(UpdaterState & s)
 	else {
 #if FZ_AUTOUPDATECHECK
 		if (s == UpdaterState::failed || s == UpdaterState::idle || s == UpdaterState::newversion_stale) {
-			if (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0) {
+			auto& options = engine_context_.GetOptions();
+			if (!options.get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && options.get_int(OPTION_UPDATECHECK) != 0) {
 				if (LongTimeSinceLastCheck()) {
 					return true;
 				}
@@ -1059,10 +1073,11 @@ void CUpdater::Reset()
 		return;
 	}
 
-	COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
-	COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
-	COptions::Get()->set(OPTION_UPDATECHECK, 1);
-	COptions::Get()->set(OPTION_UPDATECHECK_INTERVAL, 1);
+	auto& options = engine_context_.GetOptions();
+	options.set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
+	options.set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
+	options.set(OPTION_UPDATECHECK, 1);
+	options.set(OPTION_UPDATECHECK_INTERVAL, 1);
 
 	version_information_ = version_information();
 	raw_version_information_.clear();

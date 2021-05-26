@@ -57,7 +57,6 @@ unsigned int register_interface_options()
 		// Default/internal options
 		{ "Config Location", L"", option_flags::predefined_only | option_flags::platform },
 		{ "Kiosk mode", 0, option_flags::predefined_priority, 0, 2 },
-		{ "Disable update check", false, option_flags::predefined_only },
 		{ "Cache directory", L"", option_flags::predefined_priority | option_flags::platform },
 
 		// Normal UI options
@@ -69,12 +68,6 @@ unsigned int register_interface_options()
 		{ "Language Code", L"", option_flags::normal, 50 },
 		{ "Concurrent download limit", 0, option_flags::numeric_clamp, 0, 10 },
 		{ "Concurrent upload limit", 0, option_flags::numeric_clamp, 0, 10 },
-		{ "Update Check", 1, option_flags::normal, 0, 1 },
-		{ "Update Check Interval", 7, option_flags::normal, 1, 7 },
-		{ "Last automatic update check", L"", option_flags::normal, 100 },
-		{ "Last automatic update version", L"", option_flags::normal },
-		{ "Update Check New Version", L"", option_flags::platform },
-		{ "Update Check Check Beta", 0, option_flags::normal, 0, 2 },
 		{ "Show debug menu", false, option_flags::normal },
 		{ "File exists action download", 0, option_flags::normal, 0, 7 },
 		{ "File exists action upload", 0, option_flags::normal, 0, 7 },

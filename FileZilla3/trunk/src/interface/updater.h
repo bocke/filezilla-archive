@@ -4,12 +4,39 @@
 #if FZ_MANUALUPDATECHECK
 
 #include "../include/notification.h"
+#include "../include/optionsbase.h"
 
 #include <libfilezilla/buffer.hpp>
 #include <libfilezilla/uri.hpp>
 
 #include <functional>
 #include <list>
+
+enum updaterOptions : unsigned {
+	OPTION_DEFAULT_DISABLEUPDATECHECK,
+
+	OPTION_UPDATECHECK,
+	OPTION_UPDATECHECK_INTERVAL,
+	OPTION_UPDATECHECK_LASTDATE,
+	OPTION_UPDATECHECK_LASTVERSION,
+	OPTION_UPDATECHECK_NEWVERSION,
+	OPTION_UPDATECHECK_CHECKBETA,
+
+	OPTIONS_UPDATER_NUM
+};
+
+unsigned int FZC_PUBLIC_SYMBOL register_updater_options();
+
+inline optionsIndex mapOption(updaterOptions opt)
+{
+	static unsigned int const offset = register_updater_options();
+
+	auto ret = optionsIndex::invalid;
+	if (opt < OPTIONS_UPDATER_NUM) {
+		return static_cast<optionsIndex>(opt + offset);
+	}
+	return ret;
+}
 
 struct build final
 {
@@ -30,8 +57,6 @@ struct version_information final
 	bool empty() const {
 		return available_.version_.empty() && !eol_;
 	}
-
-	void update_available();
 
 	build stable_;
 	build beta_;
