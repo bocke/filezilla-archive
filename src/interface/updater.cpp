@@ -508,8 +508,7 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 
 		std::wstring local_file = GetLocalFile(version_information_.available_, false);
 
-		wxLogNull log;
-		if (local_file.empty() || !wxRenameFile(temp, local_file, false)) {
+		if (local_file.empty() || !fz::rename_file(fz::to_native(temp), fz::to_native(local_file))) {
 			s = UpdaterState::newversion;
 			fz::remove_file(fz::to_native(temp));
 			fz::scoped_lock l(mtx_);
