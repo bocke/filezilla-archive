@@ -62,6 +62,33 @@ CLocalPath GetHomeDir()
 	return ret;
 }
 
+CLocalPath GetTempDir()
+{
+	CLocalPath ret;
+
+#ifdef FZ_WINDOWS
+	DWORD len = GetTempPathW(0, nullptr);
+	if (len) {
+		std::wstring buf;
+		buf.resize(len);
+		DWORD len2 = GetTempPathW(len, buf.data());
+		if (len2 == len - 1) {
+			buf.pop_back();
+			ret.SetPath(buf);
+		}
+	}
+#elif FZ_MAC
+#else
+	if (!ret.SetPath(GetEnv("TMPDIR"))) {
+		if (!ret.SetPath(GetEnv("TMP"))) {
+			if (!ret.SetPath(GetEnv("TEMP"))) {
+				ret.SetPath(L"/tmp");
+			}
+		}
+	}
+#endif
+	return ret;
+}
 CLocalPath GetUnadjustedSettingsDir()
 {
 	CLocalPath ret;
