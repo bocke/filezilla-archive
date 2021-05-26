@@ -39,6 +39,7 @@ noinst_HEADERS = \
 	login_manager.h \
 	recursive_operation.h \
 	remote_recursive_operation.h \
+	registry.h \
 	site.h \
 	site_manager.h \
 	updater_cert.h \
@@ -47,5 +48,8 @@ noinst_HEADERS = \
 	xml_file.h
 
 if MINGW
+libfzclient_commonui_private_la_SOURCES += \
+	registry.cpp
+
 libfzclient_commonui_private_la_LDFLAGS += -lole32 -Wl,-luuid
 endif
