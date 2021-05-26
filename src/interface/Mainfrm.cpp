@@ -735,9 +735,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 	else if (event.GetId() == XRCID("ID_CLEAR_UPDATER")) {
 #if FZ_MANUALUPDATECHECK
 		if (m_pUpdater) {
-			COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
-			COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
-			m_pUpdater->Init();
+			m_pUpdater->Reset();
 		}
 #endif
 	}
@@ -1772,7 +1770,7 @@ void CMainFrame::OnCheckForUpdates(wxCommandEvent& event)
 	}
 
 	if (event.GetId() == XRCID("ID_CHECKFORUPDATES") || (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0)) {
-		m_pUpdater->RunIfNeeded();
+		m_pUpdater->Run(true);
 	}
 
 	update_dialog_timer_.Stop();
@@ -1784,43 +1782,45 @@ void CMainFrame::OnCheckForUpdates(wxCommandEvent& event)
 void CMainFrame::UpdaterStateChanged(UpdaterState s, build const& v)
 {
 #if FZ_AUTOUPDATECHECK
-	if (!m_pMenuBar) {
-		return;
-	}
+	CallAfter([this, s, v]() {
+		if (!m_pMenuBar) {
+			return;
+		}
 
-	if (s == UpdaterState::idle) {
-		wxMenu* m = 0;
-		wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId(), &m);
-		if (pItem && m) {
-			for (size_t i = 0; i != m_pMenuBar->GetMenuCount(); ++i) {
-				if ( m_pMenuBar->GetMenu(i) == m ) {
-					m_pMenuBar->Remove(i);
-					delete m;
-					break;
+		if (s == UpdaterState::idle) {
+			wxMenu* m = 0;
+			wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId(), &m);
+			if (pItem && m) {
+				for (size_t i = 0; i != m_pMenuBar->GetMenuCount(); ++i) {
+					if (m_pMenuBar->GetMenu(i) == m) {
+						m_pMenuBar->Remove(i);
+						delete m;
+						break;
+					}
 				}
 			}
+			return;
 		}
-		return;
-	}
-	else if (s != UpdaterState::newversion && s != UpdaterState::newversion_ready && s != UpdaterState::newversion_stale) {
-		return;
-	}
-
-	wxString const name = v.version_.empty() ? _("Unknown version") : wxString::Format(_("&Version %s"), v.version_);
-
-	wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId());
-	if (!pItem) {
-		wxMenu* pMenu = new wxMenu();
-		pMenu->Append(GetAvailableUpdateMenuId(), name);
-		m_pMenuBar->Append(pMenu, _("&New version available!"));
-
-		if (!update_dialog_timer_.IsRunning()) {
-			update_dialog_timer_.Start(1, true);
+		else if (s != UpdaterState::newversion && s != UpdaterState::newversion_ready && s != UpdaterState::newversion_stale) {
+			return;
 		}
-	}
-	else {
-		pItem->SetItemLabel(name);
-	}
+
+		wxString const name = v.version_.empty() ? _("Unknown version") : wxString::Format(_("&Version %s"), v.version_);
+
+		wxMenuItem* pItem = m_pMenuBar->FindItem(GetAvailableUpdateMenuId());
+		if (!pItem) {
+			wxMenu* pMenu = new wxMenu();
+			pMenu->Append(GetAvailableUpdateMenuId(), name);
+			m_pMenuBar->Append(pMenu, _("&New version available!"));
+
+			if (!update_dialog_timer_.IsRunning()) {
+				update_dialog_timer_.Start(1, true);
+			}
+		}
+		else {
+			pItem->SetItemLabel(name);
+		}
+	});
 #endif
 }
 
@@ -2127,7 +2127,7 @@ void CMainFrame::CheckChangedSettings()
 
 #if FZ_MANUALUPDATECHECK
 	if (m_pUpdater) {
-		m_pUpdater->Init();
+		m_pUpdater->Run(false);
 	}
 #endif
 }
@@ -2782,8 +2782,8 @@ void CMainFrame::PostInitialize()
 	// Need to do this after welcome screen to avoid simultaneous display of multiple dialogs
 	if (!m_pUpdater) {
 		update_dialog_timer_.SetOwner(this);
-		m_pUpdater = new CUpdater(*this, m_engineContext);
-		m_pUpdater->Init();
+		m_pUpdater = new CUpdater(m_engineContext);
+		m_pUpdater->AddHandler(*this);
 		ShowOverlay(m_pUpdater->GetResources(resource_type::overlay), this, m_pTopSplitter, wxPoint(-40, 30));
 	}
 #endif

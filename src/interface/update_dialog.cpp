@@ -338,72 +338,73 @@ void CUpdateDialog::Wrap()
 
 void CUpdateDialog::UpdaterStateChanged(UpdaterState s, build const& v)
 {
-	timer_.Stop();
-	for (auto const& panel : panels_) {
-		panel->Hide();
-	}
-	if (s == UpdaterState::idle) {
-		panels_[pagenames::latest]->Show();
-	}
-	else if (s == UpdaterState::failed) {
-		xrc_call(*this, "ID_DETAILS", &wxTextCtrl::ChangeValue, updater_.GetLog());
-		panels_[pagenames::failed]->Show();
-	}
-	else if (s == UpdaterState::checking) {
-		panels_[pagenames::checking]->Show();
-	}
-	else if (s == UpdaterState::newversion || s == UpdaterState::newversion_ready || s == UpdaterState::newversion_downloading || s == UpdaterState::newversion_stale) {
-		xrc_call(*this, "ID_VERSION", &wxStaticText::SetLabel, v.version_);
-
-		wxString news = updater_.GetChangelog();
-
-		auto pos = news.find(v.version_ + _T(" (2"));
-		if (pos != wxString::npos) {
-			news = news.Mid(pos);
+	CallAfter([this, s, v]() {
+		timer_.Stop();
+		for (auto const& panel : panels_) {
+			panel->Hide();
 		}
-
-		XRCCTRL(*this, "ID_NEWS_LABEL", wxStaticText)->Show(!news.empty());
-		XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->Show(!news.empty());
-		if (news != XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->GetValue()) {
-			XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->ChangeValue(news);
+		if (s == UpdaterState::idle) {
+			panels_[pagenames::latest]->Show();
 		}
-		bool downloading = s == UpdaterState::newversion_downloading;
-		XRCCTRL(*this, "ID_DOWNLOAD_LABEL", wxStaticText)->Show(downloading);
-		auto anim = FindWindow(XRCID("ID_WAIT_DOWNLOAD"));
-		if (anim) {
-			anim->Show(downloading);
+		else if (s == UpdaterState::failed) {
+			xrc_call(*this, "ID_DETAILS", &wxTextCtrl::ChangeValue, updater_.GetLog());
+			panels_[pagenames::failed]->Show();
 		}
-		XRCCTRL(*this, "ID_DOWNLOAD_PROGRESS", wxStaticText)->Show(downloading);
-		if (downloading) {
-			timer_.Start(500);
-			UpdateProgress();
+		else if (s == UpdaterState::checking) {
+			panels_[pagenames::checking]->Show();
 		}
+		else if (s == UpdaterState::newversion || s == UpdaterState::newversion_ready || s == UpdaterState::newversion_downloading || s == UpdaterState::newversion_stale) {
+			xrc_call(*this, "ID_VERSION", &wxStaticText::SetLabel, v.version_);
 
-		bool ready = s == UpdaterState::newversion_ready;
-		XRCCTRL(*this, "ID_DOWNLOADED", wxStaticText)->Show(ready);
-		XRCCTRL(*this, "ID_INSTALL", wxButton)->Show(ready);
+			wxString news = updater_.GetChangelog();
 
-		bool const outdated = s == UpdaterState::newversion_stale;
-		bool const manual = s == UpdaterState::newversion || outdated;
-		bool const dlfail = s == UpdaterState::newversion && !v.url_.empty();
-		bool const disabled = COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !COptions::Get()->get_int(OPTION_UPDATECHECK);
+			auto pos = news.find(v.version_ + _T(" (2"));
+			if (pos != wxString::npos) {
+				news = news.Mid(pos);
+			}
 
-		XRCCTRL(*this, "ID_OUTDATED", wxStaticText)->Show(outdated);
-		XRCCTRL(*this, "ID_DISABLED_CHECK", wxStaticText)->Show(outdated && disabled);
-		XRCCTRL(*this, "ID_DOWNLOAD_FAIL", wxStaticText)->Show(dlfail);
-		XRCCTRL(*this, "ID_DOWNLOAD_FAIL", wxStaticText)->Show(dlfail);
-		XRCCTRL(*this, "ID_DOWNLOAD_RETRY", wxHyperlinkCtrl)->Show(dlfail);
-		XRCCTRL(*this, "ID_SHOW_DETAILS_DL", wxHyperlinkCtrl)->Show(dlfail);
+			XRCCTRL(*this, "ID_NEWS_LABEL", wxStaticText)->Show(!news.empty());
+			XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->Show(!news.empty());
+			if (news != XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->GetValue()) {
+				XRCCTRL(*this, "ID_NEWS", wxTextCtrl)->ChangeValue(news);
+			}
+			bool downloading = s == UpdaterState::newversion_downloading;
+			XRCCTRL(*this, "ID_DOWNLOAD_LABEL", wxStaticText)->Show(downloading);
+			auto anim = FindWindow(XRCID("ID_WAIT_DOWNLOAD"));
+			if (anim) {
+				anim->Show(downloading);
+			}
+			XRCCTRL(*this, "ID_DOWNLOAD_PROGRESS", wxStaticText)->Show(downloading);
+			if (downloading) {
+				timer_.Start(500);
+				UpdateProgress();
+			}
 
-		XRCCTRL(*this, "ID_DETAILS_DL", wxTextCtrl)->ChangeValue(updater_.GetLog());
+			bool ready = s == UpdaterState::newversion_ready;
+			XRCCTRL(*this, "ID_DOWNLOADED", wxStaticText)->Show(ready);
+			XRCCTRL(*this, "ID_INSTALL", wxButton)->Show(ready);
 
-		XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_TEXT", wxStaticText)->Show(manual && !dlfail);
-		XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_TEXT_DLFAIL", wxStaticText)->Show(manual && dlfail);
-		XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_LINK", wxHyperlinkCtrl)->Show(manual);
+			bool const outdated = s == UpdaterState::newversion_stale;
+			bool const manual = s == UpdaterState::newversion || outdated;
+			bool const dlfail = s == UpdaterState::newversion && !v.url_.empty();
+			bool const disabled = COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !COptions::Get()->get_int(OPTION_UPDATECHECK);
 
-		panels_[pagenames::newversion]->Show();
-		panels_[pagenames::newversion]->Layout();
-	}
+			XRCCTRL(*this, "ID_OUTDATED", wxStaticText)->Show(outdated);
+			XRCCTRL(*this, "ID_DISABLED_CHECK", wxStaticText)->Show(outdated && disabled);
+			XRCCTRL(*this, "ID_DOWNLOAD_FAIL", wxStaticText)->Show(dlfail);
+			XRCCTRL(*this, "ID_DOWNLOAD_RETRY", wxHyperlinkCtrl)->Show(dlfail);
+			XRCCTRL(*this, "ID_SHOW_DETAILS_DL", wxHyperlinkCtrl)->Show(dlfail);
+
+			XRCCTRL(*this, "ID_DETAILS_DL", wxTextCtrl)->ChangeValue(updater_.GetLog());
+
+			XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_TEXT", wxStaticText)->Show(manual && !dlfail);
+			XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_TEXT_DLFAIL", wxStaticText)->Show(manual && dlfail);
+			XRCCTRL(*this, "ID_NEWVERSION_WEBSITE_LINK", wxHyperlinkCtrl)->Show(manual);
+
+			panels_[pagenames::newversion]->Show();
+			panels_[pagenames::newversion]->Layout();
+		}
+	});
 }
 
 void CUpdateDialog::OnInstall(wxCommandEvent&)
@@ -475,7 +476,7 @@ void CUpdateDialog::ShowDetailsDl(wxHyperlinkEvent&)
 
 void CUpdateDialog::Retry(wxHyperlinkEvent&)
 {
-	updater_.RunIfNeeded();
+	updater_.Run(true);
 }
 
 void CUpdateDialog::OnDebugLog(wxCommandEvent&)

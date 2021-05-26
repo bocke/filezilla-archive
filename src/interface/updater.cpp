@@ -6,29 +6,32 @@
 #include "file_utils.h"
 #include "Options.h"
 #include "updater.h"
+#include "../commonui/fz_paths.h"
 #include "../commonui/updater_cert.h"
 #include "serverdata.h"
 #include <string>
 
-#ifdef __WXMSW__
-#include <wx/msw/registry.h>
+#ifdef FZ_WINDOWS
+#include "../commonui/registry.h"
 #endif
 
+#include "../include/engine_context.h"
 #include "../include/version.h"
 #include "../include/writer.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/hash.hpp>
+#include <libfilezilla/invoker.hpp>
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/signature.hpp>
 #include <libfilezilla/translate.hpp>
-#include <libfilezilla/glue/wxinvoker.hpp>
 
 #include <string>
 
-BEGIN_EVENT_TABLE(CUpdater, wxEvtHandler)
-EVT_TIMER(wxID_ANY, CUpdater::OnTimer)
-END_EVENT_TABLE()
+namespace {
+	struct run_event_type;
+	typedef fz::simple_event<run_event_type, bool> run_event;
+}
 
 void version_information::update_available()
 {
@@ -48,42 +51,42 @@ void version_information::update_available()
 
 static CUpdater* instance = 0;
 
-CUpdater::CUpdater(CUpdateHandler& parent, CFileZillaEngineContext& engine_context)
-	: state_(UpdaterState::idle)
+CUpdater::CUpdater(CFileZillaEngineContext& engine_context)
+	: fz::event_handler(engine_context.GetEventLoop())
+	, state_(UpdaterState::idle)
 	, engine_context_(engine_context)
 {
-	AddHandler(parent);
-}
-
-void CUpdater::Init()
-{
-	if (Busy()) {
-		return;
-	}
-
-	if (COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0 || !LongTimeSinceLastCheck()) {
-		raw_version_information_ = COptions::Get()->get_string(OPTION_UPDATECHECK_NEWVERSION);
-	}
-
-	UpdaterState s = ProcessFinishedData(FZ_AUTOUPDATECHECK);
-
-	SetState(s);
-
-	AutoRunIfNeeded();
-
-	update_timer_.SetOwner(this);
-	update_timer_.Start(1000 * 3600);
-
 	if (!instance) {
 		instance = this;
 	}
+
+	send_event<run_event>(false);
+}
+
+UpdaterState CUpdater::LoadLocalData()
+{
+	// Load existing data if it isn't stale, or if it is stale and we cannot check anew
+	{
+		fz::scoped_lock l(mtx_);
+		log_.clear();
+		raw_version_information_.clear();
+		if (!LongTimeSinceLastCheck() || COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) != 0) {
+			raw_version_information_ = COptions::Get()->get_string(OPTION_UPDATECHECK_NEWVERSION);
+		}
+	}
+
+	stop_timer(update_timer_);
+	update_timer_ = add_timer(fz::duration::from_hours(1), false);
+
+	return ProcessFinishedData(FZ_AUTOUPDATECHECK);
 }
 
 CUpdater::~CUpdater()
 {
+	remove_handler();
+
 	if (instance == this) {
 		instance = 0;
-	
 	}
 
 	delete engine_;
@@ -92,38 +95,6 @@ CUpdater::~CUpdater()
 CUpdater* CUpdater::GetInstance()
 {
 	return instance;
-}
-
-void CUpdater::AutoRunIfNeeded()
-{
-#if FZ_AUTOUPDATECHECK
-	if (state_ == UpdaterState::failed || state_ == UpdaterState::idle || state_ == UpdaterState::newversion_stale) {
-		if (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0) {
-			if (LongTimeSinceLastCheck()) {
-				Run(false);
-			}
-		}
-		else {
-			auto const age = fz::datetime::now() - CBuildInfo::GetBuildDate();
-			if (age >= fz::duration::from_days(31*6)) {
-				version_information_ = version_information();
-				SetState(UpdaterState::newversion_stale);
-			}
-		}
-	}
-#endif
-}
-
-void CUpdater::RunIfNeeded()
-{
-	build const b = AvailableBuild();
-	if (state_ == UpdaterState::idle || state_ == UpdaterState::failed || state_ == UpdaterState::newversion_stale ||
-		state_ == UpdaterState::eol ||
-		LongTimeSinceLastCheck() || (state_ == UpdaterState::newversion && !b.url_.empty()) ||
-		(state_ == UpdaterState::newversion_ready && !VerifyChecksum(DownloadedFile(), b.size_, b.hash_)))
-	{
-		Run(true);
-	}
 }
 
 bool CUpdater::LongTimeSinceLastCheck() const
@@ -152,11 +123,27 @@ bool CUpdater::LongTimeSinceLastCheck() const
 	return span.get_days() >= days;
 }
 
+#if FZ_WINDOWS
+namespace {
+bool SystemIs64bit()
+{
+#ifdef _WIN64
+	// Technically, it could still be a 32bit system emulating 64bit...
+	return true;
+#else
+	BOOL w64{};
+	IsWow64Process(GetCurrentProcess(), &w64);
+	return w64;
+#endif
+}
+}
+#endif
+
 fz::uri CUpdater::GetUrl()
 {
 	fz::uri uri("https://update.filezilla-project.org/update.php");
 	fz::query_string qs;
-	
+
 	std::string host = fz::to_utf8(CBuildInfo::GetHostname());
 	if (host.empty()) {
 		host = "unknown";
@@ -164,13 +151,16 @@ fz::uri CUpdater::GetUrl()
 	qs["platform"] = host;
 	qs["version"] = fz::to_utf8(GetFileZillaVersion());
 
-#if defined(__WXMSW__) || defined(__WXMAC__)
+#if defined(FZ_WINDOWS) || defined(FZ_MAC)
 	// Makes not much sense to submit OS version on Linux, *BSD and the likes, too many flavours.
-	qs["osversion"] = fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
+	auto sysver = GetSystemVersion();
+	if (sysver) {
+		qs["osversion"] = fz::sprintf("%u.%u", sysver.major, sysver.minor);
+	}
 #endif
 
-#ifdef __WXMSW__
-	if (wxIsPlatform64Bit()) {
+#ifdef FZ_WINDOWS
+	if (SystemIs64bit()) {
 		qs["osarch"] = "64";
 	}
 	else {
@@ -178,31 +168,22 @@ fz::uri CUpdater::GetUrl()
 	}
 
 	// Add information about package
-	{
-		wxLogNull log;
-
-		// Installer always writes to 32bit section
-		auto key = std::make_unique<wxRegKey>(_T("HKEY_CURRENT_USER\\Software\\FileZilla Client"), wxRegKey::WOW64ViewMode_32);
-		if (!key->Exists()) {
-			// wxRegKey is sad, it doesn't even have a copy constructor.
-			key = std::make_unique<wxRegKey>(_T("HKEY_LOCAL_MACHINE\\Software\\FileZilla Client"), wxRegKey::WOW64ViewMode_32);
-		}
-
-		long updated{};
-		if (key->GetValueType(_T("Updated")) == wxRegKey::Type_Dword && key->QueryValue(_T("Updated"), &updated)) {
-			qs["updated"] = fz::to_string(updated);
-		}
-
-		long package{};
-		if (key->GetValueType(_T("Package")) == wxRegKey::Type_Dword && key->QueryValue(_T("Package"), &package)) {
-			qs["package"] = fz::to_string(package);
-		}
-
-		wxString channel;
-		if (key->GetValueType(_T("Channel")) == wxRegKey::Type_String && key->QueryValue(_T("Channel"), channel)) {
-			qs["channel"] = fz::to_utf8(channel);
-		}
+	// Installer always writes to 32bit section
+	auto key = regkey(HKEY_CURRENT_USER, L"Software\\FileZilla Client", true, regkey::regview_32);
+	if (!key) {
+		key.open(HKEY_LOCAL_MACHINE, L"Software\\FileZilla Client", true, regkey::regview_32);
 	}
+
+	if (key.has_value(L"Updated")) {
+		qs["updated"] = fz::to_string(key.int_value(L"Updated"));
+	}
+	if (key.has_value(L"Package")) {
+		qs["package"] = fz::to_string(key.int_value(L"Package"));
+	}
+	if (key.has_value(L"Channel")) {
+		qs["channel"] = fz::to_string(key.int_value(L"Channel"));
+	}
+
 #endif
 
 	std::string const cpuCaps = fz::to_utf8(CBuildInfo::GetCPUCaps(','));
@@ -229,29 +210,40 @@ fz::uri CUpdater::GetUrl()
 	return uri;
 }
 
-bool CUpdater::Run(bool manual)
+void CUpdater::OnRun(bool manual)
 {
-	if (state_ != UpdaterState::idle && state_ != UpdaterState::failed &&
-		state_ != UpdaterState::newversion && state_ != UpdaterState::newversion_ready
-		&& state_ != UpdaterState::newversion_stale && state_ != UpdaterState::eol)
-	{
-		return false;
+	if (Busy()) {
+		return;
+	}
+
+	manual_ = manual;
+	SetState(UpdaterState::checking);
+
+	UpdaterState s = LoadLocalData();
+	
+	if (!ShouldCheck(s)) {
+		SetState(s);
+		return;
 	}
 
 	auto const t = fz::datetime::now();
 	COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::utc));
 
-	local_file_.clear();
-	log_ = fz::sprintf(_("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
-	manual_ = manual;
+	{
+		fz::scoped_lock l(mtx_);
+		local_file_.clear();
+		log_ = fz::sprintf(_("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
+	}
 
 	std::wstring build = CBuildInfo::GetBuildType();
 	if (build.empty())  {
 		build = _("custom").ToStdWstring();
 	}
-	log_ += fz::sprintf(_("Own build type: %s\n"), build);
 
-	SetState(UpdaterState::checking);
+	{
+		fz::scoped_lock l(mtx_);
+		log_ += fz::sprintf(_("Own build type: %s\n"), build);
+	}
 
 	m_use_internal_rootcert = true;
 	int res = Request(GetUrl());
@@ -260,16 +252,18 @@ bool CUpdater::Run(bool manual)
 		SetState(UpdaterState::failed);
 	}
 	raw_version_information_.clear();
-
-	return state_ == UpdaterState::checking;
 }
 
 int CUpdater::Download(std::wstring const& url, std::wstring const& local_file)
 {
-	wxASSERT(pending_commands_.empty());
+	if (!pending_commands_.empty()) {
+		return FZ_REPLY_ERROR;
+	}
+
 	pending_commands_.clear();
 	pending_commands_.emplace_back(new CDisconnectCommand);
 	if (!CreateConnectCommand(url) || !CreateTransferCommand(url, local_file)) {
+		pending_commands_.clear();
 		return FZ_REPLY_ERROR;
 	}
 
@@ -278,13 +272,16 @@ int CUpdater::Download(std::wstring const& url, std::wstring const& local_file)
 
 int CUpdater::Request(fz::uri const& uri)
 {
-	wxASSERT(pending_commands_.empty());
+	if (!pending_commands_.empty()) {
+		return FZ_REPLY_ERROR;
+	}
+
 	pending_commands_.clear();
 	pending_commands_.emplace_back(new CDisconnectCommand);
 
 	CServer server(fz::equal_insensitive_ascii(uri.scheme_, std::string("http")) ? HTTP : HTTPS, DEFAULT, fz::to_wstring_from_utf8(uri.host_), uri.port_);
 	pending_commands_.emplace_back(new CConnectCommand(server, ServerHandle(), Credentials()));
-	pending_commands_.emplace_back(new CHttpRequestCommand(uri, writer_factory_holder(std::make_unique<memory_writer_factory>(L"Updater", output_buffer_, 1024*1024))));
+	pending_commands_.emplace_back(new CHttpRequestCommand(uri, writer_factory_holder(std::make_unique<memory_writer_factory>(L"Updater", output_buffer_, 1024*1024)), "GET", reader_factory_holder(), true));
 
 	return ContinueDownload();
 }
@@ -323,7 +320,10 @@ bool CUpdater::CreateConnectCommand(std::wstring const& url)
 
 bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const& local_file)
 {
-	
+	if (local_file.empty()) {
+		return false;
+	}
+
 	Site s;
 	CServerPath path;
 	std::wstring error;
@@ -392,6 +392,8 @@ void CUpdater::ProcessNotification(std::unique_ptr<CNotification> && notificatio
 	case nId_logmsg:
 		{
 			auto const& msg = static_cast<CLogmsgNotification const&>(*notification.get());
+
+			fz::scoped_lock l(mtx_);
 			log_ += msg.msg + L"\n";
 		}
 		break;
@@ -413,10 +415,10 @@ UpdaterState CUpdater::ProcessFinishedData(bool can_download)
 		s = UpdaterState::idle;
 	}
 	else if (!version_information_.available_.url_.empty()) {
-
 		std::wstring const temp = GetTempFile();
 		std::wstring const local_file = GetLocalFile(version_information_.available_, true);
 		if (!local_file.empty() && fz::local_filesys::get_file_type(fz::to_native(local_file)) != fz::local_filesys::unknown) {
+			fz::scoped_lock l(mtx_);
 			local_file_ = local_file;
 			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
 			s = UpdaterState::newversion_ready;
@@ -510,13 +512,16 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 		if (local_file.empty() || !wxRenameFile(temp, local_file, false)) {
 			s = UpdaterState::newversion;
 			fz::remove_file(fz::to_native(temp));
+			fz::scoped_lock l(mtx_);
 			log_ += fz::sprintf(_("Could not create local file %s\n"), local_file);
 		}
 		else {
+			fz::scoped_lock l(mtx_);
 			local_file_ = local_file;
 			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
 		}
 	}
+
 	return s;
 }
 
@@ -558,13 +563,10 @@ bool CUpdater::FilterOutput()
 		return false;
 	}
 
-	if (COptions::Get()->get_int(OPTION_LOGGING_DEBUGLEVEL) == 4) {
-		log_ += fz::sprintf(L"FilterOutput %u\n", output_buffer_.size());
-	}
-
 	raw_version_information_.resize(output_buffer_.size());
 	for (size_t i = 0; i < output_buffer_.size(); ++i) {
 		if (output_buffer_[i] < 10 || static_cast<unsigned char>(output_buffer_[i]) > 127) {
+			fz::scoped_lock l(mtx_);
 			log_ += fztranslate("Received invalid character in version information") + L"\n";
 			raw_version_information_.clear();
 			return false;
@@ -577,7 +579,9 @@ bool CUpdater::FilterOutput()
 
 void CUpdater::ParseData()
 {
-	int64_t const ownVersionNumber = CBuildInfo::ConvertToVersionNumber(GetFileZillaVersion().c_str());
+	int64_t const ownVersionNumber = ConvertToVersionNumber(GetFileZillaVersion().c_str());
+
+	fz::scoped_lock l(mtx_);
 	version_information_ = version_information();
 
 	std::wstring raw_version_information = raw_version_information_;
@@ -636,14 +640,15 @@ void CUpdater::ParseData()
 			continue;
 		}
 		else if (type == L"eol") {
-#if defined(__WXMSW__) || defined(__WXMAC__)
+#if defined(FZ_WINDOWS) || defined(FZ_MAC)
 			std::string host = fz::to_utf8(CBuildInfo::GetHostname());
 			if (host.empty()) {
 				host = "unknown";
 			}
 			fz::to_utf8(GetFileZillaVersion());
 
-			std::string data = host + '|' + fz::to_utf8(GetFileZillaVersion()) + '|' + fz::sprintf("%d.%d", wxPlatformInfo::Get().GetOSMajorVersion(), wxPlatformInfo::Get().GetOSMinorVersion());
+			auto sysver = GetSystemVersion();
+			std::string data = host + '|' + fz::to_utf8(GetFileZillaVersion()) + '|' + fz::sprintf("%u.%u", sysver.major, sysver.minor);
 
 			bool valid_signature{};
 			for (size_t i = 1; i < tokens.size(); ++i) {
@@ -686,7 +691,7 @@ void CUpdater::ParseData()
 			}
 		}
 		else if (type == L"release" || type == L"beta") {
-			int64_t v = CBuildInfo::ConvertToVersionNumber(versionOrDate.c_str());
+			int64_t v = ConvertToVersionNumber(versionOrDate.c_str());
 			if (v <= ownVersionNumber) {
 				continue;
 			}
@@ -789,9 +794,14 @@ void CUpdater::ParseData()
 	COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, raw_version_information_);
 }
 
-void CUpdater::OnTimer(wxTimerEvent&)
+void CUpdater::operator()(fz::event_base const& ev)
 {
-	AutoRunIfNeeded();
+	fz::dispatch<run_event, fz::timer_event>(ev, this, &CUpdater::OnRun, &CUpdater::on_timer);
+}
+
+void CUpdater::on_timer(fz::timer_id const&)
+{
+	OnRun(false);
 }
 
 bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstring const& checksum)
@@ -842,13 +852,12 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 
 std::wstring CUpdater::GetTempFile() const
 {
-	wxASSERT(!version_information_.available_.hash_.empty());
-	std::wstring ret = wxFileName::GetTempDir().ToStdWstring();
-	if (!ret.empty()) {
-		if (ret.back() != wxFileName::GetPathSeparator()) {
-			ret += wxFileName::GetPathSeparator();
-		}
+	if (version_information_.available_.hash_.empty()) {
+		return std::wstring();
+	}
 
+	std::wstring ret = GetTempDir().GetPath();
+	if (!ret.empty()) {
 		ret += L"fzupdate_" + version_information_.available_.hash_.substr(0, 16) + L".tmp";
 	}
 
@@ -866,7 +875,7 @@ std::wstring CUpdater::GetFilename(std::wstring const& url) const
 	if (p != std::string::npos) {
 		ret = ret.substr(0, p);
 	}
-#ifdef __WXMSW__
+#ifdef FZ_WINDOWS
 	fz::replace_substrings(ret, L":", L"_");
 #endif
 
@@ -875,7 +884,9 @@ std::wstring CUpdater::GetFilename(std::wstring const& url) const
 
 void CUpdater::SetState(UpdaterState s)
 {
-	if (s != state_) {
+	if (s != state_) { // No mutex needed for this, no other thread changes state
+
+		fz::scoped_lock l(mtx_);
 		state_ = s;
 
 		if (s != UpdaterState::checking && s != UpdaterState::newversion_downloading) {
@@ -892,6 +903,8 @@ void CUpdater::SetState(UpdaterState s)
 
 std::wstring CUpdater::DownloadedFile() const
 {
+	fz::scoped_lock l(mtx_);
+
 	std::wstring ret;
 	if (state_ == UpdaterState::newversion_ready) {
 		ret = local_file_;
@@ -901,6 +914,8 @@ std::wstring CUpdater::DownloadedFile() const
 
 void CUpdater::AddHandler(CUpdateHandler& handler)
 {
+	fz::scoped_lock l(mtx_);
+
 	for (auto const& h : handlers_) {
 		if (h == &handler) {
 			return;
@@ -913,10 +928,15 @@ void CUpdater::AddHandler(CUpdateHandler& handler)
 		}
 	}
 	handlers_.push_back(&handler);
+	if (state_ != UpdaterState::idle) {
+		handler.UpdaterStateChanged(state_, version_information_.available_);
+	}
 }
 
 void CUpdater::RemoveHandler(CUpdateHandler& handler)
 {
+	fz::scoped_lock l(mtx_);
+
 	for (auto& h : handlers_) {
 		if (h == &handler) {
 			// Set to 0 instead of removing from list to avoid issues with reentrancy.
@@ -928,6 +948,8 @@ void CUpdater::RemoveHandler(CUpdateHandler& handler)
 
 int64_t CUpdater::BytesDownloaded() const
 {
+	fz::scoped_lock l(mtx_);
+
 	int64_t ret{-1};
 	if (state_ == UpdaterState::newversion_ready) {
 		if (!local_file_.empty()) {
@@ -945,22 +967,109 @@ int64_t CUpdater::BytesDownloaded() const
 
 bool CUpdater::UpdatableBuild() const
 {
+	fz::scoped_lock l(mtx_);
 	return CBuildInfo::GetBuildType() == _T("nightly") || CBuildInfo::GetBuildType() == _T("official");
 }
 
 bool CUpdater::Busy() const
 {
+	fz::scoped_lock l(mtx_);
 	return state_ == UpdaterState::checking || state_ == UpdaterState::newversion_downloading;
 }
 
 std::wstring CUpdater::GetResources(resource_type t) const
 {
+	fz::scoped_lock l(mtx_);
+
 	std::wstring ret;
 	auto const it = version_information_.resources_.find(t);
 	if (it != version_information_.resources_.cend()) {
 		ret = it->second;
 	}
 	return ret;
+}
+
+bool CUpdater::ShouldCheck(UpdaterState & s)
+{
+	if (manual_) {
+		build const b = AvailableBuild();
+		if (s == UpdaterState::idle || s == UpdaterState::failed || s == UpdaterState::newversion_stale ||
+			s == UpdaterState::eol ||
+			LongTimeSinceLastCheck() || (s == UpdaterState::newversion && !b.url_.empty()) ||
+			(s == UpdaterState::newversion_ready && !VerifyChecksum(DownloadedFile(), b.size_, b.hash_)))
+		{
+			return true;
+		}
+	}
+	else {
+#if FZ_AUTOUPDATECHECK
+		if (s == UpdaterState::failed || s == UpdaterState::idle || s == UpdaterState::newversion_stale) {
+			if (!COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) && COptions::Get()->get_int(OPTION_UPDATECHECK) != 0) {
+				if (LongTimeSinceLastCheck()) {
+					return true;
+				}
+			}
+			else {
+				auto const age = fz::datetime::now() - CBuildInfo::GetBuildDate();
+				if (age >= fz::duration::from_days(31 * 6)) {
+					version_information_ = version_information();
+					s = UpdaterState::newversion_stale;
+				}
+			}
+		}
+#endif
+	}
+
+	return false;
+}
+
+UpdaterState CUpdater::GetState() const
+{
+	fz::scoped_lock l(mtx_);
+	return state_;
+}
+
+build CUpdater::AvailableBuild() const
+{
+	fz::scoped_lock l(mtx_);
+	return version_information_.available_;
+}
+
+std::wstring CUpdater::GetChangelog() const
+{
+	fz::scoped_lock l(mtx_);
+	return version_information_.changelog_;
+}
+
+std::wstring CUpdater::GetLog() const
+{
+	fz::scoped_lock l(mtx_);
+	return log_;
+}
+
+void CUpdater::Run(bool manual)
+{
+	send_event<run_event>(manual);
+}
+
+void CUpdater::Reset()
+{
+	fz::scoped_lock l(mtx_);
+
+	if (Busy()) {
+		return;
+	}
+
+	COptions::Get()->set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
+	COptions::Get()->set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
+	COptions::Get()->set(OPTION_UPDATECHECK, 1);
+	COptions::Get()->set(OPTION_UPDATECHECK_INTERVAL, 1);
+
+	version_information_ = version_information();
+	raw_version_information_.clear();
+	local_file_.clear();
+
+	SetState(UpdaterState::idle);
 }
 
 #endif

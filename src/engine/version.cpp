@@ -3,6 +3,7 @@
 #include "../include/version.h"
 
 #include <libfilezilla/tls_layer.hpp>
+#include <libfilezilla/glue/windows.hpp>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +31,7 @@ std::wstring GetDependencyName(lib_dependency d)
 
 std::wstring GetFileZillaVersion()
 {
+	return L"3.50.0";
 #ifdef PACKAGE_VERSION
 	return fz::to_wstring(std::string(PACKAGE_VERSION));
 #else
@@ -94,3 +96,61 @@ int64_t ConvertToVersionNumber(wchar_t const* version)
 
 	return v;
 }
+
+#if FZ_WINDOWS || FZ_MAC
+
+#ifdef FZ_WINDOWS
+namespace {
+bool IsAtLeast(unsigned int major, unsigned int minor = 0)
+{
+	OSVERSIONINFOEX vi{};
+	vi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	vi.dwMajorVersion = major;
+	vi.dwMinorVersion = minor;
+	vi.dwPlatformId = VER_PLATFORM_WIN32_NT;
+
+	DWORDLONG mask{};
+	VER_SET_CONDITION(mask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+	VER_SET_CONDITION(mask, VER_MINORVERSION, VER_GREATER_EQUAL);
+	VER_SET_CONDITION(mask, VER_PLATFORMID, VER_EQUAL);
+	return VerifyVersionInfo(&vi, VER_MAJORVERSION | VER_MINORVERSION | VER_PLATFORMID, mask) != 0;
+}
+}
+#endif
+
+SystemVersion GetSystemVersion()
+{
+	// Microsoft, in its insane stupidity, has decided to make GetVersion(Ex) useless, starting with Windows 8.1,
+	// this function no longer returns the operating system version but instead some arbitrary and random value depending
+	// on the phase of the moon.
+	// This function instead returns the actual Windows version. On non-Windows systems, it's equivalent to
+	// wxGetOsVersion
+	unsigned major = 4;
+	unsigned minor = 0;
+	while (IsAtLeast(++major, minor))
+	{
+	}
+	--major;
+	while (IsAtLeast(major, ++minor))
+	{
+	}
+	--minor;
+
+	return {major, minor};
+}
+
+#else
+SystemVersion GetSystemVersion()
+{
+	/*
+	SInt32 major{};
+	Gestalt(gestaltSystemVersionMajor, &major);
+    
+	SInt32 minor{};
+    Gestalt(gestaltSystemVersionMinor, &minor);
+
+    return {static_cast<unsigned int>(major), static_cast<unsigned int>(minor)};
+	*/
+	return { 0, 0 };
+}
+#endif
