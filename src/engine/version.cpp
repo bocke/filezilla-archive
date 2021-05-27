@@ -8,6 +8,8 @@
 #include <libfilezilla/glue/windows.hpp>
 #elif FZ_UNIX
 #include <sys/utsname.h>
+#else
+#include <Carbon/Carbon.h>
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -143,7 +145,6 @@ SystemVersion GetSystemVersion()
 #elif FZ_MAC
 SystemVersion GetSystemVersion()
 {
-	/*
 	SInt32 major{};
 	Gestalt(gestaltSystemVersionMajor, &major);
 
@@ -151,8 +152,6 @@ SystemVersion GetSystemVersion()
     Gestalt(gestaltSystemVersionMinor, &minor);
 
     return {static_cast<unsigned int>(major), static_cast<unsigned int>(minor)};
-	*/
-	return { 0, 0 };
 }
 
 #else
