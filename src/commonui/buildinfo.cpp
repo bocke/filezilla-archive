@@ -6,6 +6,8 @@
 
 #include <sqlite3.h>
 
+#include <tuple>
+
 std::wstring CBuildInfo::GetBuildDateString()
 {
 	// Get build date. Unfortunately it is in the ugly Mmm dd yyyy format.
