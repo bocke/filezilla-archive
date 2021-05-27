@@ -36,7 +36,6 @@ std::wstring GetDependencyName(lib_dependency d)
 
 std::wstring GetFileZillaVersion()
 {
-	return L"3.50.0";
 #ifdef PACKAGE_VERSION
 	return fz::to_wstring(std::string(PACKAGE_VERSION));
 #else
