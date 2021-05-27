@@ -490,14 +490,13 @@ std::string ShellUnescape(std::string const& path)
 {
 	std::string ret;
 
-	if (!s.empty()) {
-		wordexp_t p;
-		int res = wordexp(path.c_str(), &p, WRDE_NOCMD);
-		if (!res && p.we_wordc == 1 && p.we_wordv) {
-			ret = p.we_wordv[0];
-		}
-		wordfree(&p);
+	wordexp_t p;
+	int res = wordexp(path.c_str(), &p, WRDE_NOCMD);
+	if (!res && p.we_wordc == 1 && p.we_wordv) {
+		ret = p.we_wordv[0];
 	}
+	wordfree(&p);
+
 	return ret;
 }
 
@@ -546,7 +545,7 @@ CLocalPath GetXdgUserDir(std::string_view type)
 		return {};
 	}
 
-	fz::file f(fz::to_native(confdir.GetPath()) + L"/user-dirs.dirs", fz::file::reading, fz::file::existing);
+	fz::file f(fz::to_native(confdir.GetPath()) + "/user-dirs.dirs", fz::file::reading, fz::file::existing);
 	if (!f.opened()) {
 		return {};
 	}

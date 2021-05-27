@@ -6,6 +6,8 @@
 
 #if FZ_WINDOWS
 #include <libfilezilla/glue/windows.hpp>
+#elif FZ_UNIX
+#include <sys/utsname.h>
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -100,8 +102,6 @@ int64_t ConvertToVersionNumber(wchar_t const* version)
 	return v;
 }
 
-#if FZ_WINDOWS || FZ_MAC
-
 #ifdef FZ_WINDOWS
 namespace {
 bool IsAtLeast(unsigned int major, unsigned int minor = 0)
@@ -119,7 +119,6 @@ bool IsAtLeast(unsigned int major, unsigned int minor = 0)
 	return VerifyVersionInfo(&vi, VER_MAJORVERSION | VER_MINORVERSION | VER_PLATFORMID, mask) != 0;
 }
 }
-#endif
 
 SystemVersion GetSystemVersion()
 {
@@ -142,13 +141,13 @@ SystemVersion GetSystemVersion()
 	return {major, minor};
 }
 
-#else
+#elif FZ_MAC
 SystemVersion GetSystemVersion()
 {
 	/*
 	SInt32 major{};
 	Gestalt(gestaltSystemVersionMajor, &major);
-    
+
 	SInt32 minor{};
     Gestalt(gestaltSystemVersionMinor, &minor);
 
@@ -156,4 +155,31 @@ SystemVersion GetSystemVersion()
 	*/
 	return { 0, 0 };
 }
+
+#else
+
+SystemVersion GetSystemVersion()
+{
+	SystemVersion ret;
+	utsname buf{};
+	if (!uname(&buf)) {
+		char const* p = buf.release;
+		while (*p >= '0' && *p <= '9') {
+			ret.major *= 10;
+			ret.major += *p - '0';
+			++p;
+		}
+		if (*p == '.') {
+			++p;
+			while (*p >= '0' && *p <= '9') {
+				ret.minor *= 10;
+				ret.minor += *p - '0';
+				++p;
+			}
+		}
+	}
+
+	return ret;
+}
+
 #endif
