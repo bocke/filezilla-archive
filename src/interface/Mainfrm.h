@@ -12,9 +12,7 @@
 #include <wx/taskbar.h>
 #endif
 
-#if FZ_MANUALUPDATECHECK
-#include "updater.h"
-#endif
+#include "../commonui/updater.h"
 
 #include <list>
 

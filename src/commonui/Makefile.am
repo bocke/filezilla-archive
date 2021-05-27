@@ -13,6 +13,7 @@ libfzclient_commonui_private_la_LDFLAGS += ../engine/libfzclient-private.la $(LI
 libfzclient_commonui_private_la_DEPENDENCIES = ../engine/libfzclient-private.la
 
 libfzclient_commonui_private_la_SOURCES = \
+	buildinfo.cpp \
 	cert_store.cpp \
 	chmod_data.cpp \
 	file_utils.cpp \
@@ -24,11 +25,13 @@ libfzclient_commonui_private_la_SOURCES = \
 	remote_recursive_operation.cpp \
 	site.cpp \
 	site_manager.cpp \
+	updater.cpp \
 	updater_cert.cpp \
 	xml_cert_store.cpp \
 	xml_file.cpp
 
 noinst_HEADERS = \
+	buildinfo.h \
 	cert_store.h \
 	chmod_data.h \
 	file_utils.h \
@@ -42,6 +45,7 @@ noinst_HEADERS = \
 	registry.h \
 	site.h \
 	site_manager.h \
+	updater.h \
 	updater_cert.h \
 	visibility.h \
 	xml_cert_store.h \

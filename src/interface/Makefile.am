@@ -134,7 +134,6 @@ filezilla_SOURCES = \
 		timeformatting.cpp \
 		toolbar.cpp \
 		treectrlex.cpp \
-		updater.cpp \
 		update_dialog.cpp \
 		verifycertdialog.cpp \
 		verifyhostkeydialog.cpp \
@@ -261,7 +260,6 @@ noinst_HEADERS = \
 		timeformatting.h \
 		toolbar.h \
 		treectrlex.h \
-		updater.h \
 		update_dialog.h \
 		verifycertdialog.h \
 		verifyhostkeydialog.h \

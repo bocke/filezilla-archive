@@ -1,11 +1,12 @@
 #include "filezilla.h"
 
+#include "update_dialog.h"
+
 #if FZ_MANUALUPDATECHECK
 
 #include "buildinfo.h"
 #include "filezillaapp.h"
 #include "file_utils.h"
-#include "update_dialog.h"
 #include "textctrlex.h"
 #include "themeprovider.h"
 #include "xrc_helper.h"

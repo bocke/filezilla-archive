@@ -1,9 +1,10 @@
 #ifndef FILEZILLA_UPDATE_DIALOG_HEADER
 #define FILEZILLA_UPDATE_DIALOG_HEADER
 
+#include "../commonui/updater.h"
+
 #if FZ_MANUALUPDATECHECK
 #include "dialogex.h"
-#include "updater.h"
 
 #include <wx/timer.h>
 

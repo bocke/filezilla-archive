@@ -9,33 +9,6 @@
 #define PACKAGE_NAME "FileZilla"
 #endif
 
-#ifndef PACKAGE_VERSION
-	#define PACKAGE_VERSION "custom build"
-
-	// Disable updatechecks if we have no version information
-	#ifdef FZ_MANUALUPDATECHECK
-		#undef FZ_MANUALUPDATECHECK
-	#endif
-	#define FZ_MANUALUPDATECHECK 0
-#endif
-
-#ifndef FZ_MANUALUPDATECHECK
-	#define FZ_MANUALUPDATECHECK 1
-#endif
-
-#ifndef FZ_AUTOUPDATECHECK
-	#if FZ_MANUALUPDATECHECK
-		#define FZ_AUTOUPDATECHECK 1
-	#else
-		#define FZ_AUTOUPDATECHECK 0
-	#endif
-#else
-	#if FZ_AUTOUPDATECHECK && !FZ_MANUALUPDATECHECK
-		#undef FZ_AUTOUPDATECHECK
-		#define FZ_AUTOUPDATECHECK 0
-	#endif
-#endif
-
 #include <wx/app.h>
 #include <wx/button.h>
 #include <wx/checkbox.h>

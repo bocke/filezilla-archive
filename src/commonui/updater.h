@@ -1,7 +1,38 @@
 #ifndef FILEZILLA_UPDATER_HEADER
 #define FILEZILLA_UPDATER_HEADER
 
+#ifdef HAVE_CONFIG_H
+#include "../../config/config.h"
+#endif
+
+#ifndef PACKAGE_VERSION
+// Disable updatechecks if we have no version information
+#ifdef FZ_MANUALUPDATECHECK
+#undef FZ_MANUALUPDATECHECK
+#endif
+#define FZ_MANUALUPDATECHECK 0
+#endif
+
+#ifndef FZ_MANUALUPDATECHECK
+#define FZ_MANUALUPDATECHECK 1
+#endif
+
+#ifndef FZ_AUTOUPDATECHECK
 #if FZ_MANUALUPDATECHECK
+#define FZ_AUTOUPDATECHECK 1
+#else
+#define FZ_AUTOUPDATECHECK 0
+#endif
+#else
+#if FZ_AUTOUPDATECHECK && !FZ_MANUALUPDATECHECK
+#undef FZ_AUTOUPDATECHECK
+#define FZ_AUTOUPDATECHECK 0
+#endif
+#endif
+
+#if FZ_MANUALUPDATECHECK
+
+#include "visibility.h"
 
 #include "../include/notification.h"
 #include "../include/optionsbase.h"
@@ -25,7 +56,7 @@ enum updaterOptions : unsigned {
 	OPTIONS_UPDATER_NUM
 };
 
-unsigned int FZC_PUBLIC_SYMBOL register_updater_options();
+unsigned int FZCUI_PUBLIC_SYMBOL register_updater_options();
 
 inline optionsIndex mapOption(updaterOptions opt)
 {
@@ -90,8 +121,9 @@ public:
 };
 
 class memory_writer_factory;
+class CFileZillaEngine;
 class CFileZillaEngineContext;
-class CUpdater final : protected fz::event_handler
+class FZCUI_PUBLIC_SYMBOL CUpdater final : protected fz::event_handler
 {
 public:
 	CUpdater(CFileZillaEngineContext& engine_context);

@@ -1,7 +1,11 @@
 #ifndef FILEZILLA_INTERFACE_OPTIONSPAGE_UPDATECHECK_HEADER
 #define FILEZILLA_INTERFACE_OPTIONSPAGE_UPDATECHECK_HEADER
 
+#include "../commonui/updater.h"
+
 #if FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
+
+#include "optionspage.h"
 
 class COptionsPageUpdateCheck final : public COptionsPage
 {

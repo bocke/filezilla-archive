@@ -45,7 +45,6 @@
 #include "themeprovider.h"
 #include "toolbar.h"
 #include "update_dialog.h"
-#include "updater.h"
 #include "view.h"
 #include "viewheader.h"
 #include "welcome_dialog.h"
