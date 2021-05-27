@@ -1,5 +1,9 @@
 #include "buildinfo.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "../include/version.h"
 
 #include <libfilezilla/format.hpp>
