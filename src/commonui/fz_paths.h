@@ -28,6 +28,7 @@ CLocalPath FZCUI_PUBLIC_SYMBOL GetDefaultsDir();
 CLocalPath FZCUI_PUBLIC_SYMBOL GetSettingsDir();
 CLocalPath FZCUI_PUBLIC_SYMBOL GetHomeDir();
 CLocalPath FZCUI_PUBLIC_SYMBOL GetTempDir();
+CLocalPath FZCUI_PUBLIC_SYMBOL GetDownloadDir();
 
 std::string FZCUI_PUBLIC_SYMBOL ExpandPath(std::string const& dir);
 std::wstring FZCUI_PUBLIC_SYMBOL ExpandPath(std::wstring const& dir);

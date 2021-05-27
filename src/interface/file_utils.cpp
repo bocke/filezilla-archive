@@ -10,7 +10,6 @@
 #else
 #include <wx/mimetype.h>
 #include <wx/textfile.h>
-#include <wordexp.h>
 #endif
 
 #include "Options.h"
@@ -381,78 +380,3 @@ bool RenameFile(wxWindow* parent, wxString dir, wxString from, wxString to)
 	return wxRename(dir + from, dir + to) == 0;
 #endif
 }
-
-#if defined __WXMAC__
-char const* GetDownloadDirImpl();
-#elif !defined(__WXMSW__)
-wxString ShellUnescape(wxString const& path)
-{
-	wxString ret;
-
-	const wxWX2MBbuf buf = path.mb_str();
-	if (buf && *buf) {
-		wordexp_t p;
-		int res = wordexp(buf, &p, WRDE_NOCMD);
-		if (!res && p.we_wordc == 1 && p.we_wordv) {
-			ret = wxString(p.we_wordv[0], wxConvLocal);
-		}
-		wordfree(&p);
-	}
-	return ret;
-}
-#endif
-
-CLocalPath GetDownloadDir()
-{
-#ifdef __WXMSW__
-	PWSTR path;
-	HRESULT result = SHGetKnownFolderPath(FOLDERID_Downloads, 0, 0, &path);
-	if(result == S_OK) {
-		std::wstring dir = path;
-		CoTaskMemFree(path);
-		return CLocalPath(dir);
-	}
-#elif defined(__WXMAC__)
-	CLocalPath ret;
-	char const* url = GetDownloadDirImpl();
-	ret.SetPath(fz::to_wstring_from_utf8(url));
-	return ret;
-#else
-	// Code copied from wx, but for downloads directory.
-	// Also, directory is now unescaped.
-	{
-		wxLogNull logNull;
-		wxString homeDir = wxFileName::GetHomeDir();
-		wxString configPath;
-		if (wxGetenv(wxT("XDG_CONFIG_HOME"))) {
-			configPath = wxGetenv(wxT("XDG_CONFIG_HOME"));
-		}
-		else {
-			configPath = homeDir + wxT("/.config");
-		}
-		wxString dirsFile = configPath + wxT("/user-dirs.dirs");
-		if (wxFileExists(dirsFile)) {
-			wxTextFile textFile;
-			if (textFile.Open(dirsFile)) {
-				size_t i;
-				for (i = 0; i < textFile.GetLineCount(); ++i) {
-					wxString line(textFile[i]);
-					int pos = line.Find(wxT("XDG_DOWNLOAD_DIR"));
-					if (pos != wxNOT_FOUND) {
-						wxString value = line.AfterFirst(wxT('='));
-						value = ShellUnescape(value);
-						if (!value.empty() && wxDirExists(value)) {
-							return CLocalPath(value.ToStdWstring());
-						}
-						else {
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-#endif
-	return CLocalPath(wxStandardPaths::Get().GetDocumentsDir().ToStdWstring());
-}
-

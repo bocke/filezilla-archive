@@ -3,12 +3,10 @@
 #if FZ_MANUALUPDATECHECK
 
 #include "buildinfo.h"
-#include "file_utils.h"
 #include "updater.h"
 #include "../commonui/fz_paths.h"
+#include "../commonui/site.h"
 #include "../commonui/updater_cert.h"
-#include "serverdata.h"
-#include <string>
 
 #ifdef FZ_WINDOWS
 #include "../commonui/registry.h"

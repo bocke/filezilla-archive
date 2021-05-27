@@ -17,8 +17,6 @@ bool OpenInFileManager(std::wstring const& dir);
 
 bool RenameFile(wxWindow* pWnd, wxString dir, wxString from, wxString to);
 
-CLocalPath GetDownloadDir();
-
 class gui_recursive_remove final : public fz::recursive_remove
 {
 public:
