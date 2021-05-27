@@ -1074,7 +1074,7 @@ void CUpdater::Reset()
 	options.set(OPTION_UPDATECHECK_LASTDATE, std::wstring());
 	options.set(OPTION_UPDATECHECK_NEWVERSION, std::wstring());
 	options.set(OPTION_UPDATECHECK, 1);
-	options.set(OPTION_UPDATECHECK_INTERVAL, 1);
+	options.set(OPTION_UPDATECHECK_INTERVAL, 7);
 
 	version_information_ = version_information();
 	raw_version_information_.clear();
