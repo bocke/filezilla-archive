@@ -522,7 +522,7 @@ size_t next_line(fz::file& f, fz::buffer& buf, size_t maxlen = 16 * 1024)
 			return buf.size();
 		}
 		buf.add(read);
-		for (size_t i = 0; i < read; ++i) {
+		for (size_t i = 0; i < static_cast<size_t>(read); ++i) {
 			if (p[i] == '\n') {
 				return i = oldSize;
 			}
@@ -601,3 +601,4 @@ CLocalPath GetDownloadDir()
 	return dl;
 #endif
 }
+
