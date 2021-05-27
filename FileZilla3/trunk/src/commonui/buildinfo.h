@@ -4,7 +4,9 @@
 #include <string>
 #include <libfilezilla/time.hpp>
 
-class CBuildInfo final
+#include "visibility.h"
+
+class FZCUI_PUBLIC_SYMBOL CBuildInfo final
 {
 public:
 	CBuildInfo() = delete;
