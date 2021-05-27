@@ -53,3 +53,12 @@ libfzclient_commonui_private_la_SOURCES += \
 
 libfzclient_commonui_private_la_LDFLAGS += -lole32 -Wl,-luuid
 endif
+
+if MACAPPBUNDLE
+
+libfzclient_commonui_private_la_SOURCES += \
+	fz_paths_osx.mm
+
+libfzclient_commonui_private_la_LDFLAGS += -framework Cocoa
+
+endif

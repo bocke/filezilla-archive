@@ -19,7 +19,6 @@ libfzmac_a_CPPFLAGS += $(WX_CPPFLAGS)
 filezilla_DEPENDENCIES += libfzmac.a
 
 libfzmac_a_SOURCES = \
-	file_utils_osx.mm \
 	power_management_osx.mm \
 	toolbar.mm
 
