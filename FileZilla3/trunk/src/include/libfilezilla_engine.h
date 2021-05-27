@@ -2,6 +2,7 @@
 #define LIBFILEZILLA_ENGINE_HEADER
 
 #ifdef HAVE_CONFIG_H
+#undef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -12,19 +13,6 @@
 #include <libfilezilla/libfilezilla.hpp>
 
 #include "setup.h"
-
-#ifdef FZ_WINDOWS
-#ifndef UNICODE
-#define UNICODE
-#endif
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#ifndef STRICT
-#define STRICT 1
-#endif
-#include <windows.h>
-#endif
 
 #include "logging.h"
 #include "server.h"
