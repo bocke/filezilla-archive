@@ -1,6 +1,7 @@
 #include "fz_paths.h"
 
 #include "xml_file.h"
+#include <libfilezilla/buffer.hpp>
 #include <libfilezilla/local_filesys.hpp>
 
 #include <cstdlib>
@@ -19,7 +20,10 @@
 	#endif
 #else
 	#include <unistd.h>
+	#include <wordexp.h>
 #endif
+
+using namespace std::literals;
 
 #ifndef FZ_WINDOWS
 namespace {
@@ -474,4 +478,127 @@ std::string ExpandPath(std::string const& dir) {
 
 std::wstring ExpandPath(std::wstring const& dir) {
 	return ExpandPathImpl(dir);
+}
+
+
+#if defined FZ_MAC
+char const* GetDownloadDirImpl();
+#elif !defined(FZ_WINDOWS)
+
+namespace {
+std::string ShellUnescape(std::string const& path)
+{
+	std::string ret;
+
+	if (!s.empty()) {
+		wordexp_t p;
+		int res = wordexp(path.c_str(), &p, WRDE_NOCMD);
+		if (!res && p.we_wordc == 1 && p.we_wordv) {
+			ret = p.we_wordv[0];
+		}
+		wordfree(&p);
+	}
+	return ret;
+}
+
+size_t next_line(fz::file& f, fz::buffer& buf, size_t maxlen = 16 * 1024)
+{
+	if (!buf.empty() && buf[0] == '\n') {
+		buf.consume(1);
+	}
+	for (size_t i = 0; i < buf.size(); ++i) {
+		if (buf[i] == '\n') {
+			return i;
+		}
+	}
+
+	while (buf.size() < maxlen) {
+		size_t const oldSize = buf.size();
+		unsigned char* p = buf.get(maxlen - oldSize);
+		int read = f.read(p, maxlen - oldSize);
+		if (read < 0) {
+			return std::string::npos;
+		}
+		if (!read) {
+			return buf.size();
+		}
+		buf.add(read);
+		for (size_t i = 0; i < read; ++i) {
+			if (p[i] == '\n') {
+				return i = oldSize;
+			}
+		}
+	}
+
+	return std::string::npos;
+}
+
+CLocalPath GetXdgUserDir(std::string_view type)
+{
+	CLocalPath confdir(GetEnv("XDG_CONFIG_HOME"));
+	if (confdir.empty()) {
+		confdir = GetHomeDir();
+		if (!confdir.empty()) {
+			confdir.AddSegment(L".config");
+		}
+	}
+	if (confdir.empty()) {
+		return {};
+	}
+
+	fz::file f(fz::to_native(confdir.GetPath()) + L"/user-dirs.dirs", fz::file::reading, fz::file::existing);
+	if (!f.opened()) {
+		return {};
+	}
+
+	fz::buffer buf;
+	while (true) {
+		size_t const nl = next_line(f, buf);
+		if (nl == std::string::npos) {
+			break;
+		}
+
+		std::string_view line(reinterpret_cast<char const*>(buf.get()), nl);
+		fz::trim(line);
+		if (fz::starts_with(line, type)) {
+			size_t pos = line.find('=');
+			if (pos != std::string::npos) {
+				CLocalPath path(fz::to_wstring(ShellUnescape(std::string(line.substr(pos + 1)))));
+				if (!path.empty()) {
+					return path;
+				}
+			}
+		}
+		buf.consume(nl);
+	}
+
+	return {};
+}
+}
+#endif
+
+CLocalPath GetDownloadDir()
+{
+#if FZ_WINDOWS
+	PWSTR path;
+	HRESULT result = SHGetKnownFolderPath(FOLDERID_Downloads, 0, 0, &path);
+	if (result == S_OK) {
+		std::wstring dir = path;
+		CoTaskMemFree(path);
+		return CLocalPath(dir);
+	}
+	return {};
+#elif FZ_MAC
+	CLocalPath ret;
+	char const* url = GetDownloadDirImpl();
+	ret.SetPath(fz::to_wstring_from_utf8(url));
+	return ret;
+#else
+	CLocalPath dl = GetXdgUserDir("XDG_DOWNLOAD_DIR"sv);
+	if (dl.empty() || !dl.Exists()) {
+		dl = GetXdgUserDir("XDG_DOCUMENTS_DIR"sv);
+	}
+
+	return dl;
+#endif
 }

@@ -3,7 +3,10 @@
 #include "../include/version.h"
 
 #include <libfilezilla/tls_layer.hpp>
+
+#if FZ_WINDOWS
 #include <libfilezilla/glue/windows.hpp>
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
