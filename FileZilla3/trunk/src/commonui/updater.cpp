@@ -1,19 +1,20 @@
-#include "filezilla.h"
+#include "updater.h"
 
 #if FZ_MANUALUPDATECHECK
 
 #include "buildinfo.h"
-#include "updater.h"
-#include "../commonui/fz_paths.h"
-#include "../commonui/site.h"
-#include "../commonui/updater_cert.h"
+#include "fz_paths.h"
+#include "site.h"
+#include "updater_cert.h"
 
 #ifdef FZ_WINDOWS
-#include "../commonui/registry.h"
+#include "registry.h"
 #endif
 
 #include "../include/engine_context.h"
 #include "../include/engine_options.h"
+#include "../include/FileZillaEngine.h"
+#include "../include/misc.h"
 #include "../include/version.h"
 #include "../include/writer.h"
 
@@ -23,8 +24,6 @@
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/signature.hpp>
 #include <libfilezilla/translate.hpp>
-
-#include <string>
 
 namespace {
 struct run_event_type;
@@ -233,17 +232,17 @@ void CUpdater::OnRun(bool manual)
 	{
 		fz::scoped_lock l(mtx_);
 		local_file_.clear();
-		log_ = fz::sprintf(_("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
+		log_ = fz::sprintf(fztranslate("Started update check on %s\n"), t.format(L"%Y-%m-%d %H:%M:%S", fz::datetime::local));
 	}
 
 	std::wstring build = CBuildInfo::GetBuildType();
 	if (build.empty())  {
-		build = _("custom").ToStdWstring();
+		build = fztranslate("custom");
 	}
 
 	{
 		fz::scoped_lock l(mtx_);
-		log_ += fz::sprintf(_("Own build type: %s\n"), build);
+		log_ += fz::sprintf(fztranslate("Own build type: %s\n"), build);
 	}
 
 	m_use_internal_rootcert = true;
@@ -421,7 +420,7 @@ UpdaterState CUpdater::ProcessFinishedData(bool can_download)
 		if (!local_file.empty() && fz::local_filesys::get_file_type(fz::to_native(local_file)) != fz::local_filesys::unknown) {
 			fz::scoped_lock l(mtx_);
 			local_file_ = local_file;
-			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
+			log_ += fz::sprintf(fztranslate("Local file is %s\n"), local_file);
 			s = UpdaterState::newversion_ready;
 		}
 		else {
@@ -513,12 +512,12 @@ UpdaterState CUpdater::ProcessFinishedDownload()
 			s = UpdaterState::newversion;
 			fz::remove_file(fz::to_native(temp));
 			fz::scoped_lock l(mtx_);
-			log_ += fz::sprintf(_("Could not create local file %s\n"), local_file);
+			log_ += fz::sprintf(fztranslate("Could not create local file %s\n"), local_file);
 		}
 		else {
 			fz::scoped_lock l(mtx_);
 			local_file_ = local_file;
-			log_ += fz::sprintf(_("Local file is %s\n"), local_file);
+			log_ += fz::sprintf(fztranslate("Local file is %s\n"), local_file);
 		}
 	}
 
@@ -586,7 +585,7 @@ void CUpdater::ParseData()
 
 	std::wstring raw_version_information = raw_version_information_;
 
-	log_ += fz::sprintf(_("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
+	log_ += fz::sprintf(fztranslate("Parsing %d bytes of version information.\n"), static_cast<int>(raw_version_information.size()));
 
 	auto & options = engine_context_.GetOptions();
 
@@ -628,7 +627,7 @@ void CUpdater::ParseData()
 			}
 			continue;
 		}
-		else if (type == "resource") {
+		else if (type == L"resource") {
 			if (tokens.size() >= 3) {
 				std::wstring resource;
 				for (size_t i = 2; i < tokens.size(); ++i) {
@@ -655,7 +654,7 @@ void CUpdater::ParseData()
 			bool valid_signature{};
 			for (size_t i = 1; i < tokens.size(); ++i) {
 				auto const& token = tokens[i];
-				if (token.substr(0, 4) == "sig:") {
+				if (token.substr(0, 4) == L"sig:") {
 					auto const& sig = token.substr(4);
 					auto raw_sig = fz::base64_decode_s(fz::to_utf8(sig));
 
@@ -741,7 +740,7 @@ void CUpdater::ParseData()
 			bool valid_signature{};
 			for (size_t i = 6; i < tokens.size(); ++i) {
 				auto const& token = tokens[i];
-				if (token.substr(0, 4) == "sig:") {
+				if (token.substr(0, 4) == L"sig:") {
 					auto const& sig = token.substr(4);
 					auto raw_sig = fz::base64_decode(fz::to_utf8(sig));
 					auto raw_hash = fz::hex_decode(hash);
@@ -772,21 +771,21 @@ void CUpdater::ParseData()
 				}
 			}
 			if (!valid_hash) {
-				log_ += fz::sprintf(_("Invalid hash: %s\n"), hash);
+				log_ += fz::sprintf(fztranslate("Invalid hash: %s\n"), hash);
 				continue;
 			}
 
 			// @translator: Two examples: Found new nightly 2014-04-03\n, Found new release 3.9.0.1\n
-			log_ += fz::sprintf(_("Found new %s %s\n"), type, b.version_);
+			log_ += fz::sprintf(fztranslate("Found new %s %s\n"), type, b.version_);
 		}
 
-		if (type == _T("nightly") && UpdatableBuild()) {
+		if (type == L"nightly" && UpdatableBuild()) {
 			version_information_.nightly_ = b;
 		}
-		else if (type == _T("release")) {
+		else if (type == L"release") {
 			version_information_.stable_ = b;
 		}
-		else if (type == _T("beta")) {
+		else if (type == L"beta") {
 			version_information_.beta_ = b;
 		}
 	}
@@ -822,11 +821,11 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 
 	auto filesize = fz::local_filesys::get_size(fz::to_native(file));
 	if (filesize < 0) {
-		log_ += fz::sprintf(_("Could not obtain size of '%s'"), file) + L"\n";
+		log_ += fz::sprintf(fztranslate("Could not obtain size of '%s'"), file) + L"\n";
 		return false;
 	}
 	else if (filesize != size) {
-		log_ += fz::sprintf(_("Local size of '%s' does not match expected size: %d != %d"), file, filesize, size) + L"\n";
+		log_ += fz::sprintf(fztranslate("Local size of '%s' does not match expected size: %d != %d"), file, filesize, size) + L"\n";
 		return false;
 	}
 
@@ -835,7 +834,7 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 	{
 		fz::file f(fz::to_native(file), fz::file::reading);
 		if (!f.opened()) {
-			log_ += fz::sprintf(_("Could not open '%s'"), file) + L"\n";
+			log_ += fz::sprintf(fztranslate("Could not open '%s'"), file) + L"\n";
 			return false;
 		}
 		unsigned char buffer[65536];
@@ -844,7 +843,7 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 			acc.update(buffer, static_cast<size_t>(read));
 		}
 		if (read < 0) {
-			log_ += fz::sprintf(_("Could not read from '%s'"), file) + L"\n";
+			log_ += fz::sprintf(fztranslate("Could not read from '%s'"), file) + L"\n";
 			return false;
 		}
 	}
@@ -852,11 +851,11 @@ bool CUpdater::VerifyChecksum(std::wstring const& file, int64_t size, std::wstri
 	auto const digest = fz::hex_encode<std::wstring>(acc.digest());
 
 	if (digest != checksum) {
-		log_ += fz::sprintf(_("Checksum mismatch on file %s\n"), file);
+		log_ += fz::sprintf(fztranslate("Checksum mismatch on file %s\n"), file);
 		return false;
 	}
 
-	log_ += fz::sprintf(_("Checksum match on file %s\n"), file);
+	log_ += fz::sprintf(fztranslate("Checksum match on file %s\n"), file);
 	return true;
 }
 
@@ -881,7 +880,7 @@ std::wstring CUpdater::GetFilename(std::wstring const& url) const
 	if (pos != std::wstring::npos) {
 		ret = url.substr(pos + 1);
 	}
-	size_t p = ret.find_first_of(_T("?#"));
+	size_t p = ret.find_first_of(L"?#");
 	if (p != std::string::npos) {
 		ret = ret.substr(0, p);
 	}
@@ -978,7 +977,7 @@ int64_t CUpdater::BytesDownloaded() const
 bool CUpdater::UpdatableBuild() const
 {
 	fz::scoped_lock l(mtx_);
-	return CBuildInfo::GetBuildType() == _T("nightly") || CBuildInfo::GetBuildType() == _T("official");
+	return CBuildInfo::GetBuildType() == L"nightly" || CBuildInfo::GetBuildType() == L"official";
 }
 
 bool CUpdater::Busy() const

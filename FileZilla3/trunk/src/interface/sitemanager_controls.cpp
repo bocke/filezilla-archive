@@ -456,7 +456,7 @@ void GeneralSiteControls::SetControlVisibility(ServerProtocol protocol, LogonTyp
 			label.SetLabel(_("&User:"));
 		}
 		else {
-			label.SetLabel(name);
+			label.SetLabel(fz::to_wstring_from_utf8(name));
 		}
 	};
 

@@ -1,12 +1,12 @@
 #include "../filezilla.h"
 
+#include "optionspage_updatecheck.h"
+
 #if FZ_MANUALUPDATECHECK && FZ_AUTOUPDATECHECK
 
 #include "../Options.h"
 #include "settingsdialog.h"
 #include "optionspage.h"
-#include "optionspage_updatecheck.h"
-#include "../updater.h"
 #include "../update_dialog.h"
 
 #include <wx/statbox.h>

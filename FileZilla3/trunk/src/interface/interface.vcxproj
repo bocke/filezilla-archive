@@ -80,7 +80,7 @@
       <Culture>0x0407</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\commonui\Debug\commonui.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Crypt32.lib;libgnutls.dll.a;libnettle.dll.a;libhogweed.dll.a;normaliz.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;..\commonui\Debug\commonui.lib;..\engine\Debug\engine.lib;x64_static_debug\libfilezilla.lib;Netapi32.lib;Winmm.lib;Ws2_32.lib;mpr.lib;sqlite3.lib;powrprof.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\Debug/FileZilla_dbg.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -248,7 +248,6 @@
     <ClCompile Include="timeformatting.cpp" />
     <ClCompile Include="toolbar.cpp" />
     <ClCompile Include="treectrlex.cpp" />
-    <ClCompile Include="updater.cpp" />
     <ClCompile Include="update_dialog.cpp" />
     <ClCompile Include="verifycertdialog.cpp" />
     <ClCompile Include="verifyhostkeydialog.cpp" />
@@ -374,7 +373,6 @@
     <ClInclude Include="timeformatting.h" />
     <ClInclude Include="toolbar.h" />
     <ClInclude Include="treectrlex.h" />
-    <ClInclude Include="updater.h" />
     <ClInclude Include="update_dialog.h" />
     <ClInclude Include="verifycertdialog.h" />
     <ClInclude Include="verifyhostkeydialog.h" />

@@ -1,32 +1,13 @@
-#ifndef FILEZILLA_BUILDINFO_HEADER
-#define FILEZILLA_BUILDINFO_HEADER
+#ifndef FILEZILLA_INTERFACE_BUILDINFO_HEADER
+#define FILEZILLA_INTERFACE_BUILDINFO_HEADER
 
-#include <string>
+#include "../commonui/buildinfo.h"
 
 enum class gui_lib_dependency
 {
 	wxwidgets,
 	sqlite,
 	count
-};
-
-class CBuildInfo final
-{
-public:
-	CBuildInfo() = delete;
-
-public:
-
-	static std::wstring GetBuildDateString();
-	static std::wstring GetBuildTimeString();
-	static fz::datetime GetBuildDate();
-	static std::wstring GetBuildType();
-	static std::wstring GetCompiler();
-	static std::wstring GetCompilerFlags();
-	static std::wstring GetHostname();
-	static std::wstring GetBuildSystem();
-	static bool IsUnstable(); // Returns true on beta or rc releases.
-	static std::wstring GetCPUCaps(char separator = ',');
 };
 
 std::wstring GetDependencyName(gui_lib_dependency d);

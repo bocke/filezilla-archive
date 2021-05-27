@@ -75,7 +75,7 @@
       <AdditionalOptions>/MP -Zm200 /permissive- %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;../include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PACKAGE_VERSION="3.43.0";WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -128,6 +128,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="buildinfo.h" />
     <ClInclude Include="cert_store.h" />
     <ClInclude Include="chmod_data.h" />
     <ClInclude Include="file_utils.h" />
@@ -141,12 +142,14 @@
     <ClInclude Include="remote_recursive_operation.h" />
     <ClInclude Include="site.h" />
     <ClInclude Include="site_manager.h" />
+    <ClInclude Include="updater.h" />
     <ClInclude Include="updater_cert.h" />
     <ClInclude Include="visibility.h" />
     <ClInclude Include="xml_cert_store.h" />
     <ClInclude Include="xml_file.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="buildinfo.cpp" />
     <ClCompile Include="cert_store.cpp" />
     <ClCompile Include="chmod_data.cpp" />
     <ClCompile Include="file_utils.cpp" />
@@ -159,6 +162,7 @@
     <ClCompile Include="remote_recursive_operation.cpp" />
     <ClCompile Include="site.cpp" />
     <ClCompile Include="site_manager.cpp" />
+    <ClCompile Include="updater.cpp" />
     <ClCompile Include="updater_cert.cpp" />
     <ClCompile Include="xml_cert_store.cpp" />
     <ClCompile Include="xml_file.cpp" />
