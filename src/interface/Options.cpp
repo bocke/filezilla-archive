@@ -274,13 +274,13 @@ void COptions::Load(pugi::xml_node & settings, bool predefined, bool importing)
 		if (def.flags() & option_flags::platform) {
 			char const* p = setting.attribute("platform").value();
 			if (*p && strcmp(p, platform_name)) {
-				return;
+				continue;
 			}
 		}
 		if (def.flags() & option_flags::product) {
 			char const* p = setting.attribute("product").value();
 			if (product_name != p) {
-				return;
+				continue;
 			}
 		}
 
