@@ -825,16 +825,16 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		else {
 			url += _T("bugreport");
 		}
-		wxString version = GetFileZillaVersion();
-		if (version != _T("custom build")) {
+		auto const version = GetFileZillaVersion();
+		if (!version.empty()) {
 			url += _T("&version=");
 			// We need to urlencode version number
 
 			// Unbelievable, but wxWidgets does not have any method
 			// to urlencode strings.
 			// Do a crude approach: Drop everything unexpected...
-			for (unsigned int i = 0; i < version.Len(); i++) {
-				wxChar c = version.GetChar(i);
+			for (size_t i = 0; i < version.size(); ++i) {
+				auto c = version[i];
 				if ((c >= '0' && c <= '9') ||
 					(c >= 'a' && c <= 'z') ||
 					(c >= 'A' && c <= 'Z') ||
