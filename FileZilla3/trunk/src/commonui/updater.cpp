@@ -216,6 +216,10 @@ void CUpdater::OnRun(bool manual)
 		return;
 	}
 
+	if (GetFileZillaVersion().empty()) {
+		return;
+	}
+
 	manual_ = manual;
 	SetState(UpdaterState::checking);
 

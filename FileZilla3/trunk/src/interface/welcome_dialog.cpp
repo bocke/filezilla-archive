@@ -4,6 +4,7 @@
 #include "Options.h"
 #include "themeprovider.h"
 #include "xrc_helper.h"
+#include "../commonui/updater.h"
 #include "../include/version.h"
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
@@ -23,24 +24,24 @@ void CWelcomeDialog::RunDelayed(wxWindow* parent)
 
 bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 {
-	const wxString ownVersion = GetFileZillaVersion();
-	wxString greetingVersion = COptions::Get()->get_string(OPTION_GREETINGVERSION);
+	auto const ownVersion = GetFileZillaVersion();
+	auto const greetingVersion = COptions::Get()->get_string(OPTION_GREETINGVERSION);
 
-	wxString const resources = COptions::Get()->get_string(OPTION_GREETINGRESOURCES);
-	COptions::Get()->set(OPTION_GREETINGRESOURCES, _T(""));
+	auto const resources = COptions::Get()->get_string(OPTION_GREETINGRESOURCES);
+	COptions::Get()->set(OPTION_GREETINGRESOURCES, L"");
 
 	if (!force) {
 		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
 
-		if (!greetingVersion.empty() &&
+		if (!ownVersion.empty() && !greetingVersion.empty() &&
 			ConvertToVersionNumber(ownVersion.c_str()) <= ConvertToVersionNumber(greetingVersion.c_str()))
 		{
 			// Been there done that
 			return true;
 		}
-		COptions::Get()->set(OPTION_GREETINGVERSION, ownVersion.ToStdWstring());
+		COptions::Get()->set(OPTION_GREETINGVERSION, ownVersion);
 
 		if (greetingVersion.empty() && !COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE)) {
 			COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 1);
@@ -79,11 +80,11 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 
 	main->Add(new wxPanel(this, XRCID("ID_HEADERMESSAGE_PANEL")), lay.halign)->Show(false);
 
-	if (!greetingVersion.empty()) {
+	if (!greetingVersion.empty() && !ownVersion.empty()) {
 		auto news = new wxStaticText(this, -1, _("What's new"));
 		news->SetFont(news->GetFont().Bold());
 		main->Add(news);
-		main->Add(new wxHyperlinkCtrl(this, -1, wxString::Format(_("New features and improvements in %s"), GetFileZillaVersion()), wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion), 0, wxLEFT, lay.indent);
+		main->Add(new wxHyperlinkCtrl(this, -1, wxString::Format(_("New features and improvements in %s"), ownVersion), wxString::Format(url, _T("news")) + _T("&oldversion=") + greetingVersion), 0, wxLEFT, lay.indent);
 	}
 
 	main->AddSpacer(0);

@@ -41,7 +41,7 @@ std::wstring GetFileZillaVersion()
 #ifdef PACKAGE_VERSION
 	return fz::to_wstring(std::string(PACKAGE_VERSION));
 #else
-	return L"unknown";
+	return {};
 #endif
 }
 

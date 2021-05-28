@@ -534,9 +534,10 @@ bool CXmlFile::ParseData(uint8_t const* data, size_t len)
 
 bool CXmlFile::IsFromFutureVersion() const
 {
-	if (!m_element) {
+	auto const ownVer = GetFileZillaVersion();
+	if (!m_element || ownVer.empty()) {
 		return false;
 	}
 	std::wstring const version = GetTextAttribute(m_element, "version");
-	return ConvertToVersionNumber(GetFileZillaVersion().c_str()) < ConvertToVersionNumber(version.c_str());
+	return ConvertToVersionNumber(ownVer.c_str()) < ConvertToVersionNumber(version.c_str());
 }
