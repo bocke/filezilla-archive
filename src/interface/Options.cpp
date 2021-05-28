@@ -44,10 +44,9 @@ namespace {
 #else
 	auto const platform_name = "unix";
 #endif
-}
 
-namespace {
 option_registrator r(&register_interface_options);
+std::string const product_name{};
 }
 unsigned int register_interface_options()
 {
@@ -275,6 +274,12 @@ void COptions::Load(pugi::xml_node & settings, bool predefined, bool importing)
 		if (def.flags() & option_flags::platform) {
 			char const* p = setting.attribute("platform").value();
 			if (*p && strcmp(p, platform_name)) {
+				return;
+			}
+		}
+		if (def.flags() & option_flags::product) {
+			char const* p = setting.attribute("product").value();
+			if (product_name != p) {
 				return;
 			}
 		}
@@ -562,6 +567,15 @@ void COptions::set_xml_value(pugi::xml_node & settings, size_t opt, bool clean)
 					continue;
 				}
 			}
+
+			if (def.flags() & option_flags::product) {
+				// Ignore items from the wrong product
+				char const* p = cur.attribute("product").value();
+				if (product_name != p) {
+					continue;
+				}
+			}
+
 			settings.remove_child(cur);
 		}
 	}
@@ -570,6 +584,9 @@ void COptions::set_xml_value(pugi::xml_node & settings, size_t opt, bool clean)
 	setting.append_attribute("name").set_value(def.name().c_str());
 	if (def.flags() & option_flags::platform) {
 		setting.append_attribute("platform").set_value(platform_name);
+	}
+	if (def.flags() & option_flags::product && !product_name.empty()) {
+		setting.append_attribute("product").set_value(product_name.c_str());
 	}
 
 	if (def.flags() & option_flags::sensitive_data) {
