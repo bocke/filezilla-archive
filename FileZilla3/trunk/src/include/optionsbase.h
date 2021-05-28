@@ -49,7 +49,8 @@ enum class option_flags
 	predefined_priority = 4, // If that option is given in fzdefaults.xml, it overrides any user option
 	platform = 8, // A non-portable platform specific option, nodes have platform attribute
 	numeric_clamp = 16, // For numeric options, fixup input and clamp to allowed value range. If not set, setting invalid values discards
-	sensitive_data = 32 // Flag to mark sensitive data. Can be used to clear private data even without domain knowledge.
+	sensitive_data = 32, // Flag to mark sensitive data. Can be used to clear private data even without domain knowledge.
+	product = 64 // Product-specific options in common code
 };
 inline bool operator&(option_flags lhs, option_flags rhs) {
 	return (static_cast<std::underlying_type_t<option_flags>>(lhs) & static_cast<std::underlying_type_t<option_flags>>(rhs)) != 0;

@@ -39,9 +39,9 @@ unsigned int register_updater_options()
 
 		{ "Update Check", 1, option_flags::normal, 0, 1 },
 		{ "Update Check Interval", 7, option_flags::normal, 1, 7 },
-		{ "Last automatic update check", L"", option_flags::normal, 100 },
-		{ "Last automatic update version", L"", option_flags::normal },
-		{ "Update Check New Version", L"", option_flags::platform },
+		{ "Last automatic update check", L"", option_flags::product, 100 },
+		{ "Last automatic update version", L"", option_flags::product },
+		{ "Update Check New Version", L"", option_flags::platform|option_flags::product },
 		{ "Update Check Check Beta", 0, option_flags::normal, 0, 2 },
 	});
 	return value;
