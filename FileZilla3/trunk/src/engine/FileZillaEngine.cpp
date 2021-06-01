@@ -10,7 +10,10 @@ CFileZillaEngine::CFileZillaEngine(CFileZillaEngineContext& engine_context, std:
 
 CFileZillaEngine::~CFileZillaEngine()
 {
-	impl_.reset();
+	if (impl_) {
+		impl_->shutdown();
+		impl_.reset();
+	}
 }
 
 int CFileZillaEngine::Execute(const CCommand &command)

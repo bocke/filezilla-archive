@@ -97,17 +97,34 @@ void erase_unordered(C & container, V const& v) noexcept
 
 CFileZillaEnginePrivate::~CFileZillaEnginePrivate()
 {
+	shutdown();
+}
+
+void CFileZillaEnginePrivate::shutdown()
+{
 	options_.unwatch_all(this);
 	remove_handler();
 
-	m_maySendNotificationEvent = false;
+	{
+		fz::scoped_lock lock(notification_mutex_);
+		m_maySendNotificationEvent = false;
+
+		auto cb = std::move(notification_cb_);
+		notification_cb_ = nullptr;
+		// Must not hold mutex when destroying cb, or we'll deadlock
+		lock.unlock();
+	}
 
 	controlSocket_.reset();
 	currentCommand_.reset();
 
-	// Delete notification list
-	for (auto & notification : m_NotificationList) {
-		delete notification;
+	{
+		fz::scoped_lock lock(notification_mutex_);
+		// Delete notification list
+		for (auto & notification : m_NotificationList) {
+			delete notification;
+		}
+		m_NotificationList.clear();
 	}
 
 	// Remove ourself from the engine list
@@ -141,15 +158,14 @@ bool CFileZillaEnginePrivate::IsConnected() const
 	return controlSocket_ != nullptr;
 }
 
-void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification)
+void CFileZillaEnginePrivate::AddNotification(fz::scoped_lock&, std::unique_ptr<CNotification> && notification)
 {
 	if (notification) {
 		m_NotificationList.push_back(notification.release());
 	}
 
-	if (m_maySendNotificationEvent) {
+	if (m_maySendNotificationEvent && notification_cb_) {
 		m_maySendNotificationEvent = false;
-		lock.unlock();
 		notification_cb_(&parent_);
 	}
 }
@@ -185,20 +201,18 @@ void CFileZillaEnginePrivate::AddLogNotification(std::unique_ptr<CLogmsgNotifica
 
 void CFileZillaEnginePrivate::SendQueuedLogs(bool reset_flag)
 {
-	{
-		fz::scoped_lock lock(notification_mutex_);
-		m_NotificationList.insert(m_NotificationList.end(), queued_logs_.begin(), queued_logs_.end());
-		queued_logs_.clear();
+	fz::scoped_lock lock(notification_mutex_);
+	m_NotificationList.insert(m_NotificationList.end(), queued_logs_.begin(), queued_logs_.end());
+	queued_logs_.clear();
 
-		if (reset_flag) {
-			queue_logs_ = ShouldQueueLogsFromOptions();
-		}
-
-		if (!m_maySendNotificationEvent || m_NotificationList.empty()) {
-			return;
-		}
-		m_maySendNotificationEvent = false;
+	if (reset_flag) {
+		queue_logs_ = ShouldQueueLogsFromOptions();
 	}
+
+	if (!m_maySendNotificationEvent || m_NotificationList.empty() || !notification_cb_) {
+		return;
+	}
+	m_maySendNotificationEvent = false;
 
 	notification_cb_(&parent_);
 }
