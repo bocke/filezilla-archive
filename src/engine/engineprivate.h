@@ -77,7 +77,7 @@ public:
 	int CacheLookup(CServerPath const& path, CDirectoryListing& listing);
 
 	// Add new pending notification
-	void AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification); // note: Unlocks the mutex!
+	void AddNotification(fz::scoped_lock& lock, std::unique_ptr<CNotification> && notification);
 	void AddNotification(std::unique_ptr<CNotification> && notification);
 	void AddLogNotification(std::unique_ptr<CLogmsgNotification> && notification);
 	std::unique_ptr<CNotification> GetNextNotification();
@@ -109,6 +109,8 @@ public:
 
 	fz::logger_interface& GetLogger();
 	activity_logger& activity_logger_;
+
+	void shutdown();
 
 protected:
 	void OnOptionsChanged(watched_options const& options);
@@ -155,7 +157,7 @@ protected:
 	// Used to synchronize access to the notification list
 	fz::mutex notification_mutex_{false};
 
-	std::function<void(CFileZillaEngine*)> const notification_cb_;
+	std::function<void(CFileZillaEngine*)> notification_cb_;
 
 	unsigned int const m_engine_id;
 
