@@ -28,7 +28,7 @@ public:
 	void set_notifier(std::function<void()> && notification_cb);
 
 private:
-	std::atomic_uint64_t amounts_[2];
+	std::atomic_uint64_t amounts_[2]{};
 
 	fz::mutex mtx_;
 	std::function<void()> notification_cb_;
