@@ -12,22 +12,24 @@ dist_noinst_DATA = install.nsi.in \
 
 if MAKENSISSCRIPT
 
+noinst_DATA = $(MAYBE_LANGFILES) libtoolexecutablesubdir.nsh
+
 if LOCALES
   MAYBE_LANGFILES = installlangfiles.nsh uninstalllangfiles.nsh
 endif
 
-noinst_DATA = $(MAYBE_LANGFILES) libtoolexecutablesubdir.nsh dll_install.nsh
+noinst_DATA += dll_gui_install.nsh
 
-dll_install.nsh: Makefile
-	@rm -f dll_install.nsh
-	@rm -f dll_uninstall.nsh
-	@rm -rf dlls
-	@mkdir -p dlls
-	"$(srcdir)/dllcopy.sh" "$(top_builddir)/src/interface" filezilla.exe "$(OBJDUMP)" "$(CXX)" "../src/engine/:../src/commonui/:$$PATH" "$(WX_LIBS)"
-	"$(srcdir)/dllcopy.sh" "$(top_builddir)/src/putty" fzsftp.exe "$(OBJDUMP)" "$(CXX)" $$PATH
-	"$(srcdir)/dllcopy.sh" "$(top_builddir)/src/putty" fzputtygen.exe "$(OBJDUMP)" "$(CXX)" $$PATH
+dll_gui_install.nsh: Makefile
+	@rm -f dll_gui_install.nsh
+	@rm -f dll_gui_uninstall.nsh
+	@rm -rf dlls_gui
+	@mkdir -p dlls_gui
+	"$(srcdir)/dllcopy.sh" gui "$(top_builddir)/src/interface" filezilla.exe "$(OBJDUMP)" "$(CXX)" "../src/engine/:../src/commonui/:$$PATH" "$(WX_LIBS)"
+	"$(srcdir)/dllcopy.sh" gui "$(top_builddir)/src/putty" fzsftp.exe "$(OBJDUMP)" "$(CXX)" $$PATH
+	"$(srcdir)/dllcopy.sh" gui "$(top_builddir)/src/putty" fzputtygen.exe "$(OBJDUMP)" "$(CXX)" $$PATH
 	if test -f "${top_builddir}/src/storj/fzstorj.exe"; then \
-		"$(srcdir)/dllcopy.sh" "$(top_builddir)/src/storj" fzstorj.exe "$(OBJDUMP)" "$(CXX)" $$PATH; \
+		"$(srcdir)/dllcopy.sh" gui "$(top_builddir)/src/storj" fzstorj.exe "$(OBJDUMP)" "$(CXX)" $$PATH; \
 	fi
 
 installlangfiles.nsh: Makefile
@@ -68,7 +70,7 @@ libtoolexecutablesubdir.nsh: Makefile
 	fi
 	rm -f test_libtool_exedir.o test_libtool_exedir.c
 
-CLEANFILES = installlangfiles.nsh uninstalllangfiles.nsh libtoolexecutablesubdir.nsh dll_install.nsh dll_uninstall.nsh
+CLEANFILES = installlangfiles.nsh uninstalllangfiles.nsh libtoolexecutablesubdir.nsh dll_gui_install.nsh dll_gui_uninstall.nsh
 
 endif
 
@@ -79,5 +81,5 @@ appdatadir = $(datadir)/appdata
 dist_appdata_DATA = filezilla.appdata.xml
 
 clean-local:
-	rm -rf dlls
+	rm -rf dlls_gui
 

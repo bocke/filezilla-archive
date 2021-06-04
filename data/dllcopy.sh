@@ -2,17 +2,18 @@
 
 set -e
 
-if [ $# -lt 5 ]; then
+if [ $# -lt 6 ]; then
   echo Wrong number of arguments
   exit 1
 fi
 
-exepath="$1"
-exename="$2"
-objdump="$3"
-cxx="$4"
-searchpath="$5"
-ldflags="$6"
+suffix="$1"
+exepath="$2"
+exename="$3"
+objdump="$4"
+cxx="$5"
+searchpath="$6"
+ldflags="$7"
 
 searchpath=`echo $searchpath | sed "s/\\(^\\|:\\)\\/c\\/windows[/a-z0-9]*//gi"`
 
@@ -28,12 +29,12 @@ searchpath="$searchpath:`$cxx -print-search-dirs | grep libraries | sed 's/libra
 
 #echo "Searchpath: $searchpath"
 
-touch dll_install.nsh
-touch dll_uninstall.nsh
+touch "dll_${suffix}_install.nsh"
+touch "dll_${suffix}_uninstall.nsh"
 
 process_dll()
 {
-  if [ ! -f "dlls/$1" ] && [ ! -f "dlls/${1}.processed" ]; then
+  if [ ! -f "dlls_$suffix/$1" ] && [ ! -f "dlls_$suffix/${1}.processed" ]; then
     echo "Looking for dependency $1"
     (
       IFS=':'
@@ -41,26 +42,26 @@ process_dll()
         if [ -f "$path/.libs/$1" ]; then
           unset IFS
           echo "Found $1"
-          cp "$path/.libs/$1" "dlls/$1"
-          process_file "dlls/$1"
+          cp "$path/.libs/$1" "dlls_$suffix/$1"
+          process_file "dlls_$suffix/$1"
 
-          echo "File dlls\\$1" >> dll_install.nsh
-          echo "Delete \$INSTDIR\\$1" >> dll_uninstall.nsh
+          echo "File dlls_$suffix\\$1" >> "dll_${suffix}_install.nsh"
+          echo "Delete \$INSTDIR\\$1" >> "dll_${suffix}_uninstall.nsh"
           break
         fi
         if [ -f "$path/$1" ]; then
           unset IFS
           echo "Found $1"
-          cp "$path/$1" "dlls/$1"
-          process_file "dlls/$1"
+          cp "$path/$1" "dlls_$suffix/$1"
+          process_file "dlls_$suffix/$1"
 
-          echo "File dlls\\$1" >> dll_install.nsh
-          echo "Delete \$INSTDIR\\$1" >> dll_uninstall.nsh
+          echo "File dlls_$suffix\\$1" >> "dll_${suffix}_install.nsh"
+          echo "Delete \$INSTDIR\\$1" >> "dll_${suffix}_uninstall.nsh"
           break
         fi
       done
       unset IFS
-      echo processed > "dlls/${1}.processed"
+      echo processed > "dlls_$suffix/${1}.processed"
     )
   fi
 }
