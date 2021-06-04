@@ -1078,7 +1078,7 @@ Section "FileZilla Client" SecMain
   File "${top_srcdir}\NEWS"
   File "${top_srcdir}\AUTHORS"
 
-  !include "dll_install.nsh"
+  !include "dll_gui_install.nsh"
 
   DetailPrint "Installing resource files"
   SetDetailsPrint none
@@ -1574,7 +1574,7 @@ Section "Uninstall"
   Delete "$INSTDIR\NEWS"
   Delete "$INSTDIR\AUTHORS"
 
-  !include "dll_uninstall.nsh"
+  !include "dll_gui_uninstall.nsh"
 
   DetailPrint "Removing resource files"
   SetDetailsPrint none
