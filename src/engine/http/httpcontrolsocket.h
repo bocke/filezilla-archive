@@ -185,8 +185,6 @@ public:
 	CHttpControlSocket(CFileZillaEnginePrivate & engine);
 	virtual ~CHttpControlSocket();
 
-	virtual bool Connected() const override { return static_cast<bool>(currentServer_); }
-
 	void FileTransfer(CHttpRequestCommand const& command);
 
 protected:

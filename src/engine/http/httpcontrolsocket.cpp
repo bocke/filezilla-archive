@@ -287,7 +287,7 @@ int CHttpControlSocket::InternalConnect(std::wstring const& host, unsigned short
 {
 	log(logmsg::debug_verbose, L"CHttpControlSocket::InternalConnect()");
 
-	if (!Connected()) {
+	if (!currentServer_) {
 		return FZ_REPLY_INTERNALERROR;
 	}
 

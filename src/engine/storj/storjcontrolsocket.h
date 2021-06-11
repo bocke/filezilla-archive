@@ -26,8 +26,6 @@ public:
 	/*virtual void Rename(const CRenameCommand& command) override;*/
 	virtual void Cancel() override;
 
-	virtual bool Connected() const override { return input_thread_.operator bool(); }
-
 	virtual bool SetAsyncRequestReply(CAsyncRequestNotification *pNotification) override;
 
 protected:

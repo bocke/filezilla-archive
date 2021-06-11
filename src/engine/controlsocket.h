@@ -212,8 +212,6 @@ public:
 	virtual void Chmod(CChmodCommand const& command);
 	void Sleep(fz::duration const& delay);
 
-	virtual bool Connected() const = 0;
-
 	Command GetCurrentCommandId() const;
 
 	void SendAsyncRequest(std::unique_ptr<CAsyncRequestNotification> && notification);
@@ -340,8 +338,6 @@ public:
 	virtual ~CRealControlSocket();
 
 	int DoConnect(std::wstring const& host, unsigned int port);
-
-	virtual bool Connected() const override;
 
 protected:
 	virtual int DoClose(int nErrorCode = FZ_REPLY_DISCONNECTED | FZ_REPLY_ERROR) override;
