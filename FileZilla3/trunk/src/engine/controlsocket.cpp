@@ -714,11 +714,6 @@ CRealControlSocket::~CRealControlSocket()
 	ResetSocket();
 }
 
-bool CRealControlSocket::Connected() const
-{
-	return socket_ ? socket_->is_connected() : false;
-}
-
 int CRealControlSocket::Send(unsigned char const* buffer, unsigned int len)
 {
 	if (!active_layer_) {
