@@ -725,23 +725,13 @@ void CFileZillaEnginePrivate::DoCancel()
 	}
 }
 
-bool CFileZillaEnginePrivate::CheckAsyncRequestReplyPreconditions(std::unique_ptr<CAsyncRequestNotification> const& reply)
-{
-	if (!reply) {
-		return false;
-	}
-	if (!IsBusy()) {
-		return false;
-	}
-
-	bool const match = reply->requestNumber == asyncRequestCounter_;
-	return match && controlSocket_;
-}
-
 void CFileZillaEnginePrivate::OnSetAsyncRequestReplyEvent(std::unique_ptr<CAsyncRequestNotification> const& reply)
 {
 	fz::scoped_lock lock(mutex_);
-	if (!CheckAsyncRequestReplyPreconditions(reply)) {
+	if (!controlSocket_) {
+		return;
+	}
+	if (!IsPendingAsyncRequestReply(reply)) {
 		return;
 	}
 
@@ -785,7 +775,7 @@ std::unique_ptr<CNotification> CFileZillaEnginePrivate::GetNextNotification()
 bool CFileZillaEnginePrivate::SetAsyncRequestReply(std::unique_ptr<CAsyncRequestNotification> && pNotification)
 {
 	fz::scoped_lock lock(mutex_);
-	if (!CheckAsyncRequestReplyPreconditions(pNotification)) {
+	if (!IsPendingAsyncRequestReply(pNotification)) {
 		return false;
 	}
 

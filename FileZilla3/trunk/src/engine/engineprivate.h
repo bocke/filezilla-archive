@@ -122,8 +122,6 @@ protected:
 
 	int CheckCommandPreconditions(CCommand const& command, bool checkBusy);
 
-
-	bool CheckAsyncRequestReplyPreconditions(std::unique_ptr<CAsyncRequestNotification> const& reply);
 	void OnSetAsyncRequestReplyEvent(std::unique_ptr<CAsyncRequestNotification> const& reply);
 
 	// Command handlers, only called by CFileZillaEngine::Command
