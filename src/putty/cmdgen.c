@@ -110,7 +110,7 @@ int main(int argc, char **argv)
                 break;
             case SSH_KEYTYPE_SSH2:
                 ret = "ok";
-                encrypted = ssh2_userkey_encrypted(infilename, &origcomment);
+                encrypted = ppk_encrypted_f(infilename, &origcomment);
                 break;
             case SSH_KEYTYPE_UNKNOWN:
             case SSH_KEYTYPE_UNOPENABLE:
@@ -191,11 +191,11 @@ int main(int argc, char **argv)
             }
 
             sfree(passphrase);
-            passphrase = strdup(args);
+            passphrase = dupstr(args);
 
             switch (intype) {
                 case SSH_KEYTYPE_SSH2:
-                    ssh2key = ssh2_load_userkey(infilename, passphrase, &error);
+                    ssh2key = ppk_load_f(infilename, passphrase, &error);
                     break;
                 case SSH_KEYTYPE_OPENSSH_PEM:
                 case SSH_KEYTYPE_OPENSSH_NEW:
@@ -225,8 +225,9 @@ int main(int argc, char **argv)
             const char* error = 0;
 
             if (!fingerprint) {
+                FingerprintType fptype = SSH_FPTYPE_DEFAULT;
                 if (ssh2key) {
-                    fingerprint = ssh2_fingerprint(ssh2key->key);
+                    fingerprint = ssh2_fingerprint(ssh2key->key, fptype);
                 }
                 else {
                     switch (intype) {
@@ -235,9 +236,9 @@ int main(int argc, char **argv)
                             strbuf* ssh2blob = strbuf_new();
                             char* comment = NULL;
 
-                            ssh2_userkey_loadpub(infilename, 0, BinarySink_UPCAST(ssh2blob), &comment, &error);
+                            ppk_loadpub_f(infilename, 0, BinarySink_UPCAST(ssh2blob), &comment, &error);
                             if (ssh2blob->len) {
-                                fingerprint = ssh2_fingerprint_blob(ptrlen_from_strbuf(ssh2blob));
+                                fingerprint = ssh2_fingerprint_blob(ptrlen_from_strbuf(ssh2blob), fptype);
                                 strbuf_free(ssh2blob);
                             }
                             else if (!error) {
@@ -257,7 +258,7 @@ int main(int argc, char **argv)
                             if (ssh2key) {
                                 if (ssh2key != SSH2_WRONG_PASSPHRASE) {
                                     error = NULL;
-                                    fingerprint = ssh2_fingerprint(ssh2key->key);
+                                    fingerprint = ssh2_fingerprint(ssh2key->key, fptype);
                                 }
                                 else {
                                     ssh2key = NULL;
@@ -299,7 +300,8 @@ int main(int argc, char **argv)
 
             outfilename = filename_from_str(args);
 
-            ret = ssh2_save_userkey(outfilename, ssh2key, passphrase);
+            ppk_save_parameters params = ppk_save_default_parameters;
+            ret = ppk_save_f(outfilename, ssh2key, passphrase, &params);
              if (!ret) {
                 fzprintf(sftpError, "Unable to save SSH-2 private key");
                 continue;
