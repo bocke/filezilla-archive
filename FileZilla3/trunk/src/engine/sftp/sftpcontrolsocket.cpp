@@ -246,11 +246,7 @@ void CSftpControlSocket::OnSftpEvent(sftp_message const& message)
 		{
 			auto tokens = fz::strtok_view(message.text[0], ' ');
 			if (!tokens.empty()) {
-				m_sftpEncryptionDetails.hostKeyFingerprintSHA256 = tokens.back();
-				tokens.pop_back();
-			}
-			if (!tokens.empty()) {
-				m_sftpEncryptionDetails.hostKeyFingerprintMD5 = tokens.back();
+				m_sftpEncryptionDetails.hostKeyFingerprint = tokens.back();
 				tokens.pop_back();
 			}
 			for (auto const& token : tokens) {

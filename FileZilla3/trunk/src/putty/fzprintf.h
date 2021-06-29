@@ -1,4 +1,4 @@
-#define FZSFTP_PROTOCOL_VERSION 10
+#define FZSFTP_PROTOCOL_VERSION 11
 
 typedef enum
 {

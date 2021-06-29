@@ -33,8 +33,7 @@ void CVerifyHostkeyDialog::ShowVerificationDialog(wxWindow* parent, CHostKeyNoti
 	if (!notification.hostKeyAlgorithm.empty()) {
 		dlg.SetChildLabel(XRCID("ID_HOSTKEYALGO"), notification.hostKeyAlgorithm);
 	}
-	std::wstring const fingerprints = fz::sprintf(L"SHA256: %s\nMD5: %s", notification.hostKeyFingerprintSHA256, notification.hostKeyFingerprintMD5);
-	dlg.SetChildLabel(XRCID("ID_FINGERPRINT"), fingerprints);
+	dlg.SetChildLabel(XRCID("ID_FINGERPRINT"), notification.hostKeyFingerprint);
 
 	dlg.GetSizer()->Fit(&dlg);
 	dlg.GetSizer()->SetSizeHints(&dlg);
@@ -47,7 +46,7 @@ void CVerifyHostkeyDialog::ShowVerificationDialog(wxWindow* parent, CHostKeyNoti
 
 		t_keyData data;
 		data.host = host;
-		data.fingerprint = notification.hostKeyFingerprintSHA256;
+		data.fingerprint = notification.hostKeyFingerprint;
 		m_sessionTrustedKeys.push_back(data);
 		return;
 	}
@@ -61,7 +60,7 @@ bool CVerifyHostkeyDialog::IsTrusted(CHostKeyNotification const& notification)
 	std::wstring const host = fz::sprintf(L"%s:%d", notification.GetHost(), notification.GetPort());
 
 	for (auto const& trusted : m_sessionTrustedKeys) {
-		if (trusted.host == host && trusted.fingerprint == notification.hostKeyFingerprintSHA256) {
+		if (trusted.host == host && trusted.fingerprint == notification.hostKeyFingerprint) {
 			return true;
 		}
 	}
