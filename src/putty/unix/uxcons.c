@@ -16,7 +16,6 @@
 #include "putty.h"
 #include "storage.h"
 #include "ssh.h"
-#include "console.h"
 
 static struct termios orig_termios_stderr;
 static bool stderr_is_a_tty;
@@ -248,7 +247,7 @@ int console_askappend(LogPolicy *lp, Filename *filename,
         return 1;
     else
         return 0;
-*/
+#endif
 }
 
 bool console_antispoof_prompt = true;

@@ -127,7 +127,7 @@ else
 fzsftp_SOURCES += \
 		time.c \
 		unix/uxagentc.c \
-		unix/uxcliloop.c
+		unix/uxcliloop.c \
 		unix/uxnet.c \
 		unix/uxnoise.c \
 		unix/uxpeer.c \
