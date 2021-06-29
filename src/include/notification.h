@@ -274,8 +274,7 @@ public:
 	virtual ~CSftpEncryptionDetails() = default;
 
 	std::wstring hostKeyAlgorithm;
-	std::wstring hostKeyFingerprintMD5;
-	std::wstring hostKeyFingerprintSHA256;
+	std::wstring hostKeyFingerprint;
 	std::wstring kexAlgorithm;
 	std::wstring kexHash;
 	std::wstring kexCurve;
