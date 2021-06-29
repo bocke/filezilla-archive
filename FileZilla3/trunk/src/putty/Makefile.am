@@ -11,8 +11,10 @@ libfzputtycommon_a_SOURCES = \
 			misc.c \
 			mpint.c \
 			sshaes.c \
+			sshargon2.c \
 			sshauxcrypt.c \
 			sshbcrypt.c \
+			sshblake2.c \
 			sshblowf.c \
 			sshdes.c \
 			sshdss.c \
@@ -27,6 +29,7 @@ libfzputtycommon_a_SOURCES = \
 			sshsh256.c \
 			sshsh512.c \
 			sshsha.c \
+			sshsha3.c \
 			stripctrl.c \
 			tree234.c \
 			utils.c \
@@ -56,10 +59,11 @@ bin_PROGRAMS = fzsftp fzputtygen
 
 fzsftp_SOURCES = \
 		be_misc.c \
-		be_none.c \
+		be_ssh.c \
 		callback.c \
 		cproxy.c \
 		cmdline.c \
+		console.c \
 		errsock.c \
 		fzsftp.c \
 		logging.c \
@@ -93,6 +97,7 @@ fzsftp_SOURCES = \
 		sshdss.c \
 		sshmac.c \
 		sshshare.c \
+		sshutils.c \
 		sshverstring.c \
 		sshzlib.c \
 		timing.c \
@@ -103,6 +108,7 @@ fzsftp_SOURCES = \
 if SFTP_MINGW
 fzsftp_SOURCES += \
 		windows/wincapi.c \
+		windows/wincliloop.c \
 		windows/windefs.c \
 		windows/winhandl.c \
 		windows/winhsock.c \
@@ -113,17 +119,19 @@ fzsftp_SOURCES += \
 		windows/winnps.c \
 		windows/winpgntc.c \
 		windows/winsecur.c \
+		windows/winselcli.c \
 		windows/winsftp.c \
 		windows/wintime.c
 else
 fzsftp_SOURCES += \
 		time.c \
-		unix/uxsftp.c \
-		unix/uxnoise.c \
 		unix/uxagentc.c \
-		unix/uxsel.c \
+		unix/uxcliloop.c
 		unix/uxnet.c \
-		unix/uxpeer.c
+		unix/uxnoise.c \
+		unix/uxpeer.c \
+		unix/uxsel.c \
+		unix/uxsftp.c
 endif
 
 fzputtygen_SOURCES = cmdgen.c \
@@ -149,6 +157,7 @@ noinst_HEADERS = \
 	puttymem.h \
 	puttyps.h \
 	sftp.h \
+	ssh.h \
 	ssh2connection.h \
 	ssh2transport.h \
 	sshblowf.h \
@@ -156,7 +165,7 @@ noinst_HEADERS = \
 	sshchan.h \
 	sshcr.h \
 	sshgssc.h \
-	ssh.h \
+	sshkeygen.h \
 	sshppl.h \
 	sshserver.h \
 	sshsignals.h \

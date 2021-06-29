@@ -170,10 +170,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="be_misc.c" />
-    <ClCompile Include="be_none.c" />
+    <ClCompile Include="be_ssh.c" />
     <ClCompile Include="callback.c" />
+    <ClCompile Include="clicons.c" />
     <ClCompile Include="cmdline.c" />
     <ClCompile Include="conf.c" />
+    <ClCompile Include="console.c" />
     <ClCompile Include="cproxy.c" />
     <ClCompile Include="ecc.c" />
     <ClCompile Include="errsock.c" />
@@ -209,8 +211,10 @@
     <ClCompile Include="ssh2userauth.c" />
     <ClCompile Include="sshaes.c" />
     <ClCompile Include="ssharcf.c" />
+    <ClCompile Include="sshargon2.c" />
     <ClCompile Include="sshauxcrypt.c" />
     <ClCompile Include="sshbcrypt.c" />
+    <ClCompile Include="sshblake2.c" />
     <ClCompile Include="sshblowf.c" />
     <ClCompile Include="sshccp.c" />
     <ClCompile Include="sshcommon.c" />
@@ -232,7 +236,9 @@
     <ClCompile Include="sshsh256.c" />
     <ClCompile Include="sshsh512.c" />
     <ClCompile Include="sshsha.c" />
+    <ClCompile Include="sshsha3.c" />
     <ClCompile Include="sshshare.c" />
+    <ClCompile Include="sshutils.c" />
     <ClCompile Include="sshverstring.c" />
     <ClCompile Include="sshzlib.c" />
     <ClCompile Include="stripctrl.c" />
@@ -243,6 +249,7 @@
     <ClCompile Include="wcwidth.c" />
     <ClCompile Include="wildcard.c" />
     <ClCompile Include="windows\wincapi.c" />
+    <ClCompile Include="windows\wincliloop.c" />
     <ClCompile Include="windows\wincons.c" />
     <ClCompile Include="windows\windefs.c" />
     <ClCompile Include="windows\winhandl.c" />
@@ -257,6 +264,7 @@
     <ClCompile Include="windows\winnps.c" />
     <ClCompile Include="windows\winpgntc.c" />
     <ClCompile Include="windows\winsecur.c" />
+    <ClCompile Include="windows\winselcli.c" />
     <ClCompile Include="windows\winsftp.c" />
     <ClCompile Include="windows\winstore.c" />
     <ClCompile Include="windows\wintime.c" />
@@ -285,6 +293,7 @@
     <ClInclude Include="sshblowf.h" />
     <ClInclude Include="sshchan.h" />
     <ClInclude Include="sshgssc.h" />
+    <ClInclude Include="sshkeygen.h" />
     <ClInclude Include="sshsignals.h" />
     <ClInclude Include="sshttymodes.h" />
     <ClInclude Include="storage.h" />

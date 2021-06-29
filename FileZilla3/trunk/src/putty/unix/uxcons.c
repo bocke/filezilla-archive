@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -17,8 +16,7 @@
 #include "putty.h"
 #include "storage.h"
 #include "ssh.h"
-
-bool console_batch_mode = false;
+#include "console.h"
 
 static struct termios orig_termios_stderr;
 static bool stderr_is_a_tty;
@@ -26,7 +24,7 @@ static bool stderr_is_a_tty;
 void stderr_tty_init()
 {
     /* Ensure that if stderr is a tty, we can get it back to a sane state. */
-    if ((flags & FLAG_STDERR_TTY) && isatty(STDERR_FILENO)) {
+    if (isatty(STDERR_FILENO)) {
         stderr_is_a_tty = true;
         tcgetattr(STDERR_FILENO, &orig_termios_stderr);
     }
@@ -45,9 +43,6 @@ void postmsg(struct termios *cf)
         tcsetattr(STDERR_FILENO, TCSADRAIN, cf);
 }
 
-/*
- * Clean up and exit.
- */
 void cleanup_exit(int code)
 {
     /*
@@ -64,49 +59,6 @@ void cleanup_exit(int code)
 void console_print_error_msg(const char *prefix, const char *msg)
 {
     fzprintf(sftpError, "%s: %s", prefix, msg);
-}
-
-void console_print_error_msg_fmt_v(
-    const char *prefix, const char *fmt, va_list ap)
-{
-    char *msg = dupvprintf(fmt, ap);
-    console_print_error_msg(prefix, msg);
-    sfree(msg);
-}
-
-void console_print_error_msg_fmt(const char *prefix, const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    console_print_error_msg_fmt_v(prefix, fmt, ap);
-    va_end(ap);
-}
-
-void modalfatalbox(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    console_print_error_msg_fmt_v("FATAL ERROR", fmt, ap);
-    va_end(ap);
-    cleanup_exit(1);
-}
-
-void nonfatal(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    console_print_error_msg_fmt_v("ERROR", fmt, ap);
-    va_end(ap);
-}
-
-void console_connection_fatal(Seat *seat, const char *msg)
-{
-    console_print_error_msg("FATAL ERROR", msg);
-    cleanup_exit(1);
-}
-
-void timer_change_notify(unsigned long next)
-{
 }
 
 /*
@@ -147,58 +99,11 @@ static int block_and_read(int fd, void *buf, size_t len)
 }
 
 int console_verify_ssh_host_key(
-    Seat *seat, const char *host, int port,
-    const char *keytype, char *keystr, char *fingerprint,
+    Seat *seat, const char *host, int port, const char *keytype,
+    char *keystr, const char *keydisp, char **fingerprints,
     void (*callback)(void *ctx, int result), void *ctx)
 {
     int ret;
-
-/*    static const char absentmsg_batch[] =
-        "The server's host key is not cached. You have no guarantee\n"
-        "that the server is the computer you think it is.\n"
-        "The server's %s key fingerprint is:\n"
-        "%s\n"
-        "Connection abandoned.\n";
-    static const char absentmsg[] =
-        "The server's host key is not cached. You have no guarantee\n"
-        "that the server is the computer you think it is.\n"
-        "The server's %s key fingerprint is:\n"
-        "%s\n"
-        "If you trust this host, enter \"y\" to add the key to\n"
-        "PuTTY's cache and carry on connecting.\n"
-        "If you want to carry on connecting just once, without\n"
-        "adding the key to the cache, enter \"n\".\n"
-        "If you do not trust this host, press Return to abandon the\n"
-        "connection.\n"
-        "Store key in cache? (y/n) ";
-
-    static const char wrongmsg_batch[] =
-        "WARNING - POTENTIAL SECURITY BREACH!\n"
-        "The server's host key does not match the one PuTTY has\n"
-        "cached. This means that either the server administrator\n"
-        "has changed the host key, or you have actually connected\n"
-        "to another computer pretending to be the server.\n"
-        "The new %s key fingerprint is:\n"
-        "%s\n"
-        "Connection abandoned.\n";
-    static const char wrongmsg[] =
-        "WARNING - POTENTIAL SECURITY BREACH!\n"
-        "The server's host key does not match the one PuTTY has\n"
-        "cached. This means that either the server administrator\n"
-        "has changed the host key, or you have actually connected\n"
-        "to another computer pretending to be the server.\n"
-        "The new %s key fingerprint is:\n"
-        "%s\n"
-        "If you were expecting this change and trust the new key,\n"
-        "enter \"y\" to update PuTTY's cache and continue connecting.\n"
-        "If you want to carry on connecting but without updating\n"
-        "the cache, enter \"n\".\n"
-        "If you want to abandon the connection completely, press\n"
-        "Return to cancel. Pressing Return is the ONLY guaranteed\n"
-        "safe choice.\n"
-        "Update cached key? (y/n, Return cancels connection) ";
-*/
-    static const char abandoned[] = "Connection abandoned.\n";
 
     char line[32];
 //FZ struct termios cf;
@@ -214,7 +119,7 @@ int console_verify_ssh_host_key(
 //FZ premsg(&cf);
     fzprintf_raw((ret == 1) ? sftpAskHostkey : sftpAskHostkeyChanged, "%s\n%d\n", host, port);
 
-    {
+    while (true) {
         struct termios oldmode, newmode;
         tcgetattr(0, &oldmode);
         newmode = oldmode;
@@ -224,15 +129,30 @@ int console_verify_ssh_host_key(
         if (block_and_read(0, line, sizeof(line) - 1) <= 0)
             /* handled below */;
         tcsetattr(0, TCSANOW, &oldmode);
+
+        /*if (line[0] == 'i' || line[0] == 'I') {
+            fprintf(stderr, "Full public key:\n%s\n", keydisp);
+            if (fingerprints[SSH_FPTYPE_SHA256])
+                fprintf(stderr, "SHA256 key fingerprint:\n%s\n",
+                        fingerprints[SSH_FPTYPE_SHA256]);
+            if (fingerprints[SSH_FPTYPE_MD5])
+                fprintf(stderr, "MD5 key fingerprint:\n%s\n",
+                        fingerprints[SSH_FPTYPE_MD5]);
+        } else*/ {
+            break;
+        }
     }
 
-    if (line[0] != '\0' && line[0] != '\r' && line[0] != '\n') {
+    /* In case of misplaced reflexes from another program, also recognise 'q'
+     * as 'abandon connection rather than trust this key' */
+    if (line[0] != '\0' && line[0] != '\r' && line[0] != '\n' &&
+        line[0] != 'q' && line[0] != 'Q') {
         if (line[0] == 'y' || line[0] == 'Y')
             store_host_key(host, port, keytype, keystr);
 //FZ        postmsg(&cf);
         return 1;
     } else {
-        fzprintf(sftpError, abandoned);
+        fzprintf(sftpError, "Connection abandoned.");
 //FZ        postmsg(&cf);
         return 0;
     }
@@ -250,30 +170,7 @@ int console_confirm_weak_cached_hostkey(
     Seat *seat, const char *algname, const char *betteralgs,
     void (*callback)(void *ctx, int result), void *ctx)
 {
-    /*static const char msg[] =
-        "The first host key type we have stored for this server\n"
-        "is %s, which is below the configured warning threshold.\n"
-        "The server also provides the following types of host key\n"
-        "above the threshold, which we do not have stored:\n"
-        "%s\n"
-        "Continue with connection? (y/n) ";*/
-    static const char msg_batch[] =
-        "The first host key type we have stored for this server\n"
-        "is %s, which is below the configured warning threshold.\n"
-        "The server also provides the following types of host key\n"
-        "above the threshold, which we do not have stored:\n"
-        "%s\n"
-        "Connection abandoned.\n";
-    static const char abandoned[] = "Connection abandoned.";
-
     char line[32];
-//FZ    struct termios cf;
-
-//FZ    premsg(&cf);
-    if (console_batch_mode) {
-        fprintf(stderr, msg_batch, algname, betteralgs);
-        return 0;
-    }
 
     fzprintf_raw(sftpAskHostkeyBetteralg, "%d%s\n%s\n", algname, betteralgs);
 
@@ -293,7 +190,7 @@ int console_confirm_weak_cached_hostkey(
 //FZ        postmsg(&cf);
         return 1;
     } else {
-        fzprintf(sftpError, abandoned);
+        fzprintf(sftpError, "Connection abandoned.");
 //FZ        postmsg(&cf);
         return 0;
     }
@@ -302,12 +199,11 @@ int console_confirm_weak_cached_hostkey(
  * Ask whether to wipe a session log file before writing to it.
  * Returns 2 for wipe, 1 for append, 0 for cancel (don't log).
  */
-static int console_askappend(LogPolicy *lp, Filename *filename,
-                             void (*callback)(void *ctx, int result),
-                             void *ctx)
+int console_askappend(LogPolicy *lp, Filename *filename,
+                      void (*callback)(void *ctx, int result), void *ctx)
 {
-    return 0;
-/*FZ
+	return 0;
+#if 0
     static const char msgtemplate[] =
         "The session log file \"%.*s\" already exists.\n"
         "You can overwrite it with a new session log,\n"
@@ -341,7 +237,7 @@ static int console_askappend(LogPolicy *lp, Filename *filename,
         tcsetattr(0, TCSANOW, &newmode);
         line[0] = '\0';
         if (block_and_read(0, line, sizeof(line) - 1) <= 0)
-            /* handled below *//*;
+            /* handled below */;
         tcsetattr(0, TCSANOW, &oldmode);
     }
 
@@ -407,15 +303,17 @@ void old_keyfile_warning(void)
 //FZ postmsg(&cf);
 }
 
-static void console_logging_error(LogPolicy *lp, const char *string)
+void console_logging_error(LogPolicy *lp, const char *string)
 {
     fzprintf(sftpError, "%s", string);
 }
 
 
-static void console_eventlog(LogPolicy *lp, const char *string)
+void console_eventlog(LogPolicy *lp, const char *string)
 {
-    if (flags & FLAG_VERBOSE)
+    /* Ordinary Event Log entries are displayed in the same way as
+     * logging errors, but only in verbose mode */
+    if (lp_verbose(lp))
         fzprintf(sftpVerbose, "%s", string);
 }
 
@@ -479,7 +377,7 @@ int console_get_userpass_input(prompts_t *p)
     /*
      * Preamble.
      */
-    /* We always print the `name' caption... */
+    /* We fz-always print the `name' caption... */
     if (p->name)
         fzprintf_raw_untrusted(sftpRequestPreamble, "%s", p->name);
     else
@@ -552,10 +450,3 @@ bool is_interactive(void)
 char *platform_get_x_display(void) {
     return dupstr(getenv("DISPLAY"));
 }
-
-static const LogPolicyVtable default_logpolicy_vt = {
-    console_eventlog,
-    console_askappend,
-    console_logging_error,
-};
-LogPolicy default_logpolicy[1] = {{ &default_logpolicy_vt }};
