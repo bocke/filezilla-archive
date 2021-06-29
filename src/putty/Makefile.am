@@ -175,6 +175,7 @@ noinst_HEADERS = \
 	terminal.h \
 	tree234.h \
 	unix/unix.h \
+	unix/uxutils.h \
 	windows/wincapi.h \
 	windows/winsecur.h \
 	windows/winstuff.h \
