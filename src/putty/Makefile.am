@@ -4,6 +4,7 @@ noinst_LIBRARIES = libfzputtycommon.a
 
 libfzputtycommon_a_SOURCES = \
 			conf.c \
+			console.c \
 			ecc.c \
 			import.c \
 			marshal.c \
@@ -61,9 +62,9 @@ fzsftp_SOURCES = \
 		be_misc.c \
 		be_ssh.c \
 		callback.c \
-		cproxy.c \
+		clicons.c \
 		cmdline.c \
-		console.c \
+		cproxy.c \
 		errsock.c \
 		fzsftp.c \
 		logging.c \
