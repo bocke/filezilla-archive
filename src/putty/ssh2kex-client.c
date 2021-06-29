@@ -869,10 +869,7 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
             } else if (s->dlgret < 0) { /* none configured; use standard handling */
                 ssh2_userkey uk = { .key = s->hkey, .comment = NULL };
                 char *keydisp = ssh2_pubkey_openssh_str(&uk);
-                fzprintf(sftpHostkey, fingerprints[fptype_default]); //XXXFIXME
-                fzprintf(sftpStatus, fingerprints[fptype_default]); //FIXME
-                fzprintf(sftpStatus, ssh2_fingerprint(s->hkey, SSH_FPTYPE_DEFAULT)); //FIXME
-                fzprintf(sftpStatus, keydisp);
+                fzprintf(sftpHostkey, fingerprints[fptype_default]);
                 s->dlgret = seat_verify_ssh_host_key(
                     s->ppl.seat, s->savedhost, s->savedport,
                     ssh_key_cache_id(s->hkey), s->keystr, keydisp,
