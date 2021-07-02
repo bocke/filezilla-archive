@@ -10,6 +10,13 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.55.0-rc1 (2021-07-02)
+
+- Updated SFTP components
+- Set appropriate ALPN on TLS connections
+- Fixed loading of settings files that were moved between platforms
+- Refactored updater internals
+
 3.54.1 (2021-05-13)
 
 - Fix control visibility logic in Site Manager
