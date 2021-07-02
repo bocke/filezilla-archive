@@ -275,6 +275,7 @@ int CFtpLogonOpData::ParseResponse()
 			controlSocket_.tls_layer_ = std::make_unique<fz::tls_layer>(controlSocket_.event_loop_, &controlSocket_, *controlSocket_.active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), controlSocket_.logger_);
 			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
 
+			controlSocket_.tls_layer_->set_alpn("ftp");
 			if (!controlSocket_.tls_layer_->client_handshake(&controlSocket_)) {
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}
