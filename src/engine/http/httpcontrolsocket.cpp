@@ -224,6 +224,7 @@ void CHttpControlSocket::OnConnect()
 			tls_layer_ = std::make_unique<fz::tls_layer>(event_loop_, this, *active_layer_, &engine_.GetContext().GetTlsSystemTrustStore(), logger_);
 			active_layer_ = tls_layer_.get();
 
+			tls_layer_->set_alpn("http/1.1");
 			if (!tls_layer_->client_handshake(&data)) {
 				DoClose();
 			}
