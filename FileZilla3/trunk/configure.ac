@@ -1,4 +1,4 @@
-AC_INIT([FileZilla],[3.54.1],[tim.kosse@filezilla-project.org],[],[https://filezilla-project.org/])
+AC_INIT([FileZilla],[3.55.0-rc1],[tim.kosse@filezilla-project.org],[],[https://filezilla-project.org/])
 AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR(config)
@@ -156,7 +156,7 @@ if test "$buildmain" = "yes"; then
 
   # Find libfilezilla
   # -----------------
-  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.28.0],, [
+  PKG_CHECK_MODULES(LIBFILEZILLA, [libfilezilla >= 0.29.0],, [
 	AC_MSG_ERROR([libfilezilla not found: $LIBFILEZILLA_PKG_ERRORS. You can download it from https://lib.filezilla-project.org/])
   ])
   AC_SUBST(LIBFILEZILLA_CFLAGS)
@@ -386,6 +386,9 @@ if test "$buildmain" = "yes"; then
     # Set the Large Address Aware flag on 32bit Windows
     if ! echo $host_cpu | grep "x86_64" > /dev/null 2>&1; then
       AX_CHECK_LINK_FLAG([-Wl,--large-address-aware], [AX_APPEND_FLAG([-Wl,--large-address-aware], LDFLAGS)])
+    else
+      # Base address >4GB to disable some compatibility mode the kernel uses for old programs
+      AX_CHECK_LINK_FLAG([-Wl,--image-base -Wl,0x120000000], [AX_APPEND_FLAG([-Wl,--image-base -Wl,0x120000000], LDFLAGS)])
     fi
   fi
 
