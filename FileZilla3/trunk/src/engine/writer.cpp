@@ -309,7 +309,7 @@ aio_result file_writer::open(uint64_t offset, bool fsync, shm_flag shm)
 	CLocalPath local_path(name(), &tmp);
 	if (local_path.HasParent()) {
 		fz::native_string last_created;
-		fz::mkdir(fz::to_native(local_path.GetPath()), true, false, &last_created);
+		fz::mkdir(fz::to_native(local_path.GetPath()), true, fz::mkdir_permissions::normal, &last_created);
 		if (!last_created.empty()) {
 			// Send out notification
 			auto n = std::make_unique<CLocalDirCreatedNotification>();

@@ -512,7 +512,7 @@ CLocalPath COptions::InitSettingsDir()
 	}
 
 	if (!p.empty() && !p.Exists()) {
-		fz::mkdir(fz::to_native(p.GetPath()), true, true);
+		fz::mkdir(fz::to_native(p.GetPath()), true, fz::mkdir_permissions::cur_user);
 	}
 
 	set(mapOption(OPTION_DEFAULT_SETTINGSDIR), p.GetPath(), true);
