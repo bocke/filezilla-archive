@@ -10,6 +10,10 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.55.0 (2021-07-09)
+
+- Updated translations
+
 3.55.0-rc1 (2021-07-02)
 
 - Updated SFTP components
