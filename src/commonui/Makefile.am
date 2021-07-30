@@ -60,9 +60,20 @@ endif
 
 if MACAPPBUNDLE
 
-libfzclient_commonui_private_la_SOURCES += \
+noinst_LTLIBRARIES = libfzclient-commonui-private-mac.la
+
+libfzclient_commonui_private_mac_la_CPPFLAGS = -I$(top_builddir)/config
+libfzclient_commonui_private_mac_la_CPPFLAGS += $(LIBFILEZILLA_CFLAGS)
+libfzclient_commonui_private_mac_la_CPPFLAGS += -DBUILDING_FZ_COMMONUI
+
+libfzclient_commonui_private_mac_la_CXXFLAGS = -fvisibility=hidden
+
+libfzclient_commonui_private_mac_la_SOURCES = \
 	fz_paths_osx.mm
 
-libfzclient_commonui_private_la_LDFLAGS += -framework Cocoa
+libfzclient_commonui_private_mac_la_LDFLAGS = -framework Cocoa
+
+libfzclient_commonui_private_la_LIBADD = libfzclient-commonui-private-mac.la
+libfzclient_commonui_private_la_DEPENDENCIES += libfzclient-commonui-private-mac.la
 
 endif
