@@ -150,6 +150,8 @@ bool CFileZillaApp::OnInit()
 {
 	AddStartupProfileRecord("CFileZillaApp::OnInit()");
 
+	SetAppDisplayName("FileZilla");
+
 	// Turn off idle events, we don't need them
 	wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
 
