@@ -171,7 +171,7 @@ public:
 		return OnDragOver(x, y, def);
 	}
 
-	int DisplayDropHighlight(wxPoint) { return -1; }
+	int DisplayDropHighlight(wxPoint const&) { return -1; }
 protected:
 	CQueueView *m_pQueueView{};
 };

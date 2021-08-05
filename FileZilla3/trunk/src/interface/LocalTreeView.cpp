@@ -46,15 +46,6 @@ public:
 	{
 	}
 
-	void ClearDropHighlight()
-	{
-		const wxTreeItemId dropHighlight = m_pLocalTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId()) {
-			m_pLocalTreeView->SetItemDropHighlight(dropHighlight, false);
-			m_pLocalTreeView->m_dropHighlight = wxTreeItemId();
-		}
-	}
-
 	std::wstring GetDirFromItem(wxTreeItemId const& item)
 	{
 		std::wstring const dir = m_pLocalTreeView->GetDirFromItem(item);
@@ -144,7 +135,7 @@ public:
 			return false;
 		}
 
-		ClearDropHighlight();
+		m_pLocalTreeView->ClearDropHighlight();
 
 		wxTreeItemId hit = GetHit(wxPoint(x, y));
 		if (!hit) {
@@ -159,28 +150,23 @@ public:
 		return true;
 	}
 
-	wxTreeItemId DisplayDropHighlight(wxPoint point)
+	wxTreeItemId DisplayDropHighlight(wxPoint const& point) override
 	{
 		wxTreeItemId hit = GetHit(point);
 		if (!hit) {
-			ClearDropHighlight();
+			m_pLocalTreeView->ClearDropHighlight();
 			return hit;
 		}
 
 		std::wstring dir = GetDirFromItem(hit);
 
 		if (dir.empty()) {
-			ClearDropHighlight();
+			m_pLocalTreeView->ClearDropHighlight();
 			return wxTreeItemId();
 		}
-
-		const wxTreeItemId dropHighlight = m_pLocalTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId()) {
-			m_pLocalTreeView->SetItemDropHighlight(dropHighlight, false);
+		else {
+			m_pLocalTreeView->DisplayDropHighlight(hit);
 		}
-
-		m_pLocalTreeView->SetItemDropHighlight(hit, true);
-		m_pLocalTreeView->m_dropHighlight = hit;
 
 		return hit;
 	}
@@ -193,7 +179,7 @@ public:
 			def == wxDragNone ||
 			def == wxDragCancel)
 		{
-			ClearDropHighlight();
+			m_pLocalTreeView->ClearDropHighlight();
 			return def;
 		}
 
@@ -212,7 +198,7 @@ public:
 	virtual void OnLeave()
 	{
 		CScrollableDropTarget<wxTreeCtrlEx>::OnLeave();
-		ClearDropHighlight();
+		m_pLocalTreeView->ClearDropHighlight();
 	}
 
 	virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def)
