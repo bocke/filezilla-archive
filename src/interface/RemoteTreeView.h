@@ -48,8 +48,6 @@ protected:
 
 	wxTreeItemId m_ExpandAfterList;
 
-	wxTreeItemId m_dropHighlight;
-
 	CServerPath MenuMkdir();
 
 	void UpdateSortMode();

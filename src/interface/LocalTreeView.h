@@ -91,7 +91,6 @@ protected:
 	CQueueView* m_pQueueView;
 
 	wxTreeItemId m_contextMenuItem;
-	wxTreeItemId m_dropHighlight;
 
 	std::unique_ptr<CWindowTinter> m_windowTinter;
 };

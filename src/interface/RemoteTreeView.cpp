@@ -38,15 +38,6 @@ public:
 	{
 	}
 
-	void ClearDropHighlight()
-	{
-		const wxTreeItemId dropHighlight = m_pRemoteTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId()) {
-			m_pRemoteTreeView->SetItemDropHighlight(dropHighlight, false);
-			m_pRemoteTreeView->m_dropHighlight = wxTreeItemId();
-		}
-	}
-
 	wxTreeItemId GetHit(const wxPoint& point)
 	{
 		int flags = 0;
@@ -143,7 +134,7 @@ public:
 		if (!CScrollableDropTarget<wxTreeCtrlEx>::OnDrop(x, y)) {
 			return false;
 		}
-		ClearDropHighlight();
+		m_pRemoteTreeView->ClearDropHighlight();
 
 		wxTreeItemId hit = GetHit(wxPoint(x, y));
 		if (!hit) {
@@ -158,28 +149,22 @@ public:
 		return true;
 	}
 
-	wxTreeItemId DisplayDropHighlight(wxPoint point)
+	wxTreeItemId DisplayDropHighlight(wxPoint const& point) override
 	{
 		wxTreeItemId hit = GetHit(point);
 		if (!hit) {
-			ClearDropHighlight();
+			m_pRemoteTreeView->ClearDropHighlight();
 			return wxTreeItemId();
 		}
 
-		const CServerPath& path = m_pRemoteTreeView->GetPathFromItem(hit);
+		CServerPath const& path = m_pRemoteTreeView->GetPathFromItem(hit);
 
 		if (path.empty()) {
-			ClearDropHighlight();
+			m_pRemoteTreeView->ClearDropHighlight();
 			return wxTreeItemId();
 		}
 
-		const wxTreeItemId dropHighlight = m_pRemoteTreeView->m_dropHighlight;
-		if (dropHighlight != wxTreeItemId()) {
-			m_pRemoteTreeView->SetItemDropHighlight(dropHighlight, false);
-		}
-
-		m_pRemoteTreeView->SetItemDropHighlight(hit, true);
-		m_pRemoteTreeView->m_dropHighlight = hit;
+		m_pRemoteTreeView->DisplayDropHighlight(hit);
 
 		return hit;
 	}
@@ -192,7 +177,7 @@ public:
 			def == wxDragNone ||
 			def == wxDragCancel)
 		{
-			ClearDropHighlight();
+			m_pRemoteTreeView->ClearDropHighlight();
 			return def;
 		}
 
@@ -211,7 +196,7 @@ public:
 	virtual void OnLeave()
 	{
 		CScrollableDropTarget<wxTreeCtrlEx>::OnLeave();
-		ClearDropHighlight();
+		m_pRemoteTreeView->ClearDropHighlight();
 	}
 
 	virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def)

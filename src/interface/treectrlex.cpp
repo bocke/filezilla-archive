@@ -257,3 +257,78 @@ void wxTreeCtrlEx::Resort()
 		}
 	}
 }
+
+void wxTreeCtrlEx::Delete(wxTreeItemId const& item)
+{
+	if (IsRelated(item, m_dropHighlight)) {
+		m_dropHighlight = wxTreeItemId();
+	}
+	wxTreeCtrl::Delete(item);
+}
+
+void wxTreeCtrlEx::DeleteAllItems()
+{
+	m_dropHighlight = wxTreeItemId();
+	wxTreeCtrl::DeleteAllItems();
+}
+
+bool wxTreeCtrlEx::IsRelated(wxTreeItemId const& ancestor, wxTreeItemId child) const
+{
+	if (ancestor == wxTreeItemId()) {
+		return false;
+	}
+
+	while (child) {
+		if (child == ancestor) {
+			return true;
+		}
+
+		child = GetItemParent(child);
+	}
+
+	return false;
+}
+
+wxTreeItemId wxTreeCtrlEx::GetHit(wxPoint const& point)
+{
+	int flags{};
+
+	wxTreeItemId hit = HitTest(point, flags);
+
+	if (flags & (wxTREE_HITTEST_ABOVE | wxTREE_HITTEST_BELOW | wxTREE_HITTEST_NOWHERE | wxTREE_HITTEST_TOLEFT | wxTREE_HITTEST_TORIGHT)) {
+		return wxTreeItemId();
+	}
+
+	return hit;
+}
+
+wxTreeItemId wxTreeCtrlEx::DisplayDropHighlight(wxPoint const& p)
+{
+	ClearDropHighlight();
+
+	wxTreeItemId hit = GetHit(p);
+	return DisplayDropHighlight(hit);
+}
+
+wxTreeItemId wxTreeCtrlEx::DisplayDropHighlight(wxTreeItemId const& item)
+{
+	if (item != m_dropHighlight) {
+		ClearDropHighlight();
+		if (item.IsOk()) {
+			SetItemDropHighlight(item, true);
+			m_dropHighlight = item;
+		}
+	}
+
+	return item;
+}
+
+void wxTreeCtrlEx::ClearDropHighlight()
+{
+	if (m_dropHighlight == wxTreeItemId()) {
+		return;
+	}
+
+	SetItemDropHighlight(m_dropHighlight, false);
+	m_dropHighlight = wxTreeItemId();
+}

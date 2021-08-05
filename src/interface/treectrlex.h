@@ -52,6 +52,18 @@ public:
 	void Resort();
 
 	bool ShouldIgnoreChangeEvent() const { return ignore_change_event_ != 0; }
+
+	virtual void Delete(wxTreeItemId const& item) override;
+	virtual void DeleteAllItems() override;
+
+	bool IsRelated(wxTreeItemId const& ancestor, wxTreeItemId child) const;
+
+	wxTreeItemId GetHit(wxPoint const& point);
+
+	wxTreeItemId DisplayDropHighlight(wxPoint const& p);
+	wxTreeItemId DisplayDropHighlight(wxTreeItemId const& item);
+	void ClearDropHighlight();
+
 protected:
 
 	bool inPrefixSearch_{};
@@ -68,6 +80,8 @@ protected:
 
 	typedef int (*CompareFunction)(std::wstring_view const&, std::wstring_view const&);
 	CompareFunction sortFunction_{};
+
+	wxTreeItemId m_dropHighlight;
 };
 
 #endif

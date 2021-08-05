@@ -101,6 +101,11 @@ public:
 		m_pSiteManager = pSiteManager;
 	}
 
+	virtual wxTreeItemId DisplayDropHighlight(wxPoint const& p) override
+	{
+		return m_pSiteManager->tree_->DisplayDropHighlight(p);
+	}
+
 	bool IsValidDropLocation(wxTreeItemId const& hit, wxDragResult const& def)
 	{
 		if (!hit) {
@@ -141,7 +146,7 @@ public:
 			wxTreeItemId cur = hit;
 			while (cur && cur != tree->GetRootItem()) {
 				if (cur == item) {
-					ClearDropHighlight();
+					tree->ClearDropHighlight();
 					return wxDragNone;
 				}
 				cur = tree->GetItemParent(cur);
@@ -158,7 +163,8 @@ public:
 
 	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def)
 	{
-		ClearDropHighlight();
+		auto tree = m_pSiteManager->tree_;
+		tree->ClearDropHighlight();
 		if (def == wxDragError ||
 			def == wxDragNone ||
 			def == wxDragCancel)
@@ -166,7 +172,7 @@ public:
 			return def;
 		}
 
-		wxTreeItemId hit = GetHit(wxPoint(x, y));
+		wxTreeItemId hit = tree->GetHit(wxPoint(x, y));
 		if (!IsValidDropLocation(hit, def)) {
 			return wxDragNone;
 		}
@@ -187,9 +193,11 @@ public:
 	virtual bool OnDrop(wxCoord x, wxCoord y)
 	{
 		CScrollableDropTarget<wxTreeCtrlEx>::OnDrop(x, y);
-		ClearDropHighlight();
 
-		wxTreeItemId hit = GetHit(wxPoint(x, y));
+		auto tree = m_pSiteManager->tree_;
+		tree->ClearDropHighlight();
+
+		wxTreeItemId hit = tree->GetHit(wxPoint(x, y));
 		if (!IsValidDropLocation(hit, wxDragCopy)) {
 			return wxDragNone;
 		}
@@ -200,7 +208,7 @@ public:
 	virtual void OnLeave()
 	{
 		CScrollableDropTarget<wxTreeCtrlEx>::OnLeave();
-		ClearDropHighlight();
+		m_pSiteManager->tree_->ClearDropHighlight();
 	}
 
 	virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def)
@@ -209,69 +217,32 @@ public:
 		return OnDragOver(x, y, def);
 	}
 
-	wxTreeItemId GetHit(const wxPoint& point)
-	{
-		int flags = 0;
-
-		wxTreeItemId hit = m_pSiteManager->tree_->HitTest(point, flags);
-
-		if (flags & (wxTREE_HITTEST_ABOVE | wxTREE_HITTEST_BELOW | wxTREE_HITTEST_NOWHERE | wxTREE_HITTEST_TOLEFT | wxTREE_HITTEST_TORIGHT)) {
-			return wxTreeItemId();
-		}
-
-		return hit;
-	}
-
 	virtual wxDragResult OnDragOver(wxCoord x, wxCoord y, wxDragResult def)
 	{
 		def = CScrollableDropTarget<wxTreeCtrlEx>::OnDragOver(x, y, def);
 
+		auto tree = m_pSiteManager->tree_;
 		if (def == wxDragError ||
 			def == wxDragNone ||
 			def == wxDragCancel)
 		{
-			ClearDropHighlight();
+			tree->ClearDropHighlight();
 			return def;
 		}
 
-		wxTreeItemId hit = GetHit(wxPoint(x, y));
+		wxTreeItemId hit = tree->GetHit(wxPoint(x, y));
 		if (!IsValidDropLocation(hit, def)) {
-			ClearDropHighlight();
+			m_pSiteManager->tree_->ClearDropHighlight();
 		}
-
-		DisplayDropHighlight(wxPoint(x, y));
+		else {
+			tree->DisplayDropHighlight(hit);
+		}
 
 		return def;
 	}
 
-	void ClearDropHighlight()
-	{
-		if (m_dropHighlight == wxTreeItemId()) {
-			return;
-		}
-
-		auto* tree = m_pSiteManager->tree_;
-		tree->SetItemDropHighlight(m_dropHighlight, false);
-		m_dropHighlight = wxTreeItemId();
-	}
-
-	wxTreeItemId DisplayDropHighlight(wxPoint p)
-	{
-		ClearDropHighlight();
-
-		wxTreeItemId hit = GetHit(p);
-		if (hit.IsOk()) {
-			auto* tree = m_pSiteManager->tree_;
-			tree->SetItemDropHighlight(hit, true);
-			m_dropHighlight = hit;
-		}
-
-		return hit;
-	}
-
 protected:
 	CSiteManagerDialog* m_pSiteManager;
-	wxTreeItemId m_dropHighlight;
 };
 
 CSiteManagerDialog::CSiteManagerDialog()

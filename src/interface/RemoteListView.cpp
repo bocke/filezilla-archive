@@ -195,7 +195,7 @@ public:
 		return true;
 	}
 
-	virtual int DisplayDropHighlight(wxPoint point)
+	virtual int DisplayDropHighlight(wxPoint const& point)
 	{
 		DoDisplayDropHighlight(point);
 		return -1;

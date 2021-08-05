@@ -18,7 +18,7 @@ public:
 
 	virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def);
 
-	virtual typename Control::Item DisplayDropHighlight(wxPoint) = 0;
+	virtual typename Control::Item DisplayDropHighlight(wxPoint const&) = 0;
 
 protected:
 	wxDragResult FixupDragResult(wxDragResult res);
