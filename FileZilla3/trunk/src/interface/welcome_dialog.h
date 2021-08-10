@@ -16,7 +16,7 @@ public:
 
 protected:
 
-	void InitFooter(wxString const& resources);
+	void InitFooter(std::wstring const& resources);
 
 	wxTimer m_delayedShowTimer;
 

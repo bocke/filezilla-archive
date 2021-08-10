@@ -119,7 +119,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 
 	buttons->Realize();
 
-	InitFooter(force ? wxString() : resources);
+	InitFooter(force ? std::wstring() : resources);
 
 	Layout();
 
@@ -161,7 +161,7 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 }
 #endif
 
-void CWelcomeDialog::InitFooter(wxString const& resources)
+void CWelcomeDialog::InitFooter(std::wstring const& resources)
 {
 #if FZ_WINDOWS && FZ_MANUALUPDATECHECK
 	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
