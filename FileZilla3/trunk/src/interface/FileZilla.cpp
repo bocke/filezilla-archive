@@ -16,7 +16,6 @@
 #include "../include/version.h"
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/translate.hpp>
-#include <libfilezilla/tls_layer.hpp>
 #include <wx/evtloop.h>
 
 #ifdef WITH_LIBDBUS
@@ -143,31 +142,6 @@ std::wstring translator_pf(char const* const singular, char const* const plural,
 	}
 	return wxGetTranslation(singular, plural, (sizeof(unsigned int) < 8 && n > 1000000000) ? (1000000000 + n % 1000000000) : n).ToStdWstring();
 }
-}
-
-#include <wx/apptrait.h>
-#include <wx/renderer.h>
-
-class Renderer final : public wxDelegateRendererNative
-{
-	virtual wxSplitterRenderParams GetSplitterParams(wxWindow const* win) override
-	{
-		wxSplitterRenderParams params = wxDelegateRendererNative::GetSplitterParams(win);
-		return wxSplitterRenderParams(params.widthSash * 2, params.border, params.isHotSensitive);
-	}
-};
-
-class Traits final : public wxGUIAppTraits
-{
-	virtual wxRendererNative* CreateRenderer() override
-	{
-		return new Renderer;
-	}
-};
-
-wxAppTraits* CFileZillaApp::CreateTraits()
-{
-	return new Traits;
 }
 
 bool CFileZillaApp::OnInit()
