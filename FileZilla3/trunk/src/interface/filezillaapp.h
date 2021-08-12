@@ -6,9 +6,10 @@
 
 #include <vector>
 
-class CWrapEngine;
 class CCommandLine;
+class COptions;
 class CThemeProvider;
+class CWrapEngine;
 
 class CFileZillaApp : public wxApp
 {
@@ -60,6 +61,7 @@ protected:
 	virtual void OnFatalException();
 #endif
 
+	std::unique_ptr<COptions> options_;
 	std::unique_ptr<CWrapEngine> m_pWrapEngine;
 
 	std::unique_ptr<CCommandLine> m_pCommandLine;

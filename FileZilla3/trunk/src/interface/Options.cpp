@@ -162,7 +162,9 @@ END_EVENT_TABLE()
 
 COptions::COptions()
 {
-	m_theOptions = this;
+	if (!m_theOptions) {
+		m_theOptions = this;
+	}
 
 	m_save_timer.SetOwner(this);
 
@@ -195,6 +197,9 @@ COptions::COptions()
 
 COptions::~COptions()
 {
+	if (m_theOptions == this) {
+		m_theOptions = nullptr;
+	}
 }
 
 pugi::xml_node COptions::CreateSettingsXmlElement()
@@ -214,23 +219,6 @@ pugi::xml_node COptions::CreateSettingsXmlElement()
 	}
 
 	return settings;
-}
-
-void COptions::Init()
-{
-	if (!m_theOptions) {
-		new COptions(); // It sets m_theOptions internally itself
-	}
-}
-
-void COptions::Destroy()
-{
-	if (!m_theOptions) {
-		return;
-	}
-
-	delete m_theOptions;
-	m_theOptions = 0;
 }
 
 COptions* COptions::Get()

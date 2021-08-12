@@ -108,9 +108,13 @@ class CXmlFile;
 class COptions final : public wxEvtHandler, public COptionsBase
 {
 public:
+	COptions();
+	virtual ~COptions();
+	
+	COptions(COptions const&) = delete;
+	COptions& operator=(COptions const&) = delete;
+
 	static COptions* Get();
-	static void Init();
-	static void Destroy();
 
 	void Import(pugi::xml_node & element);
 
@@ -122,8 +126,6 @@ public:
 	bool Cleanup(); // Removes all unknown elements from the XML
 
 protected:
-	COptions();
-	virtual ~COptions();
 
 	void Load(pugi::xml_node & settings, bool predefined, bool importing);
 
