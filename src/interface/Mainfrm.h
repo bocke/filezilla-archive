@@ -21,6 +21,7 @@ class CContextControl;
 class CertStore;
 class CMainFrameStateEventHandler;
 class CMenuBar;
+class COptions;
 class CQueue;
 class CQueueView;
 class CQuickconnectBar;
@@ -38,7 +39,7 @@ class CMainFrame final : public wxNavigationEnabled<wxFrame>, public COptionChan
 {
 	friend class CMainFrameStateEventHandler;
 public:
-	CMainFrame();
+	CMainFrame(COptions& options);
 	virtual ~CMainFrame();
 
 	CStatusView* GetStatusView() { return m_pStatusView; }
@@ -78,6 +79,8 @@ private:
 	void OpenSiteManager(Site const* site = 0);
 
 	void FocusNextEnabled(std::list<wxWindow*>& windowOrder, std::list<wxWindow*>::iterator iter, bool skipFirst, bool forward);
+
+	COptions & options_;
 
 	CFileZillaEngineContext m_engineContext;
 

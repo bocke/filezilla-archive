@@ -16,7 +16,7 @@
 #include "../include/version.h"
 #include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/translate.hpp>
-
+#include <libfilezilla/tls_layer.hpp>
 #include <wx/evtloop.h>
 
 #ifdef WITH_LIBDBUS
@@ -64,12 +64,11 @@ CFileZillaApp::CFileZillaApp()
 CFileZillaApp::~CFileZillaApp()
 {
 	themeProvider_.reset();
-	COptions::Destroy();
 }
 
 void CFileZillaApp::InitLocale()
 {
-	wxString language = COptions::Get()->get_string(OPTION_LANGUAGE);
+	wxString language = options_->get_string(OPTION_LANGUAGE);
 	const wxLanguageInfo* pInfo = wxLocale::FindLanguageInfo(language);
 	if (!language.empty()) {
 #ifdef __WXGTK__
@@ -107,18 +106,18 @@ void CFileZillaApp::InitLocale()
 			error += _("Please make sure the requested locale is installed on your system.");
 			wxMessageBoxEx(error, _("Failed to change language"), wxICON_EXCLAMATION);
 
-			COptions::Get()->set(OPTION_LANGUAGE, _T(""));
+			options_->set(OPTION_LANGUAGE, _T(""));
 		}
 #else
 		if (!pInfo || !SetLocale(pInfo->Language)) {
 			for (language = GetFallbackLocale(language); !language.empty(); language = GetFallbackLocale(language)) {
 				const wxLanguageInfo* fallbackInfo = wxLocale::FindLanguageInfo(language);
 				if (fallbackInfo && SetLocale(fallbackInfo->Language)) {
-					COptions::Get()->set(OPTION_LANGUAGE, language.ToStdWstring());
+					options_->set(OPTION_LANGUAGE, language.ToStdWstring());
 					return;
 				}
 			}
-			COptions::Get()->set(OPTION_LANGUAGE, std::wstring());
+			options_->set(OPTION_LANGUAGE, std::wstring());
 			if (pInfo && !pInfo->Description.empty()) {
 				wxMessageBoxEx(wxString::Format(_("Failed to set language to %s (%s), using default system language"), pInfo->Description, language), _("Failed to change language"), wxICON_EXCLAMATION);
 			}
@@ -144,6 +143,31 @@ std::wstring translator_pf(char const* const singular, char const* const plural,
 	}
 	return wxGetTranslation(singular, plural, (sizeof(unsigned int) < 8 && n > 1000000000) ? (1000000000 + n % 1000000000) : n).ToStdWstring();
 }
+}
+
+#include <wx/apptrait.h>
+#include <wx/renderer.h>
+
+class Renderer final : public wxDelegateRendererNative
+{
+	virtual wxSplitterRenderParams GetSplitterParams(wxWindow const* win) override
+	{
+		wxSplitterRenderParams params = wxDelegateRendererNative::GetSplitterParams(win);
+		return wxSplitterRenderParams(params.widthSash * 2, params.border, params.isHotSensitive);
+	}
+};
+
+class Traits final : public wxGUIAppTraits
+{
+	virtual wxRendererNative* CreateRenderer() override
+	{
+		return new Renderer;
+	}
+};
+
+wxAppTraits* CFileZillaApp::CreateTraits()
+{
+	return new Traits;
 }
 
 bool CFileZillaApp::OnInit()
@@ -204,7 +228,7 @@ bool CFileZillaApp::OnInit()
 	}
 #endif
 
-	COptions::Init();
+	options_ = std::make_unique<COptions>();
 
 	InitLocale();
 
@@ -222,14 +246,13 @@ USE AT OWN RISK"), _T("Important Information"));
 	else {
 		std::wstring v = GetEnv("FZDEBUG");
 		if (v != L"1") {
-			COptions::Get()->set(OPTION_LOGGING_DEBUGLEVEL, 0);
-			COptions::Get()->set(OPTION_LOGGING_RAWLISTING, 0);
+			options_->set(OPTION_LOGGING_DEBUGLEVEL, 0);
+			options_->set(OPTION_LOGGING_RAWLISTING, 0);
 		}
 	}
 #endif
 
 	if (!LoadResourceFiles()) {
-		COptions::Destroy();
 		return false;
 	}
 
@@ -264,7 +287,7 @@ USE AT OWN RISK"), _T("Important Information"));
     }
 #endif
 
-	CMainFrame *frame = new CMainFrame();
+	CMainFrame *frame = new CMainFrame(*options_);
 	frame->Show(true);
 	SetTopWindow(frame);
 
@@ -284,7 +307,7 @@ int CFileZillaApp::OnExit()
 {
 	CContextManager::Get()->NotifyGlobalHandlers(STATECHANGE_QUITNOW);
 
-	COptions::Get()->Save();
+	options_->Save();
 
 #ifdef WITH_LIBDBUS
 	CSessionManager::Uninit();
@@ -522,7 +545,7 @@ void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const
 			_("File not found"), wxICON_ERROR | wxOK);
 		executable.clear();
 	}
-	COptions::Get()->set(setting, executable);
+	options_->set(setting, executable);
 }
 
 #ifdef __WXMSW__
@@ -614,7 +637,7 @@ void CFileZillaApp::ShowStartupProfile()
 
 std::wstring CFileZillaApp::GetSettingsFile(std::wstring const& name) const
 {
-	return COptions::Get()->get_string(OPTION_DEFAULT_SETTINGSDIR) + name + _T(".xml");
+	return options_->get_string(OPTION_DEFAULT_SETTINGSDIR) + name + _T(".xml");
 }
 
 #if defined(__MINGW32__)
