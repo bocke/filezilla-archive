@@ -324,7 +324,7 @@ wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& clie
 		std::wstring name = fz::str_tolower_ascii(id.substr(4).ToStdWstring());
 
 		auto tryTheme = [&](std::wstring const& theme) {
-			if (bmp->IsOk()) {
+			if (!bmp->IsOk()) {
 				auto it = themes_.find(theme);
 				if (it != themes_.end()) {
 					bmp = &it->second.LoadBitmap(name, newSize);
