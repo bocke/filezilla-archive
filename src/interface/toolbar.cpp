@@ -7,14 +7,72 @@
 #include "themeprovider.h"
 #include "toolbar.h"
 
-CToolBar::CToolBar()
-	: COptionChangeEventHandler(this)
+namespace {
+	constexpr int toolbarStyle = wxTB_FLAT | wxTB_HORIZONTAL | wxTB_NODIVIDER
+#ifdef __WXMSW__
+		| wxTB_NOICONS
+#endif
+		;
+}
+
+#ifdef __WXMAC__
+void fix_toolbar_style(wxFrame& frame);
+#endif
+
+CToolBar::CToolBar(CMainFrame& mainFrame, COptions& options)
+	: wxToolBar(&mainFrame, nullID, wxDefaultPosition, wxDefaultSize, toolbarStyle)
+	, COptionChangeEventHandler(this)
+	, mainFrame_(mainFrame)
+	, options_(options)
 {
+	iconSize_ = CThemeProvider::GetIconSize(iconSizeSmall, true);
+#ifdef __WXMAC__
+	fix_toolbar_style(&mainFrame_);
+
+	// OS X only knows two hardcoded toolbar sizes.
+	if (iconSize_.x >= 32) {
+		iconSize_ = wxSize(32, 32);
+	}
+	else {
+		iconSize_ = wxSize(24, 24);
+	}
+#endif
+
+	SetToolBitmapSize(iconSize_);
+	MakeTools();
+
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOTE_IDLE, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SERVER, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SYNC_BROWSE, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_COMPARISON, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_APPLYFILTER, true);
+
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_QUEUEPROCESSING, false);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_CHANGEDCONTEXT, false);
+
+	options_.watch(OPTION_SHOW_MESSAGELOG, this);
+	options_.watch(OPTION_SHOW_QUEUE, this);
+	options_.watch(OPTION_SHOW_TREE_LOCAL, this);
+	options_.watch(OPTION_SHOW_TREE_REMOTE, this);
+	options_.watch(OPTION_MESSAGELOG_POSITION, this);
+
+	ToggleTool(XRCID("ID_TOOLBAR_FILTER"), CFilterManager::HasActiveFilters());
+	ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
+	ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), options_.get_int(OPTION_SHOW_QUEUE) != 0);
+	ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), options_.get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+	ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), options_.get_int(OPTION_SHOW_TREE_REMOTE) != 0);
+
+	mainFrame_.SetToolBar(this);
+	Realize();
+
+	if (options_.get_int(OPTION_MESSAGELOG_POSITION) == 2) {
+		HideTool(XRCID("ID_TOOLBAR_LOGVIEW"));
+	}
 }
 
 CToolBar::~CToolBar()
 {
-	COptions::Get()->unwatch_all(this);
+	options_.unwatch_all(this);
 	for (auto iter = m_hidden_tools.begin(); iter != m_hidden_tools.end(); ++iter) {
 		delete iter->second;
 	}
@@ -57,74 +115,6 @@ void CToolBar::MakeTools()
 	MakeTool("ID_TOOLBAR_COMPARISON", L"ART_COMPARE", _("Toggle directory comparison. Right-click to change comparison mode.\n\nColors:\nYellow: File only exists on one side\nGreen: File is newer than the unmarked file on other side\nRed: File sizes different"), _("Directory comparison"), wxITEM_CHECK);
 	MakeTool("ID_TOOLBAR_SYNCHRONIZED_BROWSING", L"ART_SYNCHRONIZE", _("Toggle synchronized browsing.\nIf enabled, navigating the local directory hierarchy will also change the directory on the server accordingly and vice versa."), _("Synchronized browsing"), wxITEM_CHECK);
 	MakeTool("ID_TOOLBAR_FIND", L"ART_FIND", _("Search for files recursively."), _("File search"));
-}
-
-#ifdef __WXMAC__
-void fix_toolbar_style(wxFrame& frame);
-#endif
-
-CToolBar* CToolBar::Load(CMainFrame* pMainFrame)
-{
-	if (!pMainFrame) {
-		return nullptr;
-	}
-
-	CToolBar* toolbar = new CToolBar();
-	toolbar->m_pMainFrame = pMainFrame;
-
-	toolbar->iconSize_ = CThemeProvider::GetIconSize(iconSizeSmall, true);
-#ifdef __WXMAC__
-	fix_toolbar_style(*pMainFrame);
-
-	// OS X only knows two hardcoded toolbar sizes.
-	if (toolbar->iconSize_.x >= 32) {
-		toolbar->iconSize_ = wxSize(32, 32);
-	}
-	else {
-		toolbar->iconSize_ = wxSize(24, 24);
-	}
-#endif
-
-	int style = wxTB_FLAT | wxTB_HORIZONTAL | wxTB_NODIVIDER;
-#ifdef __WXMSW__
-	style |= wxTB_NOICONS;
-#endif
-	if (!toolbar->Create(pMainFrame, XRCID("ID_TOOLBAR"), wxDefaultPosition, wxDefaultSize, style)) {
-		delete toolbar;
-		return nullptr;
-	}
-	toolbar->SetToolBitmapSize(toolbar->iconSize_);
-	toolbar->MakeTools();
-
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_REMOTE_IDLE, true);
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_SERVER, true);
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_SYNC_BROWSE, true);
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_COMPARISON, true);
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_APPLYFILTER, true);
-
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_QUEUEPROCESSING, false);
-	CContextManager::Get()->RegisterHandler(toolbar, STATECHANGE_CHANGEDCONTEXT, false);
-
-	COptions::Get()->watch(OPTION_SHOW_MESSAGELOG, toolbar);
-	COptions::Get()->watch(OPTION_SHOW_QUEUE, toolbar);
-	COptions::Get()->watch(OPTION_SHOW_TREE_LOCAL, toolbar);
-	COptions::Get()->watch(OPTION_SHOW_TREE_REMOTE, toolbar);
-	COptions::Get()->watch(OPTION_MESSAGELOG_POSITION, toolbar);
-
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_FILTER"), CFilterManager::HasActiveFilters());
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
-	toolbar->ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
-
-	pMainFrame->SetToolBar(toolbar);
-	toolbar->Realize();
-
-	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
-		toolbar->HideTool(XRCID("ID_TOOLBAR_LOGVIEW"));
-	}
-
-	return toolbar;
 }
 
 #ifdef __WXMSW__
@@ -202,7 +192,7 @@ void CToolBar::OnStateChange(CState* pState, t_statechange_notifications notific
 		break;
 	case STATECHANGE_QUEUEPROCESSING:
 		{
-			const bool check = m_pMainFrame->GetQueue() && m_pMainFrame->GetQueue()->IsActive() != 0;
+			const bool check = mainFrame_.GetQueue() && mainFrame_.GetQueue()->IsActive() != 0;
 			ToggleTool(XRCID("ID_TOOLBAR_PROCESSQUEUE"), check);
 		}
 		break;
@@ -256,24 +246,24 @@ void CToolBar::UpdateToolbarState()
 void CToolBar::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_SHOW_MESSAGELOG)) {
-		ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUEUE)) {
-		ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_QUEUEVIEW"), options_.get_int(OPTION_SHOW_QUEUE) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_LOCAL)) {
-		ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_LOCALTREEVIEW"), options_.get_int(OPTION_SHOW_TREE_LOCAL) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_REMOTE)) {
-		ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
+		ToggleTool(XRCID("ID_TOOLBAR_REMOTETREEVIEW"), options_.get_int(OPTION_SHOW_TREE_REMOTE) != 0);
 	}
 	if (options.test(OPTION_MESSAGELOG_POSITION)) {
-		if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
+		if (options_.get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 			HideTool(XRCID("ID_TOOLBAR_LOGVIEW"));
 		}
 		else {
 			ShowTool(XRCID("ID_TOOLBAR_LOGVIEW"));
-			ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+			ToggleTool(XRCID("ID_TOOLBAR_LOGVIEW"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
 		}
 	}
 }

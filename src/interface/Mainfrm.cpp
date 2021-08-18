@@ -1107,12 +1107,7 @@ bool CMainFrame::CreateMainToolBar()
 	}
 #endif
 
-	m_pToolBar = CToolBar::Load(this);
-	if (!m_pToolBar) {
-		wxLogError(_("Cannot load toolbar from resource file"));
-		return false;
-	}
-	SetToolBar(m_pToolBar);
+	m_pToolBar = new CToolBar(*this, options_);
 
 #ifdef __WXMAC__
 	if (options_.get_int(OPTION_TOOLBAR_HIDDEN) != 0) {
