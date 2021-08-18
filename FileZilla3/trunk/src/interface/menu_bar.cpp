@@ -17,32 +17,13 @@ BEGIN_EVENT_TABLE(CMenuBar, wxMenuBar)
 EVT_MENU(wxID_ANY, CMenuBar::OnMenuEvent)
 END_EVENT_TABLE()
 
-CMenuBar::CMenuBar()
+CMenuBar::CMenuBar(CMainFrame& mainFrame, COptions& options)
 	: COptionChangeEventHandler(this)
-	, m_pMainFrame()
+	, mainFrame_(mainFrame)
+	, options_(options)
 {
-}
-
-CMenuBar::~CMenuBar()
-{
-	COptions::Get()->unwatch_all(this);
-
-	for (auto hidden_menu : m_hidden_items) {
-		for (auto hidden_item : hidden_menu.second) {
-			delete hidden_item.second;
-		}
-	}
-
-	m_pMainFrame->Disconnect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(CMenuBar::OnMenuEvent), 0, this);
-}
-
-CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
-{
-	CMenuBar* menubar = new CMenuBar();
-	menubar->m_pMainFrame = pMainFrame;
-
 	wxMenu* file = new wxMenu;
-	menubar->Append(file, _("&File"));
+	Append(file, _("&File"));
 
 	wxAcceleratorEntry accel;
 
@@ -66,7 +47,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 
 	wxMenu* edit = new wxMenu;
-	menubar->Append(edit, _("&Edit"));
+	Append(edit, _("&Edit"));
 	edit->Append(XRCID("ID_MENU_EDIT_NETCONFWIZARD"), _("&Network configuration wizard..."));
 	edit->Append(XRCID("ID_MENU_EDIT_CLEARPRIVATEDATA"), _("&Clear private data..."));
 	edit->AppendSeparator();
@@ -76,14 +57,14 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 #endif
 
 	wxMenu* view = new wxMenu;
-	menubar->Append(view, _("&View"));
+	Append(view, _("&View"));
 	accel.FromString(L"F5");
 	view->Append(XRCID("ID_REFRESH"), _("&Refresh"))->SetAccel(&accel);
 	view->AppendSeparator();
 	accel.FromString(L"Ctrl+I");
 	view->Append(XRCID("ID_MENU_VIEW_FILTERS"), _("Directory listing &filters..."))->SetAccel(&accel);
 
-	wxMenu * comparison = new wxMenu;
+	wxMenu* comparison = new wxMenu;
 	view->AppendSubMenu(comparison, _("&Directory comparison"));
 
 	accel.FromString(L"CTRL+O");
@@ -105,15 +86,15 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	view->Append(XRCID("ID_VIEW_REMOTETREE"), _("R&emote directory tree"), L"", wxITEM_CHECK);
 	view->Append(XRCID("ID_VIEW_QUEUE"), _("&Transfer queue"), L"", wxITEM_CHECK);
 
-	wxMenu * transfer = new wxMenu;
-	menubar->Append(transfer, _("&Transfer"));
+	wxMenu* transfer = new wxMenu;
+	Append(transfer, _("&Transfer"));
 
 	accel.FromString(L"CTRL+P");
 	transfer->Append(XRCID("ID_MENU_TRANSFER_PROCESSQUEUE"), _("Process &Queue"), L"", wxITEM_CHECK)->SetAccel(&accel);
 	transfer->AppendSeparator();
 	transfer->Append(XRCID("ID_MENU_TRANSFER_FILEEXISTS"), _("&Default file exists action..."));
 
-	wxMenu * type = new wxMenu;
+	wxMenu* type = new wxMenu;
 	transfer->Append(XRCID("ID_MENU_TRANSFER_TYPE"), _("Transfer &type"), type);
 
 	type->Append(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), _("&Auto"), L"", wxITEM_RADIO);
@@ -123,7 +104,7 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 
 	transfer->Append(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), _("&Preserve timestamps of transferred files"), L"", wxITEM_CHECK)->SetAccel(&accel);
 
-	wxMenu * speed = new wxMenu;
+	wxMenu* speed = new wxMenu;
 	transfer->AppendSubMenu(speed, _("&Speed limits"));
 
 	speed->Append(XRCID("ID_MENU_TRANSFER_SPEEDLIMITS_ENABLE"), _("&Enable"), L"", wxITEM_CHECK);
@@ -133,8 +114,8 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	accel.FromString(L"CTRL+M");
 	transfer->Append(XRCID("ID_MENU_TRANSFER_MANUAL"), _("&Manual transfer..."))->SetAccel(&accel);
 
-	wxMenu * server = new wxMenu;
-	menubar->Append(server, _("&Server"));
+	wxMenu* server = new wxMenu;
+	Append(server, _("&Server"));
 	accel.FromString(L"CTRL+.");
 	server->Append(XRCID("ID_CANCEL"), _("C&ancel current operation"))->SetAccel(&accel);
 	server->AppendSeparator();
@@ -148,19 +129,19 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 	server->Append(XRCID("ID_MENU_SERVER_CMD"), _("Enter &custom command..."), _("Send custom command to the server otherwise not available"));
 	server->Append(XRCID("ID_MENU_SERVER_VIEWHIDDEN"), _("Force showing &hidden files"), L"", wxITEM_CHECK);
 
-	wxMenu * bookmarks = new wxMenu;
-	menubar->Append(bookmarks, _("&Bookmarks"));
+	wxMenu* bookmarks = new wxMenu;
+	Append(bookmarks, _("&Bookmarks"));
 
 	accel.FromString(L"CTRL+B");
 	bookmarks->Append(XRCID("ID_BOOKMARK_ADD"), _("&Add bookmark..."))->SetAccel(&accel);
 	accel.FromString(L"CTRL+SHIFT+B");
 	bookmarks->Append(XRCID("ID_BOOKMARK_MANAGE"), _("&Manage bookmarks..."))->SetAccel(&accel);
 
-	wxMenu * help = new wxMenu;
-	menubar->Append(help, _("&Help"));
+	wxMenu* help = new wxMenu;
+	Append(help, _("&Help"));
 
 #if FZ_MANUALUPDATECHECK
-	if (COptions::Get()->get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) == 0) {
+	if (options_.get_int(OPTION_DEFAULT_DISABLEUPDATECHECK) == 0) {
 		help->Append(XRCID("ID_CHECKFORUPDATES"), _("Check for &updates..."), _("Check for newer versions of FileZilla"));
 		help->AppendSeparator();
 	}
@@ -174,86 +155,86 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 #endif
 	help->Append(XRCID("wxID_ABOUT"), _("&About..."), _("Display about dialog"));
 
-	if (COptions::Get()->get_int(OPTION_DEBUG_MENU)) {
-		wxMenu * debug = new wxMenu;
+	if (options_.get_int(OPTION_DEBUG_MENU)) {
+		wxMenu* debug = new wxMenu;
 		debug->Append(XRCID("ID_CLEARCACHE_LAYOUT"), _("Clear &layout cache"));
 		debug->Append(XRCID("ID_CIPHERS"), _("&TLS Ciphers"), _("Shows available TLS ciphers"));
 		debug->Append(XRCID("ID_CLEAR_UPDATER"), _("Clear auto&update data"));
-		menubar->Append(debug, _("&Debug"));
+		Append(debug, _("&Debug"));
 	}
 
-	menubar->UpdateBookmarkMenu();
+	UpdateBookmarkMenu();
 
-	menubar->Check(XRCID("ID_MENU_SERVER_VIEWHIDDEN"), COptions::Get()->get_int(OPTION_VIEW_HIDDEN_FILES) ? true : false);
+	Check(XRCID("ID_MENU_SERVER_VIEWHIDDEN"), options_.get_int(OPTION_VIEW_HIDDEN_FILES) ? true : false);
 
-	int mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
+	int mode = options_.get_int(OPTION_COMPARISONMODE);
 	if (mode != 1) {
-		menubar->Check(XRCID("ID_COMPARE_SIZE"), true);
+		Check(XRCID("ID_COMPARE_SIZE"), true);
 	}
 	else {
-		menubar->Check(XRCID("ID_COMPARE_DATE"), true);
+		Check(XRCID("ID_COMPARE_DATE"), true);
 	}
 
-	menubar->Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
-	menubar->Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->get_int(OPTION_SHOW_QUICKCONNECT) != 0);
-	menubar->Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) == 0);
-	menubar->Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
-	menubar->Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
-	menubar->Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
-	menubar->Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
-	menubar->Check(XRCID("ID_MENU_VIEW_FILELISTSTATUSBAR"), COptions::Get()->get_int(OPTION_FILELIST_STATUSBAR) != 0);
-	menubar->Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
+	Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), options_.get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+	Check(XRCID("ID_VIEW_QUICKCONNECT"), options_.get_int(OPTION_SHOW_QUICKCONNECT) != 0);
+	Check(XRCID("ID_VIEW_TOOLBAR"), options_.get_int(OPTION_TOOLBAR_HIDDEN) == 0);
+	Check(XRCID("ID_VIEW_MESSAGELOG"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
+	Check(XRCID("ID_VIEW_QUEUE"), options_.get_int(OPTION_SHOW_QUEUE) != 0);
+	Check(XRCID("ID_VIEW_LOCALTREE"), options_.get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+	Check(XRCID("ID_VIEW_REMOTETREE"), options_.get_int(OPTION_SHOW_TREE_REMOTE) != 0);
+	Check(XRCID("ID_MENU_VIEW_FILELISTSTATUSBAR"), options_.get_int(OPTION_FILELIST_STATUSBAR) != 0);
+	Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), options_.get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
 
-	switch (COptions::Get()->get_int(OPTION_ASCIIBINARY))
+	switch (options_.get_int(OPTION_ASCIIBINARY))
 	{
 	case 1:
-		menubar->Check(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), true);
+		Check(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), true);
 		break;
 	case 2:
-		menubar->Check(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), true);
+		Check(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), true);
 		break;
 	default:
-		menubar->Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
+		Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
 		break;
 	}
 
-	menubar->UpdateSpeedLimitMenuItem();
+	UpdateSpeedLimitMenuItem();
 
-	if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
-		menubar->HideItem(XRCID("ID_VIEW_MESSAGELOG"));
+	if (options_.get_int(OPTION_MESSAGELOG_POSITION) == 2) {
+		HideItem(XRCID("ID_VIEW_MESSAGELOG"));
 	}
 
-	menubar->UpdateMenubarState();
+	UpdateMenubarState();
 
-	pMainFrame->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(CMenuBar::OnMenuEvent), 0, menubar);
+	mainFrame_.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(CMenuBar::OnMenuEvent), 0, this);
 
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_REMOTE_IDLE, true);
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_SERVER, true);
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_SYNC_BROWSE, true);
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_COMPARISON, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOTE_IDLE, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SERVER, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SYNC_BROWSE, true);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_COMPARISON, true);
 
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_QUEUEPROCESSING, false);
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_CHANGEDCONTEXT, false);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_QUEUEPROCESSING, false);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_CHANGEDCONTEXT, false);
 
-	CContextManager::Get()->RegisterHandler(menubar, STATECHANGE_GLOBALBOOKMARKS, false);
+	CContextManager::Get()->RegisterHandler(this, STATECHANGE_GLOBALBOOKMARKS, false);
 
-	COptions::Get()->watch(OPTION_ASCIIBINARY, menubar);
-	COptions::Get()->watch(OPTION_PRESERVE_TIMESTAMPS, menubar);
-	COptions::Get()->watch(OPTION_TOOLBAR_HIDDEN, menubar);
-	COptions::Get()->watch(OPTION_SHOW_MESSAGELOG, menubar);
-	COptions::Get()->watch(OPTION_SHOW_QUEUE, menubar);
-	COptions::Get()->watch(OPTION_SHOW_TREE_LOCAL, menubar);
-	COptions::Get()->watch(OPTION_SHOW_TREE_REMOTE, menubar);
-	COptions::Get()->watch(OPTION_MESSAGELOG_POSITION, menubar);
-	COptions::Get()->watch(OPTION_COMPARISONMODE, menubar);
-	COptions::Get()->watch(OPTION_COMPARE_HIDEIDENTICAL, menubar);
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_ENABLE, menubar);
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_INBOUND, menubar);
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_OUTBOUND, menubar);
+	options_.watch(OPTION_ASCIIBINARY, this);
+	options_.watch(OPTION_PRESERVE_TIMESTAMPS, this);
+	options_.watch(OPTION_TOOLBAR_HIDDEN, this);
+	options_.watch(OPTION_SHOW_MESSAGELOG, this);
+	options_.watch(OPTION_SHOW_QUEUE, this);
+	options_.watch(OPTION_SHOW_TREE_LOCAL, this);
+	options_.watch(OPTION_SHOW_TREE_REMOTE, this);
+	options_.watch(OPTION_MESSAGELOG_POSITION, this);
+	options_.watch(OPTION_COMPARISONMODE, this);
+	options_.watch(OPTION_COMPARE_HIDEIDENTICAL, this);
+	options_.watch(OPTION_SPEEDLIMIT_ENABLE, this);
+	options_.watch(OPTION_SPEEDLIMIT_INBOUND, this);
+	options_.watch(OPTION_SPEEDLIMIT_OUTBOUND, this);
 
 #ifdef FZ_MAC
 	wxMenu* editMenu = nullptr;
-	wxMenuItem* dirsItem = menubar->FindItem(XRCID("ID_MENU_EDIT_SANDBOX_DIRECTORIES"), &editMenu);
+	wxMenuItem* dirsItem = FindItem(XRCID("ID_MENU_EDIT_SANDBOX_DIRECTORIES"), &editMenu);
 	if (editMenu && dirsItem) {
 #if USE_MAC_SANDBOX
 		editMenu->Bind(wxEVT_COMMAND_MENU_SELECTED, [pMainFrame](wxCommandEvent&)
@@ -266,8 +247,19 @@ CMenuBar* CMenuBar::Load(CMainFrame* pMainFrame)
 #endif
 	}
 #endif
+}
 
-	return menubar;
+CMenuBar::~CMenuBar()
+{
+	options_.unwatch_all(this);
+
+	for (auto hidden_menu : m_hidden_items) {
+		for (auto hidden_item : hidden_menu.second) {
+			delete hidden_item.second;
+		}
+	}
+
+	mainFrame_.Disconnect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(CMenuBar::OnMenuEvent), 0, this);
 }
 
 void CMenuBar::UpdateBookmarkMenu()
@@ -322,7 +314,7 @@ void CMenuBar::UpdateBookmarkMenu()
 	}
 
 	// Insert site-specific bookmarks
-	CContextControl* pContextControl = m_pMainFrame ? m_pMainFrame->GetContextControl() : 0;
+	CContextControl* pContextControl = mainFrame_.GetContextControl();
 	CContextControl::_context_controls* controls = pContextControl ? pContextControl->GetCurrentControls() : 0;
 	CState* pState = controls ? controls->pState : 0;
 	if (!pState) {
@@ -367,7 +359,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 	std::map<int, wxString>::const_iterator iter = m_bookmark_menu_id_map_site.find(event.GetId());
 	if (iter != m_bookmark_menu_id_map_site.end()) {
 		// We hit a site-specific bookmark
-		CContextControl* pContextControl = m_pMainFrame ? m_pMainFrame->GetContextControl() : 0;
+		CContextControl* pContextControl = mainFrame_.GetContextControl();
 		CContextControl::_context_controls* controls = pContextControl ? pContextControl->GetCurrentControls() : 0;
 		CState* pState = controls ? controls->pState : 0;
 		if (!pState) {
@@ -387,7 +379,7 @@ void CMenuBar::OnMenuEvent(wxCommandEvent& event)
 				if (!bookmark.m_remoteDir.empty() && pState->IsRemoteIdle(true)) {
 					Site const& activeSite = pState->GetSite();
 					if (!activeSite || activeSite != site) {
-						m_pMainFrame->ConnectToSite(site, bookmark);
+						mainFrame_.ConnectToSite(site, bookmark);
 						break;
 					}
 					else {
@@ -474,7 +466,7 @@ void CMenuBar::OnStateChange(CState* pState, t_statechange_notifications notific
 		break;
 	case STATECHANGE_QUEUEPROCESSING:
 		{
-			const bool check = m_pMainFrame->GetQueue() && m_pMainFrame->GetQueue()->IsActive() != 0;
+			const bool check = mainFrame_.GetQueue() && mainFrame_.GetQueue()->IsActive() != 0;
 			Check(XRCID("ID_MENU_TRANSFER_PROCESSQUEUE"), check);
 		}
 		break;
@@ -498,7 +490,7 @@ void CMenuBar::OnStateChange(CState* pState, t_statechange_notifications notific
 void CMenuBar::OnOptionsChanged(watched_options const& options)
 {
 	if (options.test(OPTION_ASCIIBINARY)) {
-		switch (COptions::Get()->get_int(OPTION_ASCIIBINARY))
+		switch (options_.get_int(OPTION_ASCIIBINARY))
 		{
 		default:
 			Check(XRCID("ID_MENU_TRANSFER_TYPE_AUTO"), true);
@@ -512,31 +504,31 @@ void CMenuBar::OnOptionsChanged(watched_options const& options)
 		}
 	}
 	if (options.test(OPTION_PRESERVE_TIMESTAMPS)) {
-		Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), COptions::Get()->get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
+		Check(XRCID("ID_MENU_TRANSFER_PRESERVETIMES"), options_.get_int(OPTION_PRESERVE_TIMESTAMPS) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_LOCAL)) {
-		Check(XRCID("ID_VIEW_LOCALTREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL) != 0);
+		Check(XRCID("ID_VIEW_LOCALTREE"), options_.get_int(OPTION_SHOW_TREE_LOCAL) != 0);
 	}
 	if (options.test(OPTION_SHOW_TREE_REMOTE)) {
-		Check(XRCID("ID_VIEW_REMOTETREE"), COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE) != 0);
+		Check(XRCID("ID_VIEW_REMOTETREE"), options_.get_int(OPTION_SHOW_TREE_REMOTE) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUICKCONNECT)) {
-		Check(XRCID("ID_VIEW_QUICKCONNECT"), COptions::Get()->get_int(OPTION_SHOW_QUICKCONNECT) != 0);
+		Check(XRCID("ID_VIEW_QUICKCONNECT"), options_.get_int(OPTION_SHOW_QUICKCONNECT) != 0);
 	}
 	if (options.test(OPTION_TOOLBAR_HIDDEN)) {
-		Check(XRCID("ID_VIEW_TOOLBAR"), COptions::Get()->get_int(OPTION_TOOLBAR_HIDDEN) == 0);
+		Check(XRCID("ID_VIEW_TOOLBAR"), options_.get_int(OPTION_TOOLBAR_HIDDEN) == 0);
 	}
 	if (options.test(OPTION_SHOW_MESSAGELOG)) {
-		Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+		Check(XRCID("ID_VIEW_MESSAGELOG"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
 	}
 	if (options.test(OPTION_SHOW_QUEUE)) {
-		Check(XRCID("ID_VIEW_QUEUE"), COptions::Get()->get_int(OPTION_SHOW_QUEUE) != 0);
+		Check(XRCID("ID_VIEW_QUEUE"), options_.get_int(OPTION_SHOW_QUEUE) != 0);
 	}
 	if (options.test(OPTION_COMPARE_HIDEIDENTICAL)) {
-		Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+		Check(XRCID("ID_COMPARE_HIDEIDENTICAL"), options_.get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 	}
 	if (options.test(OPTION_COMPARISONMODE)) {
-		if (COptions::Get()->get_int(OPTION_COMPARISONMODE) != 1) {
+		if (options_.get_int(OPTION_COMPARISONMODE) != 1) {
 			Check(XRCID("ID_COMPARE_SIZE"), true);
 		}
 		else {
@@ -544,12 +536,12 @@ void CMenuBar::OnOptionsChanged(watched_options const& options)
 		}
 	}
 	if (options.test(OPTION_MESSAGELOG_POSITION)) {
-		if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
+		if (options_.get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 			HideItem(XRCID("ID_VIEW_MESSAGELOG"));
 		}
 		else {
 			ShowItem(XRCID("ID_VIEW_MESSAGELOG"));
-			Check(XRCID("ID_VIEW_MESSAGELOG"), COptions::Get()->get_int(OPTION_SHOW_MESSAGELOG) != 0);
+			Check(XRCID("ID_VIEW_MESSAGELOG"), options_.get_int(OPTION_SHOW_MESSAGELOG) != 0);
 		}
 	}
 	if (options.test(OPTION_SPEEDLIMIT_ENABLE) || options.test(OPTION_SPEEDLIMIT_INBOUND) || options.test(OPTION_SPEEDLIMIT_OUTBOUND)) {
@@ -559,10 +551,10 @@ void CMenuBar::OnOptionsChanged(watched_options const& options)
 
 void CMenuBar::UpdateSpeedLimitMenuItem()
 {
-	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	bool enable = options_.get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 
-	int downloadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
-	int uploadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
+	int downloadLimit = options_.get_int(OPTION_SPEEDLIMIT_INBOUND);
+	int uploadLimit = options_.get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 
 	if (!downloadLimit && !uploadLimit) {
 		enable = false;

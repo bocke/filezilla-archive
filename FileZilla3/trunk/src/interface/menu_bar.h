@@ -11,10 +11,8 @@ class CMainFrame;
 class CMenuBar final : public wxMenuBar, public CGlobalStateEventHandler, public COptionChangeEventHandler
 {
 public:
-	CMenuBar();
+	CMenuBar(CMainFrame & mainFrame, COptions & options);
 	virtual ~CMenuBar();
-
-	static CMenuBar* Load(CMainFrame* pMainFrame);
 
 	bool ShowItem(int id);
 	bool HideItem(int id);
@@ -27,7 +25,8 @@ public:
 
 	void UpdateMenubarState();
 protected:
-	CMainFrame* m_pMainFrame;
+	CMainFrame & mainFrame_;
+	COptions& options_;
 
 	void UpdateSpeedLimitMenuItem();
 
