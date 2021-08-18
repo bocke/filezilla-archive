@@ -614,22 +614,15 @@ void CMainFrame::OnSize(wxSizeEvent &event)
 #endif
 }
 
-bool CMainFrame::CreateMenus()
+void CMainFrame::CreateMenus()
 {
 	wxGetApp().AddStartupProfileRecord("CMainFrame::CreateMenus");
 	CMenuBar* old = m_pMenuBar;
 
-	m_pMenuBar = CMenuBar::Load(this);
-
-	if (!m_pMenuBar) {
-		m_pMenuBar = old;
-		return false;
-	}
+	m_pMenuBar = new CMenuBar(*this, options_);
 
 	SetMenuBar(m_pMenuBar);
 	delete old;
-
-	return true;
 }
 
 void CMainFrame::CreateQuickconnectBar()

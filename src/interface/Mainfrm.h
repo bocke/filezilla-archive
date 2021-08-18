@@ -73,7 +73,7 @@ private:
 	void FixTabOrder();
 
 	bool CloseDialogsAndQuit(wxCloseEvent &event);
-	bool CreateMenus();
+	void CreateMenus();
 	void CreateQuickconnectBar();
 	bool CreateMainToolBar();
 	void OpenSiteManager(Site const* site = 0);
