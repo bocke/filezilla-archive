@@ -351,10 +351,10 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	wxSize s = CThemeProvider::GetIconSize(iconSizeSmall);
 	wxImageList* pImageList = new wxImageList(s.x, s.y);
 
-	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDERCLOSED"), wxART_OTHER, s));
-	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDER"), wxART_OTHER, s));
-	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_SERVER"), wxART_OTHER, s));
-	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_BOOKMARK"), wxART_OTHER, s));
+	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDERCLOSED"), wxART_OTHER, s, true));
+	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_FOLDER"), wxART_OTHER, s, true));
+	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_SERVER"), wxART_OTHER, s, true));
+	pImageList->Add(CThemeProvider::Get()->CreateBitmap(_T("ART_BOOKMARK"), wxART_OTHER, s, true));
 
 	tree_->AssignImageList(pImageList);
 
