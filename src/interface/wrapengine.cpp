@@ -979,35 +979,43 @@ bool CWrapEngine::LoadCache()
 
 	if (resourceDir.empty()) {
 		cacheValid = false;
-		while (resources.remove_child("xrc")) {};
+		while (resources.remove_child("xrc")) {
+		}
 	}
 	else {
 		resourceDir.AddSegment(_T("xrc"));
-		wxDir dir(resourceDir.GetPath());
 
-		wxLogNull log;
 
-		wxString xrc;
-		for (bool found = dir.GetFirst(&xrc, _T("*.xrc")); found; found = dir.GetNext(&xrc)) {
-			if (!wxFileName::FileExists(resourceDir.GetPath() + xrc)) {
-				continue;
-			}
+		fz::local_filesys dir;
+		if (dir.begin_find_files(fz::to_native(resourceDir.GetPath()))) {
+			fz::native_string name;
+			bool link{};
+			fz::local_filesys::type type{};
+			fz::datetime date;
 
-			fz::datetime const date = fz::local_filesys::get_modification_time(fz::to_native(resourceDir.GetPath() + xrc));
-			std::wstring const ticks = std::to_wstring(date.get_time_t());
+			fz::native_string const extension = fzS(fz::native_string::value_type, ".xrc");
+			while (dir.get_next_file(name, link, type, nullptr, &date, nullptr)) {
+				if (type != fz::local_filesys::file) {
+					continue;
+				}
+				if (!fz::ends_with(name, extension)) {
+					continue;
+				}
 
-			auto resourceElement = FindElementWithAttribute(resources, "xrc", "file", xrc.mb_str());
-			if (!resourceElement) {
-				resourceElement = resources.append_child("xrc");
-				SetTextAttribute(resourceElement, "file", xrc.ToStdWstring());
-				SetTextAttribute(resourceElement, "date", ticks);
-				cacheValid = false;
-			}
-			else {
-				std::wstring xrcNodeDate = GetTextAttribute(resourceElement, "date");
-				if (xrcNodeDate.empty() || xrcNodeDate != ticks) {
-					cacheValid = false;
+				std::wstring const ticks = std::to_wstring(date.get_time_t());
+				auto resourceElement = FindElementWithAttribute(resources, "xrc", "file", fz::to_utf8(name).c_str());
+				if (!resourceElement) {
+					resourceElement = resources.append_child("xrc");
+					SetTextAttribute(resourceElement, "file", name);
 					SetTextAttribute(resourceElement, "date", ticks);
+					cacheValid = false;
+				}
+				else {
+					std::wstring xrcNodeDate = GetTextAttribute(resourceElement, "date");
+					if (xrcNodeDate.empty() || xrcNodeDate != ticks) {
+						cacheValid = false;
+						SetTextAttribute(resourceElement, "date", ticks);
+					}
 				}
 			}
 		}
@@ -1043,8 +1051,9 @@ bool CWrapEngine::LoadCache()
 	std::wstring fontDesc = font.GetNativeFontInfoDesc().ToStdWstring();
 
 	auto fontElement = languageElement.child("Font");
-	if (!fontElement)
+	if (!fontElement) {
 		fontElement = languageElement.append_child("Font");
+	}
 
 	if (GetTextAttribute(fontElement, "font") != fontDesc) {
 		SetTextAttribute(fontElement, "font", fontDesc);
