@@ -27,7 +27,7 @@ void CToolBar::MakeTool(char const* id, std::wstring const& art, wxString const&
 		return;
 	}
 
-	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(art, wxART_TOOLBAR, iconSize_);
+	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(art, wxART_TOOLBAR, iconSize_, true);
 	wxToolBar::AddTool(XRCID(id), wxString(), bmp, wxBitmap(), type, tooltip, help);
 }
 
