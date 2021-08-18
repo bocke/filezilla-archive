@@ -291,11 +291,9 @@ CThemeProvider* CThemeProvider::Get()
 	return instance;
 }
 
-wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size)
+wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size, bool allowDummy)
 {
-	if (id.Left(4) != _T("ART_")) {
-		return wxNullBitmap;
-	}
+	
 	wxASSERT(size.GetWidth() == size.GetHeight());
 
 	wxSize newSize;
@@ -317,32 +315,53 @@ wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& clie
 		newSize = size;
 	}
 
-	// The ART_* IDs are always given in uppercase ASCII,
-	// all filenames used by FileZilla for the resources
-	// are lowercase ASCII. Locale-independent transformation
-	// needed e.g. if using Turkish locale.
-	std::wstring name = fz::str_tolower_ascii(id.substr(4).ToStdWstring());
-
 	wxBitmap const* bmp{&wxNullBitmap};
-	auto tryTheme = [&](std::wstring const& theme) {
-		if (!bmp->IsOk()) {
-			auto it = themes_.find(theme);
-			if (it != themes_.end()) {
-				bmp = &it->second.LoadBitmap(name, newSize);
+	if (id.Left(4) == _T("ART_")) {
+		// The ART_* IDs are always given in uppercase ASCII,
+		// all filenames used by FileZilla for the resources
+		// are lowercase ASCII. Locale-independent transformation
+		// needed e.g. if using Turkish locale.
+		std::wstring name = fz::str_tolower_ascii(id.substr(4).ToStdWstring());
+
+		auto tryTheme = [&](std::wstring const& theme) {
+			if (bmp->IsOk()) {
+				auto it = themes_.find(theme);
+				if (it != themes_.end()) {
+					bmp = &it->second.LoadBitmap(name, newSize);
+				}
 			}
+		};
+
+		wxLogNull logNull;
+
+		std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
+		if (!theme.empty() && theme != L"default") {
+			tryTheme(theme);
 		}
-	};
-
-	wxLogNull logNull;
-
-	std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
-	if (!theme.empty() && theme != L"default") {
-		tryTheme(theme);
+		tryTheme(L"default");
+		tryTheme(L"");
 	}
-	tryTheme(L"default");
-	tryTheme(L"");
+
+	if (!bmp->IsOk() && allowDummy) {
+		return GetEmpty(newSize);
+	}
 
 	return *bmp;
+}
+
+wxBitmap const& CThemeProvider::GetEmpty(wxSize const& size)
+{
+	auto& empty = emptyBitmaps_[size];
+	if (!empty.IsOk()) {
+		wxImage img;
+		img.Create(size);
+		img.InitAlpha();
+		img.SetType(wxBITMAP_TYPE_PNG);
+		memset(img.GetAlpha(), 0, size.GetWidth() * size.GetHeight());
+		*img.GetAlpha() = 1; // It cannot be fully transparent, or the system will replace it with a black square.
+		empty = wxBitmap(img);
+	}
+	return empty;
 }
 
 wxAnimation CThemeProvider::CreateAnimation(wxArtID const& id, wxSize const& size)

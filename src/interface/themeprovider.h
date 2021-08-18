@@ -7,6 +7,9 @@
 
 #include <libfilezilla/time.hpp>
 
+#include <wx/animate.h>
+#include <wx/artprov.h>
+
 enum iconSize
 {
 	iconSizeTiny,
@@ -15,6 +18,13 @@ enum iconSize
 	iconSizeNormal,
 	iconSizeLarge,
 	iconSizeHuge
+};
+
+struct wxSize_cmp final
+{
+	bool operator()(wxSize const& a, wxSize const& b) const {
+		return a.x < b.x || (a.x == b.x && a.y < b.y);
+	}
 };
 
 class CTheme final
@@ -35,18 +45,11 @@ public:
 
 	std::vector<wxBitmap> GetAllImages(wxSize const& size);
 private:
-	struct size_cmp final
-	{
-		bool operator()(wxSize const& a, wxSize const&b) const {
-			return a.x < b.x || (a.x == b.x && a.y < b.y);
-		}
-	};
-
 	struct cacheEntry
 	{
 		// Converting from wxImage to wxBitmap to wxImage is quite slow, so cache the images as well.
-		std::map<wxSize, wxBitmap, size_cmp> bitmaps_;
-		std::map<wxSize, wxImage, size_cmp> images_;
+		std::map<wxSize, wxBitmap, wxSize_cmp> bitmaps_;
+		std::map<wxSize, wxImage, wxSize_cmp> images_;
 	};
 
 	wxBitmap const& DoLoadBitmap(std::wstring const& name, wxSize const& size, cacheEntry & cache);
@@ -64,7 +67,7 @@ private:
 
 	fz::datetime timestamp_;
 
-	std::map<wxSize, bool, size_cmp> sizes_;
+	std::map<wxSize, bool, wxSize_cmp> sizes_;
 
 	std::map<std::wstring, cacheEntry> cache_;
 };
@@ -89,13 +92,18 @@ public:
 
 	wxAnimation CreateAnimation(wxArtID const& id, wxSize const& size);
 
-	virtual wxBitmap CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size);
+	virtual wxBitmap CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size) override {
+		return CreateBitmap(id, client, size, false);
+	}
+	wxBitmap CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size, bool allowDummy);
 
-protected:
+private:
+	wxBitmap const& GetEmpty(wxSize const& size);
 
 	virtual void OnOptionsChanged(watched_options const& options);
 
 	std::map<std::wstring, CTheme> themes_;
+	std::map<wxSize, wxBitmap, wxSize_cmp> emptyBitmaps_;
 };
 
 #endif
