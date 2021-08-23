@@ -27,7 +27,7 @@ CToolBar::CToolBar(CMainFrame& mainFrame, COptions& options)
 {
 	iconSize_ = CThemeProvider::GetIconSize(iconSizeSmall, true);
 #ifdef __WXMAC__
-	fix_toolbar_style(&mainFrame_);
+	fix_toolbar_style(mainFrame_);
 
 	// OS X only knows two hardcoded toolbar sizes.
 	if (iconSize_.x >= 32) {
