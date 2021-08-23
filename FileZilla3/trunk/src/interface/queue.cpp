@@ -1591,6 +1591,25 @@ CQueue::CQueue(wxWindow* parent, CMainFrame *pMainFrame, CAsyncRequestQueue *pAs
 	RemoveExtraBorders();
 
 	m_pQueueView->LoadQueue();
+
+	Bind(wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP, [this](wxAuiNotebookEvent& ev) {
+		int tab = ev.GetSelection();
+
+		wxContextMenuEvent cev(wxEVT_CONTEXT_MENU);
+		switch (tab) {
+		case 0:
+			m_pQueueView->HandleWindowEvent(cev);
+			break;
+		case 1:
+			m_pQueueView_Failed->HandleWindowEvent(cev);
+			break;
+		case 2:
+			m_pQueueView_Successful->HandleWindowEvent(cev);
+			break;
+		default:
+			break;
+		}
+	});
 }
 
 void CQueue::SetFocus()
