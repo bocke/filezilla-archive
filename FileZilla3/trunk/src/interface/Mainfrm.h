@@ -45,6 +45,7 @@ public:
 	CStatusView* GetStatusView() { return m_pStatusView; }
 	CQueueView* GetQueue() { return m_pQueueView; }
 	CQuickconnectBar* GetQuickconnectBar() { return m_pQuickconnectBar; }
+	COptions& GetOptions() { return options_; }
 
 	// Window size and position as well as pane sizes
 	void RememberSplitterPositions();

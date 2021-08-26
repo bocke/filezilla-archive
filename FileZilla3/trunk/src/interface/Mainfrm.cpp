@@ -394,7 +394,7 @@ CMainFrame::CMainFrame(COptions& options)
 	// so that contextchange events can be processed in the right order.
 	m_pContextControl = new CContextControl(*this);
 
-	m_pStatusBar = new CStatusBar(this, m_engineContext.GetActivityLogger());
+	m_pStatusBar = new CStatusBar(this, m_engineContext.GetActivityLogger(), options_);
 	if (m_pStatusBar) {
 		SetStatusBar(m_pStatusBar);
 	}
@@ -1721,7 +1721,7 @@ void CMainFrame::OnToggleQueueView(wxCommandEvent&)
 
 void CMainFrame::OnMenuHelpAbout(wxCommandEvent&)
 {
-	CAboutDialog dlg;
+	CAboutDialog dlg(options_);
 	if (!dlg.Create(this)) {
 		return;
 	}

@@ -3,15 +3,18 @@
 
 #include "dialogex.h"
 
+class COptionsBase;
 class CAboutDialog final : public wxDialogEx
 {
 public:
-	CAboutDialog() = default;
+	CAboutDialog(COptionsBase& options);
 
 	bool Create(wxWindow* parent);
 
 protected:
 	void OnCopy();
+
+	COptionsBase& options_;
 };
 
 #endif
