@@ -4,8 +4,8 @@
 class CQueueViewFailed : public CQueueViewBase
 {
 public:
-	CQueueViewFailed(CQueue* parent, int index);
-	CQueueViewFailed(CQueue* parent, int index, const wxString& title);
+	CQueueViewFailed(CQueue* parent, COptionsBase & options, int index);
+	CQueueViewFailed(CQueue* parent, COptionsBase & options, int index, const wxString& title);
 
 protected:
 

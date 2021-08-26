@@ -33,7 +33,7 @@ public:
 	bool Load(std::wstring const& theme);
 	bool Load(std::wstring const& theme, std::vector<wxSize> sizes);
 
-	wxBitmap const& LoadBitmap(std::wstring const& name, wxSize const& size);
+	wxBitmap const& LoadBitmap(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size);
 	wxAnimation LoadAnimation(std::wstring const& name, wxSize const& size);
 
 	static wxSize StringToSize(std::wstring const&);
@@ -43,7 +43,7 @@ public:
 	std::wstring get_author() const { return author_; }
 	std::wstring get_mail() const { return mail_; }
 
-	std::vector<wxBitmap> GetAllImages(wxSize const& size);
+	std::vector<wxBitmap> GetAllImages(CLocalPath const& cacheDir, wxSize const& size);
 private:
 	struct cacheEntry
 	{
@@ -52,9 +52,9 @@ private:
 		std::map<wxSize, wxImage, wxSize_cmp> images_;
 	};
 
-	wxBitmap const& DoLoadBitmap(std::wstring const& name, wxSize const& size, cacheEntry & cache);
+	wxBitmap const& DoLoadBitmap(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size, cacheEntry & cache);
 
-	wxBitmap const& LoadBitmapWithSpecificSizeAndScale(std::wstring const& name, wxSize const& size, wxSize const& scale, cacheEntry & cache);
+	wxBitmap const& LoadBitmapWithSpecificSizeAndScale(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size, wxSize const& scale, cacheEntry & cache);
 
 	wxImage const& LoadImageWithSpecificSize(std::wstring const& file, wxSize const& size, cacheEntry & cache);
 
@@ -72,10 +72,11 @@ private:
 	std::map<std::wstring, cacheEntry> cache_;
 };
 
+class COptions;
 class CThemeProvider final : public wxArtProvider, public wxEvtHandler, public COptionChangeEventHandler
 {
 public:
-	CThemeProvider();
+	CThemeProvider(COptions& options);
 	virtual ~CThemeProvider();
 
 	static std::vector<std::wstring> GetThemes();
@@ -102,6 +103,8 @@ private:
 
 	virtual void OnOptionsChanged(watched_options const& options);
 
+	COptions& options_;
+	CLocalPath cacheDir_;
 	std::map<std::wstring, CTheme> themes_;
 	std::map<wxSize, wxBitmap, wxSize_cmp> emptyBitmaps_;
 };

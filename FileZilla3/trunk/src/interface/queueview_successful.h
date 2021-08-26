@@ -6,7 +6,7 @@
 class CQueueViewSuccessful final : public CQueueViewFailed
 {
 public:
-	CQueueViewSuccessful(CQueue* parent, int index);
+	CQueueViewSuccessful(CQueue* parent, COptionsBase & options, int index);
 
 	bool AutoClear() const { return m_autoClear; }
 

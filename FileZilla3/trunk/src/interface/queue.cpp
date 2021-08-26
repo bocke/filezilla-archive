@@ -1,5 +1,6 @@
 #include "filezilla.h"
 #include "Options.h"
+#include "Mainfrm.h"
 #include "queue.h"
 #include "queueview_failed.h"
 #include "queueview_successful.h"
@@ -846,8 +847,9 @@ EVT_KEY_DOWN(CQueueViewBase::OnKeyDown)
 EVT_MENU(XRCID("ID_EXPORT"), CQueueViewBase::OnExport)
 END_EVENT_TABLE()
 
-CQueueViewBase::CQueueViewBase(CQueue* parent, int index, const wxString& title)
+CQueueViewBase::CQueueViewBase(CQueue* parent, COptionsBase & options, int index, const wxString& title)
 	: wxListCtrlEx(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCLIP_CHILDREN | wxLC_REPORT | wxLC_VIRTUAL | wxSUNKEN_BORDER | wxTAB_TRAVERSAL)
+	, options_(options)
 	, m_pageIndex(index)
 	, m_title(title)
 {
@@ -1583,9 +1585,9 @@ CQueue::CQueue(wxWindow* parent, CMainFrame *pMainFrame, CAsyncRequestQueue *pAs
 	m_pQueueView = new CQueueView(this, 0, pMainFrame, pAsyncRequestQueue, certStore);
 	AddPage(m_pQueueView, m_pQueueView->GetTitle());
 
-	m_pQueueView_Failed = new CQueueViewFailed(this, 1);
+	m_pQueueView_Failed = new CQueueViewFailed(this, pMainFrame->GetOptions(), 1);
 	AddPage(m_pQueueView_Failed, m_pQueueView_Failed->GetTitle());
-	m_pQueueView_Successful = new CQueueViewSuccessful(this, 2);
+	m_pQueueView_Successful = new CQueueViewSuccessful(this, pMainFrame->GetOptions(), 2);
 	AddPage(m_pQueueView_Successful, m_pQueueView_Successful->GetTitle());
 
 	RemoveExtraBorders();

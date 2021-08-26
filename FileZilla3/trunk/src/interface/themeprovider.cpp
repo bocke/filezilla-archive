@@ -82,7 +82,7 @@ bool CTheme::Load(std::wstring const& theme, std::vector<wxSize> sizes)
 	return !sizes_.empty();
 }
 
-wxBitmap const& CTheme::LoadBitmap(std::wstring const& name, wxSize const& size)
+wxBitmap const& CTheme::LoadBitmap(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size)
 {
 	// First, check for name in cache
 	auto it = cache_.find(name);
@@ -104,10 +104,10 @@ wxBitmap const& CTheme::LoadBitmap(std::wstring const& name, wxSize const& size)
 		return sit->second;
 	}
 
-	return DoLoadBitmap(name, size, it->second);
+	return DoLoadBitmap(cacheDir, name, size, it->second);
 }
 
-wxBitmap const& CTheme::DoLoadBitmap(std::wstring const& name, wxSize const& size, cacheEntry & cache)
+wxBitmap const& CTheme::DoLoadBitmap(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size, cacheEntry & cache)
 {
 	// Go through all the theme sizes and look for the file we need
 
@@ -121,7 +121,7 @@ wxBitmap const& CTheme::DoLoadBitmap(std::wstring const& name, wxSize const& siz
 	// First look equal or larger icon
 	auto const pivot = sizes_.lower_bound(pivotSize);
 	for (auto pit = pivot; pit != sizes_.end(); ++pit) {
-		wxBitmap const& bmp = LoadBitmapWithSpecificSizeAndScale(name, pit->first, size, cache);
+		wxBitmap const& bmp = LoadBitmapWithSpecificSizeAndScale(cacheDir, name, pit->first, size, cache);
 		if (bmp.IsOk()) {
 			return bmp;
 		}
@@ -129,7 +129,7 @@ wxBitmap const& CTheme::DoLoadBitmap(std::wstring const& name, wxSize const& siz
 
 	// Now look smaller icons
 	for (auto pit = decltype(sizes_)::reverse_iterator(pivot); pit != sizes_.rend(); ++pit) {
-		wxBitmap const& bmp = LoadBitmapWithSpecificSizeAndScale(name, pit->first, size, cache);
+		wxBitmap const& bmp = LoadBitmapWithSpecificSizeAndScale(cacheDir, name, pit->first, size, cache);
 		if (bmp.IsOk()) {
 			return bmp;
 		}
@@ -140,15 +140,13 @@ wxBitmap const& CTheme::DoLoadBitmap(std::wstring const& name, wxSize const& siz
 	return empty;
 }
 
-wxBitmap const& CTheme::LoadBitmapWithSpecificSizeAndScale(std::wstring const& name, wxSize const& size, wxSize const& scale, cacheEntry & cache)
+wxBitmap const& CTheme::LoadBitmapWithSpecificSizeAndScale(CLocalPath const& cacheDir, std::wstring const& name, wxSize const& size, wxSize const& scale, cacheEntry & cache)
 {
 	std::wstring const file = path_ + fz::sprintf(L"%dx%d/%s.png", size.x, size.y, name);
 	std::wstring cacheFile;
-	CLocalPath cacheDir;
 #ifndef __WXMAC__
 	if (size != scale && !timestamp_.empty()) {
 		// Scaling is expensive. Look into resource cache.
-		cacheDir = COptions::Get()->GetCacheDirectory();
 		if (!cacheDir.empty()) {
 			cacheFile = cacheDir.GetPath() + fz::sprintf(L"%s_%s%dx%d.png", theme_, name, scale.x, scale.y);
 			auto cacheTime = fz::local_filesys::get_modification_time(fz::to_native(cacheFile));
@@ -210,7 +208,7 @@ wxImage const& CTheme::LoadImageWithSpecificSize(std::wstring const& file, wxSiz
 	return inserted.first->second;
 }
 
-std::vector<wxBitmap> CTheme::GetAllImages(wxSize const& size)
+std::vector<wxBitmap> CTheme::GetAllImages(CLocalPath const& cacheDir, wxSize const& size)
 {
 	wxLogNull null;
 
@@ -224,7 +222,7 @@ std::vector<wxBitmap> CTheme::GetAllImages(wxSize const& size)
 				while (fs.get_next_file(name)) {
 					size_t pos = name.find(fzT(".png"));
 					if (pos != fz::native_string::npos && pos != 0) {
-						wxBitmap const& bmp = LoadBitmap(fz::to_wstring(name.substr(0, pos)), size);
+						wxBitmap const& bmp = LoadBitmap(cacheDir, fz::to_wstring(name.substr(0, pos)), size);
 						if (bmp.IsOk()) {
 							ret.emplace_back(bmp);
 						}
@@ -247,8 +245,10 @@ wxAnimation CTheme::LoadAnimation(std::wstring const& name, wxSize const& size)
 	return wxAnimation(path);
 }
 
-CThemeProvider::CThemeProvider()
+CThemeProvider::CThemeProvider(COptions& options)
 	: COptionChangeEventHandler(this)
+	, options_(options)
+	, cacheDir_(options.GetCacheDirectory())
 {
 	wxArtProvider::Push(this);
 
@@ -262,7 +262,7 @@ CThemeProvider::CThemeProvider()
 		themes_[L"default"] = defaultTheme;
 	}
 
-	std::wstring name = COptions::Get()->get_string(OPTION_ICONS_THEME);
+	std::wstring name = options_.get_string(OPTION_ICONS_THEME);
 	if (name != L"default") {
 		CTheme theme;
 		if (theme.Load(name)) {
@@ -270,8 +270,8 @@ CThemeProvider::CThemeProvider()
 		}
 	}
 
-	COptions::Get()->watch(OPTION_ICONS_THEME, this);
-	COptions::Get()->watch(OPTION_ICONS_SCALE, this);
+	options_.watch(OPTION_ICONS_THEME, this);
+	options_.watch(OPTION_ICONS_SCALE, this);
 
 	if (!instance) {
 		instance = this;
@@ -280,7 +280,7 @@ CThemeProvider::CThemeProvider()
 
 CThemeProvider::~CThemeProvider()
 {
-	COptions::Get()->unwatch_all(this);
+	options_.unwatch_all(this);
 	if (instance == this) {
 		instance = 0;
 	}
@@ -293,7 +293,6 @@ CThemeProvider* CThemeProvider::Get()
 
 wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& client, wxSize const& size, bool allowDummy)
 {
-	
 	wxASSERT(size.GetWidth() == size.GetHeight());
 
 	wxSize newSize;
@@ -327,14 +326,14 @@ wxBitmap CThemeProvider::CreateBitmap(wxArtID const& id, wxArtClient const& clie
 			if (!bmp->IsOk()) {
 				auto it = themes_.find(theme);
 				if (it != themes_.end()) {
-					bmp = &it->second.LoadBitmap(name, newSize);
+					bmp = &it->second.LoadBitmap(cacheDir_, name, newSize);
 				}
 			}
 		};
 
 		wxLogNull logNull;
 
-		std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
+		std::wstring const theme = options_.get_string(OPTION_ICONS_THEME);
 		if (!theme.empty() && theme != L"default") {
 			tryTheme(theme);
 		}
@@ -389,7 +388,7 @@ wxAnimation CThemeProvider::CreateAnimation(wxArtID const& id, wxSize const& siz
 
 	wxLogNull logNull;
 
-	std::wstring const theme = COptions::Get()->get_string(OPTION_ICONS_THEME);
+	std::wstring const theme = options_.get_string(OPTION_ICONS_THEME);
 	if (!theme.empty() && theme != L"default") {
 		tryTheme(theme);
 	}
@@ -432,7 +431,7 @@ std::vector<wxBitmap> CThemeProvider::GetAllImages(std::wstring const& theme, wx
 		it = themes_.insert(std::make_pair(theme, t)).first;
 	}
 
-	return it->second.GetAllImages(size);
+	return it->second.GetAllImages(cacheDir_, size);
 }
 
 bool CThemeProvider::GetThemeData(std::wstring const& theme, std::wstring & name, std::wstring & author, std::wstring & email)
@@ -477,7 +476,7 @@ wxIconBundle CThemeProvider::GetIconBundle(const wxArtID& id, const wxArtClient&
 
 void CThemeProvider::OnOptionsChanged(watched_options const&)
 {
-	std::wstring name = COptions::Get()->get_string(OPTION_ICONS_THEME);
+	std::wstring name = options_.get_string(OPTION_ICONS_THEME);
 	if (themes_.find(name) == themes_.end()) {
 		CTheme theme;
 		if (theme.Load(name)) {
