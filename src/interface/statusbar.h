@@ -89,10 +89,11 @@ protected:
 
 class activity_logger;
 class CLed;
+class COptionsBase;
 class CStatusBar final : public CWidgetsStatusBar, public COptionChangeEventHandler, protected CGlobalStateEventHandler
 {
 public:
-	CStatusBar(wxTopLevelWindow* parent, activity_logger& al);
+	CStatusBar(wxTopLevelWindow* parent, activity_logger& al, COptionsBase& options);
 	virtual ~CStatusBar();
 
 	void DisplayQueueSize(int64_t totalSize, bool hasUnknown);
@@ -116,6 +117,8 @@ protected:
 	virtual void OnStateChange(CState* pState, t_statechange_notifications notification, std::wstring const& data, const void* data2) override;
 
 	void DoDisplayQueueSize();
+
+	COptionsBase& options_;
 
 	CSizeFormat::_format m_sizeFormat;
 	bool m_sizeFormatThousandsSep;

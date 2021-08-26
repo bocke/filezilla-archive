@@ -245,7 +245,7 @@ void CContextControl::CreateContextControls(CState& state)
 	context_controls.pRemoteTreeViewPanel->SetWindow(context_controls.pRemoteTreeView);
 	context_controls.pRemoteListViewPanel->SetWindow(context_controls.pRemoteListView);
 
-	bool show_filelist_statusbars = COptions::Get()->get_int(OPTION_FILELIST_STATUSBAR) != 0;
+	bool show_filelist_statusbars = m_mainFrame.GetOptions().get_int(OPTION_FILELIST_STATUSBAR) != 0;
 
 	CFilelistStatusBar* pLocalFilelistStatusBar = new CFilelistStatusBar(context_controls.pLocalListViewPanel);
 	if (!show_filelist_statusbars) {
@@ -278,8 +278,8 @@ void CContextControl::CreateContextControls(CState& state)
 	context_controls.pRemoteListSearchPanel = new CListSearchPanel(context_controls.pRemoteListViewPanel, context_controls.pRemoteListView, context_controls.pState, false);
 	context_controls.pRemoteListViewPanel->SetSearchPanel(context_controls.pRemoteListSearchPanel);
 
-	const int layout = COptions::Get()->get_int(OPTION_FILEPANE_LAYOUT);
-	const int swap = COptions::Get()->get_int(OPTION_FILEPANE_SWAP);
+	const int layout = m_mainFrame.GetOptions().get_int(OPTION_FILEPANE_LAYOUT);
+	const int swap = m_mainFrame.GetOptions().get_int(OPTION_FILEPANE_SWAP);
 
 	if (layout == 1) {
 		if (swap) {
@@ -298,7 +298,7 @@ void CContextControl::CreateContextControls(CState& state)
 		}
 	}
 
-	if (COptions::Get()->get_int(OPTION_SHOW_TREE_LOCAL)) {
+	if (m_mainFrame.GetOptions().get_int(OPTION_SHOW_TREE_LOCAL)) {
 		context_controls.pLocalViewHeader = new CLocalViewHeader(context_controls.pLocalTreeViewPanel, state);
 		context_controls.pLocalTreeViewPanel->SetHeader(context_controls.pLocalViewHeader);
 		if (layout == 3 && swap) {
@@ -318,7 +318,7 @@ void CContextControl::CreateContextControls(CState& state)
 		context_controls.pLocalSplitter->Initialize(context_controls.pLocalListViewPanel);
 	}
 
-	if (COptions::Get()->get_int(OPTION_SHOW_TREE_REMOTE)) {
+	if (m_mainFrame.GetOptions().get_int(OPTION_SHOW_TREE_REMOTE)) {
 		context_controls.pRemoteViewHeader = new CRemoteViewHeader(context_controls.pRemoteTreeViewPanel, state);
 		context_controls.pRemoteTreeViewPanel->SetHeader(context_controls.pRemoteViewHeader);
 		if (layout == 3 && !swap) {
@@ -706,7 +706,7 @@ void CContextControl::SaveTabs()
 		}
 	}
 
-	COptions::Get()->set(OPTION_TAB_DATA, xml);
+	m_mainFrame.GetOptions().set(OPTION_TAB_DATA, xml);
 }
 
 void CContextControl::RestoreTabs()
@@ -717,9 +717,9 @@ void CContextControl::RestoreTabs()
 
 	int selected = 0;
 
-	auto xml = COptions::Get()->get_xml(OPTION_TAB_DATA);
+	auto xml = m_mainFrame.GetOptions().get_xml(OPTION_TAB_DATA);
 
-	bool selectedOnly = COptions::Get()->get_int(OPTION_STARTUP_ACTION) != 2;
+	bool selectedOnly = m_mainFrame.GetOptions().get_int(OPTION_STARTUP_ACTION) != 2;
 
 	CCommandLine const* pCommandLine = wxGetApp().GetCommandLine();
 	if (pCommandLine && pCommandLine->BlocksReconnectAtStartup()) {

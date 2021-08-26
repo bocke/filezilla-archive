@@ -317,25 +317,26 @@ EVT_MENU(XRCID("ID_SPEEDLIMITCONTEXT_CONFIGURE"), CStatusBar::OnSpeedLimitsConfi
 EVT_TIMER(wxID_ANY, CStatusBar::OnTimer)
 END_EVENT_TABLE()
 
-CStatusBar::CStatusBar(wxTopLevelWindow* pParent, activity_logger& al)
+CStatusBar::CStatusBar(wxTopLevelWindow* pParent, activity_logger& al, COptionsBase& options)
 	: CWidgetsStatusBar(pParent)
 	, COptionChangeEventHandler(this)
+	, options_(options)
 	, activity_logger_(al)
 {
 	// Speedlimits
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_ENABLE, this);
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_INBOUND, this);
-	COptions::Get()->watch(OPTION_SPEEDLIMIT_OUTBOUND, this);
+	options_.watch(OPTION_SPEEDLIMIT_ENABLE, this);
+	options_.watch(OPTION_SPEEDLIMIT_INBOUND, this);
+	options_.watch(OPTION_SPEEDLIMIT_OUTBOUND, this);
 
 	// Size format
-	COptions::Get()->watch(OPTION_SIZE_FORMAT, this);
-	COptions::Get()->watch(OPTION_SIZE_USETHOUSANDSEP, this);
-	COptions::Get()->watch(OPTION_SIZE_DECIMALPLACES, this);
+	options_.watch(OPTION_SIZE_FORMAT, this);
+	options_.watch(OPTION_SIZE_USETHOUSANDSEP, this);
+	options_.watch(OPTION_SIZE_DECIMALPLACES, this);
 
-	COptions::Get()->watch(OPTION_ASCIIBINARY, this);
+	options_.watch(OPTION_ASCIIBINARY, this);
 
 	// Reload icons
-	COptions::Get()->watch(OPTION_ICONS_THEME, this);
+	options_.watch(OPTION_ICONS_THEME, this);
 
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_SERVER, true);
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_CHANGEDCONTEXT, false);
@@ -374,7 +375,7 @@ CStatusBar::CStatusBar(wxTopLevelWindow* pParent, activity_logger& al)
 
 CStatusBar::~CStatusBar()
 {
-	COptions::Get()->unwatch_all(this);
+	options_.unwatch_all(this);
 }
 
 void CStatusBar::DisplayQueueSize(int64_t totalSize, bool hasUnknown)
@@ -424,7 +425,7 @@ void CStatusBar::DisplayDataType()
 		wxString name;
 		wxString desc;
 
-		const int type = COptions::Get()->get_int(OPTION_ASCIIBINARY);
+		const int type = options_.get_int(OPTION_ASCIIBINARY);
 		if (type == 1) {
 			name = _T("ART_ASCII");
 			desc = _("Current transfer type is set to ASCII.");
@@ -516,13 +517,13 @@ void CStatusBar::UpdateSizeFormat()
 {
 	// 0 equals bytes, however just use IEC binary prefixes instead,
 	// exact byte counts for queue make no sense.
-	m_sizeFormat = CSizeFormat::_format(COptions::Get()->get_int(OPTION_SIZE_FORMAT));
+	m_sizeFormat = CSizeFormat::_format(options_.get_int(OPTION_SIZE_FORMAT));
 	if (!m_sizeFormat) {
 		m_sizeFormat = CSizeFormat::iec;
 	}
 
-	m_sizeFormatThousandsSep = COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0;
-	m_sizeFormatDecimalPlaces = COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES);
+	m_sizeFormatThousandsSep = options_.get_int(OPTION_SIZE_USETHOUSANDSEP) != 0;
+	m_sizeFormatDecimalPlaces = options_.get_int(OPTION_SIZE_DECIMALPLACES);
 
 	MeasureQueueSizeWidth();
 
@@ -562,9 +563,9 @@ void CStatusBar::OnHandleRightClick(wxWindow* pWnd)
 	}
 	else if (pWnd == m_pSpeedLimitsIndicator) {
 
-		int downloadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
-		int uploadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
-		bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
+		int downloadlimit = options_.get_int(OPTION_SPEEDLIMIT_INBOUND);
+		int uploadlimit = options_.get_int(OPTION_SPEEDLIMIT_OUTBOUND);
+		bool enable = options_.get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 		if (!downloadlimit && !uploadlimit) {
 			enable = false;
 		}
@@ -584,7 +585,7 @@ void CStatusBar::ShowDataTypeMenu()
 	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_ASCII"), _("A&SCII"), wxString(), wxITEM_RADIO);
 	menu.Append(XRCID("ID_MENU_TRANSFER_TYPE_BINARY"), _("&Binary"), wxString(), wxITEM_RADIO);
 
-	const int type = COptions::Get()->get_int(OPTION_ASCIIBINARY);
+	const int type = options_.get_int(OPTION_ASCIIBINARY);
 	switch (type)
 	{
 	case 1:
@@ -603,7 +604,7 @@ void CStatusBar::ShowDataTypeMenu()
 
 void CStatusBar::UpdateSpeedLimitsIcon()
 {
-	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
+	bool enable = options_.get_int(OPTION_SPEEDLIMIT_ENABLE) != 0;
 
 	wxBitmap bmp = CThemeProvider::Get()->CreateBitmap(_T("ART_SPEEDLIMITS"), wxART_OTHER, CThemeProvider::GetIconSize(iconSizeSmall));
 	if (!bmp.Ok()) {
@@ -611,8 +612,8 @@ void CStatusBar::UpdateSpeedLimitsIcon()
 	}
 	wxString tooltip;
 
-	int downloadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
-	int uploadLimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
+	int downloadLimit = options_.get_int(OPTION_SPEEDLIMIT_INBOUND);
+	int uploadLimit = options_.get_int(OPTION_SPEEDLIMIT_OUTBOUND);
 	if (!enable || (!downloadLimit && !uploadLimit)) {
 		wxImage img = bmp.ConvertToImage();
 		img = img.ConvertToGreyscale();
@@ -682,20 +683,20 @@ void CStatusBar::OnStateChange(CState*, t_statechange_notifications notification
 
 void CStatusBar::OnSpeedLimitsEnable(wxCommandEvent&)
 {
-	int downloadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_INBOUND);
-	int uploadlimit = COptions::Get()->get_int(OPTION_SPEEDLIMIT_OUTBOUND);
-	bool enable = COptions::Get()->get_int(OPTION_SPEEDLIMIT_ENABLE) == 0;
+	int downloadlimit = options_.get_int(OPTION_SPEEDLIMIT_INBOUND);
+	int uploadlimit = options_.get_int(OPTION_SPEEDLIMIT_OUTBOUND);
+	bool enable = options_.get_int(OPTION_SPEEDLIMIT_ENABLE) == 0;
 	if (enable) {
 		if (!downloadlimit && !uploadlimit) {
 			CSpeedLimitsDialog dlg;
 			dlg.Run(m_pParent);
 		}
 		else {
-			COptions::Get()->set(OPTION_SPEEDLIMIT_ENABLE, 1);
+			options_.set(OPTION_SPEEDLIMIT_ENABLE, 1);
 		}
 	}
 	else {
-		COptions::Get()->set(OPTION_SPEEDLIMIT_ENABLE, 0);
+		options_.set(OPTION_SPEEDLIMIT_ENABLE, 0);
 	}
 }
 
@@ -747,19 +748,19 @@ void CStatusBar::UpdateActivityTooltip()
 	speeds[0] /= 2;
 	speeds[1] /= 2;
 
-	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(COptions::Get()->get_int(OPTION_SIZE_FORMAT));
+	CSizeFormat::_format format = static_cast<CSizeFormat::_format>(options_.get_int(OPTION_SIZE_FORMAT));
 	if (format == CSizeFormat::bytes) {
 		format = CSizeFormat::iec;
 	}
 
 
 	std::wstring const upSpeed = CSizeFormat::Format(speeds[0], true, format,
-													 COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
-													 COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
+													 options_.get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+													 options_.get_int(OPTION_SIZE_DECIMALPLACES));
 
 	std::wstring const dlSpeed = CSizeFormat::Format(speeds[1], true, format,
-													 COptions::Get()->get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
-													 COptions::Get()->get_int(OPTION_SIZE_DECIMALPLACES));
+													 options_.get_int(OPTION_SIZE_USETHOUSANDSEP) != 0,
+													 options_.get_int(OPTION_SIZE_DECIMALPLACES));
 
 
 	wxString tooltipText;
