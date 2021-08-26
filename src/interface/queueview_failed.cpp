@@ -14,15 +14,15 @@ EVT_MENU(XRCID("ID_REQUEUEALL"), CQueueViewFailed::OnRequeueAll)
 EVT_CHAR(CQueueViewFailed::OnChar)
 END_EVENT_TABLE()
 
-CQueueViewFailed::CQueueViewFailed(CQueue* parent, int index)
-	: CQueueViewBase(parent, index, _("Failed transfers"))
+CQueueViewFailed::CQueueViewFailed(CQueue* parent, COptionsBase & options, int index)
+	: CQueueViewBase(parent, options, index, _("Failed transfers"))
 {
 	std::vector<ColumnId> extraCols({colTime, colErrorReason});
 	CreateColumns(extraCols);
 }
 
-CQueueViewFailed::CQueueViewFailed(CQueue* parent, int index, const wxString& title)
-	: CQueueViewBase(parent, index, title)
+CQueueViewFailed::CQueueViewFailed(CQueue* parent, COptionsBase & options, int index, const wxString& title)
+	: CQueueViewBase(parent, options, index, title)
 {
 }
 

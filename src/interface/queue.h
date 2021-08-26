@@ -309,7 +309,7 @@ public:
 		colErrorReason
 	};
 
-	CQueueViewBase(CQueue* parent, int index, const wxString& title);
+	CQueueViewBase(CQueue* parent, COptionsBase & options, int index, wxString const& title);
 	virtual ~CQueueViewBase();
 
 	// Gets item for given server or creates new if it doesn't exist
@@ -349,6 +349,8 @@ protected:
 	void RefreshItem(const CQueueItem* pItem);
 
 	void DisplayNumberQueuedFiles();
+
+	COptionsBase& options_;
 
 	// Position at which insertions start and number of insertions
 	int m_insertionStart{-1};

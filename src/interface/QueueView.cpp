@@ -212,7 +212,7 @@ EVT_LIST_COL_CLICK(wxID_ANY, CQueueView::OnColumnClicked)
 END_EVENT_TABLE()
 
 CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsyncRequestQueue *pAsyncRequestQueue, cert_store & certStore)
-	: CQueueViewBase(parent, index, _("Queued files"))
+	: CQueueViewBase(parent, pMainFrame->GetOptions(), index, _("Queued files"))
 	, COptionChangeEventHandler(this)
 	, m_pMainFrame(pMainFrame)
 	, m_pAsyncRequestQueue(pAsyncRequestQueue)
@@ -224,7 +224,7 @@ CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsync
 		m_pAsyncRequestQueue->SetQueue(this);
 	}
 
-	int action = COptions::Get()->get_int(OPTION_QUEUE_COMPLETION_ACTION);
+	int action = options_.get_int(OPTION_QUEUE_COMPLETION_ACTION);
 	if (action < 0 || action >= ActionAfterState::Count) {
 		action = 1;
 	}
@@ -236,9 +236,9 @@ CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsync
 	std::vector<ColumnId> extraCols({colTransferStatus});
 	CreateColumns(extraCols);
 
-	COptions::Get()->watch(OPTION_NUMTRANSFERS, this);
-	COptions::Get()->watch(OPTION_CONCURRENTDOWNLOADLIMIT, this);
-	COptions::Get()->watch(OPTION_CONCURRENTUPLOADLIMIT, this);
+	options_.watch(OPTION_NUMTRANSFERS, this);
+	options_.watch(OPTION_CONCURRENTDOWNLOADLIMIT, this);
+	options_.watch(OPTION_CONCURRENTUPLOADLIMIT, this);
 
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REWRITE_CREDENTIALS, false);
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_QUITNOW, false);
@@ -255,7 +255,7 @@ CQueueView::CQueueView(CQueue* parent, int index, CMainFrame* pMainFrame, CAsync
 
 CQueueView::~CQueueView()
 {
-	COptions::Get()->unwatch_all(this);
+	options_.unwatch_all(this);
 	DeleteEngines();
 
 	m_resize_timer.Stop();
@@ -357,7 +357,7 @@ bool CQueueView::QueueFiles(const bool queueOnly, const CLocalPath& localPath, c
 		}
 
 		std::wstring localFile = ReplaceInvalidCharacters(fileInfo.name);
-		if (dataObject.GetServerPath().GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION)) {
+		if (dataObject.GetServerPath().GetType() == VMS && options_.get_int(OPTION_STRIP_VMS_REVISION)) {
 			localFile = StripVMSRevision(localFile);
 		}
 
@@ -447,7 +447,7 @@ void CQueueView::ProcessNotification(t_EngineData* pEngineData, std::unique_ptr<
 	{
 	case nId_logmsg:
 		m_pMainFrame->GetStatusView()->AddToLog(std::move(static_cast<CLogmsgNotification&>(*pNotification.get())));
-		if (COptions::Get()->get_int(OPTION_MESSAGELOG_POSITION) == 2) {
+		if (options_.get_int(OPTION_MESSAGELOG_POSITION) == 2) {
 			m_pQueue->Highlight(3);
 		}
 		break;
@@ -612,13 +612,13 @@ bool CQueueView::TryStartNextTransfer()
 	}
 
 	// Check transfer limit
-	if (m_activeCount >= COptions::Get()->get_int(OPTION_NUMTRANSFERS)) {
+	if (m_activeCount >= options_.get_int(OPTION_NUMTRANSFERS)) {
 		return false;
 	}
 
 	// Check limits for concurrent up/downloads
-	const int maxDownloads = COptions::Get()->get_int(OPTION_CONCURRENTDOWNLOADLIMIT);
-	const int maxUploads = COptions::Get()->get_int(OPTION_CONCURRENTUPLOADLIMIT);
+	const int maxDownloads = options_.get_int(OPTION_CONCURRENTDOWNLOADLIMIT);
+	const int maxUploads = options_.get_int(OPTION_CONCURRENTUPLOADLIMIT);
 	TransferDirection wantedDirection;
 	if (maxDownloads && m_activeCountDown >= maxDownloads) {
 		if (maxUploads && m_activeCountUp >= maxUploads) {
@@ -1480,7 +1480,7 @@ void CQueueView::CheckQueueState()
 bool CQueueView::IncreaseErrorCount(t_EngineData& engineData)
 {
 	++engineData.pItem->m_errorCount;
-	if (engineData.pItem->m_errorCount <= COptions::Get()->get_int(OPTION_RECONNECTCOUNT)) {
+	if (engineData.pItem->m_errorCount <= options_.get_int(OPTION_RECONNECTCOUNT)) {
 		return true;
 	}
 
@@ -1555,7 +1555,7 @@ void CQueueView::DisplayQueueSize()
 void CQueueView::SaveQueue(bool silent)
 {
 	// Kiosk mode 2 doesn't save queue
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
+	if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 		return;
 	}
 
@@ -1612,7 +1612,7 @@ void CQueueView::LoadQueue()
 		}
 
 		if (error || first_id > 0) {
-			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
+			if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) != 2) {
 				if (!m_queue_storage.Clear()) {
 					error = true;
 				}
@@ -1889,7 +1889,7 @@ void CQueueView::OnActionAfter(wxCommandEvent& event)
 	}
 	else if (event.GetId() == XRCID("ID_ACTIONAFTER_RUNCOMMAND")) {
 		wxTextEntryDialog dlg(m_pMainFrame, _("Please enter the complete path of a program and its arguments. This command will be executed when the queue has finished processing.\nE.g. c:\\somePath\\file.exe under MS Windows or /somePath/file under Unix.\nYou need to properly quote commands and their arguments if they contain spaces."), _("Enter command"));
-		dlg.SetValue(COptions::Get()->get_string(OPTION_QUEUE_COMPLETION_COMMAND));
+		dlg.SetValue(options_.get_string(OPTION_QUEUE_COMPLETION_COMMAND));
 
 		if (dlg.ShowModal() == wxID_OK) {
 			const wxString &command = dlg.GetValue();
@@ -1898,7 +1898,7 @@ void CQueueView::OnActionAfter(wxCommandEvent& event)
 			}
 			else {
 				m_actionAfterState = ActionAfterState::RunCommand;
-				COptions::Get()->set(OPTION_QUEUE_COMPLETION_COMMAND, command.ToStdWstring());
+				options_.set(OPTION_QUEUE_COMPLETION_COMMAND, command.ToStdWstring());
 			}
 		}
 	}
@@ -1912,7 +1912,7 @@ void CQueueView::OnActionAfter(wxCommandEvent& event)
 #endif
 
 	if (m_actionAfterState != ActionAfterState::Reboot && m_actionAfterState != ActionAfterState::Shutdown && m_actionAfterState != ActionAfterState::Sleep && m_actionAfterState != ActionAfterState::CloseOnce) {
-		COptions::Get()->set(OPTION_QUEUE_COMPLETION_ACTION, m_actionAfterState);
+		options_.set(OPTION_QUEUE_COMPLETION_ACTION, m_actionAfterState);
 	}
 }
 
@@ -2280,7 +2280,7 @@ t_EngineData* CQueueView::GetIdleEngine(Site const& site, bool allowTransient)
 
 	if (!pFirstIdle) {
 		// Check whether we can create another engine
-		const int newEngineCount = COptions::Get()->get_int(OPTION_NUMTRANSFERS);
+		const int newEngineCount = options_.get_int(OPTION_NUMTRANSFERS);
 		if (newEngineCount > static_cast<int>(m_engineData.size()) - transient) {
 			pFirstIdle = new t_EngineData;
 			pFirstIdle->pEngine = new CFileZillaEngine(m_pMainFrame->GetEngineContext(), fz::make_invoker(*this, [this](CFileZillaEngine* engine) { OnEngineEvent(engine); }));
@@ -2722,7 +2722,7 @@ void CQueueView::ActionAfter(bool warned)
 		}
 		case ActionAfterState::RunCommand:
 		{
-			wxString cmd = COptions::Get()->get_string(OPTION_QUEUE_COMPLETION_COMMAND);
+			wxString cmd = options_.get_string(OPTION_QUEUE_COMPLETION_COMMAND);
 			if (!cmd.empty()) {
 				wxExecute(cmd);
 			}
@@ -2962,11 +2962,12 @@ void CQueueView::RenameFileInTransfer(CFileZillaEngine *pEngine, std::wstring co
 
 std::wstring CQueueView::ReplaceInvalidCharacters(std::wstring const& filename, bool includeQuotesAndBreaks)
 {
-	if (!COptions::Get()->get_int(OPTION_INVALID_CHAR_REPLACE_ENABLE)) {
+	auto& options = *COptions::Get();
+	if (!options.get_int(OPTION_INVALID_CHAR_REPLACE_ENABLE)) {
 		return filename;
 	}
 
-	wchar_t const replace = COptions::Get()->get_string(OPTION_INVALID_CHAR_REPLACE)[0];
+	wchar_t const replace = options.get_string(OPTION_INVALID_CHAR_REPLACE)[0];
 
 	std::wstring ret = filename;
 	for (auto & c : ret) {
@@ -3060,7 +3061,7 @@ void CQueueView::OnStateChange(CState*, t_statechange_notifications notification
 			return;
 		}
 
-		bool const forget = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
+		bool const forget = options_.get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 		for (auto it = m_serverList.begin(); it != m_serverList.end(); ) {
 			Site site = (*it)->GetSite();
 			if (!forget) {

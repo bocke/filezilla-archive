@@ -230,7 +230,7 @@ USE AT OWN RISK"), _T("Important Information"));
 		return false;
 	}
 
-	themeProvider_ = std::make_unique<CThemeProvider>();
+	themeProvider_ = std::make_unique<CThemeProvider>(*options_);
 	CheckExistsFzsftp();
 #if ENABLE_STORJ
 	CheckExistsFzstorj();

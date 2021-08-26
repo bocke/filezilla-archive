@@ -27,7 +27,7 @@ bool CAboutDialog::Create(wxWindow* parent)
 	auto top = lay.createFlex(2);
 	main->Add(top);
 
-	top->Add(new wxStaticBitmap(this, -1, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::GetIconSize(iconSizeLarge))), 0, wxALL, lay.border);
+	top->Add(new wxStaticBitmap(this, -1, CThemeProvider::Get()->CreateBitmap("ART_FILEZILLA", wxString(), CThemeProvider::Get()->GetIconSize(iconSizeLarge))), 0, wxALL, lay.border);
 
 	auto topRight = lay.createFlex(1);
 	top->Add(topRight);
