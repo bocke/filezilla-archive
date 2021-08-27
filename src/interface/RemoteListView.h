@@ -16,7 +16,7 @@ class CRemoteListView final : public CFileListCtrl<CGenericFileData>, CStateEven
 {
 	friend class CRemoteListViewDropTarget;
 public:
-	CRemoteListView(CView* pParent, CState& state, CQueueView* pQueue);
+	CRemoteListView(CView* pParent, CState& state, CQueueView* pQueue, COptionsBase & options);
 	virtual ~CRemoteListView();
 
 	virtual bool CanStartComparison();
@@ -119,7 +119,7 @@ protected:
 	std::unique_ptr<CWindowTinter> m_windowTinter;
 
 	CView *m_parentView{};
-	
+
 	DECLARE_EVENT_TABLE()
 	void OnItemActivated(wxListEvent &event);
 	void OnContextMenu(wxContextMenuEvent& event);

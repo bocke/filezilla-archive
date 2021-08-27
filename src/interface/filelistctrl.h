@@ -499,11 +499,12 @@ namespace genericTypes {
 	};
 }
 
+class COptionsBase;
 template<class CFileData> class CFileListCtrl : public wxListCtrlEx, public CComparableListing
 {
 	template<typename Listing, typename DataEntry> friend class CFileListCtrlSortType;
 public:
-	CFileListCtrl(wxWindow* pParent, CQueueView *pQueue, bool border = false);
+	CFileListCtrl(wxWindow* pParent, CQueueView *pQueue, COptionsBase & options, bool border = false);
 	virtual ~CFileListCtrl() = default;
 
 	void SetFilelistStatusBar(CFilelistStatusBar* pFilelistStatusBar) { m_pFilelistStatusBar = pFilelistStatusBar; }
@@ -611,6 +612,8 @@ private:
 	void OnProcessMouseEvent(wxCommandEvent& event);
 #endif
 	void OnKeyDown(wxKeyEvent& event);
+
+	COptionsBase& options_;
 };
 
 class SortPredicate

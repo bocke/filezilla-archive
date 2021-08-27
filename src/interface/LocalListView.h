@@ -33,7 +33,7 @@ class CLocalListView final : public CFileListCtrl<CLocalFileData>, CStateEventHa
 	friend class CLocalListViewSortType;
 
 public:
-	CLocalListView(CView* parent, CState& state, CQueueView *pQueue);
+	CLocalListView(CView* parent, CState& state, CQueueView *pQueue, COptionsBase & options);
 	virtual ~CLocalListView();
 
 protected:

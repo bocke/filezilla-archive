@@ -234,14 +234,14 @@ void CContextControl::CreateContextControls(CState& state)
 	context_controls.pLocalTreeViewPanel = new CView(context_controls.pLocalSplitter);
 	context_controls.pLocalListViewPanel = new CView(context_controls.pLocalSplitter);
 	context_controls.pLocalTreeView = new CLocalTreeView(context_controls.pLocalTreeViewPanel, -1, state, m_mainFrame.GetQueue());
-	context_controls.pLocalListView = new CLocalListView(context_controls.pLocalListViewPanel, state, m_mainFrame.GetQueue());
+	context_controls.pLocalListView = new CLocalListView(context_controls.pLocalListViewPanel, state, m_mainFrame.GetQueue(), m_mainFrame.GetOptions());
 	context_controls.pLocalTreeViewPanel->SetWindow(context_controls.pLocalTreeView);
 	context_controls.pLocalListViewPanel->SetWindow(context_controls.pLocalListView);
 
 	context_controls.pRemoteTreeViewPanel = new CView(context_controls.pRemoteSplitter);
 	context_controls.pRemoteListViewPanel = new CView(context_controls.pRemoteSplitter);
 	context_controls.pRemoteTreeView = new CRemoteTreeView(context_controls.pRemoteTreeViewPanel, -1, state, m_mainFrame.GetQueue());
-	context_controls.pRemoteListView = new CRemoteListView(context_controls.pRemoteListViewPanel, state, m_mainFrame.GetQueue());
+	context_controls.pRemoteListView = new CRemoteListView(context_controls.pRemoteListViewPanel, state, m_mainFrame.GetQueue(), m_mainFrame.GetOptions());
 	context_controls.pRemoteTreeViewPanel->SetWindow(context_controls.pRemoteTreeView);
 	context_controls.pRemoteListViewPanel->SetWindow(context_controls.pRemoteListView);
 

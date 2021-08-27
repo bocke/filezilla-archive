@@ -107,7 +107,7 @@ class CSearchDialogFileList final : public CFileListCtrl<CGenericFileData>
 	friend class CSearchSortType;
 
 public:
-	CSearchDialogFileList(CSearchDialog* pParent, CQueueView* pQueue);
+	CSearchDialogFileList(CSearchDialog* pParent, CQueueView* pQueue, COptionsBase & options);
 
 	void clear();
 	void set_mode(CSearchDialog::search_mode mode);
@@ -160,8 +160,8 @@ END_EVENT_TABLE()
 // Defined in RemoteListView.cpp
 std::wstring StripVMSRevision(std::wstring const& name);
 
-CSearchDialogFileList::CSearchDialogFileList(CSearchDialog* pParent, CQueueView* pQueue)
-	: CFileListCtrl<CGenericFileData>(pParent, pQueue, true),
+CSearchDialogFileList::CSearchDialogFileList(CSearchDialog* pParent, CQueueView* pQueue, COptionsBase & options)
+	: CFileListCtrl<CGenericFileData>(pParent, pQueue, options, true),
 	m_searchDialog(pParent)
 {
 	m_hasParent = false;
@@ -612,10 +612,11 @@ EVT_RADIOBUTTON(XRCID("ID_COMPARE_DATE"), CSearchDialog::OnChangeCompareOption)
 EVT_CHECKBOX(XRCID("ID_COMPARE_HIDEIDENTICAL"), CSearchDialog::OnChangeCompareOption)
 END_EVENT_TABLE()
 
-CSearchDialog::CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue)
+CSearchDialog::CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue, COptionsBase & options)
 	: CStateEventHandler(state)
 	, m_parent(parent)
 	, m_pQueue(pQueue)
+	, options_(options)
 {
 	m_pComparisonManager = new CComparisonManager(state);
 }
@@ -726,11 +727,11 @@ bool CSearchDialog::Load()
 		return false;
 	}
 
-	m_results = new CSearchDialogFileList(this, 0);
+	m_results = new CSearchDialogFileList(this, 0, options_);
 	ReplaceControl(XRCCTRL(*this, "ID_RESULTS", wxWindow), m_results);
 	m_results->SetFilelistStatusBar(pStatusBar);
 
-	m_remoteResults = new CSearchDialogFileList(this, 0);
+	m_remoteResults = new CSearchDialogFileList(this, 0, options_);
 	ReplaceControl(XRCCTRL(*this, "ID_REMOTE_RESULTS", wxWindow), m_remoteResults);
 	m_remoteResults->SetFilelistStatusBar(m_remoteStatusBar);
 	m_remoteResults->Show(false);
@@ -742,14 +743,14 @@ bool CSearchDialog::Load()
 
 	SetCtrlState();
 
-	const int mode = COptions::Get()->get_int(OPTION_COMPARISONMODE);
+	const int mode = options_.get_int(OPTION_COMPARISONMODE);
 	if (mode == 0) {
 		xrc_call(*this, "ID_COMPARE_SIZE", &wxRadioButton::SetValue, true);
 	}
 	else {
 		xrc_call(*this, "ID_COMPARE_DATE", &wxRadioButton::SetValue, true);
 	}
-	xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::SetValue, COptions::Get()->get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
+	xrc_call(*this, "ID_COMPARE_HIDEIDENTICAL", &wxCheckBox::SetValue, options_.get_int(OPTION_COMPARE_HIDEIDENTICAL) != 0);
 
 	LoadConditions();
 	EditFilter(m_search_filter);
@@ -1481,7 +1482,7 @@ void CSearchDialog::OnDownload(wxCommandEvent&)
 
 		CServerPath remote_path = entry.path;
 		std::wstring localName = CQueueView::ReplaceInvalidCharacters(entry.name);
-		if (!entry.is_dir() && remote_path.GetType() == VMS && COptions::Get()->get_int(OPTION_STRIP_VMS_REVISION))
+		if (!entry.is_dir() && remote_path.GetType() == VMS && options_.get_int(OPTION_STRIP_VMS_REVISION))
 			localName = StripVMSRevision(localName);
 
 		m_pQueue->QueueFile(!start, true,
