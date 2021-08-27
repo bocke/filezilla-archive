@@ -2749,7 +2749,7 @@ void CMainFrame::OnSearch(wxCommandEvent&)
 		return;
 	}
 
-	CSearchDialog dlg(this, *pState, m_pQueueView);
+	CSearchDialog dlg(this, *pState, m_pQueueView, options_);
 	if (!dlg.Load()) {
 		return;
 	}

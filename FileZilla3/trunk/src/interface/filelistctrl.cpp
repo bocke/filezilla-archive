@@ -250,10 +250,11 @@ static gboolean gtk_button_release_event(GtkWidget*, void *gdk_event, CGtkEventC
 }
 #endif
 
-template<class CFileData> CFileListCtrl<CFileData>::CFileListCtrl(wxWindow* pParent, CQueueView* pQueue, bool border)
+template<class CFileData> CFileListCtrl<CFileData>::CFileListCtrl(wxWindow* pParent, CQueueView* pQueue, COptionsBase & options, bool border)
 	: wxListCtrlEx(pParent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxLC_VIRTUAL | wxLC_REPORT | wxLC_EDIT_LABELS | (border ? wxBORDER_SUNKEN : wxNO_BORDER))
 	, CComparableListing(this)
 	, m_pQueue(pQueue)
+	, options_(options)
 {
 	CreateSystemImageList(CThemeProvider::GetIconSize(iconSizeSmall).x);
 
@@ -356,7 +357,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList(int column /*=
 		}
 	}
 
-	const int dirSortOption = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
+	const int dirSortOption = options_.get_int(OPTION_FILELIST_DIRSORT);
 
 	if (column == m_sortColumn && direction != m_sortDirection && !m_indexMapping.empty() &&
 		dirSortOption != 1)
@@ -429,7 +430,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList_UpdateSelectio
 
 template<class CFileData> CFileListCtrlSortBase::DirSortMode CFileListCtrl<CFileData>::GetDirSortMode()
 {
-	const int dirSortOption = COptions::Get()->get_int(OPTION_FILELIST_DIRSORT);
+	const int dirSortOption = options_.get_int(OPTION_FILELIST_DIRSORT);
 
 	CFileListCtrlSortBase::DirSortMode dirSortMode;
 	switch (dirSortOption)
@@ -456,7 +457,7 @@ template<class CFileData> CFileListCtrlSortBase::DirSortMode CFileListCtrl<CFile
 
 template<class CFileData> NameSortMode CFileListCtrl<CFileData>::GetNameSortMode()
 {
-	const int nameSortOption = COptions::Get()->get_int(OPTION_FILELIST_NAMESORT);
+	const int nameSortOption = options_.get_int(OPTION_FILELIST_NAMESORT);
 
 	NameSortMode nameSortMode;
 	switch (nameSortOption)
@@ -788,7 +789,7 @@ template<class CFileData> void CFileListCtrl<CFileData>::OnColumnRightClicked(wx
 
 template<class CFileData> void CFileListCtrl<CFileData>::InitSort(interfaceOptions optionID)
 {
-	wxString sortInfo = COptions::Get()->get_string(optionID);
+	wxString sortInfo = options_.get_string(optionID);
 	if (!sortInfo.empty()) {
 		m_sortDirection = sortInfo[0] - '0';
 	}

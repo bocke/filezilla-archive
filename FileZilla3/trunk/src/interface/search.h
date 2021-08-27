@@ -7,10 +7,12 @@
 #include "state.h"
 #include <set>
 
-class CWindowStateManager;
-class CSearchDialogFileList;
-class CQueueView;
 class CFilelistStatusBar;
+class COptionsBase;
+class CQueueView;
+class CSearchDialogFileList;
+class CWindowStateManager;
+
 class CSearchDialog final : protected CFilterConditionsDialog, public CStateEventHandler
 {
 	friend class CSearchDialogFileList;
@@ -22,7 +24,7 @@ public:
 		comparison
 	};
 
-	CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue);
+	CSearchDialog(wxWindow* parent, CState& state, CQueueView* pQueue, COptionsBase & options);
 	virtual ~CSearchDialog();
 
 	bool Load();
@@ -43,6 +45,7 @@ protected:
 	CSearchDialogFileList *m_results{};
 	CSearchDialogFileList *m_remoteResults{};
 	CQueueView* m_pQueue{};
+	COptionsBase& options_;
 	wxSize m_otherSize{-1, -1};
 
 	CFilelistStatusBar* m_remoteStatusBar{};
