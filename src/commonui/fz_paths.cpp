@@ -602,3 +602,70 @@ CLocalPath GetDownloadDir()
 #endif
 }
 
+std::wstring FindTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env)
+{
+#if FZ_MAC
+	(void)buildRelPath;
+
+	// On Mac we only look inside the bundle
+	std::wstring path = GetOwnExecutableDir();
+	if (!path.empty()) {
+		std::wstring executable = path + '/' + tool;
+		if (FileExists(executable)) {
+			return executable;
+		}
+	}
+#else
+
+	// First check the given environment variable
+	std::wstring executable = GetEnv(env);
+	if (!executable.empty()) {
+		if (FileExists(executable)) {
+			return executable;
+		}
+	}
+
+	std::wstring program = tool;
+#if FZ_WINDOWS
+	program += L".exe";
+#endif
+
+	std::wstring path = GetOwnExecutableDir();
+	if (!path.empty()) {
+		// Now search in own executable dir
+		executable = path + program;
+		if (FileExists(executable)) {
+			return executable;
+		}
+
+		// Check if running from build dir
+		if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
+			if (FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
+				executable = path + L"../" + buildRelPath + program;
+				if (FileExists(executable)) {
+					return executable;
+				}
+			}
+		}
+		else if (FileExists(path + L"Makefile")) {
+			executable = path + buildRelPath + program;
+			if (FileExists(executable)) {
+				return executable;
+			}
+		}
+	}
+
+	// Last but not least, PATH
+	path = GetEnv("PATH");
+	auto const segments = fz::strtok(path, PATH_SEP);
+	for (auto const& segment : segments) {
+		auto const cur = CLocalPath(segment).GetPath();
+		executable = cur + program;
+		if (!cur.empty() && FileExists(executable)) {
+			return executable;
+		}
+	}
+#endif
+
+	return {};
+}
