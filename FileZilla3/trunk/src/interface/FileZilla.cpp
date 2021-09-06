@@ -44,16 +44,6 @@ IMPLEMENT_APP_NO_MAIN(CFileZillaApp)
   #error Please build wxWidgets with support for positional arguments.
 #endif
 
-namespace {
-#if FZ_WINDOWS
-std::wstring const PATH_SEP = L";";
-#define L_DIR_SEP L"\\"
-#else
-std::wstring const PATH_SEP = L":";
-#define L_DIR_SEP L"/"
-#endif
-}
-
 CFileZillaApp::CFileZillaApp()
 {
 	m_profile_start = fz::monotonic_clock::now();
@@ -436,88 +426,15 @@ void CFileZillaApp::CheckExistsFzstorj()
 
 void CFileZillaApp::CheckExistsTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env, engineOptions setting, std::wstring const& description)
 {
-	// Get the correct path to the specified tool
+	std::wstring const executable = FindTool(tool, buildRelPath, env);
 
-	bool found = false;
-	std::wstring executable;
-
-	std::wstring program = tool;
-#ifdef __WXMAC__
-	(void)buildRelPath;
-
-	// On Mac we only look inside the bundle
-	std::wstring path = GetOwnExecutableDir();
-	if (!path.empty()) {
-		executable = path + '/' + tool;
-		if (FileExists(executable)) {
-			found = true;
-		}
-	}
-#else
-
-#ifdef __WXMSW__
-	program += L".exe";
+	if (executable.empty()) {
+		std::wstring program = tool;
+#if FZ_WINDOWS
+		program += L".exe";
 #endif
-
-	// First check the given environment variable
-	executable = GetEnv(env);
-	if (!executable.empty()) {
-		if (FileExists(executable)) {
-			found = true;
-		}
-	}
-
-	if (!found) {
-		std::wstring path = GetOwnExecutableDir();
-		if (!path.empty()) {
-			executable = path + program;
-			if (FileExists(executable)) {
-				found = true;
-			}
-			else {
-				// Check if running from build dir
-				if (path.size() > 7 && fz::ends_with(path, std::wstring(L"/.libs/"))) {
-					if (FileExists(path.substr(0, path.size() - 6) + L"Makefile")) {
-						executable = path + L"../" + buildRelPath + program;
-						if (FileExists(executable)) {
-							found = true;
-						}
-					}
-				}
-				else if (FileExists(path + L"Makefile")) {
-					executable = path + buildRelPath + program;
-					if (FileExists(executable)) {
-						found = true;
-					}
-				}
-			}
-		}
-	}
-
-	if (!found) {
-		// Check PATH
-		std::wstring path = GetEnv("PATH");
-		auto const segments = fz::strtok(path, PATH_SEP);
-		for (auto const& segment : segments) {
-			auto const cur = CLocalPath(segment).GetPath();
-			executable = cur + program;
-			if (!cur.empty() && FileExists(executable)) {
-				found = true;
-				break;
-			}
-		}
-	}
-#endif
-
-	if (!found) {
-		// Quote path if it contains spaces
-		if (executable.find(' ') != std::wstring::npos && executable.front() != '"' && executable.front() != '\'') {
-			executable = L"\"" + executable + L"\"";
-		}
-
 		wxMessageBoxEx(fz::sprintf(fztranslate("%s could not be found. Without this component of FileZilla, %s will not work.\n\nPossible solutions:\n- Make sure %s is in a directory listed in your PATH environment variable.\n- Set the full path to %s in the %s environment variable."), program, description, program, program, env),
 			_("File not found"), wxICON_ERROR | wxOK);
-		executable.clear();
 	}
 	options_->set(setting, executable);
 }

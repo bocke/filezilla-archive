@@ -33,4 +33,6 @@ CLocalPath FZCUI_PUBLIC_SYMBOL GetDownloadDir();
 std::string FZCUI_PUBLIC_SYMBOL ExpandPath(std::string const& dir);
 std::wstring FZCUI_PUBLIC_SYMBOL ExpandPath(std::wstring const& dir);
 
+std::wstring FZCUI_PUBLIC_SYMBOL FindTool(std::wstring const& tool, std::wstring const& buildRelPath, char const* env);
+
 #endif
