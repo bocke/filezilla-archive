@@ -8,8 +8,10 @@ bool SaveWithErrorDialog(CXmlFile& file, bool updateMetadata) {
 	bool res = file.Save(updateMetadata);
 	if (!res) {
 		auto error = file.GetError();
-		assert(!error.empty());
 		wxString msg = wxString::Format(_("Could not write \"%s\":"), file.GetFileName());
+		if (error.empty()) {
+			error = _("Unknown error");
+		}
 		wxMessageBoxEx(msg + _T("\n") + error, _("Error writing xml file"), wxICON_ERROR);
 	}
 	return res;

@@ -244,6 +244,12 @@ public:
 	};
 
 protected:
+	template<typename T>
+	void set(T opt, std::wstring_view const& value, bool predefined)
+	{
+		set(mapOption(opt), value, predefined);
+	}
+
 	void add_missing(fz::scoped_write_lock & l);
 
 	int get_int(optionsIndex opt);

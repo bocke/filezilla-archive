@@ -13,11 +13,6 @@
 #elif defined(FZ_WINDOWS)
 	#include <shlobj.h>
 	#include <objbase.h>
-
-	// Needed for MinGW:
-	#ifndef SHGFP_TYPE_CURRENT
-		#define SHGFP_TYPE_CURRENT 0
-	#endif
 #else
 	#include <unistd.h>
 	#include <wordexp.h>

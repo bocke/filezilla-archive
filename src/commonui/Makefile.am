@@ -23,6 +23,7 @@ libfzclient_commonui_private_la_SOURCES = \
 	local_recursive_operation.cpp \
 	login_manager.cpp \
 	remote_recursive_operation.cpp \
+	options.cpp \
 	site.cpp \
 	site_manager.cpp \
 	updater.cpp \
@@ -40,6 +41,7 @@ noinst_HEADERS = \
 	ipcmutex.h \
 	local_recursive_operation.h \
 	login_manager.h \
+	options.h \
 	recursive_operation.h \
 	remote_recursive_operation.h \
 	registry.h \
