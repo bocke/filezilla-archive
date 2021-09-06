@@ -12,6 +12,8 @@
 #include <shlobj.h>
 #endif
 
+#include <string.h>
+
 #ifdef FZ_WINDOWS
 //case insensitive
 #define DEFAULT_FILENAME_SORT   0
