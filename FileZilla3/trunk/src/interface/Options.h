@@ -1,18 +1,15 @@
 #ifndef FILEZILLA_INTERFACE_OPTIONS_HEADER
 #define FILEZILLA_INTERFACE_OPTIONS_HEADER
 
-#include "../include/local_path.h"
 #include "../include/engine_options.h"
 
-#include <libfilezilla/mutex.hpp>
+#include "../commonui/options.h"
 
 #include <wx/timer.h>
 
 enum interfaceOptions
 {
 	// Default/internal options
-	OPTION_DEFAULT_SETTINGSDIR, // guaranteed to be (back)slash-terminated
-	OPTION_DEFAULT_KIOSKMODE,
 	OPTION_DEFAULT_CACHE_DIR,
 
 	OPTION_NUMTRANSFERS,
@@ -104,8 +101,7 @@ unsigned int register_interface_options();
 
 optionsIndex mapOption(interfaceOptions opt);
 
-class CXmlFile;
-class COptions final : public wxEvtHandler, public COptionsBase
+class COptions final : public wxEvtHandler, public XmlOptions
 {
 public:
 	COptions();
@@ -116,32 +112,13 @@ public:
 
 	static COptions* Get();
 
-	void Import(pugi::xml_node & element);
+	CLocalPath GetCacheDirectory();
 
 	void Save(bool processChanged = true);
 
-	static CLocalPath GetUnadjustedSettingsDir();
-	CLocalPath GetCacheDirectory();
-
-	bool Cleanup(); // Removes all unknown elements from the XML
-
 protected:
-
-	void Load(pugi::xml_node & settings, bool predefined, bool importing);
-
-	pugi::xml_node CreateSettingsXmlElement();
-
-	void LoadGlobalDefaultOptions();
-	CLocalPath InitSettingsDir();
-
-	virtual void process_changed(watched_options const& changed) override;
-	void set_xml_value(pugi::xml_node & settings, size_t opt, bool clean);
-
 	virtual void notify_changed() override;
-
-	bool dirty_{};
-	std::unique_ptr<CXmlFile> xmlFile_;
-
+	virtual void on_dirty() override;
 	static COptions* m_theOptions;
 
 	wxTimer m_save_timer;
