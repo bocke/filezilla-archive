@@ -15,9 +15,9 @@ enum commonOptions : unsigned int {
 	OPTIONS_COMMON_NUM
 };
 
-unsigned int register_common_options();
+unsigned int FZCUI_PUBLIC_SYMBOL register_common_options();
 
-optionsIndex mapOption(commonOptions opt);
+optionsIndex FZCUI_PUBLIC_SYMBOL mapOption(commonOptions opt);
 
 class CXmlFile;
 class FZCUI_PUBLIC_SYMBOL XmlOptions : public COptionsBase
