@@ -88,6 +88,7 @@ CLocalPath GetTempDir()
 #endif
 	return ret;
 }
+
 CLocalPath GetUnadjustedSettingsDir()
 {
 	CLocalPath ret;
@@ -601,11 +602,14 @@ std::wstring FindTool(std::wstring const& tool, std::wstring const& buildRelPath
 {
 #if FZ_MAC
 	(void)buildRelPath;
+	(void)env;
 
 	// On Mac we only look inside the bundle
 	std::wstring path = GetOwnExecutableDir();
 	if (!path.empty()) {
-		std::wstring executable = path + '/' + tool;
+		std::wstring executable = path;
+		executable += '/';
+		executable += tool;
 		if (FileExists(executable)) {
 			return executable;
 		}
