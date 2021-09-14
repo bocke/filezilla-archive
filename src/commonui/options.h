@@ -12,6 +12,8 @@ enum commonOptions : unsigned int {
 	OPTION_DEFAULT_SETTINGSDIR, // If non-empty, guaranteed to be (back)slash-terminated
 	OPTION_DEFAULT_KIOSKMODE,
 
+	OPTION_MASTERPASSWORDENCRYPTOR,
+
 	OPTIONS_COMMON_NUM
 };
 
