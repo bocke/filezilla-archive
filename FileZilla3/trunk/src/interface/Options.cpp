@@ -120,7 +120,6 @@ unsigned int register_interface_options()
 		{ "Queue completion command", L"", option_flags::normal },
 		{ "Drag and Drop disabled", false, option_flags::normal },
 		{ "Disable update footer", false, option_flags::normal },
-		{ "Master password encryptor", L"", option_flags::normal },
 		{ "Tab data", L"", option_flags::normal | option_flags::sensitive_data, option_type::xml },
 		{ "Highest shown overlay id", 0, option_flags::normal }
 	});
