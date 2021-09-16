@@ -300,6 +300,8 @@ int main(int argc, char **argv)
 
             outfilename = filename_from_str(args);
 
+            random_ref();
+
             ppk_save_parameters params = ppk_save_default_parameters;
             ret = ppk_save_f(outfilename, ssh2key, passphrase, &params);
              if (!ret) {
@@ -312,7 +314,7 @@ int main(int argc, char **argv)
             fzprintf(sftpReply, "");
         }
         else
-                fzprintf(sftpError, "Unknown command");
+            fzprintf(sftpError, "Unknown command");
     }
 
     if (infilename) {
