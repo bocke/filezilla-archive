@@ -121,13 +121,6 @@ void xml_cert_store::LoadTrustedCerts()
 				return false;
 			}
 
-			for (auto const& cert : data_[persistent].trusted_certs_) {
-				// A host can't be both trusted and insecure
-				if (cert.host == host && cert.port == port) {
-					return false;
-				}
-			}
-
 			data_[persistent].ftp_tls_resumption_support_.emplace(std::make_tuple(host, port), node.text().as_bool());
 
 			return true;
