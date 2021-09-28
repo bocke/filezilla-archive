@@ -3,12 +3,9 @@
 #include "logon.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"
+#include "../tls.h"
 
 #include "../../include/engine_options.h"
-
-#include <libfilezilla/tls_layer.hpp>
-
-#include <assert.h>
 
 CFtpLogonOpData::CFtpLogonOpData(CFtpControlSocket& controlSocket)
 	: COpData(Command::connect, L"CFtpLogonOpData")
@@ -191,7 +188,9 @@ int CFtpLogonOpData::Send()
 				}
 				break;
 			case loginCommandType::other:
-				assert(!cmd.command.empty());
+				if (cmd.command.empty()) {
+					return FZ_REPLY_INTERNALERROR;
+				}
 				return controlSocket_.SendCommand(cmd.command, cmd.hide_arguments);
 			default:
 				return FZ_REPLY_INTERNALERROR;
@@ -276,6 +275,7 @@ int CFtpLogonOpData::ParseResponse()
 			controlSocket_.active_layer_ = controlSocket_.tls_layer_.get();
 
 			controlSocket_.tls_layer_->set_alpn("ftp");
+			controlSocket_.tls_layer_->set_min_tls_ver(get_min_tls_ver(options_));
 			if (!controlSocket_.tls_layer_->client_handshake(&controlSocket_)) {
 				return FZ_REPLY_ERROR | FZ_REPLY_DISCONNECTED;
 			}

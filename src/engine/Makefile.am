@@ -66,6 +66,7 @@ libfzclient_private_la_SOURCES = \
 		sftp/sftpcontrolsocket.cpp \
 		sizeformatting_base.cpp \
 		string_reader.cpp \
+		tls.cpp \
 		version.cpp \
 		writer.cpp \
 		xmlutils.cpp
@@ -115,7 +116,8 @@ noinst_HEADERS = \
 		sftp/rename.h \
 		sftp/rmd.h \
 		sftp/sftpcontrolsocket.h \
-		string_reader.h
+		string_reader.h \
+		tls.h
 
 if ENABLE_STORJ
 libfzclient_private_la_SOURCES += \

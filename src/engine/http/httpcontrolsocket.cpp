@@ -10,11 +10,11 @@
 
 #include "../controlsocket.h"
 #include "../engineprivate.h"
+#include "../tls.h"
 
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/iputils.hpp>
 #include <libfilezilla/local_filesys.hpp>
-#include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/uri.hpp>
 
 #include <assert.h>
@@ -226,6 +226,7 @@ void CHttpControlSocket::OnConnect()
 
 			tls_layer_->set_alpn("http/1.1");
 			if (!tls_layer_->client_handshake(&data)) {
+				tls_layer_->set_min_tls_ver(get_min_tls_ver(engine_.GetOptions()));
 				DoClose();
 			}
 		}
