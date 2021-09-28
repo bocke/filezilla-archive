@@ -6,15 +6,15 @@
 #include <wx/timer.h>
 
 #include <list>
-#include <memory>
 
 class cert_store;
+class COptionsBase;
 class CQueueView;
 
 class CAsyncRequestQueue final : public wxEvtHandler, protected CGlobalStateEventHandler
 {
 public:
-	CAsyncRequestQueue(wxTopLevelWindow * parent, cert_store & certStore);
+	CAsyncRequestQueue(wxTopLevelWindow * parent, COptionsBase & options, cert_store & certStore);
 	~CAsyncRequestQueue();
 
 	bool AddRequest(CFileZillaEngine *pEngine, std::unique_ptr<CAsyncRequestNotification> && pNotification);
@@ -34,6 +34,8 @@ protected:
 
 	wxTopLevelWindow *parent_{};
 	CQueueView *m_pQueueView{};
+
+	COptionsBase & options_;
 	cert_store & certStore_;
 
 	bool ProcessNextRequest();

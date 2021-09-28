@@ -43,7 +43,8 @@ unsigned int register_common_options()
 		{ "Config Location", L"", option_flags::predefined_only | option_flags::platform },
 		{ "Kiosk mode", 0, option_flags::predefined_priority, 0, 2 },
 
-		{ "Master password encryptor", L"", option_flags::normal }
+		{ "Master password encryptor", L"", option_flags::normal },
+		{ "Trust system trust store", false, option_flags::normal }
 	});
 	return value;
 }

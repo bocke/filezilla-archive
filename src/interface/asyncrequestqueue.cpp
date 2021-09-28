@@ -20,8 +20,9 @@ EVT_COMMAND(wxID_ANY, fzEVT_PROCESSASYNCREQUESTQUEUE, CAsyncRequestQueue::OnProc
 EVT_TIMER(wxID_ANY, CAsyncRequestQueue::OnTimer)
 END_EVENT_TABLE()
 
-CAsyncRequestQueue::CAsyncRequestQueue(wxTopLevelWindow *parent, cert_store & certStore)
+CAsyncRequestQueue::CAsyncRequestQueue(wxTopLevelWindow *parent, COptionsBase & options, cert_store & certStore)
 	: parent_(parent)
+	, options_(options)
 	, certStore_(certStore)
 {
 	CContextManager::Get()->RegisterHandler(this, STATECHANGE_REMOVECONTEXT, false);
@@ -48,7 +49,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 				action = CDefaultFileExistsDlg::GetDefault(pFileExistsNotification->download);
 			}
 			if (action == CFileExistsNotification::unknown) {
-				int option = COptions::Get()->get_int(pFileExistsNotification->download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
+				int option = options_.get_int(pFileExistsNotification->download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
 				if (option < CFileExistsNotification::unknown || option >= CFileExistsNotification::ACTION_COUNT) {
 					action = CFileExistsNotification::unknown;
 				}
@@ -64,7 +65,7 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 
 			if (action == CFileExistsNotification::resume && pFileExistsNotification->ascii) {
 				// Check if resuming ascii files is allowed
-				if (!COptions::Get()->get_int(OPTION_ASCIIRESUME)) {
+				if (!options_.get_int(OPTION_ASCIIRESUME)) {
 					// Overwrite instead
 					action = CFileExistsNotification::overwrite;
 				}
@@ -95,6 +96,10 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 	case reqId_certificate:
 		{
 			auto & certNotification = static_cast<CCertificateNotification&>(*pNotification.get());
+
+			if (certNotification.info_.system_trust() && options_.get_bool(OPTION_TRUST_SYSTEM_TRUST_STORE)) {
+				certNotification.trusted_ = true;
+			}
 
 			if (!certStore_.IsTrusted(certNotification.info_)) {
 				break;
@@ -275,7 +280,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 		action = CDefaultFileExistsDlg::GetDefault(notification.download);
 	}
 	if (action == CFileExistsNotification::unknown) {
-		int option = COptions::Get()->get_int(notification.download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
+		int option = options_.get_int(notification.download ? OPTION_FILEEXISTS_DOWNLOAD : OPTION_FILEEXISTS_UPLOAD);
 		if (option <= CFileExistsNotification::unknown || option >= CFileExistsNotification::ACTION_COUNT) {
 			action = CFileExistsNotification::ask;
 		}
@@ -350,7 +355,7 @@ bool CAsyncRequestQueue::ProcessFileExistsNotification(t_queueEntry &entry)
 
 	if (action == CFileExistsNotification::resume && notification.ascii) {
 		// Check if resuming ascii files is allowed
-		if (!COptions::Get()->get_int(OPTION_ASCIIRESUME)) {
+		if (!options_.get_int(OPTION_ASCIIRESUME)) {
 			// Overwrite instead
 			action = CFileExistsNotification::overwrite;
 		}
