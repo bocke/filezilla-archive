@@ -414,7 +414,7 @@ CMainFrame::CMainFrame(COptions& options)
 	}
 
 	cert_store_ = std::make_unique<CertStore>();
-	async_request_queue_ = std::make_unique<CAsyncRequestQueue>(this, *cert_store_);
+	async_request_queue_ = std::make_unique<CAsyncRequestQueue>(this, options_, *cert_store_);
 
 #ifdef __WXMSW__
 	long style = wxSP_NOBORDER | wxSP_LIVE_UPDATE;
