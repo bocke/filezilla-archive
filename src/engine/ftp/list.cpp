@@ -106,7 +106,7 @@ int CFtpListOpData::Send()
 			controlSocket_.Transfer(L"MLSD", this);
 		}
 		else {
-			if (engine_.GetOptions().get_int(OPTION_VIEW_HIDDEN_FILES)) {
+			if (options_.get_int(OPTION_VIEW_HIDDEN_FILES)) {
 				capabilities cap = CServerCapabilities::GetCapability(currentServer_, list_hidden_support);
 				if (cap == unknown) {
 					viewHiddenCheck_ = true;

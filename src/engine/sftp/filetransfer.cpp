@@ -129,7 +129,7 @@ int CSftpFileTransferOpData::ParseResponse()
 {
 	if (opState == filetransfer_transfer) {
 		writer_.reset();
-		if (controlSocket_.result_ == FZ_REPLY_OK && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
+		if (controlSocket_.result_ == FZ_REPLY_OK && options_.get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 			if (download()) {
 				if (!remoteFileTime_.empty()) {
 					if (!writer_factory_.set_mtime(remoteFileTime_)) {
@@ -200,7 +200,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 				if (!dirDidExist) {
 					opState = filetransfer_waitlist;
 				}
-				else if (download() && engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS)) {
+				else if (download() && options_.get_int(OPTION_PRESERVE_TIMESTAMPS)) {
 					opState = filetransfer_mtime;
 				}
 				else {
@@ -219,7 +219,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 						}
 
 						if (download() && !entry.has_time() &&
-							engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
+							options_.get_int(OPTION_PRESERVE_TIMESTAMPS))
 						{
 							opState = filetransfer_mtime;
 						}
@@ -259,7 +259,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					opState = filetransfer_mtime;
 				}
 				else if (download() &&
-					engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
+					options_.get_int(OPTION_PRESERVE_TIMESTAMPS))
 				{
 					opState = filetransfer_mtime;
 				}
@@ -275,7 +275,7 @@ int CSftpFileTransferOpData::SubcommandResult(int prevResult, COpData const&)
 					}
 
 					if (download() && !entry.has_time() &&
-						engine_.GetOptions().get_int(OPTION_PRESERVE_TIMESTAMPS))
+						options_.get_int(OPTION_PRESERVE_TIMESTAMPS))
 					{
 						opState = filetransfer_mtime;
 					}

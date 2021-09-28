@@ -47,7 +47,7 @@ int CStorjConnectOpData::Send()
 				}
 			}
 
-			auto executable = fz::to_native(engine_.GetOptions().get_string(OPTION_FZSTORJ_EXECUTABLE));
+			auto executable = fz::to_native(options_.get_string(OPTION_FZSTORJ_EXECUTABLE));
 			if (executable.empty()) {
 				executable = fzT("fzstorj");
 			}

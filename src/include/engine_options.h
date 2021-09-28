@@ -79,6 +79,8 @@ enum engineOptions : unsigned int
 
 	OPTION_CACHE_TTL,
 
+	OPTION_MIN_TLS_VER,
+
 	OPTIONS_ENGINE_NUM
 };
 
