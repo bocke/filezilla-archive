@@ -385,7 +385,7 @@ void CTransferSocket::OnConnect()
 
 	if (tls_layer_) {
 		auto const cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
-		if (false && tls_layer_->resumed_session()) {
+		if (tls_layer_->resumed_session()) {
 			if (cap != yes) {
 				engine_.AddNotification(std::make_unique<FtpTlsResumptionNotification>(controlSocket_.currentServer_));
 				CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
