@@ -20,6 +20,7 @@
 #include "../pathcache.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"
+#include "../tls.h"
 
 #include "../../include/externalipresolver.h"
 #include "../../include/engine_options.h"
@@ -27,7 +28,6 @@
 #include <libfilezilla/file.hpp>
 #include <libfilezilla/iputils.hpp>
 #include <libfilezilla/local_filesys.hpp>
-#include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/util.hpp>
 
 #include <algorithm>
@@ -191,6 +191,7 @@ void CFtpControlSocket::OnConnect()
 			active_layer_ = tls_layer_.get();
 
 			tls_layer_->set_alpn("ftp");
+			tls_layer_->set_min_tls_ver(get_min_tls_ver(engine_.GetOptions()));
 			if (!tls_layer_->client_handshake(this)) {
 				DoClose();
 			}

@@ -61,6 +61,7 @@ public:
 		, engine_(controlSocket.engine_)
 		, currentServer_(controlSocket.currentServer_)
 		, currentPath_(controlSocket.currentPath_)
+		, options_(engine_.GetOptions())
 	{
 	}
 
@@ -75,6 +76,7 @@ public:
 	CFileZillaEnginePrivate & engine_;
 	CServer & currentServer_;
 	CServerPath& currentPath_;
+	COptionsBase& options_;
 };
 
 class ResultOpData : public COpData

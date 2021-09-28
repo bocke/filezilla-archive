@@ -4,6 +4,7 @@
 #include "../engineprivate.h"
 #include "../proxy.h"
 #include "../servercapabilities.h"
+#include "../tls.h"
 
 #include "ftpcontrolsocket.h"
 #include "transfersocket.h"
@@ -11,10 +12,7 @@
 #include "../../include/engine_options.h"
 
 #include <libfilezilla/rate_limited_layer.hpp>
-#include <libfilezilla/tls_layer.hpp>
 #include <libfilezilla/util.hpp>
-
-#include <assert.h>
 
 #ifndef FZ_WINDOWS
 #define HAVE_ASCII_TRANSFORM 1
@@ -387,7 +385,7 @@ void CTransferSocket::OnConnect()
 
 	if (tls_layer_) {
 		auto const cap = CServerCapabilities::GetCapability(controlSocket_.currentServer_, tls_resumption);
-		if (tls_layer_->resumed_session()) {
+		if (false && tls_layer_->resumed_session()) {
 			if (cap != yes) {
 				engine_.AddNotification(std::make_unique<FtpTlsResumptionNotification>(controlSocket_.currentServer_));
 				CServerCapabilities::SetCapability(controlSocket_.currentServer_, tls_resumption, yes);
@@ -718,6 +716,7 @@ bool CTransferSocket::InitLayers(bool active)
 
 		tls_layer_ = std::make_unique<fz::tls_layer>(controlSocket_.event_loop_, nullptr, *active_layer_, nullptr, controlSocket_.logger_);
 		active_layer_ = tls_layer_.get();
+		tls_layer_->set_min_tls_ver(get_min_tls_ver(engine_.GetOptions()));
 
 		if (!tls_layer_->client_handshake(controlSocket_.tls_layer_->get_raw_certificate(), controlSocket_.tls_layer_->get_session_parameters(), controlSocket_.tls_layer_->peer_host())) {
 			return false;
@@ -809,7 +808,6 @@ std::unique_ptr<fz::listen_socket> CTransferSocket::CreateSocketServer()
 
 	if (start < low || start > high) {
 		start = static_cast<decltype(start)>(fz::random_number(low, high));
-		assert(start >= low && start <= high);
 	}
 
 	std::unique_ptr<fz::listen_socket> server;
