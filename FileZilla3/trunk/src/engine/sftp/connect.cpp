@@ -42,7 +42,7 @@ int CSftpConnectOpData::Send()
 				keyfiles_ = fz::strtok(controlSocket_.credentials_.keyFile_, L"\r\n");
 			}
 			else {
-				keyfiles_ = fz::strtok(engine_.GetOptions().get_string(OPTION_SFTP_KEYFILES), L"\r\n");
+				keyfiles_ = fz::strtok(options_.get_string(OPTION_SFTP_KEYFILES), L"\r\n");
 			}
 
 			keyfiles_.erase(
@@ -57,7 +57,7 @@ int CSftpConnectOpData::Send()
 
 			keyfile_ = keyfiles_.cbegin();
 
-			auto executable = fz::to_native(engine_.GetOptions().get_string(OPTION_FZSFTP_EXECUTABLE));
+			auto executable = fz::to_native(options_.get_string(OPTION_FZSFTP_EXECUTABLE));
 			if (executable.empty()) {
 				executable = fzT("fzsftp");
 			}
@@ -65,7 +65,7 @@ int CSftpConnectOpData::Send()
 			log(logmsg::debug_verbose, L"Going to execute %s", executable);
 
 			std::vector<fz::native_string> args = { fzT("-v") };
-			if (engine_.GetOptions().get_int(OPTION_SFTP_COMPRESSION)) {
+			if (options_.get_int(OPTION_SFTP_COMPRESSION)) {
 				args.push_back(fzT("-C"));
 			}
 #ifndef FZ_WINDOWS
@@ -108,7 +108,7 @@ int CSftpConnectOpData::Send()
 	case connect_proxy:
 		{
 			int type;
-			switch (engine_.GetOptions().get_int(OPTION_PROXY_TYPE))
+			switch (options_.get_int(OPTION_PROXY_TYPE))
 			{
 			case static_cast<int>(ProxyType::HTTP):
 				type = 1;
@@ -125,15 +125,15 @@ int CSftpConnectOpData::Send()
 			}
 
 			std::wstring cmd = fz::sprintf(L"proxy %d \"%s\" %d", type,
-				engine_.GetOptions().get_string(OPTION_PROXY_HOST),
-				engine_.GetOptions().get_int(OPTION_PROXY_PORT));
-			std::wstring user = engine_.GetOptions().get_string(OPTION_PROXY_USER);
+				options_.get_string(OPTION_PROXY_HOST),
+				options_.get_int(OPTION_PROXY_PORT));
+			std::wstring user = options_.get_string(OPTION_PROXY_USER);
 			if (!user.empty()) {
 				cmd += L" \"" + user + L"\"";
 			}
 
 			std::wstring show = cmd;
-			std::wstring pass = engine_.GetOptions().get_string(OPTION_PROXY_PASS);
+			std::wstring pass = options_.get_string(OPTION_PROXY_PASS);
 			if (!pass.empty()) {
 				cmd += L" \"" + pass + L"\"";
 				show += L" \"" + std::wstring(pass.size(), '*') + L"\"";
@@ -169,7 +169,7 @@ int CSftpConnectOpData::ParseResponse()
 			log(logmsg::error, _("fzsftp belongs to a different version of FileZilla"));
 			return FZ_REPLY_INTERNALERROR | FZ_REPLY_DISCONNECTED;
 		}
-		if (engine_.GetOptions().get_int(OPTION_PROXY_TYPE) && !currentServer_.GetBypassProxy()) {
+		if (options_.get_int(OPTION_PROXY_TYPE) && !currentServer_.GetBypassProxy()) {
 			opState = connect_proxy;
 		}
 		else if (keyfile_ != keyfiles_.cend()) {
