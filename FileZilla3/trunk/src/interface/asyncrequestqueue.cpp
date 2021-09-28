@@ -97,12 +97,10 @@ bool CAsyncRequestQueue::ProcessDefaults(CFileZillaEngine *pEngine, std::unique_
 		{
 			auto & certNotification = static_cast<CCertificateNotification&>(*pNotification.get());
 
-			if (certNotification.info_.system_trust() && options_.get_bool(OPTION_TRUST_SYSTEM_TRUST_STORE)) {
-				certNotification.trusted_ = true;
-			}
-
-			if (!certStore_.IsTrusted(certNotification.info_)) {
-				break;
+			if (!certNotification.info_.system_trust() || !options_.get_bool(OPTION_TRUST_SYSTEM_TRUST_STORE)) {
+				if (!certStore_.IsTrusted(certNotification.info_)) {
+					break;
+				}
 			}
 
 			certNotification.trusted_ = true;
