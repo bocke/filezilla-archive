@@ -26,7 +26,7 @@
 #include <libfilezilla/time.hpp>
 #include <libfilezilla/tls_info.hpp>
 
-enum NotificationId
+enum NotificationId : unsigned int
 {
 	nId_logmsg,				// notification about new messages for the message log
 	nId_operation,			// operation reply codes
@@ -40,7 +40,7 @@ enum NotificationId
 };
 
 // Async request IDs
-enum RequestId
+enum RequestId : unsigned int
 {
 	reqId_fileexists,          // Target file already exists, awaiting further instructions
 	reqId_interactiveLogin,    // gives a challenge prompt for a password
