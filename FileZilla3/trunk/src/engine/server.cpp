@@ -10,6 +10,7 @@ struct t_protocolInfo
 	ServerProtocol const protocol;
 	std::wstring const prefix;
 	bool alwaysShowPrefix;
+	bool parse_from_prefix;
 	unsigned int defaultPort;
 	bool const translateable;
 	char const* const name;
@@ -17,29 +18,29 @@ struct t_protocolInfo
 };
 
 static const t_protocolInfo protocolInfos[] = {
-	{ FTP,             L"ftp",       false, 21,  true,  fztranslate_mark("FTP - File Transfer Protocol with optional encryption"), L"" },
-	{ SFTP,            L"sftp",      true,  22,  false, "SFTP - SSH File Transfer Protocol",                                       L"" },
-	{ HTTP,            L"http",      true,  80,  false, "HTTP - Hypertext Transfer Protocol",                                      L"" },
-	{ HTTPS,           L"https",     true, 443,  true,  fztranslate_mark("HTTPS - HTTP over TLS"),                                 L"" },
-	{ FTPS,            L"ftps",      true, 990,  true,  fztranslate_mark("FTPS - FTP over implicit TLS"),                          L"" },
-	{ FTPES,           L"ftpes",     true,  21,  true,  fztranslate_mark("FTPES - FTP over explicit TLS"),                         L"" },
-	{ INSECURE_FTP,    L"ftp",       false, 21,  true,  fztranslate_mark("FTP - Insecure File Transfer Protocol"),                 L"" },
-	{ S3,              L"s3",        true, 443,  false, "S3 - Amazon Simple Storage Service",                                      L"" },
-	{ STORJ,           L"storj",     true, 7777, true,  fztranslate_mark("Storj (using legacy API key)"),                          L"" },
-	{ WEBDAV,          L"webdav",    true, 443,  true,  fztranslate_mark("WebDAV using HTTPS"),                                    L"https" },
-	{ AZURE_FILE,      L"azfile",    true, 443,  false, "Microsoft Azure File Storage Service",                                    L"https" },
-	{ AZURE_BLOB,      L"azblob",    true, 443,  false, "Microsoft Azure Blob Storage Service",                                    L"https" },
-	{ SWIFT,           L"swift",     true, 443,  false, "OpenStack Swift",                                                         L"https" },
-	{ GOOGLE_CLOUD,    L"google",    true, 443,  false, "Google Cloud Storage",                                                    L"https" },
-	{ GOOGLE_DRIVE,    L"gdrive",    true, 443,  false, "Google Drive",                                                            L"https" },
-	{ DROPBOX,         L"dropbox",   true, 443,  false, "Dropbox",                                                                 L"https" },
-	{ ONEDRIVE,        L"onedrive",  true, 443,  false, "Microsoft OneDrive",                                                      L"https" },
-	{ B2,              L"b2",        true, 443,  false, "Backblaze B2",                                                            L"https" },
-	{ BOX,             L"box",       true, 443,  false, "Box",                                                                     L"https" },
-	{ INSECURE_WEBDAV, L"webdav",    true,  80,  true,  fztranslate_mark("WebDAV using HTTP (insecure)"),                          L"http" },
-	{ RACKSPACE,       L"rackspace", true, 443,  false, "Rackspace Cloud Storage",                                                 L"https" },
-	{ STORJ_GRANT,     L"storj",     true, 7777, true,  fztranslate_mark("Storj - Decentralized Cloud Storage"),                   L"" },
-	{ UNKNOWN,         L"",          false, 21,  false, "",                                                                        L"" }
+	{ FTP,             L"ftp",       false, true,    21, true,  fztranslate_mark("FTP - File Transfer Protocol with optional encryption"), L"" },
+	{ SFTP,            L"sftp",      true,  true,    22, false, "SFTP - SSH File Transfer Protocol",                                       L"" },
+	{ HTTP,            L"http",      true,  true,    80, false, "HTTP - Hypertext Transfer Protocol",                                      L"" },
+	{ HTTPS,           L"https",     true,  true,   443, true,  fztranslate_mark("HTTPS - HTTP over TLS"),                                 L"" },
+	{ FTPS,            L"ftps",      true,  true,   990, true,  fztranslate_mark("FTPS - FTP over implicit TLS"),                          L"" },
+	{ FTPES,           L"ftpes",     true,  true,    21, true,  fztranslate_mark("FTPES - FTP over explicit TLS"),                         L"" },
+	{ INSECURE_FTP,    L"ftp",       false, false,   21, true,  fztranslate_mark("FTP - Insecure File Transfer Protocol"),                 L"" },
+	{ S3,              L"s3",        true,  true,   443, false, "S3 - Amazon Simple Storage Service",                                      L"" },
+	{ STORJ,           L"storj",     true,  false, 7777, true,  fztranslate_mark("Storj (using legacy API key)"),                          L"" },
+	{ WEBDAV,          L"webdav",    true,  true,   443, true,  fztranslate_mark("WebDAV using HTTPS"),                                    L"https" },
+	{ AZURE_FILE,      L"azfile",    true,  true,   443, false, "Microsoft Azure File Storage Service",                                    L"https" },
+	{ AZURE_BLOB,      L"azblob",    true,  true,   443, false, "Microsoft Azure Blob Storage Service",                                    L"https" },
+	{ SWIFT,           L"swift",     true,  true,   443, false, "OpenStack Swift",                                                         L"https" },
+	{ GOOGLE_CLOUD,    L"google",    true,  true,   443, false, "Google Cloud Storage",                                                    L"https" },
+	{ GOOGLE_DRIVE,    L"gdrive",    true,  true,   443, false, "Google Drive",                                                            L"https" },
+	{ DROPBOX,         L"dropbox",   true,  true,   443, false, "Dropbox",                                                                 L"https" },
+	{ ONEDRIVE,        L"onedrive",  true,  true,   443, false, "Microsoft OneDrive",                                                      L"https" },
+	{ B2,              L"b2",        true,  true,   443, false, "Backblaze B2",                                                            L"https" },
+	{ BOX,             L"box",       true,  true,   443, false, "Box",                                                                     L"https" },
+	{ INSECURE_WEBDAV, L"webdav",    true,  true,    80, true,  fztranslate_mark("WebDAV using HTTP (insecure)"),                          L"http" },
+	{ RACKSPACE,       L"rackspace", true,  true,   443, false, "Rackspace Cloud Storage",                                                 L"https" },
+	{ STORJ_GRANT,     L"storj",     true,  true,  7777, true,  fztranslate_mark("Storj - Decentralized Cloud Storage"),                   L"" },
+	{ UNKNOWN,         L"",          false, false,   21, false, "",                                                                        L"" }
 };
 
 static std::vector<ServerProtocol> const defaultProtocols = {
@@ -520,7 +521,7 @@ ServerProtocol CServer::GetProtocolFromPrefix(std::wstring const& prefix, Server
 	}
 
 	for (unsigned int i = 0; protocolInfos[i].protocol != UNKNOWN; ++i) {
-		if (protocolInfos[i].prefix == lower) {
+		if (protocolInfos[i].prefix == lower && protocolInfos[i].parse_from_prefix) {
 			return protocolInfos[i].protocol;
 		}
 	}
