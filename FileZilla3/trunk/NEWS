@@ -10,6 +10,11 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.56.0 (2021-10-11) 
+
+- Updated to libfilezilla 0.34.0
+- Updated translations
+
 3.56.0-rc1 (2021-09-29) 
 
 + Right-clicking a queue tab header now opens the same context menu as right-clicking the correponding queue contents
