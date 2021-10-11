@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: FileZilla 3\n"
 "Report-Msgid-Bugs-To: https://trac.filezilla-project.org/\n"
-"POT-Creation-Date: 2021-07-02 11:56+0200\n"
-"PO-Revision-Date: 2021-05-31 15:12+0800\n"
+"POT-Creation-Date: 2021-10-11 10:50+0200\n"
+"PO-Revision-Date: 2021-09-30 15:47+0800\n"
 "Last-Translator: Sun Junwen <sunjw8888@gmail.com>\n"
 "Language-Team: Sun Junwen <sunjw8888@gmail.com>\n"
 "Language: zh_CN\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 #. @translator: This is a date/time formatting specifier. See https://wiki.filezilla-project.org/Date_and_Time_formatting
 #: ../src/interface/statuslinectrl.cpp:59
@@ -47,8 +47,8 @@ msgid "%d directory"
 msgid_plural "%d directories"
 msgstr[0] "%d 个目录"
 
-#: ../src/interface/RemoteListView.cpp:1436 ../src/interface/search.cpp:1280
-#: ../src/interface/search.cpp:1682
+#: ../src/interface/RemoteListView.cpp:1436 ../src/interface/search.cpp:1281
+#: ../src/interface/search.cpp:1683
 #, c-format
 msgid "%d directory with its contents"
 msgid_plural "%d directories with their contents"
@@ -56,8 +56,8 @@ msgstr[0] "%d 个目录及其内容"
 
 #: ../src/interface/filelist_statusbar.cpp:57
 #: ../src/interface/filelist_statusbar.cpp:82
-#: ../src/interface/RemoteListView.cpp:1435 ../src/interface/search.cpp:1279
-#: ../src/interface/search.cpp:1681
+#: ../src/interface/RemoteListView.cpp:1435 ../src/interface/search.cpp:1280
+#: ../src/interface/search.cpp:1682
 #, c-format
 msgid "%d file"
 msgid_plural "%d files"
@@ -112,6 +112,12 @@ msgstr "%s (%s/秒)"
 msgid "%s (? B/s)"
 msgstr "%s (? B/秒)"
 
+#: ../src/interface/settings/optionspage_connection.cpp:74
+#: ../src/interface/settings/optionspage_connection.cpp:75
+#, c-format
+msgid "%s (insecure)"
+msgstr "%s (不安全)"
+
 #: ../src/interface/settings/optionspage_ftpproxy.cpp:77
 #, c-format
 msgid "%s - Proxy user"
@@ -133,7 +139,7 @@ msgid "%s byte"
 msgid_plural "%s bytes"
 msgstr[0] "%s 字节"
 
-#: ../src/interface/FileZilla.cpp:519
+#: ../src/interface/FileZilla.cpp:436
 #, c-format
 msgid ""
 "%s could not be found. Without this component of FileZilla, %s will not "
@@ -177,7 +183,7 @@ msgstr "AWS S3 加密(&A)"
 msgid "&Abort previous connection and connect in current tab"
 msgstr "放弃之前的连接并在当前标签中连接(&A)"
 
-#: ../src/interface/menu_bar.cpp:175
+#: ../src/interface/menu_bar.cpp:156
 msgid "&About..."
 msgstr "关于(&A)..."
 
@@ -201,7 +207,7 @@ msgstr "帐号(&A):"
 msgid "&Active"
 msgstr "主动(&A)"
 
-#: ../src/interface/menu_bar.cpp:155
+#: ../src/interface/menu_bar.cpp:136
 msgid "&Add bookmark..."
 msgstr "添加书签(&A)..."
 
@@ -218,8 +224,8 @@ msgstr "添加文件到队列(&A)"
 msgid "&Add key file..."
 msgstr "添加密钥文件(&A)..."
 
-#: ../src/interface/LocalTreeView.cpp:1114
-#: ../src/interface/RemoteTreeView.cpp:921
+#: ../src/interface/LocalTreeView.cpp:1100
+#: ../src/interface/RemoteTreeView.cpp:906
 msgid "&Add to queue"
 msgstr "添加到队列(&A)"
 
@@ -261,9 +267,9 @@ msgstr "总是使用该操作(&A)"
 msgid "&Ask your operating system for the external IP address"
 msgstr "向您的操作系统查询外部 IP 地址(&A)"
 
-#: ../src/interface/menu_bar.cpp:119
+#: ../src/interface/menu_bar.cpp:100
 #: ../src/interface/settings/optionspage_filetype.cpp:48
-#: ../src/interface/statusbar.cpp:583
+#: ../src/interface/statusbar.cpp:584
 msgid "&Auto"
 msgstr "自动(&A)"
 
@@ -275,9 +281,9 @@ msgstr "自动检测(&A)"
 msgid "&Background color:"
 msgstr "背景颜色(&B)"
 
-#: ../src/interface/menu_bar.cpp:121
+#: ../src/interface/menu_bar.cpp:102
 #: ../src/interface/settings/optionspage_filetype.cpp:52
-#: ../src/interface/statusbar.cpp:585
+#: ../src/interface/statusbar.cpp:586
 msgid "&Binary"
 msgstr "二进制(&B)"
 
@@ -285,7 +291,7 @@ msgstr "二进制(&B)"
 msgid "&Binary prefixes using SI symbols. (e.g. 1 KB = 1024 bytes)"
 msgstr "使用 SI 式二进制前缀。(例如 1 KB = 1024 bytes)(&B)"
 
-#: ../src/interface/menu_bar.cpp:152
+#: ../src/interface/menu_bar.cpp:133
 msgid "&Bookmarks"
 msgstr "书签(&B)"
 
@@ -299,7 +305,7 @@ msgstr "浏览(&B)"
 #: ../src/interface/edithandler.cpp:1807
 #: ../src/interface/settings/optionspage_edit.cpp:71
 #: ../src/interface/sitemanager_controls.cpp:912
-#: ../src/interface/sitemanager_dialog.cpp:304
+#: ../src/interface/sitemanager_dialog.cpp:275
 msgid "&Browse..."
 msgstr "浏览(&B)..."
 
@@ -315,7 +321,7 @@ msgstr "取消(&C)"
 msgid "&Certificate in chain:"
 msgstr "证书链(&C):"
 
-#: ../src/interface/menu_bar.cpp:71
+#: ../src/interface/menu_bar.cpp:52
 msgid "&Clear private data..."
 msgstr "清除个人信息(&C)..."
 
@@ -331,30 +337,30 @@ msgstr "关闭 FileZilla(&C)"
 msgid "&Close FileZilla once"
 msgstr "关闭 FileZilla(&C)"
 
-#: ../src/interface/statusbar.cpp:574
+#: ../src/interface/statusbar.cpp:575
 msgid "&Configure speed limits..."
 msgstr "设置速度限制(&C)..."
 
-#: ../src/interface/menu_bar.cpp:130
+#: ../src/interface/menu_bar.cpp:111
 msgid "&Configure..."
 msgstr "配置(&C)..."
 
-#: ../src/interface/sitemanager_dialog.cpp:369
+#: ../src/interface/sitemanager_dialog.cpp:340
 msgid "&Connect"
 msgstr "连接(&C)"
 
-#: ../src/interface/menu_bar.cpp:51
+#: ../src/interface/menu_bar.cpp:32
 msgid "&Copy current connection to Site Manager..."
 msgstr "添加当前连接到站点管理器(&C)..."
 
-#: ../src/interface/aboutdialog.cpp:121 ../src/interface/StatusView.cpp:438
+#: ../src/interface/aboutdialog.cpp:126 ../src/interface/StatusView.cpp:438
 msgid "&Copy to clipboard"
 msgstr "复制到剪贴板(&C)"
 
 #: ../src/interface/LocalListView.cpp:823
-#: ../src/interface/LocalTreeView.cpp:1122
+#: ../src/interface/LocalTreeView.cpp:1108
 #: ../src/interface/RemoteListView.cpp:1076
-#: ../src/interface/RemoteTreeView.cpp:926
+#: ../src/interface/RemoteTreeView.cpp:911
 msgid "&Create directory"
 msgstr "创建目录(&C)"
 
@@ -362,7 +368,7 @@ msgstr "创建目录(&C)"
 msgid "&Create new tab"
 msgstr "创建新标签(&C)"
 
-#: ../src/interface/menu_bar.cpp:182
+#: ../src/interface/menu_bar.cpp:163
 msgid "&Debug"
 msgstr "调试(&D)"
 
@@ -374,18 +380,18 @@ msgstr "消息记录中的调试信息(&D):"
 msgid "&Default editor:"
 msgstr "默认编辑器(&D):"
 
-#: ../src/interface/menu_bar.cpp:114 ../src/interface/QueueView.cpp:1792
+#: ../src/interface/menu_bar.cpp:95 ../src/interface/QueueView.cpp:1792
 msgid "&Default file exists action..."
 msgstr "对已存在文件的默认操作(&D)..."
 
-#: ../src/interface/settings/optionspage_connection.cpp:56
+#: ../src/interface/settings/optionspage_connection.cpp:58
 msgid "&Delay between failed login attempts:"
 msgstr "登录重试延时(&D):"
 
 #: ../src/interface/bookmarks_dialog.cpp:276
 #: ../src/interface/filteredit.cpp:100 ../src/interface/LocalListView.cpp:828
-#: ../src/interface/LocalTreeView.cpp:1126
-#: ../src/interface/sitemanager_dialog.cpp:361
+#: ../src/interface/LocalTreeView.cpp:1112
+#: ../src/interface/sitemanager_dialog.cpp:332
 msgid "&Delete"
 msgstr "删除(&D)"
 
@@ -397,11 +403,11 @@ msgstr "删除符号链接(&D)"
 msgid "&Delete..."
 msgstr "删除(&D)..."
 
-#: ../src/interface/menu_bar.cpp:75
+#: ../src/interface/menu_bar.cpp:56
 msgid "&Directory access permissions..."
 msgstr "目录访问权限(&D)..."
 
-#: ../src/interface/menu_bar.cpp:87
+#: ../src/interface/menu_bar.cpp:68
 msgid "&Directory comparison"
 msgstr "目录对比(&D)"
 
@@ -419,7 +425,7 @@ msgstr "停止同步浏览并且继续修改远程目录(&D)"
 msgid "&Discard local file then download and edit file anew"
 msgstr "放弃本地文件，重新下载并编辑(&D)"
 
-#: ../src/interface/menu_bar.cpp:144
+#: ../src/interface/menu_bar.cpp:125
 msgid "&Disconnect"
 msgstr "断开连接(&D)"
 
@@ -452,7 +458,7 @@ msgid "&Double-click action on files:"
 msgstr "双击文件操作(&D):"
 
 #: ../src/interface/RemoteListView.cpp:1066
-#: ../src/interface/RemoteTreeView.cpp:918
+#: ../src/interface/RemoteTreeView.cpp:903
 msgid "&Download"
 msgstr "下载(&D)"
 
@@ -460,7 +466,7 @@ msgstr "下载(&D)"
 msgid "&Download to:"
 msgstr "下载到(&D):"
 
-#: ../src/interface/search.cpp:1227
+#: ../src/interface/search.cpp:1228
 msgid "&Download..."
 msgstr "下载(&D)..."
 
@@ -473,7 +479,7 @@ msgstr "下载(&D):"
 msgid "&Duplicate"
 msgstr "复制(&D)"
 
-#: ../src/interface/LocalListView.cpp:820 ../src/interface/menu_bar.cpp:69
+#: ../src/interface/LocalListView.cpp:820 ../src/interface/menu_bar.cpp:50
 msgid "&Edit"
 msgstr "编辑(&E)"
 
@@ -481,8 +487,8 @@ msgstr "编辑(&E)"
 msgid "&Edit filter rules..."
 msgstr "编辑过滤器规则(&E)..."
 
-#: ../src/interface/Mainfrm.cpp:2451 ../src/interface/menu_bar.cpp:90
-#: ../src/interface/menu_bar.cpp:129 ../src/interface/statusbar.cpp:573
+#: ../src/interface/Mainfrm.cpp:2438 ../src/interface/menu_bar.cpp:71
+#: ../src/interface/menu_bar.cpp:110 ../src/interface/statusbar.cpp:574
 msgid "&Enable"
 msgstr "启用(&E)"
 
@@ -519,8 +525,8 @@ msgstr "执行(&E)"
 msgid "&Export Site Manager entries"
 msgstr "导出站点管理器记录(&E)"
 
-#: ../src/interface/menu_bar.cpp:58
-#: ../src/interface/sitemanager_dialog.cpp:1919
+#: ../src/interface/menu_bar.cpp:39
+#: ../src/interface/sitemanager_dialog.cpp:1890
 msgid "&Export..."
 msgstr "导出(&E)..."
 
@@ -528,11 +534,11 @@ msgstr "导出(&E)..."
 msgid "&Fall back to active mode"
 msgstr "退回到主动模式(&F)"
 
-#: ../src/interface/menu_bar.cpp:45
+#: ../src/interface/menu_bar.cpp:26
 msgid "&File"
 msgstr "文件(&F)"
 
-#: ../src/interface/RemoteTreeView.cpp:939
+#: ../src/interface/RemoteTreeView.cpp:924
 msgid "&File Attributes..."
 msgstr "文件属性(&F)..."
 
@@ -588,7 +594,7 @@ msgstr "跟踪符号链接，删除目标目录内容(&F)"
 msgid "&Get external IP address from the following URL:"
 msgstr "从以下 URL 得到外部 IP 地址(&G):"
 
-#: ../src/interface/menu_bar.cpp:169
+#: ../src/interface/menu_bar.cpp:150
 msgid "&Getting help..."
 msgstr "获得帮助(&G)..."
 
@@ -600,12 +606,12 @@ msgstr "全局书签(&G)"
 msgid "&HTTP/1.1 using CONNECT method"
 msgstr "&HTTP/1.1 使用 CONNECT 方式"
 
-#: ../src/interface/menu_bar.cpp:160
+#: ../src/interface/menu_bar.cpp:141
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: ../src/interface/Mainfrm.cpp:2458 ../src/interface/menu_bar.cpp:95
-#: ../src/interface/search.cpp:696
+#: ../src/interface/Mainfrm.cpp:2445 ../src/interface/menu_bar.cpp:76
+#: ../src/interface/search.cpp:697
 msgid "&Hide identical files"
 msgstr "隐藏相同的文件(&H)"
 
@@ -631,7 +637,7 @@ msgstr "&IEC 式二进制前缀(例如 1 KiB = 1024 bytes)(&I)"
 msgid "&ISO 8601 (example: 2007-09-15)"
 msgstr "&ISO 8601 (示例: 2007-09-15)"
 
-#: ../src/interface/menu_bar.cpp:59
+#: ../src/interface/menu_bar.cpp:40
 msgid "&Import..."
 msgstr "导入(&I)..."
 
@@ -663,16 +669,16 @@ msgstr "限制 FilaZila 使用的本地端口(&L)"
 msgid "&Limit number of simultaneous connections"
 msgstr "限制并发连接数(&L)"
 
-#: ../src/interface/menu_bar.cpp:104
+#: ../src/interface/menu_bar.cpp:85
 msgid "&Local directory tree"
 msgstr "本地目录树(&L)"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:666
-#: ../src/interface/sitemanager_dialog.cpp:298
+#: ../src/interface/sitemanager_dialog.cpp:269
 msgid "&Local directory:"
 msgstr "本地目录(&L):"
 
-#: ../src/interface/search.cpp:655
+#: ../src/interface/search.cpp:656
 msgid "&Local search"
 msgstr "本地搜索(&L)"
 
@@ -688,11 +694,11 @@ msgstr "登录类型(&L):"
 msgid "&Low"
 msgstr "低(&L)"
 
-#: ../src/interface/menu_bar.cpp:157
+#: ../src/interface/menu_bar.cpp:138
 msgid "&Manage bookmarks..."
 msgstr "管理书签(&M)..."
 
-#: ../src/interface/menu_bar.cpp:134
+#: ../src/interface/menu_bar.cpp:115
 msgid "&Manual transfer..."
 msgstr "手动传输(&M)..."
 
@@ -704,11 +710,11 @@ msgstr "主密码(&M):"
 msgid "&Maximum number of connections:"
 msgstr "最大连接数(&M):"
 
-#: ../src/interface/settings/optionspage_connection.cpp:51
+#: ../src/interface/settings/optionspage_connection.cpp:53
 msgid "&Maximum number of retries:"
 msgstr "最大重试次数(&M):"
 
-#: ../src/interface/menu_bar.cpp:103
+#: ../src/interface/menu_bar.cpp:84
 msgid "&Message log"
 msgstr "消息日志(&M)"
 
@@ -724,7 +730,7 @@ msgstr "名称排序方式(&N):"
 msgid "&Name:"
 msgstr "名字(&N):"
 
-#: ../src/interface/menu_bar.cpp:70
+#: ../src/interface/menu_bar.cpp:51
 msgid "&Network configuration wizard..."
 msgstr "网络配置向导(&N)..."
 
@@ -732,11 +738,11 @@ msgstr "网络配置向导(&N)..."
 msgid "&New"
 msgstr "新建(&N)"
 
-#: ../src/interface/sitemanager_dialog.cpp:357
+#: ../src/interface/sitemanager_dialog.cpp:328
 msgid "&New site"
 msgstr "新站点(&N)"
 
-#: ../src/interface/Mainfrm.cpp:1813
+#: ../src/interface/Mainfrm.cpp:1800
 msgid "&New version available!"
 msgstr "有新版本！(&N)"
 
@@ -771,7 +777,7 @@ msgstr "数字值(&N):"
 #: ../src/interface/loginmanager.cpp:317
 #: ../src/interface/manual_transfer.cpp:178
 #: ../src/interface/osx_sandbox_userdirs.cpp:308
-#: ../src/interface/sitemanager_dialog.cpp:373
+#: ../src/interface/sitemanager_dialog.cpp:344
 #: ../src/interface/speedlimits_dialog.cpp:71
 #: ../src/interface/verifycertdialog.cpp:638
 #: ../src/interface/verifycertdialog.cpp:706
@@ -783,7 +789,7 @@ msgid "&OPEN"
 msgstr "打开(&O)"
 
 #: ../src/interface/LocalListView.cpp:819
-#: ../src/interface/LocalTreeView.cpp:1119
+#: ../src/interface/LocalTreeView.cpp:1105
 msgid "&Open"
 msgstr "打开(&O)"
 
@@ -808,7 +814,7 @@ msgstr "播放声音(&P)"
 msgid "&Port:"
 msgstr "端口(&P):"
 
-#: ../src/interface/menu_bar.cpp:124
+#: ../src/interface/menu_bar.cpp:105
 msgid "&Preserve timestamps of transferred files"
 msgstr "保留传输文件的时间戳(&P)"
 
@@ -824,7 +830,7 @@ msgstr "队列(&Q)"
 msgid "&Quickconnect"
 msgstr "快速连接(&Q)"
 
-#: ../src/interface/menu_bar.cpp:102
+#: ../src/interface/menu_bar.cpp:83
 msgid "&Quickconnect bar"
 msgstr "快速连接工具栏(&Q)"
 
@@ -836,7 +842,7 @@ msgstr "快速连接栏历史(&Q)"
 msgid "&Read"
 msgstr "读取(&R)"
 
-#: ../src/interface/menu_bar.cpp:142
+#: ../src/interface/menu_bar.cpp:123
 msgid "&Reconnect"
 msgstr "重新连接(&R)"
 
@@ -844,7 +850,7 @@ msgstr "重新连接(&R)"
 msgid "&Reconnect information"
 msgstr "重新连接信息(&R)"
 
-#: ../src/interface/context_control.cpp:505 ../src/interface/menu_bar.cpp:81
+#: ../src/interface/context_control.cpp:505 ../src/interface/menu_bar.cpp:62
 msgid "&Refresh"
 msgstr "刷新(&R)"
 
@@ -857,7 +863,7 @@ msgid "&Remember password until FileZilla is closed"
 msgstr "在 FileZilla 关闭前记住密码(&R)"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:693
-#: ../src/interface/sitemanager_dialog.cpp:306
+#: ../src/interface/sitemanager_dialog.cpp:277
 msgid "&Remote directory:"
 msgstr "远程目录(&R):"
 
@@ -865,7 +871,7 @@ msgstr "远程目录(&R):"
 msgid "&Remote path:"
 msgstr "远程路径(&R):"
 
-#: ../src/interface/search.cpp:656
+#: ../src/interface/search.cpp:657
 msgid "&Remote search"
 msgstr "远程搜索(&R)"
 
@@ -884,10 +890,10 @@ msgstr "移除选定(&R)"
 
 #: ../src/interface/bookmarks_dialog.cpp:275
 #: ../src/interface/filteredit.cpp:101 ../src/interface/LocalListView.cpp:829
-#: ../src/interface/LocalTreeView.cpp:1127
+#: ../src/interface/LocalTreeView.cpp:1113
 #: ../src/interface/RemoteListView.cpp:1083
-#: ../src/interface/RemoteTreeView.cpp:931
-#: ../src/interface/sitemanager_dialog.cpp:360
+#: ../src/interface/RemoteTreeView.cpp:916
+#: ../src/interface/sitemanager_dialog.cpp:331
 msgid "&Rename"
 msgstr "重命名(&R)"
 
@@ -907,7 +913,7 @@ msgstr "再次输入密码(&R):"
 msgid "&Replace invalid characters with:"
 msgstr "将无效字符替换为(&R):"
 
-#: ../src/interface/menu_bar.cpp:170
+#: ../src/interface/menu_bar.cpp:151
 msgid "&Report a bug..."
 msgstr "报告问题(&R)..."
 
@@ -947,11 +953,11 @@ msgstr "站点(&S)"
 msgid "&Save as..."
 msgstr "保存为(&S)..."
 
-#: ../src/interface/search.cpp:660
+#: ../src/interface/search.cpp:661
 msgid "&Search"
 msgstr "搜索(&S)"
 
-#: ../src/interface/menu_bar.cpp:147
+#: ../src/interface/menu_bar.cpp:128
 msgid "&Search remote files..."
 msgstr "搜索远程文件(&S)..."
 
@@ -959,7 +965,7 @@ msgstr "搜索远程文件(&S)..."
 msgid "&Select a key:"
 msgstr "选择一个密钥(&S):"
 
-#: ../src/interface/sitemanager_dialog.cpp:348
+#: ../src/interface/sitemanager_dialog.cpp:319
 msgid "&Select entry:"
 msgstr "选择记录(&S):"
 
@@ -971,15 +977,15 @@ msgstr "选择语言(&S):"
 msgid "&Select the columns that should be displayed:"
 msgstr "设置要显示的栏目(&S):"
 
-#: ../src/interface/manual_transfer.cpp:119 ../src/interface/menu_bar.cpp:137
+#: ../src/interface/manual_transfer.cpp:119 ../src/interface/menu_bar.cpp:118
 msgid "&Server"
 msgstr "服务器(&S)"
 
-#: ../src/interface/search.cpp:1220
+#: ../src/interface/search.cpp:1221
 msgid "&Set as local directory and close dialog"
 msgstr "设为本地目录并关闭对话框(&S)"
 
-#: ../src/interface/search.cpp:1228
+#: ../src/interface/search.cpp:1229
 msgid "&Set as remote directory and close dialog"
 msgstr "设为远程目录并关闭对话框(&S)"
 
@@ -987,7 +993,7 @@ msgstr "设为远程目录并关闭对话框(&S)"
 msgid "&Settings"
 msgstr "设置(&S)"
 
-#: ../src/interface/menu_bar.cpp:73
+#: ../src/interface/menu_bar.cpp:54
 msgid "&Settings..."
 msgstr "设置(&S)..."
 
@@ -1007,7 +1013,7 @@ msgstr "在消息日志中显示时间戳(&S)"
 msgid "&Site Manager entries"
 msgstr "站点管理器记录(&S)"
 
-#: ../src/interface/menu_bar.cpp:50
+#: ../src/interface/menu_bar.cpp:31
 msgid "&Site Manager..."
 msgstr "站点管理器(&S)..."
 
@@ -1019,7 +1025,7 @@ msgstr "特定站点书签(&S)"
 msgid "&Skip"
 msgstr "跳过(&S)"
 
-#: ../src/interface/menu_bar.cpp:127
+#: ../src/interface/menu_bar.cpp:108
 msgid "&Speed limits"
 msgstr "速度限制(&S)"
 
@@ -1032,7 +1038,7 @@ msgstr "立即开始传输(&S)"
 msgid "&Swap local and remote panes"
 msgstr "交换本地面板和远程面板(&S)"
 
-#: ../src/interface/menu_bar.cpp:180
+#: ../src/interface/menu_bar.cpp:161
 msgid "&TLS Ciphers"
 msgstr "&TLS 密码"
 
@@ -1044,7 +1050,7 @@ msgstr "测试(&T)"
 msgid "&Theme:"
 msgstr "主题(&T):"
 
-#: ../src/interface/menu_bar.cpp:109
+#: ../src/interface/menu_bar.cpp:90
 msgid "&Transfer"
 msgstr "传输(&T)"
 
@@ -1053,7 +1059,7 @@ msgid "&Transfer mode:"
 msgstr "传输模式(&T):"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:272
-#: ../src/interface/menu_bar.cpp:106
+#: ../src/interface/menu_bar.cpp:87
 msgid "&Transfer queue"
 msgstr "传输队列(&T)"
 
@@ -1074,7 +1080,7 @@ msgid "&Update cached key for this host"
 msgstr "更新该主机的缓存密钥(&U)"
 
 #: ../src/interface/LocalListView.cpp:810
-#: ../src/interface/LocalTreeView.cpp:1111
+#: ../src/interface/LocalTreeView.cpp:1097
 msgid "&Upload"
 msgstr "上传(&U)"
 
@@ -1082,7 +1088,7 @@ msgstr "上传(&U)"
 msgid "&Upload to:"
 msgstr "上传至(&U):"
 
-#: ../src/interface/search.cpp:1219
+#: ../src/interface/search.cpp:1220
 msgid "&Upload..."
 msgstr "上传(&U)..."
 
@@ -1098,6 +1104,10 @@ msgstr "使用自定义程序(&U)"
 #: ../src/interface/sitemanager_controls.cpp:926
 msgid "&Use synchronized browsing"
 msgstr "使用同步浏览(&U)"
+
+#: ../src/interface/settings/optionspage_connection.cpp:79
+msgid "&Use system trust store to validate TLS certificates"
+msgstr "使用系统信任存储验证TLS证书(&U)"
 
 #: ../src/interface/settings/optionspage_edit.cpp:60
 msgid "&Use system's default editor for text files"
@@ -1126,7 +1136,7 @@ msgstr "用户(&U):"
 msgid "&Username:"
 msgstr "用户名(&U):"
 
-#: ../src/interface/Mainfrm.cpp:1807
+#: ../src/interface/Mainfrm.cpp:1794
 #, c-format
 msgid "&Version %s"
 msgstr "版本 %s (&V)"
@@ -1135,11 +1145,11 @@ msgstr "版本 %s (&V)"
 msgid "&Version 3"
 msgstr ""
 
-#: ../src/interface/menu_bar.cpp:79
+#: ../src/interface/menu_bar.cpp:60
 msgid "&View"
 msgstr "查看(&V)"
 
-#: ../src/interface/RemoteListView.cpp:1073 ../src/interface/search.cpp:1229
+#: ../src/interface/RemoteListView.cpp:1073 ../src/interface/search.cpp:1230
 msgid "&View/Edit"
 msgstr "查看/编辑(&V)"
 
@@ -1181,7 +1191,7 @@ msgid ""
 "changed to 'Ask for password'."
 msgstr "“正常”和“帐户”登录类型不可用。您的记录已更改为“询问密码”。"
 
-#: ../src/interface/Mainfrm.cpp:698
+#: ../src/interface/Mainfrm.cpp:692
 msgid ""
 "'quote' is usually a local command used by commandline clients to send the "
 "arguments following 'quote' to the server. You might want to enter the raw "
@@ -1207,11 +1217,11 @@ msgstr "(%u%% 已下载)"
 msgid "(0 for no limit)"
 msgstr "(0 代表不限制)"
 
-#: ../src/interface/settings/optionspage_connection.cpp:55
+#: ../src/interface/settings/optionspage_connection.cpp:57
 msgid "(0-99)"
 msgstr "(0-99)"
 
-#: ../src/interface/settings/optionspage_connection.cpp:60
+#: ../src/interface/settings/optionspage_connection.cpp:62
 msgid "(0-999 seconds)"
 msgstr "(0-999 秒)"
 
@@ -1219,7 +1229,7 @@ msgstr "(0-999 秒)"
 msgid "(1-10)"
 msgstr "(1-10)"
 
-#: ../src/interface/settings/optionspage_connection.cpp:44
+#: ../src/interface/settings/optionspage_connection.cpp:46
 msgid "(10-9999, 0 to disable)"
 msgstr "(10-9999，0 表示禁用)"
 
@@ -1322,7 +1332,7 @@ msgstr "2 - 信息"
 msgid "3 - Verbose"
 msgstr "3 - 详细"
 
-#: ../src/interface/aboutdialog.cpp:102
+#: ../src/interface/aboutdialog.cpp:107
 msgid "32-bit system"
 msgstr "32位系统"
 
@@ -1330,7 +1340,7 @@ msgstr "32位系统"
 msgid "4 - Debug"
 msgstr "4 - 调试"
 
-#: ../src/interface/aboutdialog.cpp:99
+#: ../src/interface/aboutdialog.cpp:104
 msgid "64-bit system"
 msgstr "64位系统"
 
@@ -1348,7 +1358,7 @@ msgid "A default editor needs to be set."
 msgstr "需要设置默认编辑器。"
 
 #: ../src/interface/RemoteListView.cpp:168
-#: ../src/interface/RemoteTreeView.cpp:123 ../src/interface/state.cpp:892
+#: ../src/interface/RemoteTreeView.cpp:114 ../src/interface/state.cpp:892
 msgid "A directory cannot be dragged into one of its subdirectories."
 msgstr "目录无法被拖入其子目录中。"
 
@@ -1374,7 +1384,7 @@ msgid ""
 "A file with that name is still being edited. Please close it and try again."
 msgstr "该名称的文件仍在编辑，请将其关闭后再试一次。"
 
-#: ../src/interface/FileZilla.cpp:416
+#: ../src/interface/FileZilla.cpp:405
 msgid ""
 "A local filename could not be decoded.\n"
 "Please make sure the LC_CTYPE (or LC_ALL) environment variable is set "
@@ -1398,7 +1408,7 @@ msgstr "主密码一旦丢失无法恢复！请牢记您的密码。"
 msgid "A new version of FileZilla is available:"
 msgstr "有新版的 FileZilla 可用:"
 
-#: ../src/interface/Mainfrm.cpp:768
+#: ../src/interface/Mainfrm.cpp:762
 msgid ""
 "A proper server always shows all files, but some broken servers hide files "
 "from the user. Use this option to force the server to show all files."
@@ -1420,9 +1430,9 @@ msgstr ""
 "一个远程操作正在进行并且同步浏览是启用的。\n"
 "关闭同步浏览并且继续修改本地目录？"
 
-#: ../src/interface/menu_bar.cpp:120
+#: ../src/interface/menu_bar.cpp:101
 #: ../src/interface/settings/optionspage_filetype.cpp:50
-#: ../src/interface/statusbar.cpp:584
+#: ../src/interface/statusbar.cpp:585
 msgid "A&SCII"
 msgstr "A&SCII"
 
@@ -1467,7 +1477,7 @@ msgstr "ASCII"
 msgid "AWS &KMS encryption"
 msgstr "AWS KMS 加密(&K)"
 
-#: ../src/interface/aboutdialog.cpp:17
+#: ../src/interface/aboutdialog.cpp:22
 msgid "About FileZilla"
 msgstr "关于 FileZilla"
 
@@ -1488,7 +1498,7 @@ msgstr "访问密钥(&K):"
 msgid "Access to some local directories could not be restored:"
 msgstr "无法恢复访问某些本地目录:"
 
-#: ../src/engine/server.cpp:711 ../src/engine/server.cpp:737
+#: ../src/engine/server.cpp:712 ../src/engine/server.cpp:738
 msgid "Account"
 msgstr "帐号"
 
@@ -1544,8 +1554,8 @@ msgstr "主动模式 IP"
 msgid "Add files to &queue only"
 msgstr "只添加文件到队列(&Q)"
 
-#: ../src/interface/LocalTreeView.cpp:1114
-#: ../src/interface/RemoteTreeView.cpp:921
+#: ../src/interface/LocalTreeView.cpp:1100
+#: ../src/interface/RemoteTreeView.cpp:906
 msgid "Add selected directory to the transfer queue"
 msgstr "添加选中的文件夹到传输队列"
 
@@ -1658,13 +1668,13 @@ msgstr ""
 "在保存传输队列到“%s”时发生了一个错误。\n"
 "队列中的一些项可能没有保存。"
 
-#: ../src/interface/sitemanager_dialog.cpp:1704
+#: ../src/interface/sitemanager_dialog.cpp:1675
 msgid ""
 "An item with the same name as the dragged item already exists at the target "
 "location."
 msgstr "目标位置已存在与所拖拽项目同名的文件。"
 
-#: ../src/engine/server.cpp:741
+#: ../src/engine/server.cpp:742
 msgid "Anonymous"
 msgstr "匿名"
 
@@ -1673,7 +1683,7 @@ msgid ""
 "Another remote operation is already in progress, cannot change directory now."
 msgstr "另一个远程操作正在进行，现在无法更改目录。"
 
-#: ../src/interface/sitemanager_dialog.cpp:804
+#: ../src/interface/sitemanager_dialog.cpp:775
 msgid "Any changes made in the Site Manager could not be saved."
 msgstr "站点管理器的任何更改都无法保存。"
 
@@ -1720,7 +1730,7 @@ msgstr "作为传输队列面板中的标签"
 msgid "Ask for action"
 msgstr "询问操作"
 
-#: ../src/engine/server.cpp:702 ../src/engine/server.cpp:731
+#: ../src/engine/server.cpp:703 ../src/engine/server.cpp:732
 msgid "Ask for password"
 msgstr "询问密码"
 
@@ -1801,8 +1811,8 @@ msgstr "黑板"
 msgid "Blue"
 msgstr "蓝色"
 
-#: ../src/interface/bookmarks_dialog.cpp:315 ../src/interface/menu_bar.cpp:434
-#: ../src/interface/sitemanager_dialog.cpp:415
+#: ../src/interface/bookmarks_dialog.cpp:315 ../src/interface/menu_bar.cpp:426
+#: ../src/interface/sitemanager_dialog.cpp:386
 msgid "Bookmark"
 msgstr "书签"
 
@@ -1823,11 +1833,11 @@ msgstr "有问题的服务器，在发送完整请求前已回复"
 msgid "Browse..."
 msgstr "浏览..."
 
-#: ../src/interface/aboutdialog.cpp:56
+#: ../src/interface/aboutdialog.cpp:61
 msgid "Build date:"
 msgstr "编译日期:"
 
-#: ../src/interface/aboutdialog.cpp:43
+#: ../src/interface/aboutdialog.cpp:48
 msgid "Build information"
 msgstr "编译信息"
 
@@ -1844,7 +1854,7 @@ msgstr ""
 "默认情况下 FileZilla 的主动模式使用本地任意可用的端口建立传输。如果您希望限"
 "制 FileZilla 只使用小范围的端口，请在下面输入端口范围。"
 
-#: ../src/interface/menu_bar.cpp:139
+#: ../src/interface/menu_bar.cpp:120
 msgid "C&ancel current operation"
 msgstr "取消当前操作(&C)"
 
@@ -1852,17 +1862,17 @@ msgstr "取消当前操作(&C)"
 msgid "C&lear all"
 msgstr "全部清除(&C)"
 
-#: ../src/interface/search.cpp:657
+#: ../src/interface/search.cpp:658
 msgid "C&omparative search"
 msgstr "对比搜索"
 
 #: ../src/interface/RemoteListView.cpp:1084
-#: ../src/interface/RemoteTreeView.cpp:932 ../src/interface/search.cpp:1236
+#: ../src/interface/RemoteTreeView.cpp:917 ../src/interface/search.cpp:1237
 msgid "C&opy URL(s) to clipboard"
 msgstr "复制 URL 到剪贴板(&O)"
 
 #: ../src/interface/RemoteListView.cpp:1085
-#: ../src/interface/RemoteTreeView.cpp:933 ../src/interface/search.cpp:1233
+#: ../src/interface/RemoteTreeView.cpp:918 ../src/interface/search.cpp:1234
 msgid "C&opy URL(s) with password to clipboard"
 msgstr "将 URL 和密码一起复制到到剪贴板(&O)"
 
@@ -1878,7 +1888,7 @@ msgstr "自定义 KMS ARN (&U):"
 msgid "C&ustom filetype associations:"
 msgstr "自定义文件格式关联(&U):"
 
-#: ../src/interface/aboutdialog.cpp:108
+#: ../src/interface/aboutdialog.cpp:113
 msgid "CPU features:"
 msgstr "CPU 特性:"
 
@@ -1908,7 +1918,7 @@ msgstr "计算服务器时差..."
 #: ../src/interface/manual_transfer.cpp:183
 #: ../src/interface/osx_sandbox_userdirs.cpp:312
 #: ../src/interface/settings/settingsdialog.cpp:76
-#: ../src/interface/sitemanager_dialog.cpp:376
+#: ../src/interface/sitemanager_dialog.cpp:347
 #: ../src/interface/speedlimits_dialog.cpp:76
 #: ../src/interface/verifycertdialog.cpp:398
 #: ../src/interface/verifycertdialog.cpp:645
@@ -1916,11 +1926,11 @@ msgstr "计算服务器时差..."
 msgid "Cancel"
 msgstr "取消"
 
-#: ../src/interface/toolbar.cpp:51
+#: ../src/interface/toolbar.cpp:109
 msgid "Cancel current operation"
 msgstr "取消当前操作"
 
-#: ../src/interface/toolbar.cpp:51
+#: ../src/interface/toolbar.cpp:109
 msgid "Cancels the current operation"
 msgstr "取消当前操作"
 
@@ -1929,7 +1939,7 @@ msgstr "取消当前操作"
 msgid "Cannot access '%s', no media inserted or drive not ready."
 msgstr "无法访问“%s”，没有媒介插入或者驱动器未准备好。"
 
-#: ../src/interface/Mainfrm.cpp:669
+#: ../src/interface/Mainfrm.cpp:663
 msgid "Cannot add server to Site Manager"
 msgstr "无法添加服务器到站点管理器"
 
@@ -1958,8 +1968,8 @@ msgid "Cannot create new filter"
 msgstr "无法创建新过滤器"
 
 #: ../src/interface/edithandler.cpp:1114 ../src/interface/edithandler.cpp:1340
-#: ../src/interface/LocalListView.cpp:1931 ../src/interface/search.cpp:1625
-#: ../src/interface/search.cpp:2069
+#: ../src/interface/LocalListView.cpp:1931 ../src/interface/search.cpp:1626
+#: ../src/interface/search.cpp:2070
 msgid "Cannot edit file"
 msgstr "无法编辑文件"
 
@@ -1981,12 +1991,8 @@ msgstr "无法和 SFTP 服务器建立 FTP 连接，请选择合适的协议。"
 msgid "Cannot load key file"
 msgstr "无法加载密钥文件"
 
-#: ../src/interface/Mainfrm.cpp:1118
-msgid "Cannot load toolbar from resource file"
-msgstr "无法从资源文件导入工具栏"
-
 #: ../src/interface/bookmarks_dialog.cpp:777
-#: ../src/interface/sitemanager_dialog.cpp:1036
+#: ../src/interface/sitemanager_dialog.cpp:1007
 msgid "Cannot rename entry"
 msgstr "无法重命名记录"
 
@@ -2045,7 +2051,7 @@ msgstr "需要清除的分类"
 msgid "Certificate"
 msgstr "证书"
 
-#: ../src/interface/statusbar.cpp:546
+#: ../src/interface/statusbar.cpp:547
 msgid "Certificate and session data are not available yet."
 msgstr "证书和会话数据目前不可用。"
 
@@ -2062,7 +2068,7 @@ msgid "Change file attributes"
 msgstr "改变文件属性"
 
 #: ../src/interface/RemoteListView.cpp:1086
-#: ../src/interface/RemoteTreeView.cpp:939
+#: ../src/interface/RemoteTreeView.cpp:924
 msgid "Change the file permissions."
 msgstr "改变文件权限。"
 
@@ -2070,7 +2076,7 @@ msgstr "改变文件权限。"
 msgid "Changing logfile settings requires restart of FileZilla."
 msgstr "修改日志文件设置需要重启 FileZilla。"
 
-#: ../src/interface/FileZilla.cpp:416
+#: ../src/interface/FileZilla.cpp:405
 msgid "Character encoding issue"
 msgstr "字符编码问题"
 
@@ -2078,7 +2084,7 @@ msgstr "字符编码问题"
 msgid "Charset"
 msgstr "字符集"
 
-#: ../src/interface/menu_bar.cpp:164
+#: ../src/interface/menu_bar.cpp:145
 msgid "Check for &updates..."
 msgstr "检查更新(&U)..."
 
@@ -2090,7 +2096,7 @@ msgstr "自动检查 FileZilla 更新(&U):"
 msgid "Check for Updates"
 msgstr "检查更新"
 
-#: ../src/interface/menu_bar.cpp:164
+#: ../src/interface/menu_bar.cpp:145
 msgid "Check for newer versions of FileZilla"
 msgstr "检查新版的 FileZilla"
 
@@ -2138,7 +2144,7 @@ msgstr "选择默认的本地目录"
 
 #: ../src/interface/bookmarks_dialog.cpp:139
 #: ../src/interface/bookmarks_dialog.cpp:430
-#: ../src/interface/sitemanager_dialog.cpp:1982
+#: ../src/interface/sitemanager_dialog.cpp:1953
 msgid "Choose the local directory"
 msgstr "选择本地目录"
 
@@ -2150,7 +2156,7 @@ msgstr "块数据错误中止"
 msgid "Cipher:"
 msgstr "密码:"
 
-#: ../src/interface/context_control.cpp:501 ../src/interface/menu_bar.cpp:56
+#: ../src/interface/context_control.cpp:501 ../src/interface/menu_bar.cpp:37
 msgid "Cl&ose tab"
 msgstr "关闭标签(&O)"
 
@@ -2158,11 +2164,11 @@ msgstr "关闭标签(&O)"
 msgid "Classic"
 msgstr "经典"
 
-#: ../src/interface/menu_bar.cpp:179
+#: ../src/interface/menu_bar.cpp:160
 msgid "Clear &layout cache"
 msgstr "清空布局缓存(&L)"
 
-#: ../src/interface/menu_bar.cpp:181
+#: ../src/interface/menu_bar.cpp:162
 msgid "Clear auto&update data"
 msgstr "清除自动更新数据(&U)"
 
@@ -2203,8 +2209,8 @@ msgstr "关闭"
 msgid "Close &all other tabs"
 msgstr "关闭所有其它的标签(&A)"
 
-#: ../src/interface/Mainfrm.cpp:1274 ../src/interface/Mainfrm.cpp:1296
-#: ../src/interface/menu_bar.cpp:65
+#: ../src/interface/Mainfrm.cpp:1263 ../src/interface/Mainfrm.cpp:1285
+#: ../src/interface/menu_bar.cpp:46
 msgid "Close FileZilla"
 msgstr "关闭 FileZilla"
 
@@ -2212,11 +2218,11 @@ msgstr "关闭 FileZilla"
 msgid "Close all running instances of FileZilla"
 msgstr "关闭所有运行的 FileZilla 实例"
 
-#: ../src/interface/Mainfrm.cpp:2404
+#: ../src/interface/Mainfrm.cpp:2391
 msgid "Close quick search and continue comparing?"
 msgstr "关闭快速搜索，继续对比？"
 
-#: ../src/interface/menu_bar.cpp:56
+#: ../src/interface/menu_bar.cpp:37
 msgid "Closes current tab"
 msgstr "关闭当前标签"
 
@@ -2269,11 +2275,11 @@ msgstr "一般名称:"
 msgid "Communication tainted by router or firewall"
 msgstr "通讯已受路由器或防火墙影响"
 
-#: ../src/interface/Mainfrm.cpp:2455 ../src/interface/menu_bar.cpp:93
+#: ../src/interface/Mainfrm.cpp:2442 ../src/interface/menu_bar.cpp:74
 msgid "Compare &modification time"
 msgstr "比较修改时间(&M)"
 
-#: ../src/interface/Mainfrm.cpp:2454 ../src/interface/menu_bar.cpp:92
+#: ../src/interface/Mainfrm.cpp:2441 ../src/interface/menu_bar.cpp:73
 msgid "Compare file&size"
 msgstr "比较文件大小(&S)"
 
@@ -2283,7 +2289,7 @@ msgid ""
 "received from your server administrator or server hosting provider."
 msgstr "比较这里显示的指纹与您的服务器管理员或服务提供商提供的证书指纹。"
 
-#: ../src/interface/search.cpp:693
+#: ../src/interface/search.cpp:694
 msgid "Compare:"
 msgstr "比较:"
 
@@ -2295,19 +2301,19 @@ msgstr "对比差异值(分钟)(&T):"
 msgid "Comparison threshold needs to be between 0 and 1440 minutes."
 msgstr "对比值必须在 0 和 1440 分钟之间。"
 
-#: ../src/interface/aboutdialog.cpp:47
+#: ../src/interface/aboutdialog.cpp:52
 msgid "Compiled for:"
 msgstr "编译目标:"
 
-#: ../src/interface/aboutdialog.cpp:53
+#: ../src/interface/aboutdialog.cpp:58
 msgid "Compiled on:"
 msgstr "编译平台:"
 
-#: ../src/interface/aboutdialog.cpp:59
+#: ../src/interface/aboutdialog.cpp:64
 msgid "Compiled with:"
 msgstr "编译器:"
 
-#: ../src/interface/aboutdialog.cpp:66
+#: ../src/interface/aboutdialog.cpp:71
 msgid "Compiler flags:"
 msgstr "编译参数:"
 
@@ -2319,7 +2325,7 @@ msgstr "已压缩"
 msgid "Concurrent transfers"
 msgstr "并发传输"
 
-#: ../src/interface/filteredit.cpp:132 ../src/interface/search.cpp:687
+#: ../src/interface/filteredit.cpp:132 ../src/interface/search.cpp:688
 msgid "Conditions are c&ase sensitive"
 msgstr "条件是区分大小写的(&A)"
 
@@ -2339,15 +2345,15 @@ msgstr "配置端口范围"
 msgid "Configuring FileZilla and your network"
 msgstr "配置 FileZilla 和您的网络"
 
-#: ../src/interface/search.cpp:1686
+#: ../src/interface/search.cpp:1687
 msgid "Confirm deletion"
 msgstr "确认删除"
 
 #: ../src/interface/edithandler.cpp:1126 ../src/interface/file_utils.h:43
 #: ../src/interface/LocalListView.cpp:1896
 #: ../src/interface/RemoteListView.cpp:1440
-#: ../src/interface/RemoteTreeView.cpp:1113 ../src/interface/search.cpp:1637
-#: ../src/interface/search.cpp:2033
+#: ../src/interface/RemoteTreeView.cpp:1098 ../src/interface/search.cpp:1638
+#: ../src/interface/search.cpp:2034
 msgid "Confirmation needed"
 msgstr "需要确认"
 
@@ -2376,7 +2382,7 @@ msgstr "在新标签中连接"
 msgid "Connect to specified Site Manager site"
 msgstr "连接至指定的站点管理器站点"
 
-#: ../src/interface/queue.cpp:349
+#: ../src/interface/queue.cpp:350
 msgid "Connecting"
 msgstr "正在连接"
 
@@ -2386,7 +2392,7 @@ msgstr "正在连接"
 msgid "Connecting to %s"
 msgstr "连接到 %s"
 
-#: ../src/engine/controlsocket.cpp:879 ../src/engine/ftp/logon.cpp:98
+#: ../src/engine/controlsocket.cpp:879 ../src/engine/ftp/logon.cpp:95
 #, c-format
 msgid "Connecting to %s through %s proxy"
 msgstr "连接到 %s，通过代理 %s"
@@ -2401,7 +2407,7 @@ msgstr "正在连接 %s..."
 msgid "Connection"
 msgstr "连接"
 
-#: ../src/interface/queue.cpp:350
+#: ../src/interface/queue.cpp:351
 msgid "Connection attempt failed"
 msgstr "连接尝试失败"
 
@@ -2434,7 +2440,7 @@ msgstr "连接被服务器关闭"
 msgid "Connection established, initializing TLS..."
 msgstr "连接已建立，正在初始化 TLS..."
 
-#: ../src/engine/http/httpcontrolsocket.cpp:238
+#: ../src/engine/http/httpcontrolsocket.cpp:239
 msgid "Connection established, sending HTTP request"
 msgstr "连接已建立，正在发送 HTTP 请求"
 
@@ -2442,7 +2448,7 @@ msgstr "连接已建立，正在发送 HTTP 请求"
 msgid "Connection established, waiting for welcome message."
 msgstr "连接建立，等待欢迎消息。"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:210
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:211
 msgid "Connection established, waiting for welcome message..."
 msgstr "连接建立，等待欢迎消息..."
 
@@ -2468,7 +2474,7 @@ msgstr[0] "%d 秒后无活动，连接超时"
 msgid "Connection timed out."
 msgstr "连接超时。"
 
-#: ../src/interface/search.cpp:1063
+#: ../src/interface/search.cpp:1064
 msgid "Connection to server lost."
 msgstr "与服务器的连接丢失。"
 
@@ -2499,16 +2505,16 @@ msgid "Copy of %s"
 msgstr "复制 %s"
 
 #: ../src/interface/RemoteListView.cpp:1085
-#: ../src/interface/RemoteTreeView.cpp:933
+#: ../src/interface/RemoteTreeView.cpp:918
 msgid "Copy the URLs of the selected items to clipboard, including password."
 msgstr "复制选中项的 URL 和密码到剪贴板。"
 
 #: ../src/interface/RemoteListView.cpp:1084
-#: ../src/interface/RemoteTreeView.cpp:932
+#: ../src/interface/RemoteTreeView.cpp:917
 msgid "Copy the URLs of the selected items to clipboard."
 msgstr "复制选中项的 URL 到剪贴板。"
 
-#: ../src/engine/ftp/transfersocket.cpp:361
+#: ../src/engine/ftp/transfersocket.cpp:359
 #, c-format
 msgid "Could not accept connection: %s"
 msgstr "无法接受连接: %s"
@@ -2562,11 +2568,11 @@ msgid "Could not convert private key"
 msgstr "无法转换私钥"
 
 #: ../src/interface/RemoteListView.cpp:2682
-#: ../src/interface/RemoteTreeView.cpp:1477 ../src/interface/search.cpp:1925
+#: ../src/interface/RemoteTreeView.cpp:1462 ../src/interface/search.cpp:1926
 msgid "Could not copy URLs"
 msgstr "无法复制 URL"
 
-#: ../src/interface/aboutdialog.cpp:215
+#: ../src/interface/aboutdialog.cpp:220
 msgid "Could not copy data"
 msgstr "无法复制数据"
 
@@ -2600,7 +2606,7 @@ msgid "Could not create temporary file name."
 msgstr "无法创建临时文件名。"
 
 #: ../src/interface/RemoteListView.cpp:2323
-#: ../src/interface/RemoteTreeView.cpp:903
+#: ../src/interface/RemoteTreeView.cpp:888
 msgid ""
 "Could not determine the target of the Drag&Drop operation.\n"
 "Either the shell extension is not installed properly or you didn't drop the "
@@ -2613,7 +2619,7 @@ msgstr ""
 msgid "Could not establish connection to server"
 msgstr "无法建立到服务器的连接"
 
-#: ../src/interface/FileZilla.cpp:310
+#: ../src/interface/FileZilla.cpp:299
 msgid ""
 "Could not find the resource files for FileZilla, closing FileZilla.\n"
 "You can specify the data directory of FileZilla by setting the FZ_DATADIR "
@@ -2652,7 +2658,7 @@ msgstr "无法得到 fzputtygen 的回应。"
 msgid "Could not get reply from fzstorj."
 msgstr "无法得到 fzstorj 的回应。"
 
-#: ../src/interface/edithandler.cpp:1114 ../src/interface/search.cpp:1625
+#: ../src/interface/edithandler.cpp:1114 ../src/interface/search.cpp:1626
 msgid "Could not get temporary directory to download file into."
 msgstr "找不到放置下载文件所需的临时目录。"
 
@@ -2740,9 +2746,9 @@ msgstr "无法打开并读取“%s”。"
 msgid "Could not open '%s' for writing."
 msgstr "无法打开并写入“%s”。"
 
-#: ../src/interface/aboutdialog.cpp:215
+#: ../src/interface/aboutdialog.cpp:220
 #: ../src/interface/RemoteListView.cpp:2682
-#: ../src/interface/RemoteTreeView.cpp:1477 ../src/interface/search.cpp:1925
+#: ../src/interface/RemoteTreeView.cpp:1462 ../src/interface/search.cpp:1926
 msgid "Could not open clipboard"
 msgstr "无法打开剪贴板"
 
@@ -2822,7 +2828,7 @@ msgstr "无法为“%s”启动读取线程。"
 msgid "Could not spawn worker thread for writing '%s'."
 msgstr "无法为“%s”启动写入线程。"
 
-#: ../src/interface/queue.cpp:355
+#: ../src/interface/queue.cpp:356
 msgid "Could not start transfer"
 msgstr "无法启动传输"
 
@@ -2837,7 +2843,7 @@ msgid "Could not truncate '%s' to offset %d."
 msgstr "无法将“%s”截断至 %d 偏移。"
 
 #: ../src/interface/sitemanager.cpp:329
-#: ../src/interface/sitemanager_dialog.cpp:827
+#: ../src/interface/sitemanager_dialog.cpp:798
 #, c-format
 msgid ""
 "Could not write \"%s\", any changes to the Site Manager could not be saved: "
@@ -2855,13 +2861,13 @@ msgid "Could not write \"%s\", the global bookmarks could no be saved: %s"
 msgstr "无法写入“%s”，不能添加该全局书签: %s"
 
 #: ../src/interface/sitemanager.cpp:422 ../src/interface/sitemanager.cpp:479
-#: ../src/interface/sitemanager_dialog.cpp:1965
+#: ../src/interface/sitemanager_dialog.cpp:1936
 #, c-format
 msgid "Could not write \"%s\", the selected sites could not be exported: %s"
 msgstr "无法写入“%s”，不能导出所选择的站点: %s"
 
-#: ../src/interface/verifycertdialog.cpp:28
-#: ../src/interface/xmlfunctions.cpp:12
+#: ../src/interface/Options.cpp:185 ../src/interface/verifycertdialog.cpp:28
+#: ../src/interface/xmlfunctions.cpp:11
 #, c-format
 msgid "Could not write \"%s\":"
 msgstr "无法写入“%s”:"
@@ -2876,7 +2882,7 @@ msgstr "无法写入密钥文件: %s"
 msgid "Could not write to '%s'."
 msgstr "无法写入“%s”。"
 
-#: ../src/interface/queue.cpp:354
+#: ../src/interface/queue.cpp:355
 msgid "Could not write to local file"
 msgstr "无法写入本地文件"
 
@@ -2908,16 +2914,16 @@ msgid "Create &missing remote directory and enter it"
 msgstr "创建缺失的远程目录并进入该目录(&M)"
 
 #: ../src/interface/LocalListView.cpp:823
-#: ../src/interface/LocalTreeView.cpp:1122
+#: ../src/interface/LocalTreeView.cpp:1108
 #: ../src/interface/RemoteListView.cpp:1076
-#: ../src/interface/RemoteTreeView.cpp:926
+#: ../src/interface/RemoteTreeView.cpp:911
 msgid "Create a new subdirectory in the current directory"
 msgstr "在当前目录创建一个新的子目录"
 
 #: ../src/interface/LocalListView.cpp:824
-#: ../src/interface/LocalTreeView.cpp:1123
+#: ../src/interface/LocalTreeView.cpp:1109
 #: ../src/interface/RemoteListView.cpp:1077
-#: ../src/interface/RemoteTreeView.cpp:927
+#: ../src/interface/RemoteTreeView.cpp:912
 msgid "Create a new subdirectory in the current directory and change into it"
 msgstr "在当前目录创建一个新的子目录并进入该目录"
 
@@ -2926,16 +2932,16 @@ msgid "Create a new, empty file in the current directory"
 msgstr "在当前目录创建一个新的空文件"
 
 #: ../src/interface/LocalListView.cpp:824
-#: ../src/interface/LocalTreeView.cpp:1123
+#: ../src/interface/LocalTreeView.cpp:1109
 #: ../src/interface/RemoteListView.cpp:1077
-#: ../src/interface/RemoteTreeView.cpp:927
+#: ../src/interface/RemoteTreeView.cpp:912
 msgid "Create director&y and enter it"
 msgstr "创建目录并进入(&Y)"
 
 #: ../src/interface/LocalListView.cpp:994
-#: ../src/interface/LocalTreeView.cpp:1241
+#: ../src/interface/LocalTreeView.cpp:1227
 #: ../src/interface/RemoteListView.cpp:1338
-#: ../src/interface/RemoteTreeView.cpp:1312
+#: ../src/interface/RemoteTreeView.cpp:1297
 msgid "Create directory"
 msgstr "创建目录"
 
@@ -2943,7 +2949,7 @@ msgstr "创建目录"
 msgid "Create empty file"
 msgstr "创建空文件"
 
-#: ../src/interface/queue.cpp:357
+#: ../src/interface/queue.cpp:358
 msgid "Creating directory"
 msgstr "正在创建目录"
 
@@ -2979,15 +2985,15 @@ msgstr ""
 "当前远程目录“%s”不在同步根目录(%s)下面。\n"
 "同步浏览已关闭。"
 
-#: ../src/interface/statusbar.cpp:430
+#: ../src/interface/statusbar.cpp:431
 msgid "Current transfer type is set to ASCII."
 msgstr "当前的传送类型被设置到 ASCII 模式。"
 
-#: ../src/interface/statusbar.cpp:438
+#: ../src/interface/statusbar.cpp:439
 msgid "Current transfer type is set to automatic detection."
 msgstr "当前的传送类型为自动检测。"
 
-#: ../src/interface/statusbar.cpp:434
+#: ../src/interface/statusbar.cpp:435
 msgid "Current transfer type is set to binary."
 msgstr "当前的传送类型被设置为二进制模式。"
 
@@ -3050,8 +3056,8 @@ msgid "D&efault"
 msgstr "默认(&E)"
 
 #: ../src/interface/RemoteListView.cpp:1082
-#: ../src/interface/RemoteTreeView.cpp:930 ../src/interface/search.cpp:1222
-#: ../src/interface/search.cpp:1230
+#: ../src/interface/RemoteTreeView.cpp:915 ../src/interface/search.cpp:1223
+#: ../src/interface/search.cpp:1231
 msgid "D&elete"
 msgstr "删除(&E)"
 
@@ -3072,7 +3078,7 @@ msgstr "不要保存密码(&O)"
 msgid "D&uplicate"
 msgstr "复制(&U)"
 
-#: ../src/engine/server.cpp:65
+#: ../src/engine/server.cpp:66
 msgid "DOS-like with virtual paths"
 msgstr "带虚拟路径的 DOS 式"
 
@@ -3117,7 +3123,7 @@ msgstr "默认本地目录(&L):"
 msgid "Default (AWS/S3)"
 msgstr "默认(AWS/S3)"
 
-#: ../src/engine/server.cpp:57
+#: ../src/engine/server.cpp:58
 msgid "Default (Autodetect)"
 msgstr "默认(自动检测)"
 
@@ -3159,7 +3165,7 @@ msgstr "默认传输类型:"
 msgid "Default: http://ip.filezilla-project.org/ip.php"
 msgstr "默认: http://ip.filezilla-project.org/ip.php"
 
-#: ../src/interface/settings/optionspage_connection.cpp:97
+#: ../src/interface/settings/optionspage_connection.cpp:119
 msgid ""
 "Delay between failed connection attempts has to be between 1 and 999 seconds."
 msgstr "失败的连接请求之间的延迟必须在 1 和 999 秒之间。"
@@ -3174,12 +3180,12 @@ msgid_plural ""
 "attempt..."
 msgstr[0] "由于上一次尝试连接失败，将推迟连接 %d 秒..."
 
-#: ../src/interface/sitemanager_dialog.cpp:1087
+#: ../src/interface/sitemanager_dialog.cpp:1058
 msgid "Delete Site Manager entries"
 msgstr "删除站点管理器记录"
 
-#: ../src/interface/LocalTreeView.cpp:1126
-#: ../src/interface/RemoteTreeView.cpp:930
+#: ../src/interface/LocalTreeView.cpp:1112
+#: ../src/interface/RemoteTreeView.cpp:915
 msgid "Delete selected directory"
 msgstr "删除所选的目录"
 
@@ -3202,7 +3208,7 @@ msgstr "正在从“%2$s”删除 %1$u 个文件"
 msgid "Deleting symbolic link"
 msgstr "正在删除符号链接"
 
-#: ../src/interface/LocalTreeView.cpp:1036
+#: ../src/interface/LocalTreeView.cpp:1022
 msgid "Desktop"
 msgstr "桌面"
 
@@ -3215,7 +3221,7 @@ msgstr "详细资料"
 msgid "Details for new key:"
 msgstr "新密钥的详细资料:"
 
-#: ../src/interface/import.cpp:71 ../src/interface/sitemanager_dialog.cpp:752
+#: ../src/interface/import.cpp:71 ../src/interface/sitemanager_dialog.cpp:723
 msgid "Detected newer version of FileZilla"
 msgstr "有新版的 FileZilla"
 
@@ -3223,11 +3229,11 @@ msgstr "有新版的 FileZilla"
 msgid "Dire&ctories"
 msgstr "目录(&C)"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Direction"
 msgstr "方向"
 
-#: ../src/interface/filelistctrl.cpp:278
+#: ../src/interface/filelistctrl.cpp:279
 msgid "Directory"
 msgstr "目录"
 
@@ -3235,11 +3241,11 @@ msgstr "目录"
 msgid "Directory access permissions"
 msgstr "目录访问权限"
 
-#: ../src/interface/filelistctrl.cpp:492 ../src/interface/Mainfrm.cpp:2402
-#: ../src/interface/Mainfrm.cpp:2422
+#: ../src/interface/filelistctrl.cpp:493 ../src/interface/Mainfrm.cpp:2389
+#: ../src/interface/Mainfrm.cpp:2409
 #: ../src/interface/settings/optionspage_filelists.cpp:64
 #: ../src/interface/sitemanager_controls.cpp:927
-#: ../src/interface/sitemanager_dialog.cpp:310 ../src/interface/toolbar.cpp:57
+#: ../src/interface/sitemanager_dialog.cpp:281 ../src/interface/toolbar.cpp:115
 #: ../src/interface/view.cpp:109
 msgid "Directory comparison"
 msgstr "目录对比"
@@ -3252,7 +3258,7 @@ msgstr "目录对比失败"
 msgid "Directory containing the logfile does not exist or filename is invalid."
 msgstr "保存日志文件的目录不存在或文件名无效。"
 
-#: ../src/interface/menu_bar.cpp:84
+#: ../src/interface/menu_bar.cpp:65
 msgid "Directory listing &filters..."
 msgstr "目录列表过滤器(&F)..."
 
@@ -3286,38 +3292,38 @@ msgid ""
 "Disable synchronized browsing and continue changing the remote directory?"
 msgstr "关闭同步浏览并且继续修改本地目录？"
 
-#: ../src/interface/Mainfrm.cpp:770
+#: ../src/interface/Mainfrm.cpp:764
 msgid ""
 "Disable this option again if you will not be able to see the correct "
 "directory contents anymore."
 msgstr "如果您无法再看见文件时请停用此选项。"
 
-#: ../src/interface/toolbar.cpp:52
+#: ../src/interface/toolbar.cpp:110
 msgid "Disconnect from server"
 msgstr "从服务器断开"
 
 #: ../src/engine/controlsocket.cpp:53 ../src/engine/controlsocket.cpp:734
 #: ../src/engine/controlsocket.cpp:833
 #: ../src/engine/ftp/ftpcontrolsocket.cpp:64 ../src/engine/http/request.cpp:280
-#: ../src/interface/queue.cpp:348
+#: ../src/interface/queue.cpp:349
 msgid "Disconnected from server"
 msgstr "已从服务器断开"
 
 #: ../src/engine/controlsocket.cpp:858
-#: ../src/engine/http/httpcontrolsocket.cpp:324
+#: ../src/engine/http/httpcontrolsocket.cpp:325
 #, c-format
 msgid "Disconnected from server: %s"
 msgstr "已从服务器断开: %s"
 
-#: ../src/interface/queue.cpp:347 ../src/interface/statuslinectrl.cpp:262
+#: ../src/interface/queue.cpp:348 ../src/interface/statuslinectrl.cpp:262
 msgid "Disconnecting from previous server"
 msgstr "正在从上一个服务器断开连接"
 
-#: ../src/interface/toolbar.cpp:52
+#: ../src/interface/toolbar.cpp:110
 msgid "Disconnects from the currently visible server"
 msgstr "断开当前可见的服务器"
 
-#: ../src/interface/menu_bar.cpp:175
+#: ../src/interface/menu_bar.cpp:156
 msgid "Display about dialog"
 msgstr "显示关于对话框"
 
@@ -3329,7 +3335,7 @@ msgstr "不使用默认编辑器(&N)"
 msgid "Do the same with &all selected files already being edited"
 msgstr "对所有正在编辑的选中文件执行相同操作(&A)"
 
-#: ../src/interface/Mainfrm.cpp:1277 ../src/interface/Mainfrm.cpp:1300
+#: ../src/interface/Mainfrm.cpp:1266 ../src/interface/Mainfrm.cpp:1289
 msgid "Do you really want to close FileZilla?"
 msgstr "您真的要关闭 FileZilla？"
 
@@ -3342,7 +3348,7 @@ msgstr "您真的要删除站点管理器里的所有记录和传输队列？"
 msgid "Do you really want to delete all Site Manager entries?"
 msgstr "您真的要删除站点管理器里的所有记录？"
 
-#: ../src/interface/sitemanager_dialog.cpp:1089
+#: ../src/interface/sitemanager_dialog.cpp:1060
 msgid "Do you really want to delete the selected entries?"
 msgstr "您真的要删除选定的记录？"
 
@@ -3350,7 +3356,7 @@ msgstr "您真的要删除选定的记录？"
 msgid "Do you really want to delete the transfer queue?"
 msgstr "您真的要删除传输队列？"
 
-#: ../src/interface/Mainfrm.cpp:699
+#: ../src/interface/Mainfrm.cpp:693
 #, c-format
 msgid "Do you really want to send '%s' to the server?"
 msgstr "您真的要发送“%s”给服务器吗?"
@@ -3388,21 +3394,21 @@ msgstr "下载"
 msgid "Download &limit:"
 msgstr "下载限制(&L):"
 
-#: ../src/interface/statusbar.cpp:630
+#: ../src/interface/statusbar.cpp:631
 #, c-format
 msgid "Download limit: %s/s"
 msgstr "下载限制: %s/s"
 
-#: ../src/interface/statusbar.cpp:633
+#: ../src/interface/statusbar.cpp:634
 msgid "Download limit: none"
 msgstr "下载限制: 无"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:749
-#: ../src/interface/search.cpp:1332 ../src/interface/search.cpp:1337
+#: ../src/interface/search.cpp:1333 ../src/interface/search.cpp:1338
 msgid "Download search results"
 msgstr "下载搜索结果"
 
-#: ../src/interface/RemoteTreeView.cpp:918
+#: ../src/interface/RemoteTreeView.cpp:903
 msgid "Download selected directory"
 msgstr "下载选定的目录"
 
@@ -3410,7 +3416,7 @@ msgstr "下载选定的目录"
 msgid "Download selected files and directories"
 msgstr "下载选定的文件和目录"
 
-#: ../src/interface/statusbar.cpp:766
+#: ../src/interface/statusbar.cpp:767
 #, c-format
 msgid "Download: %s/s"
 msgstr "下载: %s/s"
@@ -3419,7 +3425,7 @@ msgstr "下载: %s/s"
 msgid "Downloading"
 msgstr "正在下载"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:248
+#: ../src/engine/http/httpcontrolsocket.cpp:249
 #, c-format
 msgid "Downloading %s"
 msgstr "正在下载 %s"
@@ -3429,18 +3435,18 @@ msgid "Downloading update..."
 msgstr "正在下载更新..."
 
 #: ../src/interface/LocalListView.cpp:117
-#: ../src/interface/LocalTreeView.cpp:123 ../src/interface/QueueView.cpp:100
+#: ../src/interface/LocalTreeView.cpp:114 ../src/interface/QueueView.cpp:100
 #: ../src/interface/RemoteListView.cpp:117
-#: ../src/interface/RemoteTreeView.cpp:99
+#: ../src/interface/RemoteTreeView.cpp:90
 msgid ""
 "Drag&drop between different instances of FileZilla has not been implemented "
 "yet."
 msgstr "在不同的 FileZilla 的实例间拖放还未被实现。"
 
 #: ../src/interface/LocalListView.cpp:122
-#: ../src/interface/LocalTreeView.cpp:129 ../src/interface/QueueView.cpp:114
+#: ../src/interface/LocalTreeView.cpp:120 ../src/interface/QueueView.cpp:114
 #: ../src/interface/RemoteListView.cpp:122
-#: ../src/interface/RemoteTreeView.cpp:104
+#: ../src/interface/RemoteTreeView.cpp:95
 msgid "Drag&drop between different servers has not been implemented yet."
 msgstr "在不同服务器之间拖放还未实现。"
 
@@ -3448,7 +3454,7 @@ msgstr "在不同服务器之间拖放还未实现。"
 msgid "Dropbox for Business:"
 msgstr ""
 
-#: ../src/interface/sitemanager_dialog.cpp:362
+#: ../src/interface/sitemanager_dialog.cpp:333
 msgid "Dupl&icate"
 msgstr "复制(&I)"
 
@@ -3465,7 +3471,7 @@ msgstr "进入目录(&N)"
 msgid "E&xecute"
 msgstr "执行(&X)"
 
-#: ../src/interface/menu_bar.cpp:65
+#: ../src/interface/menu_bar.cpp:46
 msgid "E&xit"
 msgstr "退出(&X)"
 
@@ -3491,7 +3497,7 @@ msgid ""
 "Edit the file with the configured editor and upload changes to the server."
 msgstr "使用设置的编辑器编辑文件并上传修改后的文件到服务器。"
 
-#: ../src/interface/search.cpp:1613
+#: ../src/interface/search.cpp:1614
 msgid "Editing directories is not supported"
 msgstr "不支持编辑目录"
 
@@ -3500,7 +3506,7 @@ msgstr "不支持编辑目录"
 msgid "Editing failed"
 msgstr "编辑失败"
 
-#: ../src/interface/search.cpp:1613
+#: ../src/interface/search.cpp:1614
 msgid "Editing search results"
 msgstr "编辑搜索结果"
 
@@ -3567,7 +3573,7 @@ msgstr "加密细节"
 msgid "Encryption passphrase is not set"
 msgstr "未设置加密密码"
 
-#: ../src/interface/filelistctrl.cpp:494
+#: ../src/interface/filelistctrl.cpp:495
 msgid "End comparison and change sorting order?"
 msgstr "结束对比并改变排序？"
 
@@ -3575,7 +3581,7 @@ msgstr "结束对比并改变排序？"
 msgid "End comparison and open quick search?"
 msgstr "结束对比并打开快速搜索？"
 
-#: ../src/interface/menu_bar.cpp:148
+#: ../src/interface/menu_bar.cpp:129
 msgid "Enter &custom command..."
 msgstr "输入自定义命令(&C)..."
 
@@ -3587,7 +3593,7 @@ msgstr "输入 0 表示无速度限制。"
 msgid "Enter command"
 msgstr "输入命令"
 
-#: ../src/interface/Mainfrm.cpp:681
+#: ../src/interface/Mainfrm.cpp:675
 msgid "Enter custom command"
 msgstr "输入自定义命令"
 
@@ -3700,15 +3706,15 @@ msgstr "加载队列出错"
 #: ../src/interface/bookmarks_dialog.cpp:836
 #: ../src/interface/bookmarks_dialog.cpp:889
 #: ../src/interface/filter_manager.cpp:527
-#: ../src/interface/filter_manager.cpp:570 ../src/interface/Options.cpp:177
+#: ../src/interface/filter_manager.cpp:570 ../src/interface/Options.cpp:156
 #: ../src/interface/osx_sandbox_userdirs.cpp:67
 #: ../src/interface/osx_sandbox_userdirs.cpp:138
-#: ../src/interface/search.cpp:1781 ../src/interface/search.cpp:1815
+#: ../src/interface/search.cpp:1782 ../src/interface/search.cpp:1816
 #: ../src/interface/sitemanager.cpp:44 ../src/interface/sitemanager.cpp:281
 #: ../src/interface/sitemanager.cpp:358 ../src/interface/sitemanager.cpp:446
 #: ../src/interface/sitemanager.cpp:544 ../src/interface/sitemanager.cpp:650
-#: ../src/interface/sitemanager_dialog.cpp:745
-#: ../src/interface/sitemanager_dialog.cpp:805
+#: ../src/interface/sitemanager_dialog.cpp:716
+#: ../src/interface/sitemanager_dialog.cpp:776
 #: ../src/interface/wrapengine.cpp:946
 msgid "Error loading xml file"
 msgstr "导入 XML 文件出错"
@@ -3725,13 +3731,13 @@ msgid "Error starting program"
 msgstr "启动程序出错"
 
 #: ../src/interface/bookmarks_dialog.cpp:376
-#: ../src/interface/bookmarks_dialog.cpp:931
+#: ../src/interface/bookmarks_dialog.cpp:931 ../src/interface/Options.cpp:190
 #: ../src/interface/sitemanager.cpp:330 ../src/interface/sitemanager.cpp:423
 #: ../src/interface/sitemanager.cpp:480
-#: ../src/interface/sitemanager_dialog.cpp:828
-#: ../src/interface/sitemanager_dialog.cpp:1966
+#: ../src/interface/sitemanager_dialog.cpp:799
+#: ../src/interface/sitemanager_dialog.cpp:1937
 #: ../src/interface/verifycertdialog.cpp:29
-#: ../src/interface/xmlfunctions.cpp:13
+#: ../src/interface/xmlfunctions.cpp:15
 msgid "Error writing xml file"
 msgstr "写入 XML 文件出错"
 
@@ -3797,11 +3803,11 @@ msgstr "FTP"
 msgid "FTP - File Transfer Protocol"
 msgstr "FTP - 文件传输协议"
 
-#: ../src/engine/server.cpp:20
+#: ../src/engine/server.cpp:21
 msgid "FTP - File Transfer Protocol with optional encryption"
 msgstr "FTP - 可选加密的文件传输协议"
 
-#: ../src/engine/server.cpp:26
+#: ../src/engine/server.cpp:27
 msgid "FTP - Insecure File Transfer Protocol"
 msgstr "FTP - 不安全的文件传输协议"
 
@@ -3828,11 +3834,11 @@ msgstr "FTP 使用另一些连接来传输数据。这些额外的连接有两�
 msgid "FTP: File Types"
 msgstr "FTP: 文件类型"
 
-#: ../src/engine/server.cpp:25
+#: ../src/engine/server.cpp:26
 msgid "FTPES - FTP over explicit TLS"
 msgstr "FTPES - 通过显式 TLS 的 FTP"
 
-#: ../src/engine/server.cpp:24
+#: ../src/engine/server.cpp:25
 msgid "FTPS - FTP over implicit TLS"
 msgstr "FTPS - 通过隐式 TLS 的 FTP"
 
@@ -3840,21 +3846,21 @@ msgstr "FTPS - 通过隐式 TLS 的 FTP"
 #: ../src/interface/LocalListView.cpp:638
 #: ../src/interface/LocalListView.cpp:981
 #: ../src/interface/LocalListView.cpp:2014
-#: ../src/interface/LocalTreeView.cpp:912
-#: ../src/interface/LocalTreeView.cpp:1214 ../src/interface/viewheader.cpp:505
+#: ../src/interface/LocalTreeView.cpp:898
+#: ../src/interface/LocalTreeView.cpp:1200 ../src/interface/viewheader.cpp:505
 msgid "Failed to change directory"
 msgstr "改变目录失败"
 
-#: ../src/interface/FileZilla.cpp:108 ../src/interface/FileZilla.cpp:123
-#: ../src/interface/FileZilla.cpp:126
+#: ../src/interface/FileZilla.cpp:96 ../src/interface/FileZilla.cpp:111
+#: ../src/interface/FileZilla.cpp:114
 msgid "Failed to change language"
 msgstr "切换语言失败"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:304
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:305
 msgid "Failed to convert command to 8 bit charset"
 msgstr "转换命令到 8 bit 编码失败"
 
-#: ../src/interface/sitemanager_dialog.cpp:1704
+#: ../src/interface/sitemanager_dialog.cpp:1675
 msgid "Failed to copy or move sites"
 msgstr "无法复制或移动站点"
 
@@ -3875,11 +3881,11 @@ msgstr "为主动模式传输创建监听套接字失败"
 msgid "Failed to decrypt server password."
 msgstr "无法解密服务器密码。"
 
-#: ../src/interface/LocalTreeView.cpp:660
+#: ../src/interface/LocalTreeView.cpp:646
 msgid "Failed to get 'My Documents' path"
 msgstr "无法获取“我的文档”路径"
 
-#: ../src/interface/LocalTreeView.cpp:646
+#: ../src/interface/LocalTreeView.cpp:632
 msgid "Failed to get desktop path"
 msgstr "无法获取桌面路径"
 
@@ -3917,7 +3923,7 @@ msgstr "读取目录列表失败"
 msgid "Failed to retrieve external IP address, aborting."
 msgstr "无法获取外部 IP 地址，中止操作。"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:650
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:651
 msgid "Failed to retrieve external IP address, using local address"
 msgstr "无法获取外部 IP 地址，使用本地地址"
 
@@ -3925,7 +3931,7 @@ msgstr "无法获取外部 IP 地址，使用本地地址"
 msgid "Failed to retrieve local IP address, aborting."
 msgstr "无法获取本地 IP 地址，中止操作。"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:668
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:669
 msgid "Failed to retrieve local IP address."
 msgstr "无法获取本地 IP 地址。"
 
@@ -3937,33 +3943,33 @@ msgstr "无法获取外部 IP 地址。"
 msgid "Failed to send command."
 msgstr "发送命令失败。"
 
-#: ../src/interface/FileZilla.cpp:123
+#: ../src/interface/FileZilla.cpp:111
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language"
 msgstr "无法将语言设置为 %s (%s)，将使用系统默认语言"
 
-#: ../src/interface/FileZilla.cpp:100
+#: ../src/interface/FileZilla.cpp:88
 #, c-format
 msgid ""
 "Failed to set language to %s (%s), using default system language (%s, %s)."
 msgstr "无法将语言设置为 %s (%s)，将使用系统默认语言 (%s，%s)。"
 
-#: ../src/interface/FileZilla.cpp:87
+#: ../src/interface/FileZilla.cpp:75
 #, c-format
 msgid "Failed to set language to %s (%s), using default system language."
 msgstr "无法将语言设置为 %s (%s)，将使用系统默认语言。"
 
-#: ../src/interface/FileZilla.cpp:126
+#: ../src/interface/FileZilla.cpp:114
 #, c-format
 msgid "Failed to set language to %s, using default system language"
 msgstr "无法将语言设置为 %s，将使用默认系统语言"
 
-#: ../src/interface/FileZilla.cpp:95
+#: ../src/interface/FileZilla.cpp:83
 #, c-format
 msgid "Failed to set language to %s, using default system language (%s, %s)."
 msgstr "无法将语言设置为 %s，将使用系统默认语言(%s，%s)。"
 
-#: ../src/interface/FileZilla.cpp:83
+#: ../src/interface/FileZilla.cpp:71
 #, c-format
 msgid "Failed to set language to %s, using default system language."
 msgstr "无法将语言设置为 %s，将使用系统默认语言。"
@@ -3984,7 +3990,7 @@ msgstr "传输失败"
 msgid "Fall back to active mode"
 msgstr "退回主动模式"
 
-#: ../src/interface/search.cpp:694
+#: ../src/interface/search.cpp:695
 msgid "Fil&e sizes"
 msgstr "文件大小(&E)"
 
@@ -3996,7 +4002,7 @@ msgstr "文件(&E):"
 msgid "Fil&es"
 msgstr "文件(&E)"
 
-#: ../src/interface/filelistctrl.cpp:277
+#: ../src/interface/filelistctrl.cpp:278
 msgid "File"
 msgstr "文件"
 
@@ -4024,13 +4030,13 @@ msgstr "文件已改变"
 msgid "File lists"
 msgstr "文件列表"
 
-#: ../src/interface/edithandler.cpp:1918 ../src/interface/FileZilla.cpp:520
+#: ../src/interface/edithandler.cpp:1918 ../src/interface/FileZilla.cpp:437
 #: ../src/interface/settings/optionspage_edit.cpp:194
 msgid "File not found"
 msgstr "文件未找到"
 
-#: ../src/interface/search.cpp:638 ../src/interface/search.cpp:1030
-#: ../src/interface/toolbar.cpp:59
+#: ../src/interface/search.cpp:639 ../src/interface/search.cpp:1031
+#: ../src/interface/toolbar.cpp:117
 msgid "File search"
 msgstr "文件搜索"
 
@@ -4065,11 +4071,11 @@ msgstr "文件传输成功"
 msgid "File transfer successful, transferred %s in %s"
 msgstr "文件传输成功，传输了 %s (用时%s)"
 
-#: ../src/interface/Mainfrm.cpp:1276
+#: ../src/interface/Mainfrm.cpp:1265
 msgid "File transfers still in progress."
 msgstr "文件传输仍在进行。"
 
-#: ../src/interface/FileZilla.cpp:311
+#: ../src/interface/FileZilla.cpp:300
 msgid "FileZilla Error"
 msgstr "FileZilla 错误"
 
@@ -4083,7 +4089,7 @@ msgstr "FileZilla 现在可以测试您的配置以确保所有配置正常。"
 msgid "FileZilla is already connected to a server."
 msgstr "FileZilla 已经连接了一台服务器。"
 
-#: ../src/interface/Mainfrm.cpp:1581
+#: ../src/interface/Mainfrm.cpp:1568
 msgid "FileZilla needs to be restarted for the language change to take effect."
 msgstr "改变语言需要重启 FileZilla 才会生效。"
 
@@ -4091,7 +4097,7 @@ msgstr "改变语言需要重启 FileZilla 才会生效。"
 msgid "FileZilla updates"
 msgstr "FileZilla 更新"
 
-#: ../src/interface/menu_bar.cpp:99
+#: ../src/interface/menu_bar.cpp:80
 msgid "Filelist status &bars"
 msgstr "文件列表状态栏(&B)"
 
@@ -4112,7 +4118,7 @@ msgstr "无法为目录 %s 和文件名 %s 构造文件名"
 msgid "Filename invalid"
 msgstr "文件名无效"
 
-#: ../src/interface/asyncrequestqueue.cpp:391
+#: ../src/interface/asyncrequestqueue.cpp:394
 msgid "Filename unchanged"
 msgstr "文件名没有改变"
 
@@ -4135,7 +4141,7 @@ msgstr "文件名不能包含以下任何字符: / \\ : * ? \" < > |"
 msgid "Files currently being edited"
 msgstr "正在编辑的文件"
 
-#: ../src/interface/toolbar.cpp:56
+#: ../src/interface/toolbar.cpp:114
 msgid "Files matching a filter rule are removed from directory listings."
 msgstr "匹配过滤器的文件已从目录列表中移除。"
 
@@ -4192,7 +4198,7 @@ msgstr "滤除不匹配以下所有条件的项目"
 msgid "Filter set already exists"
 msgstr "过滤器集合已经存在"
 
-#: ../src/interface/toolbar.cpp:56
+#: ../src/interface/toolbar.cpp:114
 msgid "Filter the directory listings"
 msgstr "过滤目录列表"
 
@@ -4201,11 +4207,11 @@ msgstr "过滤目录列表"
 msgid "Filter validation failed"
 msgstr "过滤器核对失败"
 
-#: ../src/interface/search.cpp:688
+#: ../src/interface/search.cpp:689
 msgid "Find &files"
 msgstr "查找文件(&F)"
 
-#: ../src/interface/search.cpp:689
+#: ../src/interface/search.cpp:690
 msgid "Find d&irectories"
 msgstr "查找目录(&I)"
 
@@ -4237,7 +4243,7 @@ msgstr "请运行网络配置向导获取关于这些选项的更多信息。"
 msgid "For reliability you should specify a range of at least 10 ports."
 msgstr "您至少需要指定 10 个端口才能保证可靠性。"
 
-#: ../src/interface/Options.cpp:176
+#: ../src/interface/Options.cpp:155
 msgid ""
 "For this session the default settings will be used. Any changes to the "
 "settings will not be saved."
@@ -4251,11 +4257,11 @@ msgstr "文件扩展名中禁止使用的字符。"
 msgid "Force &UTF-8"
 msgstr "强制 UTF-8 (&U)"
 
-#: ../src/interface/menu_bar.cpp:149
+#: ../src/interface/menu_bar.cpp:130
 msgid "Force showing &hidden files"
 msgstr "强制显示隐藏文件(&H)"
 
-#: ../src/interface/Mainfrm.cpp:765
+#: ../src/interface/Mainfrm.cpp:759
 msgid "Force showing hidden files"
 msgstr "强制显示隐藏文件"
 
@@ -4318,7 +4324,7 @@ msgstr "给定的过滤器集合名已经存在，是否覆盖过滤器集合？
 msgid "Global bookmarks"
 msgstr "全局书签"
 
-#: ../src/interface/aboutdialog.cpp:76
+#: ../src/interface/aboutdialog.cpp:81
 msgid "GnuTLS:"
 msgstr "GnuTLS:"
 
@@ -4334,7 +4340,7 @@ msgstr "组权限"
 msgid "H&igh"
 msgstr "高(&I)"
 
-#: ../src/engine/server.cpp:23
+#: ../src/engine/server.cpp:24
 msgid "HTTPS - HTTP over TLS"
 msgstr "HTTPS - 通过 TLS 的 HTTP"
 
@@ -4346,12 +4352,12 @@ msgstr "散列值:"
 msgid "Hidden"
 msgstr "隐藏"
 
-#: ../src/interface/queue.cpp:993 ../src/interface/queue.cpp:1055
+#: ../src/interface/queue.cpp:995 ../src/interface/queue.cpp:1057
 #: ../src/interface/settings/optionspage_transfer.cpp:97
 msgid "High"
 msgstr "高"
 
-#: ../src/interface/queue.cpp:995 ../src/interface/queue.cpp:1057
+#: ../src/interface/queue.cpp:997 ../src/interface/queue.cpp:1059
 msgid "Highest"
 msgstr "最高"
 
@@ -4364,7 +4370,7 @@ msgid ""
 "Hold the shift key to toggle the filter state on both sides simultaneously."
 msgstr "按住 shift 键来同时开/关两边的过滤器状态。"
 
-#: ../src/interface/aboutdialog.cpp:38
+#: ../src/interface/aboutdialog.cpp:43
 msgid "Homepage:"
 msgstr "主页:"
 
@@ -4430,7 +4436,7 @@ msgstr ""
 msgid "Identity service path:"
 msgstr "认证服务路径:"
 
-#: ../src/interface/settings/optionspage_connection.cpp:45
+#: ../src/interface/settings/optionspage_connection.cpp:47
 msgid ""
 "If no data is sent or received during an operation for longer than the "
 "specified time, the connection will be closed and FileZilla will try to "
@@ -4533,7 +4539,7 @@ msgstr ""
 "如果您点击了测试，FileZilla 会连接到 probe.filezilla-project.org 并且进行一些"
 "简单测试。"
 
-#: ../src/interface/Mainfrm.cpp:1299
+#: ../src/interface/Mainfrm.cpp:1288
 msgid "If you close FileZilla, your changes will be lost."
 msgstr "如果关闭 FileZilla，您所做的改变将会丢失。"
 
@@ -4646,7 +4652,7 @@ msgstr ""
 "在被动模式下(推荐大多数用户使用)，FileZilla 请求服务器给出一个端口，然后连接"
 "到那个端口去。不需要太多的配置。"
 
-#: ../src/interface/queue.cpp:345
+#: ../src/interface/queue.cpp:346
 msgid "Incorrect password"
 msgstr "密码错误"
 
@@ -4656,7 +4662,7 @@ msgid ""
 "Please try again later."
 msgstr "无法获取最新版本 FileZilla 的信息。请稍后重试。"
 
-#: ../src/engine/ftp/logon.cpp:273
+#: ../src/engine/ftp/logon.cpp:272
 msgid "Initializing TLS..."
 msgstr "初始化 TLS 中..."
 
@@ -4673,11 +4679,11 @@ msgstr "不安全的 FTP 数据连接"
 msgid "Insecure algorithm!"
 msgstr "不安全的算法！"
 
-#: ../src/engine/ftp/logon.cpp:259
+#: ../src/engine/ftp/logon.cpp:258
 msgid "Insecure server, it does not support FTP over TLS."
 msgstr "不安全的服务器，不支持 FTP over TLS。"
 
-#: ../src/engine/server.cpp:708 ../src/engine/server.cpp:735
+#: ../src/engine/server.cpp:709 ../src/engine/server.cpp:736
 msgid "Interactive"
 msgstr "交互式"
 
@@ -4689,7 +4695,7 @@ msgstr "界面"
 msgid "Intermediate certificate"
 msgstr "中级证书"
 
-#: ../src/engine/controlsocket.cpp:214 ../src/interface/queue.cpp:351
+#: ../src/engine/controlsocket.cpp:214 ../src/interface/queue.cpp:352
 msgid "Interrupted by user"
 msgstr "用户终止"
 
@@ -4773,7 +4779,7 @@ msgstr ""
 "ftps:// FTP over TLS (隐式) 以及\n"
 "ftpes:// FTP over TLS (显式)。"
 
-#: ../src/engine/ftp/logon.cpp:72
+#: ../src/engine/ftp/logon.cpp:69
 msgid ""
 "Invalid proxy host, after closing bracket only colon and port may follow."
 msgstr "无效代理主机名，在闭合括号之后只允许是跟冒号加端口号。"
@@ -4786,7 +4792,7 @@ msgstr "无效的正则表达式"
 msgid "Invalid response code"
 msgstr "无效的响应码"
 
-#: ../src/interface/search.cpp:1030
+#: ../src/interface/search.cpp:1031
 #, c-format
 msgid "Invalid search conditions: %s"
 msgstr "无效的搜索条件: %s"
@@ -4828,7 +4834,7 @@ msgstr "司法管辖州或省:"
 msgid "Keep directories on top"
 msgstr "保持目录在上方"
 
-#: ../src/interface/Mainfrm.cpp:769
+#: ../src/interface/Mainfrm.cpp:763
 msgid ""
 "Keep in mind that not all servers support this feature and may return "
 "incorrect listings if this option is enabled. Although FileZilla performs "
@@ -4846,7 +4852,7 @@ msgstr "密钥交换"
 msgid "Key exchange:"
 msgstr "密钥交换:"
 
-#: ../src/engine/server.cpp:705 ../src/engine/server.cpp:733
+#: ../src/engine/server.cpp:706 ../src/engine/server.cpp:734
 msgid "Key file"
 msgstr "密钥文件"
 
@@ -4862,7 +4868,7 @@ msgstr "最低(&O)"
 msgid "Language"
 msgstr "语言"
 
-#: ../src/interface/Mainfrm.cpp:1581
+#: ../src/interface/Mainfrm.cpp:1568
 msgid "Language changed"
 msgstr "语言已经更改"
 
@@ -4909,7 +4915,7 @@ msgstr "限制:"
 msgid "Line length exceeded"
 msgstr "行长度已超出"
 
-#: ../src/interface/aboutdialog.cpp:73
+#: ../src/interface/aboutdialog.cpp:78
 msgid "Linked against"
 msgstr "链接库"
 
@@ -4930,7 +4936,7 @@ msgstr "最低可用端口(&W):"
 msgid "Local"
 msgstr "本地"
 
-#: ../src/interface/search.cpp:1185
+#: ../src/interface/search.cpp:1186
 msgid "Local &directory:"
 msgstr "本地目录(&D):"
 
@@ -4955,7 +4961,7 @@ msgstr "本地文件是一个目录而不是一个文件。"
 msgid "Local file is not a valid filename."
 msgstr "本地文件不是一个有效的文件名。"
 
-#: ../src/interface/search.cpp:1042 ../src/interface/search.cpp:1048
+#: ../src/interface/search.cpp:1043 ../src/interface/search.cpp:1049
 msgid "Local file search"
 msgstr "本地文件搜索"
 
@@ -4967,7 +4973,7 @@ msgstr "本地过滤器:"
 msgid "Local path handling:"
 msgstr "本地路径处理:"
 
-#: ../src/interface/search.cpp:708
+#: ../src/interface/search.cpp:709
 msgid "Local results:"
 msgstr "本地结果:"
 
@@ -5031,11 +5037,11 @@ msgid ""
 "'%s' or '%s'"
 msgstr "登录类型只能和 FTP URL 一起使用。参数必须是“%s”或“%s”"
 
-#: ../src/interface/queue.cpp:988 ../src/interface/queue.cpp:1050
+#: ../src/interface/queue.cpp:990 ../src/interface/queue.cpp:1052
 msgid "Low"
 msgstr "低"
 
-#: ../src/interface/queue.cpp:986 ../src/interface/queue.cpp:1048
+#: ../src/interface/queue.cpp:988 ../src/interface/queue.cpp:1050
 msgid "Lowest"
 msgstr "最低"
 
@@ -5103,19 +5109,19 @@ msgstr "主密码(&P):"
 msgid "Master password:"
 msgstr "主密码:"
 
-#: ../src/interface/search.cpp:672
+#: ../src/interface/search.cpp:673
 msgid "Match all of the following"
 msgstr "匹配以下所有"
 
-#: ../src/interface/search.cpp:673
+#: ../src/interface/search.cpp:674
 msgid "Match any of the following"
 msgstr "匹配以下任意一个"
 
-#: ../src/interface/search.cpp:674
+#: ../src/interface/search.cpp:675
 msgid "Match none of the following"
 msgstr "不匹配以下任何内容"
 
-#: ../src/interface/search.cpp:675
+#: ../src/interface/search.cpp:676
 msgid "Match not all of the following"
 msgstr "不匹配以下所有内容"
 
@@ -5123,7 +5129,7 @@ msgstr "不匹配以下所有内容"
 msgid "Maximum simultaneous &transfers:"
 msgstr "最大并发传输(&T):"
 
-#: ../src/interface/Mainfrm.cpp:489 ../src/interface/Mainfrm.cpp:1909
+#: ../src/interface/Mainfrm.cpp:490 ../src/interface/Mainfrm.cpp:1896
 msgid "Message log"
 msgstr "消息日志"
 
@@ -5135,11 +5141,15 @@ msgstr "消息日志位置(&N):"
 msgid "MiB"
 msgstr "MiB"
 
+#: ../src/interface/settings/optionspage_connection.cpp:72
+msgid "Minimum allowed TLS &version:"
+msgstr "允许的最低 TLS 版本(&V):"
+
 #: ../src/interface/sitemanager_controls.cpp:943
 msgid "Minutes"
 msgstr "分钟"
 
-#: ../src/interface/search.cpp:695
+#: ../src/interface/search.cpp:696
 msgid "Modification tim&e"
 msgstr "修改时间(&E)"
 
@@ -5151,17 +5161,17 @@ msgstr "下移(&D)"
 msgid "Move &up"
 msgstr "上移(&U)"
 
-#: ../src/interface/LocalTreeView.cpp:1053
+#: ../src/interface/LocalTreeView.cpp:1039
 msgid "My Computer"
 msgstr "我的电脑"
 
-#: ../src/interface/LocalTreeView.cpp:1044
+#: ../src/interface/LocalTreeView.cpp:1030
 msgid "My Documents"
 msgstr "我的文档"
 
 #: ../src/interface/sitemanager.cpp:203
-#: ../src/interface/sitemanager_dialog.cpp:731
-#: ../src/interface/sitemanager_dialog.cpp:734
+#: ../src/interface/sitemanager_dialog.cpp:702
+#: ../src/interface/sitemanager_dialog.cpp:705
 msgid "My Sites"
 msgstr "我的站点"
 
@@ -5179,7 +5189,7 @@ msgid "Name"
 msgstr "名字"
 
 #: ../src/interface/bookmarks_dialog.cpp:777
-#: ../src/interface/sitemanager_dialog.cpp:1036
+#: ../src/interface/sitemanager_dialog.cpp:1007
 msgid "Name already exists"
 msgstr "名称已经存在"
 
@@ -5188,7 +5198,7 @@ msgstr "名称已经存在"
 msgid "Name of bookmark already exists."
 msgstr "该名称的书签已经存在。"
 
-#: ../src/engine/server.cpp:861 ../src/engine/server.cpp:909
+#: ../src/engine/server.cpp:862 ../src/engine/server.cpp:910
 msgid "Name or email address"
 msgstr "名称或电子邮件地址"
 
@@ -5205,11 +5215,11 @@ msgstr "自然排序"
 msgid "Need to enter filter name"
 msgstr "需要输入过滤器名"
 
-#: ../src/interface/search.cpp:1042
+#: ../src/interface/search.cpp:1043
 msgid "Need to enter valid local path"
 msgstr "需要输入正确的本地路径"
 
-#: ../src/interface/search.cpp:1070
+#: ../src/interface/search.cpp:1071
 msgid "Need to enter valid remote path"
 msgstr "需要输入正确的远程路径"
 
@@ -5217,7 +5227,7 @@ msgstr "需要输入正确的远程路径"
 msgid "Need to specify a character encoding"
 msgstr "需要指定字符编码"
 
-#: ../src/interface/statusbar.cpp:766
+#: ../src/interface/statusbar.cpp:767
 msgid "Network activity:"
 msgstr "网络活动:"
 
@@ -5229,16 +5239,16 @@ msgstr "无法连接网络"
 msgid "Never"
 msgstr "从不"
 
-#: ../src/interface/sitemanager_dialog.cpp:358
+#: ../src/interface/sitemanager_dialog.cpp:329
 msgid "New &folder"
 msgstr "新文件夹(&F)"
 
-#: ../src/interface/menu_bar.cpp:54
+#: ../src/interface/menu_bar.cpp:35
 msgid "New &tab"
 msgstr "新标签(&T)"
 
 #: ../src/interface/bookmarks_dialog.cpp:274
-#: ../src/interface/sitemanager_dialog.cpp:359
+#: ../src/interface/sitemanager_dialog.cpp:330
 msgid "New Book&mark"
 msgstr "新建书签(&M)"
 
@@ -5257,13 +5267,13 @@ msgstr "新建书签(&M)"
 #: ../src/interface/bookmarks_dialog.cpp:644
 #: ../src/interface/bookmarks_dialog.cpp:901
 #: ../src/interface/sitemanager.cpp:389
-#: ../src/interface/sitemanager_dialog.cpp:1888
+#: ../src/interface/sitemanager_dialog.cpp:1859
 msgid "New bookmark"
 msgstr "新建书签"
 
-#: ../src/interface/LocalTreeView.cpp:1245
+#: ../src/interface/LocalTreeView.cpp:1231
 #: ../src/interface/RemoteListView.cpp:1351
-#: ../src/interface/RemoteTreeView.cpp:1326
+#: ../src/interface/RemoteTreeView.cpp:1311
 msgid "New directory"
 msgstr "创建目录"
 
@@ -5276,12 +5286,12 @@ msgstr "%s 中的新功能和改进"
 msgid "New filter"
 msgstr "新过滤器"
 
-#: ../src/interface/sitemanager_dialog.cpp:905
+#: ../src/interface/sitemanager_dialog.cpp:876
 msgid "New folder"
 msgstr "新文件夹"
 
 #: ../src/interface/sitemanager.cpp:301 ../src/interface/sitemanager.cpp:315
-#: ../src/interface/sitemanager_dialog.cpp:1861
+#: ../src/interface/sitemanager_dialog.cpp:1832
 msgid "New site"
 msgstr "新站点"
 
@@ -5305,12 +5315,12 @@ msgstr "没有给出命令，中止操作。"
 msgid "No directory added"
 msgstr "没有创建目录"
 
-#: ../src/interface/sitemanager_dialog.cpp:1450
+#: ../src/interface/sitemanager_dialog.cpp:1421
 #, c-format
 msgid "No entries found matching '%s'."
 msgstr "没有找到匹配“%s”的记录。"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:623
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:624
 msgid "No external IP address set, trying default."
 msgstr "没有设定外部 IP 地址，尝试使用默认值。"
 
@@ -5353,9 +5363,13 @@ msgstr "无扩展名文件没有关联程序。"
 msgid "No program has been associated to edit files with the extension '%s'."
 msgstr "扩展名为“%s”的文件没有关联程序。"
 
-#: ../src/interface/search.cpp:714 ../src/interface/search.cpp:720
+#: ../src/interface/search.cpp:715 ../src/interface/search.cpp:721
 msgid "No search results"
 msgstr "没有搜索结果"
+
+#: ../src/commonui/options.cpp:246
+msgid "No settings loaded to save."
+msgstr "没有需要保存的已加载设置。"
 
 #: ../src/interface/sitemanager.cpp:213
 msgid "No sites available"
@@ -5380,8 +5394,8 @@ msgstr "无"
 msgid "None selected yet"
 msgstr "尚未选择项目"
 
-#: ../src/engine/server.cpp:699 ../src/engine/server.cpp:729
-#: ../src/interface/queue.cpp:991 ../src/interface/queue.cpp:1053
+#: ../src/engine/server.cpp:700 ../src/engine/server.cpp:730
+#: ../src/interface/queue.cpp:993 ../src/interface/queue.cpp:1055
 #: ../src/interface/settings/optionspage_transfer.cpp:96
 msgid "Normal"
 msgstr "正常"
@@ -5399,7 +5413,7 @@ msgstr "未连接"
 msgid "Not connected to any server"
 msgstr "没有连接到任何服务器"
 
-#: ../src/interface/Mainfrm.cpp:669
+#: ../src/interface/Mainfrm.cpp:663
 msgid "Not connected to any server."
 msgstr "没有连接到任何服务器。"
 
@@ -5411,7 +5425,7 @@ msgstr "未连接。"
 msgid "Not yet valid!"
 msgstr "尚未生效！"
 
-#: ../src/interface/Mainfrm.cpp:767
+#: ../src/interface/Mainfrm.cpp:761
 msgid "Note that this feature is only supported using the FTP protocol."
 msgstr "注意该功能只支持使用 FTP 协议。"
 
@@ -5431,7 +5445,7 @@ msgstr "行中有空字符"
 msgid "Number of decimal places:"
 msgstr "小数位数:"
 
-#: ../src/interface/settings/optionspage_connection.cpp:92
+#: ../src/interface/settings/optionspage_connection.cpp:114
 msgid "Number of retries has to be between 0 and 99."
 msgstr "重试的次数必须在 0 和 99 之间。"
 
@@ -5445,7 +5459,7 @@ msgstr "重试的次数必须在 0 和 99 之间。"
 #: ../src/interface/resources/xrc/dialogs.xrc:826
 #: ../src/interface/resources/xrc/dialogs.xrc:921
 #: ../src/interface/resources/xrc/dialogs.xrc:990
-#: ../src/interface/aboutdialog.cpp:127 ../src/interface/edithandler.cpp:1229
+#: ../src/interface/aboutdialog.cpp:132 ../src/interface/edithandler.cpp:1229
 #: ../src/interface/edithandler.cpp:1506 ../src/interface/edithandler.cpp:1812
 #: ../src/interface/filteredit.cpp:140 ../src/interface/filter_manager.cpp:123
 #: ../src/interface/listctrlex.cpp:736
@@ -5455,7 +5469,7 @@ msgstr "重试的次数必须在 0 和 99 之间。"
 msgid "OK"
 msgstr "确定"
 
-#: ../src/interface/aboutdialog.cpp:92
+#: ../src/interface/aboutdialog.cpp:97
 msgid "OS version:"
 msgstr "操作系统版本:"
 
@@ -5495,23 +5509,23 @@ msgstr "只使用明文 FTP (不安全)"
 msgid "Op&en file"
 msgstr "打开文件(&E)"
 
-#: ../src/interface/LocalTreeView.cpp:1119
+#: ../src/interface/LocalTreeView.cpp:1105
 msgid "Open directory in system's file manager"
 msgstr "在系统的文件管理器中打开目录"
 
-#: ../src/interface/toolbar.cpp:37 ../src/interface/toolbar.cpp:39
+#: ../src/interface/toolbar.cpp:95 ../src/interface/toolbar.cpp:97
 msgid "Open the Site Manager"
 msgstr "打开站点管理器"
 
-#: ../src/interface/toolbar.cpp:37
+#: ../src/interface/toolbar.cpp:95
 msgid "Open the Site Manager."
 msgstr "打开站点管理器。"
 
-#: ../src/interface/toolbar.cpp:39
+#: ../src/interface/toolbar.cpp:97
 msgid "Open the Site Manager. Right-click for a list of sites."
 msgstr "打开站点管理器。右击查看站点列表。"
 
-#: ../src/interface/menu_bar.cpp:75
+#: ../src/interface/menu_bar.cpp:56
 msgid ""
 "Open the directory access permissions dialog to configure the local "
 "directories FileZilla has access to."
@@ -5521,7 +5535,7 @@ msgstr "打开目录访问权限对话框调整 FileZilla 的本地目录权限�
 msgid "Open the file."
 msgstr "打开文件。"
 
-#: ../src/interface/menu_bar.cpp:73
+#: ../src/interface/menu_bar.cpp:54
 msgid "Open the settings dialog of FileZilla"
 msgstr "打开 FileZilla 的设置对话框"
 
@@ -5531,25 +5545,25 @@ msgstr "打开为:"
 
 #: ../src/interface/edithandler.cpp:367 ../src/interface/edithandler.cpp:1334
 #: ../src/interface/LocalListView.cpp:1926
-#: ../src/interface/LocalListView.cpp:1938 ../src/interface/search.cpp:2064
-#: ../src/interface/search.cpp:2075
+#: ../src/interface/LocalListView.cpp:1938 ../src/interface/search.cpp:2065
+#: ../src/interface/search.cpp:2076
 msgid "Opening failed"
 msgstr "打开失败"
 
-#: ../src/interface/menu_bar.cpp:54
+#: ../src/interface/menu_bar.cpp:35
 msgid "Opens a new tab"
 msgstr "打开一个新的标签"
 
-#: ../src/interface/menu_bar.cpp:50
+#: ../src/interface/menu_bar.cpp:31
 msgid "Opens the Site Manager"
 msgstr "打开站点管理器"
 
-#: ../src/interface/toolbar.cpp:56
+#: ../src/interface/toolbar.cpp:114
 msgid ""
 "Opens the directory listing filter dialog. Right-click to toggle filters."
 msgstr "打开目录列表过滤器对话框。右击开/关过滤器。"
 
-#: ../src/interface/aboutdialog.cpp:86
+#: ../src/interface/aboutdialog.cpp:91
 msgid "Operating System:"
 msgstr "操作系统:"
 
@@ -5646,7 +5660,7 @@ msgstr "PORT 命令已受路由器或防火墙影响。"
 msgid "Pa&ssive (recommended)"
 msgstr "被动(推荐)(&S)"
 
-#: ../src/interface/Mainfrm.cpp:2596
+#: ../src/interface/Mainfrm.cpp:2583
 msgid "Parameter not a valid URL"
 msgstr "参数不是有效的 URL"
 
@@ -5696,11 +5710,11 @@ msgstr "路径"
 msgid "Path cannot be constructed for directory %s and subdir %s"
 msgstr "无法为目录 %s 和子目录 %s 构造路径"
 
-#: ../src/interface/Mainfrm.cpp:2554
+#: ../src/interface/Mainfrm.cpp:2541
 msgid "Path not found:"
 msgstr "路径未找到:"
 
-#: ../src/engine/server.cpp:871 ../src/engine/server.cpp:883
+#: ../src/engine/server.cpp:872 ../src/engine/server.cpp:884
 msgid "Path of identity service"
 msgstr "认证服务路径"
 
@@ -5721,11 +5735,11 @@ msgstr "权限"
 msgid "Permissions"
 msgstr "权限"
 
-#: ../src/engine/ftp/logon.cpp:129
+#: ../src/engine/ftp/logon.cpp:126
 msgid "Plain FTP is insecure. Please switch to FTP over TLS."
 msgstr "明文 FTP 不安全。请切换到 FTP over TLS。"
 
-#: ../src/interface/aboutdialog.cpp:97
+#: ../src/interface/aboutdialog.cpp:102
 msgid "Platform:"
 msgstr "平台:"
 
@@ -5827,7 +5841,7 @@ msgstr "请输入 1 到 10 之间的数字来设置并发传输任务数。"
 msgid "Please enter a password for this server:"
 msgstr "请为该服务器输入密码:"
 
-#: ../src/interface/settings/optionspage_connection.cpp:87
+#: ../src/interface/settings/optionspage_connection.cpp:109
 msgid ""
 "Please enter a timeout between 10 and 9999 seconds or 0 to disable timeouts."
 msgstr "请输入介于 10 和 9999 之间的超时秒数，或输入 0 禁用超时。"
@@ -5854,7 +5868,7 @@ msgstr "请输入您用以获取外部地址的 URL"
 msgid "Please enter an upload speed limit greater or equal to 0 %s/s."
 msgstr "请输入大于等于 0 %s/s 的上传速度限制。"
 
-#: ../src/interface/Mainfrm.cpp:681
+#: ../src/interface/Mainfrm.cpp:675
 msgid ""
 "Please enter raw FTP command.\n"
 "Using raw ftp commands will clear the directory cache."
@@ -5875,9 +5889,9 @@ msgstr ""
 "如果路径或参数中有空格，请使用双引号。"
 
 #: ../src/interface/LocalListView.cpp:994
-#: ../src/interface/LocalTreeView.cpp:1241
+#: ../src/interface/LocalTreeView.cpp:1227
 #: ../src/interface/RemoteListView.cpp:1338
-#: ../src/interface/RemoteTreeView.cpp:1312
+#: ../src/interface/RemoteTreeView.cpp:1297
 msgid "Please enter the name of the directory which should be created:"
 msgstr "请输入将要创建的目录名:"
 
@@ -5925,7 +5939,7 @@ msgid ""
 "make sure you typed the address of the address resolver correctly."
 msgstr "请确保 FileZilla 被允许建立向外的连接并且输入了正确的已解析地址。"
 
-#: ../src/interface/FileZilla.cpp:107
+#: ../src/interface/FileZilla.cpp:95
 msgid "Please make sure the requested locale is installed on your system."
 msgstr "请确认要求的区域配置已安装在系统里。"
 
@@ -5950,7 +5964,7 @@ msgstr ""
 "墙认为只有木马或其它有害软件才会用到的端口。这可能会引发一个错误的警告，您可"
 "以安全地忽略掉。"
 
-#: ../src/interface/Mainfrm.cpp:808
+#: ../src/interface/Mainfrm.cpp:802
 msgid ""
 "Please note that preserving timestamps on uploads on FTP, FTPS and FTPES "
 "servers only works if they support the MFMT command."
@@ -5958,7 +5972,7 @@ msgstr ""
 "请注意保留时间戳只针对支持 MFMT 命令的 FTP，FTPS 和 FTPES 服务器上(不包含 "
 "SFTP)。"
 
-#: ../src/interface/settings/optionspage_connection.cpp:62
+#: ../src/interface/settings/optionspage_connection.cpp:64
 msgid ""
 "Please note that some servers might ban you if you try to reconnect too "
 "often or in too short intervals."
@@ -6038,11 +6052,11 @@ msgid "Preallocation"
 msgstr "预分配"
 
 #: ../src/interface/sitemanager.cpp:202
-#: ../src/interface/sitemanager_dialog.cpp:1538
+#: ../src/interface/sitemanager_dialog.cpp:1509
 msgid "Predefined Sites"
 msgstr "预定义的站点"
 
-#: ../src/interface/Mainfrm.cpp:807
+#: ../src/interface/Mainfrm.cpp:801
 msgid "Preserving file timestamps"
 msgstr "保留文件时间戳"
 
@@ -6062,7 +6076,7 @@ msgstr "打印版本信息至标准输出(stdout)并退出"
 msgid "Prioritize directories (default)"
 msgstr "目录优先(默认)"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Priority"
 msgstr "优先级"
 
@@ -6095,7 +6109,7 @@ msgstr "协议(&T):"
 msgid "Pro&xy password:"
 msgstr "代理密码(&X):"
 
-#: ../src/interface/menu_bar.cpp:112 ../src/interface/QueueView.cpp:1787
+#: ../src/interface/menu_bar.cpp:93 ../src/interface/QueueView.cpp:1787
 msgid "Process &Queue"
 msgstr "处理队列(&Q)"
 
@@ -6105,7 +6119,7 @@ msgstr "处理队列(&Q)"
 msgid "Processed %s in %s."
 msgstr "已处理 %s 个文件， %s 个目录。"
 
-#: ../src/engine/server.cpp:714 ../src/engine/server.cpp:739
+#: ../src/engine/server.cpp:715 ../src/engine/server.cpp:740
 msgid "Profile"
 msgstr ""
 
@@ -6131,12 +6145,12 @@ msgstr "代理用户(&U):"
 msgid "Proxy authentication failed"
 msgstr "代理认证失败"
 
-#: ../src/engine/ftp/transfersocket.cpp:312
+#: ../src/engine/ftp/transfersocket.cpp:310
 #, c-format
 msgid "Proxy handshake failed: %s"
 msgstr "代理握手失败: %s"
 
-#: ../src/engine/ftp/logon.cpp:67
+#: ../src/engine/ftp/logon.cpp:64
 msgid "Proxy host starts with '[' but no closing bracket found."
 msgstr "代理主机以“[”开始，但没有闭合括号。"
 
@@ -6163,7 +6177,7 @@ msgstr "代理请求失败: CONNECT 回复了未知的地址类型"
 msgid "Proxy sent data while we haven't sent out request yet"
 msgstr "代理在我们还未发送请求前发送了数据"
 
-#: ../src/engine/ftp/logon.cpp:94
+#: ../src/engine/ftp/logon.cpp:91
 msgid "Proxy set but proxy host or port invalid"
 msgstr "已设定代理服务器，但代理地址或端口设置无效"
 
@@ -6183,17 +6197,17 @@ msgstr "公共权限"
 msgid "Queue has been fully processed"
 msgstr "队列已全部处理"
 
-#: ../src/interface/statusbar.cpp:467
+#: ../src/interface/statusbar.cpp:468
 #, c-format
 msgid "Queue: %s MiB"
 msgstr "队列: %s MiB"
 
-#: ../src/interface/statusbar.cpp:402
+#: ../src/interface/statusbar.cpp:403
 #, c-format
 msgid "Queue: %s%s"
 msgstr "队列: %s%s"
 
-#: ../src/interface/statusbar.cpp:398 ../src/interface/statusbar.cpp:458
+#: ../src/interface/statusbar.cpp:399 ../src/interface/statusbar.cpp:459
 msgid "Queue: empty"
 msgstr "队列: 空"
 
@@ -6225,7 +6239,7 @@ msgstr "引号规则"
 msgid "R&eboot system once"
 msgstr "重启系统(&E)"
 
-#: ../src/interface/menu_bar.cpp:105
+#: ../src/interface/menu_bar.cpp:86
 msgid "R&emote directory tree"
 msgstr "远程目录(&E)"
 
@@ -6234,7 +6248,7 @@ msgstr "远程目录(&E)"
 msgid "R&eset and requeue selected files"
 msgstr "重置并重新请求所选的文件(&E)"
 
-#: ../src/interface/Mainfrm.cpp:696
+#: ../src/interface/Mainfrm.cpp:690
 msgid "Raw FTP command"
 msgstr "原始 FTP 命令"
 
@@ -6269,29 +6283,29 @@ msgstr "读取(&D)"
 msgid "Read-only"
 msgstr "只读"
 
-#: ../src/interface/Mainfrm.cpp:1158
+#: ../src/interface/Mainfrm.cpp:1147
 msgid "Really cancel current operation?"
 msgstr "真的要取消当前操作吗？"
 
-#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1678
+#: ../src/interface/RemoteListView.cpp:1432 ../src/interface/search.cpp:1679
 #, c-format
 msgid "Really delete %d directory with its contents from the server?"
 msgid_plural ""
 "Really delete %d directories with their contents from the server?"
 msgstr[0] "确实要从服务器上删除 %d 个目录及其内容吗？"
 
-#: ../src/interface/RemoteListView.cpp:1429 ../src/interface/search.cpp:1675
+#: ../src/interface/RemoteListView.cpp:1429 ../src/interface/search.cpp:1676
 #, c-format
 msgid "Really delete %d file from the server?"
 msgid_plural "Really delete %d files from the server?"
 msgstr[0] "确实要从服务器上删除 %d 个文件吗？"
 
-#: ../src/interface/RemoteListView.cpp:1437 ../src/interface/search.cpp:1683
+#: ../src/interface/RemoteListView.cpp:1437 ../src/interface/search.cpp:1684
 #, c-format
 msgid "Really delete %s and %s from the server?"
 msgstr "确实要从服务器上删除 %s 和 %s 吗？"
 
-#: ../src/interface/RemoteTreeView.cpp:1113
+#: ../src/interface/RemoteTreeView.cpp:1098
 msgid "Really delete all selected files and/or directories from the server?"
 msgstr "真的要从服务器上删除所有选定的文件和/或目录吗？"
 
@@ -6299,7 +6313,7 @@ msgstr "真的要从服务器上删除所有选定的文件和/或目录吗？"
 msgid "Really delete all selected files and/or directories from your computer?"
 msgstr "真的要从您的计算机上删除所有选定的文件和/或目录吗？"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Reason"
 msgstr "原因"
 
@@ -6346,11 +6360,11 @@ msgstr ""
 "连接到服务器时无法清除重新连接信息。\n"
 "如果您要继续，您的连接将会断开。"
 
-#: ../src/interface/settings/optionspage_connection.cpp:48
+#: ../src/interface/settings/optionspage_connection.cpp:50
 msgid "Reconnection settings"
 msgstr "重连设置"
 
-#: ../src/interface/toolbar.cpp:53
+#: ../src/interface/toolbar.cpp:111
 msgid "Reconnects to the last used server"
 msgstr "重新连接上一次使用过的服务器"
 
@@ -6380,7 +6394,7 @@ msgstr "重定向 URI 无效或不被支持: %s"
 msgid "Redirection to invalid or unsupported address: %s"
 msgstr "重定向地址无效或未被支持: %s"
 
-#: ../src/interface/toolbar.cpp:49
+#: ../src/interface/toolbar.cpp:107
 msgid "Refresh the file and folder lists"
 msgstr "刷新文件和文件夹列表"
 
@@ -6392,11 +6406,11 @@ msgstr "记住密码？"
 msgid "Remote"
 msgstr "远程"
 
-#: ../src/interface/manual_transfer.cpp:100 ../src/interface/queue.cpp:1271
+#: ../src/interface/manual_transfer.cpp:100 ../src/interface/queue.cpp:1273
 msgid "Remote file"
 msgstr "远程文件"
 
-#: ../src/interface/search.cpp:1063 ../src/interface/search.cpp:1070
+#: ../src/interface/search.cpp:1064 ../src/interface/search.cpp:1071
 msgid "Remote file search"
 msgstr "远程文件搜索"
 
@@ -6417,7 +6431,7 @@ msgstr ""
 "默认远程路经无法解析。请确认是否是有效的绝对路径并且被当前站点的服务器模式"
 "(%s)支持。"
 
-#: ../src/interface/sitemanager_dialog.cpp:952
+#: ../src/interface/sitemanager_dialog.cpp:923
 #, c-format
 msgid ""
 "Remote path cannot be parsed. Make sure it is a valid absolute path and is "
@@ -6428,7 +6442,7 @@ msgstr ""
 
 #: ../src/interface/bookmarks_dialog.cpp:489
 #: ../src/interface/bookmarks_dialog.cpp:494
-#: ../src/interface/sitemanager_dialog.cpp:955
+#: ../src/interface/sitemanager_dialog.cpp:926
 msgid "Remote path cannot be parsed. Make sure it is a valid absolute path."
 msgstr "远程路经无法解析。请确认是否是有效的绝对路径。"
 
@@ -6444,7 +6458,7 @@ msgstr "远程路径处理:"
 msgid "Remote path:"
 msgstr "远程路径:"
 
-#: ../src/interface/search.cpp:709
+#: ../src/interface/search.cpp:710
 msgid "Remote results:"
 msgstr "远程结果:"
 
@@ -6462,14 +6476,14 @@ msgstr "删除所有(&A)"
 msgid "Remove &selected"
 msgstr "删除选定(&S)"
 
-#: ../src/interface/asyncrequestqueue.cpp:381
+#: ../src/interface/asyncrequestqueue.cpp:384
 #: ../src/interface/defaultfileexistsdlg.cpp:51
 #: ../src/interface/settings/optionspage_fileexists.cpp:52
 msgid "Rename file"
 msgstr "重命名文件"
 
-#: ../src/interface/LocalTreeView.cpp:1127
-#: ../src/interface/RemoteTreeView.cpp:931
+#: ../src/interface/LocalTreeView.cpp:1113
+#: ../src/interface/RemoteTreeView.cpp:916
 msgid "Rename selected directory"
 msgstr "重命令选定的文件夹"
 
@@ -6504,7 +6518,7 @@ msgstr "请求失败 - 客户端的 identd 无法确认用户标识字符串"
 msgid "Request rejected or failed"
 msgstr "请求被拒或失败"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:258
+#: ../src/engine/http/httpcontrolsocket.cpp:259
 #, c-format
 msgid "Requesting %s"
 msgstr "请求 %s"
@@ -6535,7 +6549,7 @@ msgstr "响应:"
 msgid "Restore ta&bs and reconnect"
 msgstr "恢复打开的标签并重新连接(&B)"
 
-#: ../src/interface/search.cpp:700
+#: ../src/interface/search.cpp:701
 msgid "Results:"
 msgstr "结果:"
 
@@ -6560,7 +6574,7 @@ msgstr "读取“%s”的目录列表..."
 msgid "Retrieving directory listing..."
 msgstr "读取目录列表..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:638
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:639
 #: ../src/interface/netconfwizard.cpp:711
 #, c-format
 msgid "Retrieving external IP address from %s"
@@ -6580,7 +6594,7 @@ msgstr "根证书"
 msgid "S&atellite:"
 msgstr ""
 
-#: ../src/interface/menu_bar.cpp:62
+#: ../src/interface/menu_bar.cpp:43
 msgid "S&how files currently being edited..."
 msgstr "显示正在被编辑的文件(&H)..."
 
@@ -6596,7 +6610,7 @@ msgstr "关闭系统(&H)"
 msgid "S&tart normally"
 msgstr "正常启动(&T)"
 
-#: ../src/interface/search.cpp:663
+#: ../src/interface/search.cpp:664
 msgid "S&top"
 msgstr "停止(&T)"
 
@@ -6604,7 +6618,7 @@ msgstr "停止(&T)"
 msgid "S&uspend system once"
 msgstr "挂起系统(&U)"
 
-#: ../src/interface/menu_bar.cpp:98
+#: ../src/interface/menu_bar.cpp:79
 msgid "S&ynchronized browsing"
 msgstr "同步浏览(&Y)"
 
@@ -6612,7 +6626,7 @@ msgstr "同步浏览(&Y)"
 msgid "SFTP"
 msgstr "SFTP"
 
-#: ../src/interface/FileZilla.cpp:427
+#: ../src/interface/FileZilla.cpp:416
 msgid "SFTP support"
 msgstr "支持 SFTP"
 
@@ -6626,7 +6640,7 @@ msgid ""
 "SOCKS5 does not support usernames or passwords longer than 255 characters."
 msgstr "SOCKS5 不支持用户名或密码长度超过 255 个字符。"
 
-#: ../src/interface/aboutdialog.cpp:78
+#: ../src/interface/aboutdialog.cpp:83
 msgid "SQLite:"
 msgstr "SQLite:"
 
@@ -6664,36 +6678,36 @@ msgstr "您禁止了保存密码。"
 msgid "Scale factor:"
 msgstr "放大倍数:"
 
-#: ../src/interface/search.cpp:669
+#: ../src/interface/search.cpp:670
 msgid "Search &conditions:"
 msgstr "搜索条件(&C):"
 
-#: ../src/interface/search.cpp:661 ../src/interface/search.cpp:666
-#: ../src/interface/search.cpp:1188
+#: ../src/interface/search.cpp:662 ../src/interface/search.cpp:667
+#: ../src/interface/search.cpp:1189
 msgid "Search &directory:"
 msgstr "搜索目录(&D):"
 
-#: ../src/interface/sitemanager_dialog.cpp:1407
+#: ../src/interface/sitemanager_dialog.cpp:1378
 msgid "Search for entries containing the entered text."
 msgstr "搜索包含所输入文字的记录。"
 
-#: ../src/interface/toolbar.cpp:59
+#: ../src/interface/toolbar.cpp:117
 msgid "Search for files recursively."
 msgstr "递归搜索文件。"
 
-#: ../src/interface/sitemanager_dialog.cpp:1450
+#: ../src/interface/sitemanager_dialog.cpp:1421
 msgid "Search result"
 msgstr "搜索结果"
 
-#: ../src/interface/menu_bar.cpp:147
+#: ../src/interface/menu_bar.cpp:128
 msgid "Search server for files"
 msgstr "在服务器上搜索文件"
 
-#: ../src/interface/sitemanager_dialog.cpp:1407
+#: ../src/interface/sitemanager_dialog.cpp:1378
 msgid "Search sites"
 msgstr "搜索站点"
 
-#: ../src/interface/search.cpp:651
+#: ../src/interface/search.cpp:652
 msgid "Search type:"
 msgstr "搜索类型:"
 
@@ -6706,7 +6720,7 @@ msgstr "秘密访问密钥(&K):"
 msgid "Security Token Service:"
 msgstr ""
 
-#: ../src/interface/statusbar.cpp:546
+#: ../src/interface/statusbar.cpp:547
 msgid "Security information"
 msgstr "安全信息"
 
@@ -6761,7 +6775,7 @@ msgstr "选择用于导出数据的文件"
 msgid "Select file for exported filters"
 msgstr "选择用于导出过滤器的文件"
 
-#: ../src/interface/export.cpp:42 ../src/interface/queue.cpp:1557
+#: ../src/interface/export.cpp:42 ../src/interface/queue.cpp:1559
 msgid "Select file for exported queue"
 msgstr "选择用于导出列队的文件"
 
@@ -6769,7 +6783,7 @@ msgstr "选择用于导出列队的文件"
 msgid "Select file for exported settings"
 msgstr "选择需要导出设定的文件"
 
-#: ../src/interface/export.cpp:39 ../src/interface/sitemanager_dialog.cpp:1931
+#: ../src/interface/export.cpp:39 ../src/interface/sitemanager_dialog.cpp:1902
 msgid "Select file for exported sites"
 msgstr "选择用于导出站点的文件"
 
@@ -6789,7 +6803,7 @@ msgstr "为转换的密钥文件输入文件名"
 msgid "Select how these files should be opened."
 msgstr "选择如何打开这些文件。"
 
-#: ../src/interface/search.cpp:1319
+#: ../src/interface/search.cpp:1320
 msgid "Select target download directory"
 msgstr "选择下载目标文件夹"
 
@@ -6805,7 +6819,7 @@ msgstr "选择要导出的分类:"
 msgid "Select the private data you would like to delete."
 msgstr "请选择您要删除的个人信息。"
 
-#: ../src/interface/search.cpp:1276
+#: ../src/interface/search.cpp:1277
 #, c-format
 msgid "Selected %d directory with its contents for transfer."
 msgid_plural "Selected %d directories with their contents for transfer."
@@ -6817,7 +6831,7 @@ msgid "Selected %d directory."
 msgid_plural "Selected %d directories."
 msgstr[0] "选择了 %d 个文件夹。"
 
-#: ../src/interface/search.cpp:1273
+#: ../src/interface/search.cpp:1274
 #, c-format
 msgid "Selected %d file for transfer."
 msgid_plural "Selected %d files for transfer."
@@ -6835,7 +6849,7 @@ msgid "Selected %d file. Total size: At least %s"
 msgid_plural "Selected %d files. Total size: At least %s"
 msgstr[0] "选择了 %d 个文件。大小总共: 至少 %s"
 
-#: ../src/interface/search.cpp:1281
+#: ../src/interface/search.cpp:1282
 #, c-format
 msgid "Selected %s and %s for transfer."
 msgstr "选择了 %s 和 %s 进行传输。"
@@ -6875,7 +6889,7 @@ msgstr "所选文件已在编辑"
 msgid "Selected filter only works for local files."
 msgstr "选择的过滤器只针对本地文件。"
 
-#: ../src/interface/menu_bar.cpp:434
+#: ../src/interface/menu_bar.cpp:426
 msgid ""
 "Selected global bookmark and current server use a different server type.\n"
 "Use site-specific bookmarks for this server."
@@ -6895,11 +6909,11 @@ msgstr "自签名服务器证书"
 msgid "Send FTP &keep-alive commands"
 msgstr "发出 FTP 保持连接命令(&K)"
 
-#: ../src/interface/menu_bar.cpp:148
+#: ../src/interface/menu_bar.cpp:129
 msgid "Send custom command to the server otherwise not available"
 msgstr "发送自定义命令到服务器，如果可用的话"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:728
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:729
 msgid "Sending keep-alive command"
 msgstr "发出保持连接命令"
 
@@ -7031,7 +7045,7 @@ msgstr "服务器至本地 MAC:"
 msgid "Server to client cipher:"
 msgstr "服务器至本地密码:"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Server/Local file"
 msgstr "服务器/本地文件"
 
@@ -7057,7 +7071,7 @@ msgstr "正在将“%s”的权限修改为“%s”"
 msgid "Settings"
 msgstr "设置"
 
-#: ../src/interface/aboutdialog.cpp:113
+#: ../src/interface/aboutdialog.cpp:118
 msgid "Settings directory:"
 msgstr "设置文件目录:"
 
@@ -7069,11 +7083,11 @@ msgstr "显示气泡通知(&O)"
 msgid "Show &raw directory listing"
 msgstr "显示目录列表(&R)"
 
-#: ../src/interface/menu_bar.cpp:168
+#: ../src/interface/menu_bar.cpp:149
 msgid "Show &welcome dialog..."
 msgstr "显示欢迎对话框(&W)..."
 
-#: ../src/interface/Mainfrm.cpp:2425
+#: ../src/interface/Mainfrm.cpp:2412
 msgid "Show both directory trees and continue comparing?"
 msgstr "要显示两边的目录树并进行对比吗？"
 
@@ -7086,11 +7100,11 @@ msgstr "显示细节"
 msgid "Show details about custom date and time formats"
 msgstr "显示有关自定义日期时间格式的详细信息"
 
-#: ../src/interface/search.cpp:1221
+#: ../src/interface/search.cpp:1222
 msgid "Show in file &manager"
 msgstr "在文件管理器中打开(&M)"
 
-#: ../src/interface/menu_bar.cpp:180
+#: ../src/interface/menu_bar.cpp:161
 msgid "Shows available TLS ciphers"
 msgstr "显示可用的 TLS 密码"
 
@@ -7114,7 +7128,7 @@ msgstr "注册"
 msgid "Site &Manager entries"
 msgstr "站点管理器记录(&M)"
 
-#: ../src/interface/sitemanager_dialog.cpp:330
+#: ../src/interface/sitemanager_dialog.cpp:301
 msgid "Site Manager"
 msgstr "站点管理器"
 
@@ -7137,13 +7151,13 @@ msgstr "站点管理器 - 无法记住密码"
 #: ../src/interface/sitemanager_controls.cpp:1390
 #: ../src/interface/sitemanager_controls.cpp:1402
 #: ../src/interface/sitemanager_controls.cpp:1416
-#: ../src/interface/sitemanager_dialog.cpp:957
-#: ../src/interface/sitemanager_dialog.cpp:966
-#: ../src/interface/sitemanager_dialog.cpp:973
+#: ../src/interface/sitemanager_dialog.cpp:928
+#: ../src/interface/sitemanager_dialog.cpp:937
+#: ../src/interface/sitemanager_dialog.cpp:944
 msgid "Site Manager - Invalid data"
 msgstr "站点管理器 - 无效数据"
 
-#: ../src/interface/sitemanager_dialog.cpp:320
+#: ../src/interface/sitemanager_dialog.cpp:291
 msgid "Site Manager already open"
 msgstr "站点管理器已经打开"
 
@@ -7170,7 +7184,7 @@ msgstr ""
 "站点特定书签需要将服务器保存在站点管理器中。\n"
 "将当前连接加入站点管理器码？"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Size"
 msgstr "大小"
 
@@ -7204,7 +7218,7 @@ msgstr "跳过不存在的密匙文件“%s”"
 msgid "Skipping upload of %s"
 msgstr "跳过上传 %s"
 
-#: ../src/interface/Mainfrm.cpp:1298
+#: ../src/interface/Mainfrm.cpp:1287
 msgid "Some files are still being edited or need to be uploaded."
 msgstr "部分文件正被编辑或者需要上传。"
 
@@ -7219,7 +7233,7 @@ msgstr "一些处于路由器后面的远程服务器使用了错误的配置，
 msgid "Sort directories inline"
 msgstr "在原位置排序目录列表"
 
-#: ../src/interface/filelistctrl.cpp:493
+#: ../src/interface/filelistctrl.cpp:494
 msgid "Sort order cannot be changed if comparing directories."
 msgstr "对比目录时不能改变目录排序。"
 
@@ -7231,7 +7245,7 @@ msgstr "正在排序"
 msgid "Sorting &mode:"
 msgstr "排序模式(&M):"
 
-#: ../src/interface/RemoteTreeView.cpp:110
+#: ../src/interface/RemoteTreeView.cpp:101
 msgid "Source and path of the drop operation are identical"
 msgstr "拖放操作的来源和路径相同"
 
@@ -7257,11 +7271,11 @@ msgstr "速度限制"
 msgid "Speed limits"
 msgstr "速度限制"
 
-#: ../src/interface/statusbar.cpp:624
+#: ../src/interface/statusbar.cpp:625
 msgid "Speed limits are disabled, click to change."
 msgstr "速度限制已禁用，点击修改。"
 
-#: ../src/interface/statusbar.cpp:627
+#: ../src/interface/statusbar.cpp:628
 msgid "Speed limits are enabled, click to change."
 msgstr "速度限制已启用，点击修改。"
 
@@ -7310,7 +7324,7 @@ msgstr "启动给定路径下的本地站点"
 msgid "State or province:"
 msgstr "州或省:"
 
-#: ../src/interface/edithandler.cpp:1412 ../src/interface/queue.cpp:1271
+#: ../src/interface/edithandler.cpp:1412 ../src/interface/queue.cpp:1273
 msgid "Status"
 msgstr "状态"
 
@@ -7332,15 +7346,15 @@ msgstr "停止递归操作"
 msgid "Storage &account:"
 msgstr "存储帐号(&A):"
 
-#: ../src/engine/server.cpp:28
+#: ../src/engine/server.cpp:29
 msgid "Storj (using legacy API key)"
 msgstr "Storj (使用传统的 API key)"
 
-#: ../src/engine/server.cpp:41
+#: ../src/engine/server.cpp:42
 msgid "Storj - Decentralized Cloud Storage"
 msgstr "Storj - 去中心化的云端存储"
 
-#: ../src/interface/FileZilla.cpp:434
+#: ../src/interface/FileZilla.cpp:423
 msgid "Storj support"
 msgstr "支持 storj"
 
@@ -7377,7 +7391,7 @@ msgstr "指向文件的符号链接不受该选择的影响，这种符号链接
 #: ../src/interface/state.cpp:425 ../src/interface/state.cpp:1127
 #: ../src/interface/state.cpp:1135 ../src/interface/state.cpp:1142
 #: ../src/interface/state.cpp:1151 ../src/interface/state.cpp:1178
-#: ../src/interface/toolbar.cpp:58
+#: ../src/interface/toolbar.cpp:116
 msgid "Synchronized browsing"
 msgstr "同步浏览"
 
@@ -7392,8 +7406,8 @@ msgstr "语法错误"
 
 #: ../src/interface/cmdline.cpp:83 ../src/interface/cmdline.cpp:88
 #: ../src/interface/cmdline.cpp:93 ../src/interface/cmdline.cpp:100
-#: ../src/interface/cmdline.cpp:105 ../src/interface/Mainfrm.cpp:2556
-#: ../src/interface/Mainfrm.cpp:2598
+#: ../src/interface/cmdline.cpp:105 ../src/interface/Mainfrm.cpp:2543
+#: ../src/interface/Mainfrm.cpp:2585
 msgid "Syntax error in command line"
 msgstr "命令行语法错误"
 
@@ -7401,27 +7415,31 @@ msgstr "命令行语法错误"
 msgid "System"
 msgstr "系统"
 
-#: ../src/interface/aboutdialog.cpp:83
+#: ../src/interface/aboutdialog.cpp:88
 msgid "System details"
 msgstr "系统信息"
 
-#: ../src/interface/menu_bar.cpp:101
+#: ../src/interface/menu_bar.cpp:82
 msgid "T&oolbar"
 msgstr "工具栏(&O)"
 
-#: ../src/engine/http/httpcontrolsocket.cpp:233
+#: ../src/engine/http/httpcontrolsocket.cpp:234
 msgid "TLS connection established, sending HTTP request"
 msgstr "TLS 连接已建立，正在发送 HTTP 请求"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:201
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:202
 msgid "TLS connection established, waiting for welcome message..."
 msgstr "TLS 连接建立，等待欢迎消息..."
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:205
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:206
 msgid "TLS connection established."
 msgstr "TLS 连接已建立。"
 
-#: ../src/engine/ftp/ftpcontrolsocket.cpp:444
+#: ../src/interface/settings/optionspage_connection.cpp:67
+msgid "TLS options"
+msgstr "TLS 选项"
+
+#: ../src/engine/ftp/ftpcontrolsocket.cpp:445
 msgid ""
 "TLS session resumption on data connection failed. Closing control connection "
 "to start over."
@@ -7473,11 +7491,11 @@ msgstr "正在检测服务器能否续传"
 msgid "The &following files are currently being edited:"
 msgstr "以下文件已被编辑(&F):"
 
-#: ../src/interface/sitemanager_dialog.cpp:744
+#: ../src/interface/sitemanager_dialog.cpp:715
 msgid "The Site Manager cannot be used unless the file gets repaired."
 msgstr "需要修复文件，否则无法打开站点管理器。"
 
-#: ../src/interface/sitemanager_dialog.cpp:319
+#: ../src/interface/sitemanager_dialog.cpp:290
 msgid ""
 "The Site Manager is opened in another instance of FileZilla 3.\n"
 "Do you want to continue? Any changes made in the Site Manager won't be saved "
@@ -7512,7 +7530,7 @@ msgstr "无法添加该书签。"
 msgid "The bookmarks could not be cleared."
 msgstr "无法清除该书签。"
 
-#: ../src/interface/statusbar.cpp:507
+#: ../src/interface/statusbar.cpp:508
 msgid "The connection is encrypted. Click icon for details."
 msgstr "该连接是加密的。点击图标显示细节。"
 
@@ -7530,7 +7548,7 @@ msgid ""
 "The custom time format is invalid or contains unsupported format specifiers."
 msgstr "自定义时间格式无效或包含不支持的格式限定符。"
 
-#: ../src/engine/ftp/transfersocket.cpp:315
+#: ../src/engine/ftp/transfersocket.cpp:313
 #, c-format
 msgid "The data connection could not be established: %s"
 msgstr "无法建立数据连接: %s"
@@ -7558,8 +7576,8 @@ msgstr "输入的密码不同。"
 msgid "The extension '%s' does already exist in the list"
 msgstr "扩展名“%s”已经在列表里了"
 
-#: ../src/interface/asyncrequestqueue.cpp:370
-#: ../src/interface/asyncrequestqueue.cpp:378
+#: ../src/interface/asyncrequestqueue.cpp:373
+#: ../src/interface/asyncrequestqueue.cpp:381
 #, c-format
 msgid ""
 "The file %s already exists.\n"
@@ -7569,7 +7587,7 @@ msgstr ""
 "请输入一个新的名字:"
 
 #: ../src/interface/edithandler.cpp:1339
-#: ../src/interface/LocalListView.cpp:1930 ../src/interface/search.cpp:2068
+#: ../src/interface/LocalListView.cpp:1930 ../src/interface/search.cpp:2069
 #, c-format
 msgid ""
 "The file '%s' cannot be opened:\n"
@@ -7599,7 +7617,7 @@ msgid "The file '%s' could not be loaded."
 msgstr "文件“%s”无法加载。"
 
 #: ../src/interface/edithandler.cpp:1334
-#: ../src/interface/LocalListView.cpp:1926 ../src/interface/search.cpp:2064
+#: ../src/interface/LocalListView.cpp:1926 ../src/interface/search.cpp:2065
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -7609,7 +7627,7 @@ msgstr ""
 "系统中没有设置此类型文件关联的程序。"
 
 #: ../src/interface/edithandler.cpp:367 ../src/interface/LocalListView.cpp:1938
-#: ../src/interface/search.cpp:2075
+#: ../src/interface/search.cpp:2076
 #, c-format
 msgid ""
 "The file '%s' could not be opened:\n"
@@ -7618,7 +7636,7 @@ msgstr ""
 "无法打开文件“%s”:\n"
 "关联的程序打开失败"
 
-#: ../src/interface/import.cpp:70 ../src/interface/sitemanager_dialog.cpp:751
+#: ../src/interface/import.cpp:70 ../src/interface/sitemanager_dialog.cpp:722
 #, c-format
 msgid ""
 "The file '%s' has been created by a more recent version of FileZilla.\n"
@@ -7861,7 +7879,7 @@ msgid ""
 "you have and tests your configuration."
 msgstr "本向导会帮助您正确地配置任何您使用的路由器和防火墙，并且测试您的配置。"
 
-#: ../src/interface/queue.cpp:1271
+#: ../src/interface/queue.cpp:1273
 msgid "Time"
 msgstr "时间"
 
@@ -7869,12 +7887,12 @@ msgstr "时间"
 msgid "Time formatting"
 msgstr "时间格式"
 
-#: ../src/interface/settings/optionspage_connection.cpp:40
+#: ../src/interface/settings/optionspage_connection.cpp:42
 msgid "Time&out in seconds:"
 msgstr "超时秒数(&O):"
 
-#: ../src/interface/queue.cpp:346
-#: ../src/interface/settings/optionspage_connection.cpp:37
+#: ../src/interface/queue.cpp:347
+#: ../src/interface/settings/optionspage_connection.cpp:39
 msgid "Timeout"
 msgstr "超时"
 
@@ -7882,15 +7900,15 @@ msgstr "超时"
 msgid "Title:"
 msgstr "标题:"
 
-#: ../src/interface/Mainfrm.cpp:2403
+#: ../src/interface/Mainfrm.cpp:2390
 msgid "To compare directories quick search must be closed."
 msgstr "对比目录必须关闭快速搜索。"
 
-#: ../src/interface/Mainfrm.cpp:2423
+#: ../src/interface/Mainfrm.cpp:2410
 msgid "To compare directories, both file lists have to be aligned."
 msgstr "两边的文件列表必须排列整齐才能对比目录。"
 
-#: ../src/interface/Mainfrm.cpp:2424
+#: ../src/interface/Mainfrm.cpp:2411
 msgid "To do this, the directory trees need to be both shown or both hidden."
 msgstr "两边的目录树必须同时显示或隐藏才能执行此动作。"
 
@@ -7900,7 +7918,7 @@ msgid ""
 "keys to use."
 msgstr "为了支持进行公钥认证，FileZilla 需要知道所使用的私钥。"
 
-#: ../src/interface/toolbar.cpp:57
+#: ../src/interface/toolbar.cpp:115
 msgid ""
 "Toggle directory comparison. Right-click to change comparison mode.\n"
 "\n"
@@ -7916,7 +7934,7 @@ msgstr ""
 "绿: 文件比另一边未标记的文件新\n"
 "红: 文件大小不同"
 
-#: ../src/interface/toolbar.cpp:58
+#: ../src/interface/toolbar.cpp:116
 msgid ""
 "Toggle synchronized browsing.\n"
 "If enabled, navigating the local directory hierarchy will also change the "
@@ -7925,23 +7943,23 @@ msgstr ""
 "启用/停止同步浏览。\n"
 "如果启用，导航本地目录时将相应的修改服务器目录，反之亦然。"
 
-#: ../src/interface/toolbar.cpp:50
+#: ../src/interface/toolbar.cpp:108
 msgid "Toggles processing of the transfer queue"
 msgstr "开/关传输队列处理"
 
-#: ../src/interface/toolbar.cpp:44
+#: ../src/interface/toolbar.cpp:102
 msgid "Toggles the display of the local directory tree"
 msgstr "开/关本地目录树显示"
 
-#: ../src/interface/toolbar.cpp:43
+#: ../src/interface/toolbar.cpp:101
 msgid "Toggles the display of the message log"
 msgstr "开/关消息记录显示"
 
-#: ../src/interface/toolbar.cpp:45
+#: ../src/interface/toolbar.cpp:103
 msgid "Toggles the display of the remote directory tree"
 msgstr "开/关远程目录树显示"
 
-#: ../src/interface/toolbar.cpp:46
+#: ../src/interface/toolbar.cpp:104
 msgid "Toggles the display of the transfer queue"
 msgstr "开/关传输队列显示"
 
@@ -7967,7 +7985,7 @@ msgstr "传输"
 msgid "Transfer &direction"
 msgstr "传输目录(&D)"
 
-#: ../src/interface/menu_bar.cpp:117
+#: ../src/interface/menu_bar.cpp:98
 msgid "Transfer &type"
 msgstr "传输类型(&T)"
 
@@ -7983,7 +8001,7 @@ msgstr "传输队列"
 msgid "Transfer Settings"
 msgstr "传输设置"
 
-#: ../src/engine/ftp/transfersocket.cpp:642
+#: ../src/engine/ftp/transfersocket.cpp:640
 #, c-format
 msgid "Transfer connection interrupted: %s"
 msgstr "传输连接被打断: %s"
@@ -7992,7 +8010,7 @@ msgstr "传输连接被打断: %s"
 msgid "Transferred data got tainted."
 msgstr "已传输的数据被损坏。"
 
-#: ../src/interface/queue.cpp:356 ../src/interface/statuslinectrl.cpp:271
+#: ../src/interface/queue.cpp:357 ../src/interface/statuslinectrl.cpp:271
 msgid "Transferring"
 msgstr "正在传输"
 
@@ -8108,6 +8126,10 @@ msgstr "未知 SOCKS 协议版本: %d"
 msgid "Unknown certificate"
 msgstr "未知证书"
 
+#: ../src/interface/Options.cpp:188 ../src/interface/xmlfunctions.cpp:13
+msgid "Unknown error"
+msgstr "未知错误"
+
 #: ../src/engine/misc.cpp:59
 #, c-format
 msgid "Unknown error %d"
@@ -8138,7 +8160,7 @@ msgstr "未知的根元素，该文件似乎不是由 FileZilla 生成的。"
 msgid "Unknown transfer encoding"
 msgstr "未知的传输编码方式"
 
-#: ../src/interface/Mainfrm.cpp:1807
+#: ../src/interface/Mainfrm.cpp:1794
 msgid "Unknown version"
 msgstr "未知版本"
 
@@ -8180,21 +8202,21 @@ msgstr "上传限制(&L):"
 msgid "Upload failed"
 msgstr "上传失败"
 
-#: ../src/interface/statusbar.cpp:637
+#: ../src/interface/statusbar.cpp:638
 #, c-format
 msgid "Upload limit: %s/s"
 msgstr "上传限制: %s/s"
 
-#: ../src/interface/statusbar.cpp:640
+#: ../src/interface/statusbar.cpp:641
 msgid "Upload limit: none"
 msgstr "上传限制: 无"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:850
-#: ../src/interface/search.cpp:1346
+#: ../src/interface/search.cpp:1347
 msgid "Upload search results"
 msgstr "上传搜索结果"
 
-#: ../src/interface/LocalTreeView.cpp:1111
+#: ../src/interface/LocalTreeView.cpp:1097
 msgid "Upload selected directory"
 msgstr "上传选定的目录"
 
@@ -8210,7 +8232,7 @@ msgstr "上传该文件回服务器？"
 msgid "Upload this file to the server?"
 msgstr "上传该文件到服务器？"
 
-#: ../src/interface/statusbar.cpp:766
+#: ../src/interface/statusbar.cpp:767
 #, c-format
 msgid "Upload: %s/s"
 msgstr "上传: %s/s"
@@ -8245,7 +8267,7 @@ msgid "Use &default editor for text files"
 msgstr "使用默认的文本编辑器(&D)"
 
 #: ../src/interface/resources/xrc/dialogs.xrc:709
-#: ../src/interface/sitemanager_dialog.cpp:309
+#: ../src/interface/sitemanager_dialog.cpp:280
 msgid "Use &synchronized browsing"
 msgstr "使用同步浏览(&S)"
 
@@ -8368,11 +8390,11 @@ msgstr "可见栏目"
 msgid "W&rite"
 msgstr "写入(&R)"
 
-#: ../src/interface/queue.cpp:352
+#: ../src/interface/queue.cpp:353
 msgid "Waiting for browsing connection"
 msgstr "等待浏览连接"
 
-#: ../src/interface/queue.cpp:353
+#: ../src/interface/queue.cpp:354
 msgid "Waiting for password"
 msgstr "等待密码"
 
@@ -8427,11 +8449,11 @@ msgstr "警告: 潜在的安全隐患！"
 msgid "WebDAV"
 msgstr ""
 
-#: ../src/engine/server.cpp:39
+#: ../src/engine/server.cpp:40
 msgid "WebDAV using HTTP (insecure)"
 msgstr "通过 HTTP 的 WebDAV (不安全)"
 
-#: ../src/engine/server.cpp:29
+#: ../src/engine/server.cpp:30
 msgid "WebDAV using HTTPS"
 msgstr "通过 HTTPS 的 WebDAV"
 
@@ -8547,7 +8569,7 @@ msgstr ""
 msgid "You cannot upload files into the root directory."
 msgstr "您无法将文件上传到根目录。"
 
-#: ../src/interface/asyncrequestqueue.cpp:391
+#: ../src/interface/asyncrequestqueue.cpp:394
 msgid "You did not enter a new name for the file. Overwrite the file instead?"
 msgstr "您没有输入该文件的新的名字。要覆盖这个文件吗？"
 
@@ -8559,13 +8581,13 @@ msgstr "您没有权限列出该目录内容"
 msgid "You have selected at least one symbolic link."
 msgstr "您选择了至少一个符号链接。"
 
-#: ../src/interface/edithandler.cpp:1127 ../src/interface/search.cpp:1638
+#: ../src/interface/edithandler.cpp:1127 ../src/interface/search.cpp:1639
 msgid ""
 "You have selected more than 10 files for editing, do you really want to "
 "continue?"
 msgstr "您选择编辑超过 10 个文件，真的要继续吗？"
 
-#: ../src/interface/LocalListView.cpp:1897 ../src/interface/search.cpp:2034
+#: ../src/interface/LocalListView.cpp:1897 ../src/interface/search.cpp:2035
 msgid ""
 "You have selected more than 10 files or directories to open, do you really "
 "want to continue?"
@@ -8579,11 +8601,11 @@ msgstr "请输入一个主机名称。"
 msgid "You have to enter a key file path"
 msgstr "请输入一个密钥文件路径"
 
-#: ../src/interface/search.cpp:1332
+#: ../src/interface/search.cpp:1333
 msgid "You have to enter a local directory."
 msgstr "请输入一个本地目录。"
 
-#: ../src/interface/search.cpp:1346
+#: ../src/interface/search.cpp:1347
 msgid "You have to enter a remote directory."
 msgstr "请输入一个远程目录。"
 
@@ -8605,7 +8627,7 @@ msgstr ""
 "请输入一个有效的访问授权。\n"
 "错误: %s"
 
-#: ../src/interface/search.cpp:1337
+#: ../src/interface/search.cpp:1338
 msgid "You have to enter a writable local directory."
 msgstr "请输入一个可写入的本地目录。"
 
@@ -8658,13 +8680,13 @@ msgstr "请输入访问授权。"
 
 #: ../src/interface/bookmarks_dialog.cpp:84
 #: ../src/interface/bookmarks_dialog.cpp:504
-#: ../src/interface/sitemanager_dialog.cpp:966
+#: ../src/interface/sitemanager_dialog.cpp:937
 msgid "You need to enter at least one path, empty bookmarks are not supported."
 msgstr "请输入至少一个路径，不支持空书签。"
 
 #: ../src/interface/bookmarks_dialog.cpp:90
 #: ../src/interface/bookmarks_dialog.cpp:510
-#: ../src/interface/sitemanager_dialog.cpp:973
+#: ../src/interface/sitemanager_dialog.cpp:944
 msgid ""
 "You need to enter both a local and a remote path to enable synchronized "
 "browsing for this bookmark."
@@ -8751,7 +8773,7 @@ msgstr "结束于"
 msgid "equals"
 msgstr "相等"
 
-#: ../src/interface/filelistctrl.cpp:531
+#: ../src/interface/filelistctrl.cpp:532
 msgid "file"
 msgstr "文件"
 
@@ -8827,7 +8849,7 @@ msgstr "小于"
 msgid "matches regex"
 msgstr "匹配正则表达式 (regex)"
 
-#: ../src/interface/asyncrequestqueue.cpp:373
+#: ../src/interface/asyncrequestqueue.cpp:376
 msgid "new name"
 msgstr "新名称"
 
@@ -8859,9 +8881,12 @@ msgstr "全体可读"
 msgid "world writeable"
 msgstr "全体可写"
 
-#: ../src/interface/aboutdialog.cpp:74
+#: ../src/interface/aboutdialog.cpp:79
 msgid "wxWidgets:"
 msgstr ""
+
+#~ msgid "Cannot load toolbar from resource file"
+#~ msgstr "无法从资源文件导入工具栏"
 
 #~ msgid "(app-compat is set to %d.%d)"
 #~ msgstr "(已设置为与 %d.%d 版本兼容)"
