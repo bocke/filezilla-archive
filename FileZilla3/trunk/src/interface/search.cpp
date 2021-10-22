@@ -958,7 +958,7 @@ void CSearchDialog::ProcessDirectoryListing(CLocalRecursiveOperation::listing co
 	int old_count = m_results->m_fileData.size();
 	int added_count = 0;
 
-	std::wstring const path = listing.localPath.GetPath();
+	std::wstring const& path = listing.localPath.GetPath();
 
 	bool const has_selections = m_results->GetSelectedItemCount() != 0;
 
@@ -978,11 +978,11 @@ void CSearchDialog::ProcessDirectoryListing(CLocalRecursiveOperation::listing co
 		static_cast<CLocalRecursiveOperation::listing::entry&>(localData) = entry;
 		localData.path = listing.localPath;
 		localData.dir = dir;
-		m_results->localFileData_.push_back(localData);
+		m_results->localFileData_.emplace_back(std::move(localData));
 
 		CGenericFileData data;
 		data.icon = dir ? m_results->m_dirIcon : -2;
-		m_results->m_fileData.push_back(data);
+		m_results->m_fileData.emplace_back(std::move(data));
 
 		auto insertPos = std::lower_bound(m_results->m_indexMapping.begin(), m_results->m_indexMapping.end(), old_count + added_count, SortPredicate(compare));
 		int const added_index = insertPos - m_results->m_indexMapping.begin();
