@@ -431,7 +431,7 @@ void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryLis
 		added_indexes.reserve(to_add);
 	}
 
-	std::unique_ptr<CFileListCtrlSortBase> compare = GetSortComparisonObject();
+	auto& compare = GetSortComparisonObject();
 	for (size_t i = pDirectoryListing->size() - to_add; i < pDirectoryListing->size(); ++i) {
 		CDirentry const& entry = (*pDirectoryListing)[i];
 		CGenericFileData data;
@@ -2564,7 +2564,7 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 	return wxString();
 }
 
-std::unique_ptr<CFileListCtrlSortBase> CRemoteListView::GetSortComparisonObject()
+void CRemoteListView::UpdateSortComparisonObject()
 {
 	CFileListCtrlSort<CDirectoryListing>::DirSortMode dirSortMode = GetDirSortMode();
 	NameSortMode nameSortMode = GetNameSortMode();
@@ -2572,42 +2572,42 @@ std::unique_ptr<CFileListCtrlSortBase> CRemoteListView::GetSortComparisonObject(
 	CDirectoryListing const& directoryListing = *m_pDirectoryListing;
 	if (!m_sortDirection) {
 		if (m_sortColumn == 1) {
-			return std::make_unique<CFileListCtrlSortSize<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortSize<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 2) {
-			return std::make_unique<CFileListCtrlSortType<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortType<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 3) {
-			return std::make_unique<CFileListCtrlSortTime<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortTime<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 4) {
-			return std::make_unique<CFileListCtrlSortPermissions<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortPermissions<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 5) {
-			return std::make_unique<CFileListCtrlSortOwnerGroup<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortOwnerGroup<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else {
-			return std::make_unique<CFileListCtrlSortName<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CFileListCtrlSortName<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 	}
 	else {
 		if (m_sortColumn == 1) {
-			return std::make_unique<CReverseSort<CFileListCtrlSortSize<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortSize<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 2) {
-			return std::make_unique<CReverseSort<CFileListCtrlSortType<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortType<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 3) {
-			return std::make_unique<CReverseSort<CFileListCtrlSortTime<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortTime<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 4) {
-			return std::make_unique<CReverseSort<CFileListCtrlSortPermissions<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortPermissions<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else if (m_sortColumn == 5) {
-			return std::make_unique<CReverseSort<CFileListCtrlSortOwnerGroup<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortOwnerGroup<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 		else {
-			return std::make_unique<CReverseSort<CFileListCtrlSortName<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
+			sortComparisonObject_ = std::make_unique<CReverseSort<CFileListCtrlSortName<CDirectoryListing, CGenericFileData>, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
 		}
 	}
 }

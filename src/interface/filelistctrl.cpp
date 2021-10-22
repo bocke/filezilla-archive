@@ -392,7 +392,8 @@ template<class CFileData> void CFileListCtrl<CFileData>::SortList(int column /*=
 	if (m_hasParent) {
 		++start;
 	}
-	std::unique_ptr<CFileListCtrlSortBase> object = GetSortComparisonObject();
+	UpdateSortComparisonObject();
+	auto & object = GetSortComparisonObject();
 	std::sort(start, m_indexMapping.end(), SortPredicate(object));
 
 	if (updateSelections) {
@@ -1165,4 +1166,13 @@ template<class CFileData> void CFileListCtrl<CFileData>::UpdateSelections_ItemsA
 			SetSelection(i, should_selected);
 		}
 	}
+}
+
+template<class CFileData> CFileListCtrlSortBase& CFileListCtrl<CFileData>::GetSortComparisonObject()
+{
+	if (!sortComparisonObject_) {
+		UpdateSortComparisonObject();
+	}
+
+	return *sortComparisonObject_;
 }
