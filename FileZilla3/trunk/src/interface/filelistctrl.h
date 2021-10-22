@@ -538,7 +538,8 @@ protected:
 	void SortList(int column = -1, int direction = -1, bool updateSelections = true);
 	CFileListCtrlSortBase::DirSortMode GetDirSortMode();
 	NameSortMode GetNameSortMode();
-	virtual std::unique_ptr<CFileListCtrlSortBase> GetSortComparisonObject() = 0;
+	virtual void UpdateSortComparisonObject() = 0;
+	CFileListCtrlSortBase& GetSortComparisonObject();
 
 	// An empty path denotes a virtual file
 	std::wstring GetType(std::wstring const& name, bool dir, std::wstring const& path = std::wstring());
@@ -614,6 +615,8 @@ private:
 	void OnKeyDown(wxKeyEvent& event);
 
 	COptionsBase& options_;
+
+	std::unique_ptr<CFileListCtrlSortBase> sortComparisonObject_;
 };
 
 class SortPredicate
@@ -621,15 +624,18 @@ class SortPredicate
 public:
 	SortPredicate() = delete;
 	SortPredicate(std::unique_ptr<CFileListCtrlSortBase> const& ref)
-		: p_(ref.get())
+		: p_(*ref)
+	{}
+	SortPredicate(CFileListCtrlSortBase const& ref)
+	    : p_(ref)
 	{}
 
 	inline bool operator()(int lhs, int rhs) {
-		return (*p_)(lhs, rhs);
+		return p_(lhs, rhs);
 	}
 
 public:
-	CFileListCtrlSortBase const* p_;
+	CFileListCtrlSortBase const& p_;
 };
 
 #ifdef FILELISTCTRL_INCLUDE_TEMPLATE_DEFINITION

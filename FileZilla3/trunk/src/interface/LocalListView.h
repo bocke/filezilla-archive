@@ -76,7 +76,7 @@ protected:
 	bool IsItemValid(unsigned int item) const;
 	CLocalFileData *GetData(unsigned int item);
 
-	virtual std::unique_ptr<CFileListCtrlSortBase> GetSortComparisonObject() override;
+	void UpdateSortComparisonObject() override;
 
 	void RefreshFile(std::wstring const& file);
 
