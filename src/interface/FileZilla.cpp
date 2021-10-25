@@ -260,7 +260,6 @@ USE AT OWN RISK"), _T("Important Information"));
 	}
 
 	frame->ProcessCommandLine();
-	frame->PostInitialize();
 
 	ShowStartupProfile();
 
