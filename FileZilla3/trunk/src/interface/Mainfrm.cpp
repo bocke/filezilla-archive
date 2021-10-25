@@ -542,6 +542,10 @@ CMainFrame::CMainFrame(COptions& options)
 	options_.watch(OPTION_MESSAGELOG_POSITION, this);
 	options_.watch(OPTION_FILEPANE_LAYOUT, this);
 	options_.watch(OPTION_FILEPANE_SWAP, this);
+
+	// Delay call to PostInitialize, otherwise macOS gets really confused about the right mouse button...
+	startupTimer_.SetOwner(this);
+	startupTimer_.Start(1, true);
 }
 
 CMainFrame::~CMainFrame()
@@ -1445,6 +1449,9 @@ void CMainFrame::OnTimer(wxTimerEvent& event)
 		TriggerUpdateDialog();
 	}
 #endif
+	else if (event.GetId() == startupTimer_.GetId()) {
+		PostInitialize();
+	}
 }
 
 void CMainFrame::OpenSiteManager(Site const* site)
@@ -2778,7 +2785,9 @@ void CMainFrame::PostInitialize()
 	bool startupReconnect = startupAction == 2;
 
 	if (startupAction == 1) {
-		OpenSiteManager();
+		if (wxDialogEx::CanShowPopupDialog()) {
+			OpenSiteManager();
+		}
 		startupReconnect = false;
 	}
 

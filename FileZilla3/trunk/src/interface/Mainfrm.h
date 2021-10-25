@@ -195,6 +195,8 @@ private:
 #ifdef __WXMAC__
 	int m_lastFocusedChild{-1};
 #endif
+
+	wxTimer startupTimer_;
 };
 
 #endif
