@@ -2,6 +2,16 @@
 #include <Foundation/NSURL.h>
 
 #include <string.h>
+#include <string>
+
+std::string const& GetTempDirImpl()
+{
+	static std::string const dir = []() {
+		NSString* d = NSTemporaryDirectory();
+		return std::string(d ? d.UTF8String : "");
+	}();
+	return dir;
+}
 
 char const* GetDownloadDirImpl()
 {

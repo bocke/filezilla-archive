@@ -61,6 +61,10 @@ CLocalPath GetHomeDir()
 	return ret;
 }
 
+#if FZ_MAC
+std::string const& GetTempDirImpl();
+#endif
+
 CLocalPath GetTempDir()
 {
 	CLocalPath ret;
@@ -77,6 +81,7 @@ CLocalPath GetTempDir()
 		}
 	}
 #elif FZ_MAC
+	ret.SetPath(fz::to_wstring_from_utf8(GetTempDirImpl()));
 #else
 	if (!ret.SetPath(GetEnv("TMPDIR"))) {
 		if (!ret.SetPath(GetEnv("TMP"))) {
