@@ -59,6 +59,7 @@ if ! test "$localesonly" = "yes"; then
   # Check for C++17 support
   AX_CXX_COMPILE_STDCXX_17([noext],[mandatory])
   CHECK_LIBCXX
+  AX_APPEND_FLAG([-std=c++17], [OBJCXXFLAGS])
 
   # libstdc++ as shipped with GCC 4.7 lacks std::map::emplace
   FZ_CHECK_MAP_EMPLACE
