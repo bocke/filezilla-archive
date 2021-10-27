@@ -415,6 +415,7 @@ void CRemoteListView::UpdateDirectoryListing_Added(std::shared_ptr<CDirectoryLis
 {
 	size_t const to_add = pDirectoryListing->size() - m_pDirectoryListing->size();
 	m_pDirectoryListing = pDirectoryListing;
+	UpdateSortComparisonObject();
 
 	m_indexMapping[0] = pDirectoryListing->size();
 
@@ -495,6 +496,7 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 	size_t const countRemoved = m_pDirectoryListing->size() - pDirectoryListing->size();
 	if (!countRemoved) {
 		m_pDirectoryListing = pDirectoryListing;
+		UpdateSortComparisonObject();
 		return;
 	}
 	wxASSERT(!IsComparing());
@@ -618,6 +620,7 @@ void CRemoteListView::UpdateDirectoryListing_Removed(std::shared_ptr<CDirectoryL
 	wxASSERT(m_indexMapping.size() == pDirectoryListing->size() + 1);
 
 	m_pDirectoryListing = pDirectoryListing;
+	UpdateSortComparisonObject();
 
 	if (m_pFilelistStatusBar) {
 		m_pFilelistStatusBar->SetHidden(m_pDirectoryListing->size() + 1 - m_indexMapping.size());
@@ -657,6 +660,7 @@ bool CRemoteListView::UpdateDirectoryListing(std::shared_ptr<CDirectoryListing> 
 		}
 
 		m_pDirectoryListing = pDirectoryListing;
+		UpdateSortComparisonObject();
 
 		// We don't have to do anything
 		return true;
@@ -733,6 +737,7 @@ void CRemoteListView::SetDirectoryListing(std::shared_ptr<CDirectoryListing> con
 	}
 
 	m_pDirectoryListing = pDirectoryListing;
+	UpdateSortComparisonObject();
 
 	m_fileData.clear();
 	m_indexMapping.clear();
@@ -2569,7 +2574,8 @@ void CRemoteListView::UpdateSortComparisonObject()
 	CFileListCtrlSort<CDirectoryListing>::DirSortMode dirSortMode = GetDirSortMode();
 	NameSortMode nameSortMode = GetNameSortMode();
 
-	CDirectoryListing const& directoryListing = *m_pDirectoryListing;
+	static CDirectoryListing const empty;
+	CDirectoryListing const& directoryListing = m_pDirectoryListing ? *m_pDirectoryListing : empty;
 	if (!m_sortDirection) {
 		if (m_sortColumn == 1) {
 			sortComparisonObject_ = std::make_unique<CFileListCtrlSortSize<CDirectoryListing, CGenericFileData>>(directoryListing, m_fileData, dirSortMode, nameSortMode, this);
