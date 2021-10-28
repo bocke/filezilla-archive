@@ -7,7 +7,7 @@
 
 #include <wx/timer.h>
 
-enum interfaceOptions
+enum interfaceOptions : unsigned int
 {
 	// Default/internal options
 	OPTION_DEFAULT_CACHE_DIR,
