@@ -21,8 +21,9 @@
 #include "commctrl.h"
 #endif
 
-CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog &sitemanager)
+CSiteManagerSite::CSiteManagerSite(CSiteManagerDialog & sitemanager, COptionsBase & options)
     : sitemanager_(sitemanager)
+	, options_(options)
 {
 }
 
@@ -46,7 +47,7 @@ bool CSiteManagerSite::Load(wxWindow* parent)
 		AddPage(generalPage_, _("General"));
 
 		auto* main = lay.createMain(generalPage_, 1);
-		controls_.emplace_back(std::make_unique<GeneralSiteControls>(*generalPage_, lay, *main, onChange));
+		controls_.emplace_back(std::make_unique<GeneralSiteControls>(*generalPage_, lay, *main, options_, onChange));
 
 		main->Add(new wxStaticLine(generalPage_), lay.grow);
 
@@ -259,7 +260,7 @@ void CSiteManagerSite::SetSite(Site const& site, bool predefined)
 		SetControlVisibility(site.server.GetProtocol(), site.credentials.logonType_);
 	}
 	else {
-		bool const kiosk_mode = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
+		bool const kiosk_mode = options_.get_int(OPTION_DEFAULT_KIOSKMODE) != 0;
 		auto const logonType = kiosk_mode ? LogonType::ask : LogonType::normal;
 		SetControlVisibility(FTP, logonType);
 	}

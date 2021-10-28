@@ -245,7 +245,8 @@ protected:
 	CSiteManagerDialog* m_pSiteManager;
 };
 
-CSiteManagerDialog::CSiteManagerDialog()
+CSiteManagerDialog::CSiteManagerDialog(COptionsBase & options)
+	: options_(options)
 {
 }
 
@@ -361,7 +362,7 @@ bool CSiteManagerDialog::Create(wxWindow* parent, std::vector<_connected_site>* 
 	auto right = new wxBoxSizer(wxVERTICAL);
 	sides->Add(right, 1, wxLEFT|wxGROW, lay.gap);
 
-	m_pNotebook_Site = new CSiteManagerSite(*this);
+	m_pNotebook_Site = new CSiteManagerSite(*this, options_);
 	if (!m_pNotebook_Site->Load(this)) {
 		return false;
 	}
@@ -551,15 +552,13 @@ void CSiteManagerDialog::OnConnect(wxCommandEvent&)
 class CSiteManagerXmlHandler_Tree : public CSiteManagerXmlHandler
 {
 public:
-	CSiteManagerXmlHandler_Tree(wxTreeCtrlEx* tree_, wxTreeItemId root, std::wstring const& lastSelection, bool predefined)
-		: m_tree_(tree_), m_item(root), m_predefined(predefined)
+	CSiteManagerXmlHandler_Tree(wxTreeCtrlEx* tree_, wxTreeItemId root, std::wstring const& lastSelection, bool predefined, int kiosk)
+		: m_tree_(tree_), m_item(root), m_predefined(predefined), m_kiosk(kiosk)
 	{
 		if (!CSiteManager::UnescapeSitePath(lastSelection, m_lastSelection)) {
 			m_lastSelection.clear();
 		}
 		m_lastSelectionIt = m_lastSelection.cbegin();
-
-		m_kiosk = COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE);
 	}
 
 	virtual ~CSiteManagerXmlHandler_Tree()
@@ -730,7 +729,7 @@ bool CSiteManagerDialog::Load()
 		return true;
 	}
 
-	std::wstring lastSelection = COptions::Get()->get_string(OPTION_SITEMANAGER_LASTSELECTED);
+	std::wstring lastSelection = options_.get_string(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '0') {
 		if (lastSelection == _T("0")) {
 			tree_->SafeSelectItem(treeId);
@@ -742,7 +741,7 @@ bool CSiteManagerDialog::Load()
 	else {
 		lastSelection.clear();
 	}
-	CSiteManagerXmlHandler_Tree handler(tree_, treeId, lastSelection, false);
+	CSiteManagerXmlHandler_Tree handler(tree_, treeId, lastSelection, false, options_.get_int(OPTION_DEFAULT_KIOSKMODE));
 
 	bool res = CSiteManager::Load(element, handler);
 
@@ -792,7 +791,7 @@ bool CSiteManagerDialog::Save(pugi::xml_node element, wxTreeItemId treeId)
 		bool res = Save(element, m_ownSites);
 
 		if (!xml.Save()) {
-			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
+			if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 				return res;
 			}
 			wxString msg = wxString::Format(_("Could not write \"%s\", any changes to the Site Manager could not be saved: %s"), xml.GetFileName(), xml.GetError());
@@ -1510,7 +1509,7 @@ bool CSiteManagerDialog::LoadDefaultSites()
 	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_Expanded);
 	tree_->SetItemImage(m_predefinedSites, 1, wxTreeItemIcon_SelectedExpanded);
 
-	std::wstring lastSelection = COptions::Get()->get_string(OPTION_SITEMANAGER_LASTSELECTED);
+	std::wstring lastSelection = options_.get_string(OPTION_SITEMANAGER_LASTSELECTED);
 	if (!lastSelection.empty() && lastSelection[0] == '1') {
 		if (lastSelection == _T("1")) {
 			tree_->SafeSelectItem(m_predefinedSites);
@@ -1522,7 +1521,7 @@ bool CSiteManagerDialog::LoadDefaultSites()
 	else {
 		lastSelection.clear();
 	}
-	CSiteManagerXmlHandler_Tree handler(tree_, m_predefinedSites, lastSelection, true);
+	CSiteManagerXmlHandler_Tree handler(tree_, m_predefinedSites, lastSelection, true, options_.get_int(OPTION_DEFAULT_KIOSKMODE));
 
 	CSiteManager::Load(element, handler);
 
@@ -1554,7 +1553,7 @@ void CSiteManagerDialog::OnBeginDrag(wxTreeEvent& event)
 	}
 #endif
 
-	if (COptions::Get()->get_int(OPTION_DND_DISABLED) != 0) {
+	if (options_.get_int(OPTION_DND_DISABLED) != 0) {
 		event.Veto();
 		return;
 	}
@@ -1876,7 +1875,7 @@ void CSiteManagerDialog::RememberLastSelected()
 		path = GetSitePath(sel);
 	}
 
-	COptions::Get()->set(OPTION_SITEMANAGER_LASTSELECTED, path);
+	options_.set(OPTION_SITEMANAGER_LASTSELECTED, path);
 }
 
 void CSiteManagerDialog::OnContextMenu(wxTreeEvent&)

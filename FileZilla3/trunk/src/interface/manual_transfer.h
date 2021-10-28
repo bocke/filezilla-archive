@@ -4,12 +4,13 @@
 #include "dialogex.h"
 #include "serverdata.h"
 
+class COptionsBase;
 class CQueueView;
 class CState;
 class CManualTransfer final : public wxDialogEx
 {
 public:
-	CManualTransfer(CQueueView* pQueueView);
+	CManualTransfer(COptionsBase& options, CQueueView* pQueueView);
 	~CManualTransfer();
 
 	void Run(wxWindow* parent, CState* pState);
@@ -36,6 +37,7 @@ protected:
 	Site site_;
 	Site lastSite_;
 
+	COptionsBase & options_;
 	CState* state_{};
 	CQueueView* queue_{};
 };

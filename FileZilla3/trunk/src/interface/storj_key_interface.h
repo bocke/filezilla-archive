@@ -7,10 +7,12 @@ class process;
 
 #include <tuple>
 
+class COptionsBase;
+class wxWindow;
 class CStorjKeyInterface final
 {
 public:
-	CStorjKeyInterface(wxWindow* parent);
+	CStorjKeyInterface(COptionsBase& options, wxWindow* parent);
 	virtual ~CStorjKeyInterface();
 
 	std::tuple<bool, std::wstring> ValidateGrant(std::wstring const& grant, bool silent);
@@ -18,9 +20,10 @@ public:
 	bool ProcessFailed() const;
 protected:
 
+	COptionsBase& options_;
+	wxWindow* m_parent;
 	std::unique_ptr<fz::process> m_process;
 	bool m_initialized{};
-	wxWindow* m_parent;
 
 	enum ReplyCode {
 		success = 1,

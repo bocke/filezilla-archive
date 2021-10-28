@@ -884,7 +884,7 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 			wxBell();
 			return;
 		}
-		CManualTransfer dlg(m_pQueueView);
+		CManualTransfer dlg(options_, m_pQueueView);
 		dlg.Run(this, pState);
 	}
 	else if (event.GetId() == XRCID("ID_BOOKMARK_ADD") || event.GetId() == XRCID("ID_BOOKMARK_MANAGE")) {
@@ -1461,7 +1461,7 @@ void CMainFrame::OpenSiteManager(Site const* site)
 		return;
 	}
 
-	CSiteManagerDialog dlg;
+	CSiteManagerDialog dlg(options_);
 
 	std::vector<CSiteManagerDialog::_connected_site> connected_sites;
 
