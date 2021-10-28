@@ -5,19 +5,20 @@
 
 #include <wx/timer.h>
 
+class COptionsBase;
 class CWelcomeDialog final : public wxDialogEx
 {
 public:
-	CWelcomeDialog() = default;
+	CWelcomeDialog(COptionsBase & options, wxWindow* parent);
 
-	bool Run(wxWindow* parent, bool force = false);
-
-	static void RunDelayed(wxWindow* parent);
+	bool Run(bool force = false);
+	void RunDelayed();
 
 protected:
 
 	void InitFooter(std::wstring const& resources);
 
+	COptionsBase & options_;
 	wxTimer m_delayedShowTimer;
 
 	wxWindow* parent_{};

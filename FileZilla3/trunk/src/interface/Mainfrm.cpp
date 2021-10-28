@@ -926,8 +926,8 @@ void CMainFrame::OnMenuHandler(wxCommandEvent &event)
 		}
 	}
 	else if (event.GetId() == XRCID("ID_MENU_HELP_WELCOME")) {
-		CWelcomeDialog dlg;
-		dlg.Run(this, true);
+		CWelcomeDialog dlg(options_, this);
+		dlg.Run(true);
 	}
 	else if (event.GetId() == XRCID("ID_MENU_TRANSFER_SPEEDLIMITS_ENABLE")) {
 		bool enable = options_.get_int(OPTION_SPEEDLIMIT_ENABLE) == 0;
