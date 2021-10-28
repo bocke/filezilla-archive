@@ -8,6 +8,7 @@ class CInterProcessMutex;
 class CWindowStateManager;
 class CSiteManagerDropTarget;
 class CSiteManagerSite;
+class COptionsBase;
 class wxTreeCtrlEx;
 
 class CSiteManagerDialog final : public wxDialogEx
@@ -24,7 +25,7 @@ public:
 	};
 
 	/// Constructors
-	CSiteManagerDialog();
+	CSiteManagerDialog(COptionsBase & options);
 	virtual ~CSiteManagerDialog();
 
 	// Creation. If pServer is set, it will cause a new item to be created.
@@ -80,6 +81,8 @@ protected:
 	void OnNewBookmark(wxCommandEvent&);
 	void OnBookmarkBrowse(wxCommandEvent&);
 	void OnSearch(wxCommandEvent&);
+
+	COptionsBase & options_;
 
 	CInterProcessMutex* m_pSiteManagerMutex{};
 

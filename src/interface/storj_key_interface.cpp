@@ -4,10 +4,12 @@
 #include "filezillaapp.h"
 #include "inputdialog.h"
 
+#include <libfilezilla/local_filesys.hpp>
 #include <libfilezilla/process.hpp>
 
-CStorjKeyInterface::CStorjKeyInterface(wxWindow* parent)
-	: m_parent(parent)
+CStorjKeyInterface::CStorjKeyInterface(COptionsBase & options, wxWindow* parent)
+	: options_(options)
+	, m_parent(parent)
 {
 }
 
@@ -44,8 +46,8 @@ bool CStorjKeyInterface::LoadProcess(bool silent)
 	}
 	m_initialized = true;
 
-	std::wstring executable = COptions::Get()->get_string(OPTION_FZSTORJ_EXECUTABLE);
-	size_t pos = executable.rfind(wxFileName::GetPathSeparator());
+	std::wstring executable = options_.get_string(OPTION_FZSTORJ_EXECUTABLE);
+	size_t pos = executable.rfind(fz::local_filesys::path_separator);
 	if (pos == std::wstring::npos) {
 		if (!silent) {
 			wxMessageBoxEx(_("fzstorj could not be started.\nPlease make sure this executable exists in the same directory as the main FileZilla executable."), _("Error starting program"), wxICON_EXCLAMATION);

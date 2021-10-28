@@ -70,8 +70,9 @@ std::pair<std::array<ProtocolGroup, 2>::const_iterator, std::vector<std::pair<Se
 }
 }
 
-GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler)
+GeneralSiteControls::GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, COptionsBase & options, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler)
     : SiteControls(parent)
+	, options_(options)
     , changeHandler_(changeHandler)
 {
 	if (!sizer.IsColGrowable(0)) {
@@ -582,13 +583,13 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 		logon_type = supportedlogonTypes.front();
 	}
 
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 &&
+	if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) != 0 &&
 			!predefined_ &&
 	        (logon_type == LogonType::account || logon_type == LogonType::normal))
 	{
 		if (!silent) {
 			wxString msg;
-			if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && COptions::Get()->predefined(OPTION_DEFAULT_KIOSKMODE)) {
+			if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) != 0 && options_.predefined(OPTION_DEFAULT_KIOSKMODE)) {
 				msg = _("Saving of password has been disabled by your system administrator.");
 			}
 			else {
@@ -718,7 +719,7 @@ bool GeneralSiteControls::UpdateSite(Site & site, bool silent)
 				xrc_call(parent_, "ID_PASS", &wxWindow::SetFocus);
 			}
 			else if (!pw.empty()) {
-				CStorjKeyInterface ki(wxGetTopLevelParent(&parent_));
+				CStorjKeyInterface ki(options_, wxGetTopLevelParent(&parent_));
 				auto [valid, satellite] = ki.ValidateGrant(pw, silent);
 				if (valid) {
 					if (!satellite.empty()) {

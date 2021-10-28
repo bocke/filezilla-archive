@@ -31,10 +31,11 @@ public:
 	LogonType logonType_{};
 };
 
+class COptionsBase;
 class GeneralSiteControls final : public SiteControls
 {
 public:
-	GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler = nullptr);
+	GeneralSiteControls(wxWindow & parent, DialogLayout const& lay, wxFlexGridSizer & sizer, COptionsBase & options, std::function<void(ServerProtocol protocol, LogonType logon_type)> const& changeHandler = nullptr);
 
 	virtual void SetControlVisibility(ServerProtocol protocol, LogonType) override;
 	virtual void SetSite(Site const& site) override;
@@ -50,6 +51,8 @@ private:
 	LogonType GetLogonType() const;
 
 	void UpdateHostFromDefaults(ServerProtocol const newProtocol);
+
+	COptionsBase& options_;
 
 	std::map<ServerProtocol, int> mainProtocolListIndex_;
 	typedef std::tuple<std::string, wxStaticText*, wxTextCtrl*> Parameter;

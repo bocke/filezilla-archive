@@ -6,11 +6,11 @@
 class Site;
 class CSiteManagerDialog;
 class SiteControls;
-class GeneralSiteControls; //remove
+class COptionsBase;
 class CSiteManagerSite : public wxNotebook
 {
 public:
-	CSiteManagerSite(CSiteManagerDialog & sitemanager);
+	CSiteManagerSite(CSiteManagerDialog & sitemanager, COptionsBase & options);
 
 	bool Load(wxWindow * parent);
 
@@ -21,6 +21,7 @@ private:
 	void SetControlVisibility(ServerProtocol protocol, LogonType type);
 
 	CSiteManagerDialog & sitemanager_;
+	COptionsBase & options_;
 
 	wxNotebookPage *generalPage_{};
 	wxNotebookPage *advancedPage_{};

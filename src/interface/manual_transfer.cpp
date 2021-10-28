@@ -41,8 +41,9 @@ struct CManualTransfer::impl
 	std::unique_ptr<GeneralSiteControls> controls_;
 };
 
-CManualTransfer::CManualTransfer(CQueueView* pQueueView)
+CManualTransfer::CManualTransfer(COptionsBase& options, CQueueView* pQueueView)
 	: impl_(std::make_unique<impl>())
+	, options_(options)
 	, queue_(pQueueView)
 {
 }
@@ -153,7 +154,7 @@ void CManualTransfer::Run(wxWindow* parent, CState* pState)
 	{
 		auto [box, inner] = lay.createStatBox(server_row, _("Custom server"), 2);
 
-		impl_->controls_ = std::make_unique<GeneralSiteControls>(*box, lay, *inner, onChange);
+		impl_->controls_ = std::make_unique<GeneralSiteControls>(*box, lay, *inner, options_, onChange);
 	}
 
 	{
@@ -211,7 +212,7 @@ void CManualTransfer::Run(wxWindow* parent, CState* pState)
 
 	SetControlState();
 
-	switch(COptions::Get()->get_int(OPTION_ASCIIBINARY))
+	switch(options_.get_int(OPTION_ASCIIBINARY))
 	{
 	case 1:
 		impl_->type_ascii_->SetValue(true);
@@ -396,17 +397,17 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		return;
 	}
 
-	int const old_data_type = COptions::Get()->get_int(OPTION_ASCIIBINARY);
+	int const old_data_type = options_.get_int(OPTION_ASCIIBINARY);
 
 	// Set data type for the file to add
 	if (impl_->type_ascii_->GetValue()) {
-		COptions::Get()->set(OPTION_ASCIIBINARY, 1);
+		options_.set(OPTION_ASCIIBINARY, 1);
 	}
 	else if (impl_->type_binary_->GetValue()) {
-		COptions::Get()->set(OPTION_ASCIIBINARY, 2);
+		options_.set(OPTION_ASCIIBINARY, 2);
 	}
 	else {
-		COptions::Get()->set(OPTION_ASCIIBINARY, 0);
+		options_.set(OPTION_ASCIIBINARY, 0);
 	}
 
 	queue_->QueueFile(!start, download,
@@ -415,7 +416,7 @@ void CManualTransfer::OnOK(wxCommandEvent&)
 		localPath, path, site_, -1);
 
 	// Restore old data type
-	COptions::Get()->set(OPTION_ASCIIBINARY, old_data_type);
+	options_.set(OPTION_ASCIIBINARY, old_data_type);
 
 	queue_->QueueFile_Finish(start);
 
