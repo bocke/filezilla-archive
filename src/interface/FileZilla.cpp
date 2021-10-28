@@ -239,7 +239,7 @@ USE AT OWN RISK"), _T("Important Information"));
 	OSXSandboxUserdirs::Get().Load();
 
 	if (OSXSandboxUserdirs::Get().GetDirs().empty()) {
-		CWelcomeDialog welcome;
+		CWelcomeDialog welcome(*options_, nullptr);
 		welcome.Run(nullptr, false);
 		welcome_skip = true;
 
@@ -256,7 +256,8 @@ USE AT OWN RISK"), _T("Important Information"));
 	SetTopWindow(frame);
 
 	if (!welcome_skip) {
-		CWelcomeDialog::RunDelayed(frame);
+		auto welcome = new CWelcomeDialog(*options_, frame);
+		welcome->RunDelayed();
 	}
 
 	frame->ProcessCommandLine();

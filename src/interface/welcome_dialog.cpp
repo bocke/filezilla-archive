@@ -14,24 +14,28 @@ BEGIN_EVENT_TABLE(CWelcomeDialog, wxDialogEx)
 EVT_TIMER(wxID_ANY, CWelcomeDialog::OnTimer)
 END_EVENT_TABLE()
 
-void CWelcomeDialog::RunDelayed(wxWindow* parent)
+CWelcomeDialog::CWelcomeDialog(COptionsBase & options, wxWindow* parent)
+    : options_(options)
+    , parent_(parent)
 {
-	CWelcomeDialog * dlg = new CWelcomeDialog;
-	dlg->parent_ = parent;
-	dlg->m_delayedShowTimer.SetOwner(dlg);
-	dlg->m_delayedShowTimer.Start(10, true);
 }
 
-bool CWelcomeDialog::Run(wxWindow* parent, bool force)
+void CWelcomeDialog::RunDelayed()
+{
+	m_delayedShowTimer.SetOwner(this);
+	m_delayedShowTimer.Start(10, true);
+}
+
+bool CWelcomeDialog::Run(bool force)
 {
 	auto const ownVersion = GetFileZillaVersion();
-	auto const greetingVersion = COptions::Get()->get_string(OPTION_GREETINGVERSION);
+	auto const greetingVersion = options_.get_string(OPTION_GREETINGVERSION);
 
-	auto const resources = COptions::Get()->get_string(OPTION_GREETINGRESOURCES);
-	COptions::Get()->set(OPTION_GREETINGRESOURCES, L"");
+	auto const resources = options_.get_string(OPTION_GREETINGRESOURCES);
+	options_.set(OPTION_GREETINGRESOURCES, L"");
 
 	if (!force) {
-		if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
+		if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) == 2) {
 			return true;
 		}
 
@@ -41,15 +45,15 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 			// Been there done that
 			return true;
 		}
-		COptions::Get()->set(OPTION_GREETINGVERSION, ownVersion);
+		options_.set(OPTION_GREETINGVERSION, ownVersion);
 
-		if (greetingVersion.empty() && !COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE)) {
-			COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 1);
+		if (greetingVersion.empty() && !options_.get_int(OPTION_DEFAULT_KIOSKMODE)) {
+			options_.set(OPTION_PROMPTPASSWORDSAVE, 1);
 		}
 	}
 
 
-	Create(parent, -1, _("Welcome to FileZilla"));
+	Create(parent_, -1, _("Welcome to FileZilla"));
 
 	auto const& lay = layout();
 	auto outer = new wxBoxSizer(wxVERTICAL);
@@ -133,7 +137,7 @@ bool CWelcomeDialog::Run(wxWindow* parent, bool force)
 void CWelcomeDialog::OnTimer(wxTimerEvent&)
 {
 	if (CanShowPopupDialog()) {
-		Run(parent_, false);
+		Run(false);
 	}
 	Destroy();
 }
@@ -164,7 +168,7 @@ void CreateMessagePanel(wxWindow& dlg, char const* ctrl, wxXmlResource& resource
 void CWelcomeDialog::InitFooter(std::wstring const& resources)
 {
 #if FZ_WINDOWS && FZ_MANUALUPDATECHECK
-	if (CBuildInfo::GetBuildType() == _T("official") && !COptions::Get()->get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
+	if (CBuildInfo::GetBuildType() == _T("official") && !options_.get_bool(OPTION_DISABLE_UPDATE_FOOTER)) {
 		if (!resources.empty()) {
 			wxLogNull null;
 
