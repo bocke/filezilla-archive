@@ -359,9 +359,13 @@ std::tuple<wxStaticBox*, wxFlexGridSizer*> DialogLayout::createStatBox(wxSizer* 
 	return std::make_tuple(box, flex);
 }
 
-std::wstring LabelEscape(std::wstring const& label)
+std::wstring LabelEscape(std::wstring_view const& label, size_t maxlen)
 {
-	return fz::replaced_substrings(label, L"&", L"&&");
+	std::wstring ret = fz::replaced_substrings(label.substr(0, maxlen), L"&", L"&&");
+	if (label.size() > maxlen) {
+		ret += 0x2026; //unicode ellipsis character
+	}
+	return ret;
 }
 
 #ifdef __WXMAC__
