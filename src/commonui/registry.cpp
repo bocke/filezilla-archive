@@ -2,6 +2,8 @@
 
 #include <libfilezilla/string.hpp>
 
+#include <limits>
+
 regkey::~regkey()
 {
 	close();
