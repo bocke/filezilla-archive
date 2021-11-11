@@ -83,7 +83,10 @@ unsigned int register_options(std::initializer_list<option_def> options)
 	size_t const prev = registry.first.options_.size();
 	registry.first.options_.insert(registry.first.options_.end(), options);
 	for (size_t i = prev; i < registry.first.options_.size(); ++i) {
-		registry.first.name_to_option_[registry.first.options_[i].name()] = i;
+		auto const& n = registry.first.options_[i].name();
+		if (!n.empty()) {
+			registry.first.name_to_option_[n] = i;
+		}
 	}
 
 	return static_cast<unsigned int>(prev);

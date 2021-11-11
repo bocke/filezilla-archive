@@ -138,7 +138,7 @@ void XmlOptions::Load(pugi::xml_node& settings, bool predefined, bool importing)
 		next = setting.next_sibling("Setting");
 
 		const char* name = setting.attribute("name").value();
-		if (!name) {
+		if (!name || !*name) {
 			continue;
 		}
 
@@ -351,6 +351,9 @@ void XmlOptions::set_xml_value(pugi::xml_node& settings, size_t opt, bool clean)
 {
 	auto const& def = options_[opt];
 	if (def.flags() & (option_flags::internal | option_flags::predefined_only)) {
+		return;
+	}
+	if (def.name().empty()) {
 		return;
 	}
 
