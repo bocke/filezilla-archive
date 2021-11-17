@@ -112,14 +112,14 @@ bool COptionsPageEdit::LoadPage()
 		impl_->custom_->ChangeValue(editor);
 	}
 
-	if (m_pOptions->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (m_pOptions->get_bool(OPTION_EDIT_ALWAYSDEFAULT) && !impl_->default_none_->GetValue()) {
 		impl_->use_default_->SetValue(true);
 	}
 	else {
 		impl_->use_assoc_->SetValue(true);
 	}
 
-	impl_->watch_->SetValue(m_pOptions->get_int(OPTION_EDIT_TRACK_LOCAL) != 0);
+	impl_->watch_->SetValue(m_pOptions->get_bool(OPTION_EDIT_TRACK_LOCAL));
 
 	SetCtrlState();
 
@@ -135,8 +135,8 @@ bool COptionsPageEdit::SavePage()
 		m_pOptions->set(OPTION_EDIT_DEFAULTEDITOR, impl_->default_system_->GetValue() ? L"1" : L"0");
 	}
 
-	m_pOptions->set(OPTION_EDIT_ALWAYSDEFAULT, impl_->use_default_->GetValue() ? 1 : 0);
-	m_pOptions->set(OPTION_EDIT_TRACK_LOCAL, impl_->watch_->GetValue() ? 1 : 0);
+	m_pOptions->set(OPTION_EDIT_ALWAYSDEFAULT, impl_->use_default_->GetValue() && !impl_->default_none_->GetValue());
+	m_pOptions->set(OPTION_EDIT_TRACK_LOCAL, impl_->watch_->GetValue());
 
 	return true;
 }
