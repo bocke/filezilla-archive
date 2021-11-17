@@ -502,7 +502,7 @@ void CSiteManagerDialog::OnOK(wxCommandEvent&)
 
 	UpdateItem();
 
-	if (!CAskSavePasswordDialog::Run(this)) {
+	if (!CAskSavePasswordDialog::Run(this, options_)) {
 		return;
 	}
 
@@ -538,7 +538,7 @@ void CSiteManagerDialog::OnConnect(wxCommandEvent&)
 
 	UpdateItem();
 
-	if (!CAskSavePasswordDialog::Run(this)) {
+	if (!CAskSavePasswordDialog::Run(this, options_)) {
 		return;
 	}
 
