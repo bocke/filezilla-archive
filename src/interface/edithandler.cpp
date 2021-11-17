@@ -27,11 +27,12 @@ EVT_TIMER(wxID_ANY, CEditHandler::OnTimerEvent)
 EVT_COMMAND(wxID_ANY, fzEDIT_CHANGEDFILE, CEditHandler::OnChangedFileEvent)
 END_EVENT_TABLE()
 
-Associations LoadAssociations()
+namespace {
+Associations LoadAssociations(COptionsBase & options)
 {
 	Associations ret;
 
-	std::wstring const raw_assocs = COptions::Get()->get_string(OPTION_EDIT_CUSTOMASSOCIATIONS);
+	std::wstring const raw_assocs = options.get_string(OPTION_EDIT_CUSTOMASSOCIATIONS);
 	auto assocs = fz::strtok_view(raw_assocs, L"\r\n", true);
 
 	for (std::wstring_view assoc : assocs) {
@@ -50,7 +51,7 @@ Associations LoadAssociations()
 
 }
 
-void SaveAssociations(Associations const& assocs)
+void SaveAssociations(Associations const& assocs, COptionsBase & options)
 {
 	std::wstring quoted;
 	for (auto const& assoc : assocs) {
@@ -69,15 +70,37 @@ void SaveAssociations(Associations const& assocs)
 		quoted += ' ';
 		quoted += QuoteCommand(assoc.second);
 	}
-	COptions::Get()->set(OPTION_EDIT_CUSTOMASSOCIATIONS, quoted);
+	options.set(OPTION_EDIT_CUSTOMASSOCIATIONS, quoted);
+}
+
+class CNewAssociationDialog final : protected wxDialogEx
+{
+public:
+	CNewAssociationDialog(wxWindow* parent, COptionsBase & options);
+	virtual ~CNewAssociationDialog();
+
+	bool Run(std::wstring const& file);
+
+protected:
+	struct impl;
+	std::unique_ptr<impl> impl_;
+
+	void SetCtrlState();
+
+	wxWindow* parent_{};
+	std::wstring file_;
+	std::wstring ext_;
+
+	void OnOK();
+	void OnBrowseEditor();
+};
 }
 
 CEditHandler* CEditHandler::m_pEditHandler = 0;
 
-CEditHandler::CEditHandler()
+CEditHandler::CEditHandler(COptionsBase & options)
+    : options_(options)
 {
-	m_pQueue = 0;
-
 	m_timer.SetOwner(this);
 	m_busyTimer.SetOwner(this);
 
@@ -91,7 +114,7 @@ CEditHandler::CEditHandler()
 CEditHandler* CEditHandler::Create()
 {
 	if (!m_pEditHandler) {
-		m_pEditHandler = new CEditHandler();
+		m_pEditHandler = new CEditHandler(*COptions::Get());
 	}
 
 	return m_pEditHandler;
@@ -360,7 +383,7 @@ bool CEditHandler::AddFile(CEditHandler::fileType type, std::wstring const& loca
 	if (type == local) {
 		bool const launched = LaunchEditor(local, data);
 
-		if (launched && COptions::Get()->get_int(OPTION_EDIT_TRACK_LOCAL)) {
+		if (launched && options_.get_bool(OPTION_EDIT_TRACK_LOCAL)) {
 			m_fileDataList[type].emplace_back(std::move(data));
 		}
 		if (!launched) {
@@ -951,8 +974,8 @@ std::vector<std::wstring> CEditHandler::CanOpen(std::wstring const& fileName, bo
 std::vector<std::wstring> CEditHandler::GetAssociation(std::wstring const& file)
 {
 	std::vector<std::wstring> ret = GetCustomAssociation(file);
-	if (ret.empty() || COptions::Get()->get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
-		std::wstring command = COptions::Get()->get_string(OPTION_EDIT_DEFAULTEDITOR);
+	if (ret.empty() || options_.get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
+		std::wstring command = options_.get_string(OPTION_EDIT_DEFAULTEDITOR);
 		if (!command.empty()) {
 			if (command[0] == '1') {
 				// Text editor
@@ -976,7 +999,7 @@ std::vector<std::wstring> CEditHandler::GetCustomAssociation(std::wstring_view c
 		ext = L"/";
 	}
 
-	auto assocs = LoadAssociations();
+	auto assocs = LoadAssociations(options_);
 	auto it = assocs.find(ext);
 	if (it != assocs.end()) {
 		ret = it->second;
@@ -1187,7 +1210,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 
 			main->AddSpacer(0);
 
-			int choices = COptions::Get()->get_int(OPTION_PERSISTENT_CHOICES);
+			int choices = options_.get_int(OPTION_PERSISTENT_CHOICES);
 
 			wxRadioButton* reopen{};
 			if (type == local) {
@@ -1264,7 +1287,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 					choices &= ~edit_choices::edit_existing_always;
 				}
 			}
-			COptions::Get()->set(OPTION_PERSISTENT_CHOICES, choices);
+			options_.set(OPTION_PERSISTENT_CHOICES, choices);
 		}
 
 		if (action == -1) {
@@ -1316,11 +1339,11 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	// Find associated program
 	bool program_exists = false;
 	std::vector<std::wstring> cmd_with_args;
-	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (!wxGetKeyState(WXK_SHIFT) || options_.get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
 		cmd_with_args = CanOpen(file.name, program_exists);
 	}
 	if (cmd_with_args.empty()) {
-		CNewAssociationDialog dlg(parent);
+		CNewAssociationDialog dlg(parent, options_);
 		if (!dlg.Run(file.name)) {
 			return false;
 		}
@@ -1705,10 +1728,16 @@ CEditHandler::t_fileData* CEditHandlerStatusDialog::GetDataFromItem(int item, CE
 	return pData;
 }
 
+void ShowQuotingRules(wxWindow* parent);
 
-
+namespace {
 struct CNewAssociationDialog::impl
 {
+	impl(COptionsBase & options)
+		: options_(options)
+	{}
+
+	COptionsBase & options_;
 	wxRadioButton* rbSystem_{};
 	wxRadioButton* rbDefault_{};
 	wxRadioButton* rbCustom_{};
@@ -1719,8 +1748,9 @@ struct CNewAssociationDialog::impl
 	wxButton* browse_{};
 };
 
-CNewAssociationDialog::CNewAssociationDialog(wxWindow *parent)
-	: parent_(parent)
+CNewAssociationDialog::CNewAssociationDialog(wxWindow *parent, COptionsBase & options)
+	: impl_(std::make_unique<impl>(options))
+	, parent_(parent)
 {
 }
 
@@ -1728,15 +1758,11 @@ CNewAssociationDialog::~CNewAssociationDialog()
 {
 }
 
-void ShowQuotingRules(wxWindow* parent);
-
 bool CNewAssociationDialog::Run(std::wstring const& file)
 {
 	file_ = file;
 
 	ext_ = GetExtension(file);
-
-	impl_ = std::make_unique<impl>();
 
 	Create(parent_, -1, _("No program associated with filetype"));
 
@@ -1841,7 +1867,7 @@ void CNewAssociationDialog::OnOK()
 	const bool always = impl_->always_ && impl_->always_->GetValue();
 
 	if (def && always) {
-		COptions::Get()->set(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
+		impl_->options_.set(OPTION_EDIT_DEFAULTEDITOR, _T("1"));
 		EndModal(wxID_OK);
 
 		return;
@@ -1880,9 +1906,9 @@ void CNewAssociationDialog::OnOK()
 	if (ext_.empty()) {
 		ext_ = L"/";
 	}
-	auto associations = LoadAssociations();
+	auto associations = LoadAssociations(impl_->options_);
 	associations[ext_] = cmd_with_args;
-	SaveAssociations(associations);
+	SaveAssociations(associations, impl_->options_);
 
 	EndModal(wxID_OK);
 }
@@ -1920,4 +1946,5 @@ void CNewAssociationDialog::OnBrowseEditor()
 	}
 
 	impl_->custom_->ChangeValue(editor);
+}
 }

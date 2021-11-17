@@ -25,6 +25,7 @@ enum type
 };
 }
 
+class COptionsBase;
 class CQueueView;
 class CEditHandler final : protected wxEvtHandler
 {
@@ -126,9 +127,11 @@ protected:
 
 	bool DoEdit(CEditHandler::fileType type, FileData const& file, CServerPath const& path, Site const& site, wxWindow* parent, size_t fileCount, int & already_editing_action);
 
-	CEditHandler();
+	CEditHandler(COptionsBase & options);
 
 	static CEditHandler* m_pEditHandler;
+
+	COptionsBase & options_;
 
 	std::wstring m_localDir;
 
@@ -147,7 +150,7 @@ protected:
 	std::list<t_fileData>::iterator GetFile(std::wstring const& fileName, CServerPath const& remotePath, Site const& site);
 	std::list<t_fileData>::const_iterator GetFile(std::wstring const& fileName, CServerPath const& remotePath, Site const& site) const;
 
-	CQueueView* m_pQueue;
+	CQueueView* m_pQueue{};
 
 	wxTimer m_timer;
 	wxTimer m_busyTimer;
@@ -192,27 +195,6 @@ protected:
 	void OnUnedit();
 	void OnUpload(bool uneditAfter);
 	void OnEdit();
-};
-
-class CNewAssociationDialog final : protected wxDialogEx
-{
-public:
-	CNewAssociationDialog(wxWindow* parent);
-	virtual ~CNewAssociationDialog();
-
-	bool Run(std::wstring const& file);
-
-protected:
-	struct impl;
-	std::unique_ptr<impl> impl_;
-
-	void SetCtrlState();
-	wxWindow* parent_{};
-	std::wstring file_;
-	std::wstring ext_;
-
-	void OnOK();
-	void OnBrowseEditor();
 };
 
 #endif
