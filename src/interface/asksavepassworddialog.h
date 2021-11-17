@@ -3,13 +3,14 @@
 
 #include "dialogex.h"
 
+class COptionsBase;
 class CAskSavePasswordDialog final : public wxDialogEx
 {
 public:
-	CAskSavePasswordDialog();
+	CAskSavePasswordDialog(COptionsBase & options);
 	~CAskSavePasswordDialog();
 
-	static bool Run(wxWindow* parent);
+	static bool Run(wxWindow* parent, COptionsBase & options);
 private:
 	bool Create(wxWindow* parent);
 

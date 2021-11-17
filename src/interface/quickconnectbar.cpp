@@ -22,21 +22,18 @@ EVT_MENU(wxID_ANY, CQuickconnectBar::OnMenu)
 EVT_TEXT_ENTER(wxID_ANY, CQuickconnectBar::OnQuickconnect)
 END_EVENT_TABLE()
 
-bool CQuickconnectBar::Create(CMainFrame* pParent)
+CQuickconnectBar::CQuickconnectBar(CMainFrame & parent)
+	: wxPanel(&parent, -1)
+	, options_(parent.GetOptions())
+	, mainFrame_(parent)
 {
-	m_pMainFrame = pParent;
-
-	if (!wxPanel::Create(pParent, -1)) {
-		return false;
-	}
-
 	auto sizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(sizer);
 #ifndef __WXMAC__
 	sizer->Add(new wxStaticLine(this, -1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL), wxSizerFlags().Expand());
 #endif
 
-	DialogLayout layout(pParent);
+	DialogLayout layout(&parent);
 	auto mainSizer = layout.createFlex(0, 1);
 	sizer->Add(mainSizer, wxSizerFlags().Border(wxALL, ConvertDialogToPixels(wxPoint(2, 0)).x));
 
@@ -82,7 +79,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 
 #ifdef __WXMAC__
 	// Under OS X default buttons are toplevel window wide, where under Windows / GTK they stop at the parent panel.
-	wxTopLevelWindow *tlw = dynamic_cast<wxTopLevelWindow*>(wxGetTopLevelParent(pParent));
+	wxTopLevelWindow *tlw = dynamic_cast<wxTopLevelWindow*>(wxGetTopLevelParent(&parent));
 	if (tlw) {
 		tlw->SetDefaultItem(0);
 	}
@@ -106,9 +103,7 @@ bool CQuickconnectBar::Create(CMainFrame* pParent)
 	});
 #endif
 
-
 	GetSizer()->Fit(this);
-	return true;
 }
 
 void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
@@ -184,17 +179,17 @@ void CQuickconnectBar::OnQuickconnect(wxCommandEvent& event)
 		site.server.SetBypassProxy(true);
 	}
 
-	if (site.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this)) {
+	if (site.credentials.logonType_ != LogonType::anonymous && !CAskSavePasswordDialog::Run(this, options_)) {
 		return;
 	}
 
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
+	if (options_.get_int(OPTION_DEFAULT_KIOSKMODE) && site.credentials.logonType_ == LogonType::normal) {
 		site.SetLogonType(LogonType::ask);
 		CLoginManager::Get().RememberPassword(site);
 	}
 	Bookmark bm;
 	bm.m_remoteDir = path;
-	if (!m_pMainFrame->ConnectToSite(site, bm)) {
+	if (!mainFrame_.ConnectToSite(site, bm)) {
 		return;
 	}
 
@@ -206,7 +201,7 @@ void CQuickconnectBar::OnQuickconnectDropdown(wxCommandEvent& event)
 	wxMenu* pMenu = new wxMenu;
 
 	// We have to start with id 1 since menu items with id 0 don't work under OS X
-	if (COptions::Get()->get_int(OPTION_FTP_PROXY_TYPE)) {
+	if (options_.get_int(OPTION_FTP_PROXY_TYPE)) {
 		pMenu->Append(1, _("Connect bypassing proxy settings"));
 	}
 	pMenu->Append(2, _("Clear quickconnect bar"));
@@ -262,7 +257,7 @@ void CQuickconnectBar::OnMenu(wxCommandEvent& event)
 	std::advance(iter, index);
 
 	Site site = *iter;
-	m_pMainFrame->ConnectToSite(site, Bookmark());
+	mainFrame_.ConnectToSite(site, Bookmark());
 }
 
 void CQuickconnectBar::ClearFields()

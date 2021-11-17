@@ -6,8 +6,13 @@
 #include "textctrlex.h"
 #include <libfilezilla/util.hpp>
 
-struct CAskSavePasswordDialog::impl
+struct CAskSavePasswordDialog::impl final
 {
+	impl(COptionsBase & options)
+		: options_(options)
+	{}
+
+	COptionsBase & options_;
 	wxRadioButton* nosave_{};
 	wxRadioButton* save_{};
 	wxRadioButton* usemaster_{};
@@ -15,8 +20,8 @@ struct CAskSavePasswordDialog::impl
 	wxTextCtrlEx* repeat_{};
 };
 
-CAskSavePasswordDialog::CAskSavePasswordDialog()
-	: impl_(std::make_unique<impl>())
+CAskSavePasswordDialog::CAskSavePasswordDialog(COptionsBase & options)
+	: impl_(std::make_unique<impl>(options))
 {
 }
 
@@ -107,36 +112,36 @@ void CAskSavePasswordDialog::OnOk(wxCommandEvent& event)
 			return;
 		}
 		else {
-			COptions::Get()->set(OPTION_DEFAULT_KIOSKMODE, 0);
-			COptions::Get()->set(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
+			impl_->options_.set(OPTION_DEFAULT_KIOSKMODE, 0);
+			impl_->options_.set(OPTION_MASTERPASSWORDENCRYPTOR, fz::to_wstring_from_utf8(pub.to_base64()));
 		}
 	}
 	else {
 		bool const save = impl_->save_->GetValue();
-		COptions::Get()->set(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
-		COptions::Get()->set(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
+		impl_->options_.set(OPTION_DEFAULT_KIOSKMODE, save ? 0 : 1);
+		impl_->options_.set(OPTION_MASTERPASSWORDENCRYPTOR, std::wstring());
 	}
 
 	event.Skip();
 }
 
-bool CAskSavePasswordDialog::Run(wxWindow* parent)
+bool CAskSavePasswordDialog::Run(wxWindow* parent, COptionsBase & options)
 {
 	bool ret = true;
 
-	if (COptions::Get()->get_int(OPTION_DEFAULT_KIOSKMODE) == 0 && COptions::Get()->get_int(OPTION_PROMPTPASSWORDSAVE) != 0 &&
-		!CSiteManager::HasSites() && COptions::Get()->get_string(OPTION_MASTERPASSWORDENCRYPTOR).empty())
+	if (options.get_int(OPTION_DEFAULT_KIOSKMODE) == 0 && options.get_int(OPTION_PROMPTPASSWORDSAVE) != 0 &&
+		!CSiteManager::HasSites() && options.get_string(OPTION_MASTERPASSWORDENCRYPTOR).empty())
 	{
-		CAskSavePasswordDialog dlg;
+		CAskSavePasswordDialog dlg(options);
 		if (dlg.Create(parent)) {
 			ret = dlg.ShowModal() == wxID_OK;
 			if (ret) {
-				COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 0);
+				options.set(OPTION_PROMPTPASSWORDSAVE, 0);
 			}
 		}
 	}
 	else {
-		COptions::Get()->set(OPTION_PROMPTPASSWORDSAVE, 0);
+		options.set(OPTION_PROMPTPASSWORDSAVE, 0);
 	}
 
 	return ret;
