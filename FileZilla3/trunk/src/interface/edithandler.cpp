@@ -950,13 +950,8 @@ std::vector<std::wstring> CEditHandler::CanOpen(std::wstring const& fileName, bo
 
 std::vector<std::wstring> CEditHandler::GetAssociation(std::wstring const& file)
 {
-	std::vector<std::wstring> ret;
-
-	if (!COptions::Get()->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
-		ret = GetCustomAssociation(file);
-	}
-
-	if (ret.empty()) {
+	std::vector<std::wstring> ret = GetCustomAssociation(file);
+	if (ret.empty() || COptions::Get()->get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
 		std::wstring command = COptions::Get()->get_string(OPTION_EDIT_DEFAULTEDITOR);
 		if (!command.empty()) {
 			if (command[0] == '1') {
@@ -1321,7 +1316,7 @@ bool CEditHandler::DoEdit(CEditHandler::fileType type, FileData const& file, CSe
 	// Find associated program
 	bool program_exists = false;
 	std::vector<std::wstring> cmd_with_args;
-	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->get_int(OPTION_EDIT_ALWAYSDEFAULT)) {
+	if (!wxGetKeyState(WXK_SHIFT) || COptions::Get()->get_bool(OPTION_EDIT_ALWAYSDEFAULT)) {
 		cmd_with_args = CanOpen(file.name, program_exists);
 	}
 	if (cmd_with_args.empty()) {

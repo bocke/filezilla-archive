@@ -75,7 +75,7 @@ unsigned int register_interface_options()
 		{ "Show message log", true, option_flags::normal },
 		{ "Show queue", true, option_flags::normal },
 		{ "Default editor", L"", option_flags::platform },
-		{ "Always use default editor", true, option_flags::normal },
+		{ "Always use default editor", false, option_flags::normal },
 		{ "File associations (v2)", L"", option_flags::platform },
 		{ "Comparison mode", 1, option_flags::normal, 0, 1 },
 		{ "Comparison threshold", 1, option_flags::normal, 0, 1440 },
