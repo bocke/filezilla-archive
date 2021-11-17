@@ -634,19 +634,14 @@ void CMainFrame::CreateQuickconnectBar()
 	wxGetApp().AddStartupProfileRecord("CMainFrame::CreateQuickconnectBar");
 	delete m_pQuickconnectBar;
 
-	m_pQuickconnectBar = new CQuickconnectBar();
-	if (!m_pQuickconnectBar->Create(this)) {
-		delete m_pQuickconnectBar;
-		m_pQuickconnectBar = 0;
+	m_pQuickconnectBar = new CQuickconnectBar(*this);
+
+	wxSize clientSize = GetClientSize();
+	if (m_pTopSplitter) {
+		wxSize panelSize = m_pQuickconnectBar->GetSize();
+		m_pTopSplitter->SetSize(-1, panelSize.GetHeight(), -1, clientSize.GetHeight() - panelSize.GetHeight(), wxSIZE_USE_EXISTING);
 	}
-	else {
-		wxSize clientSize = GetClientSize();
-		if (m_pTopSplitter) {
-			wxSize panelSize = m_pQuickconnectBar->GetSize();
-			m_pTopSplitter->SetSize(-1, panelSize.GetHeight(), -1, clientSize.GetHeight() - panelSize.GetHeight(), wxSIZE_USE_EXISTING);
-		}
-		m_pQuickconnectBar->SetSize(0, 0, clientSize.GetWidth(), -1);
-	}
+	m_pQuickconnectBar->SetSize(0, 0, clientSize.GetWidth(), -1);
 }
 
 void CMainFrame::OnMenuHandler(wxCommandEvent &event)

@@ -4,10 +4,11 @@
 #include "serverdata.h"
 
 class CMainFrame;
+class COptionsBase;
 class CQuickconnectBar final : public wxPanel
 {
 public:
-	bool Create(CMainFrame* pParent);
+	CQuickconnectBar(CMainFrame & parent);
 
 	void ClearFields();
 
@@ -20,12 +21,14 @@ protected:
 	void OnQuickconnectDropdown(wxCommandEvent& event);
 	void OnMenu(wxCommandEvent& event);
 
+	COptionsBase & options_;
+
 	wxTextCtrl* m_pHost{};
 	wxTextCtrl* m_pUser{};
 	wxTextCtrl* m_pPass{};
 	wxTextCtrl* m_pPort{};
 
-	CMainFrame *m_pMainFrame{};
+	CMainFrame & mainFrame_;
 };
 
 
