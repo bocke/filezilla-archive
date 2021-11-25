@@ -43,6 +43,7 @@ public:
 
 	virtual int Send() override;
 	virtual int ParseResponse() override { return FZ_REPLY_INTERNALERROR; }
+	virtual int Reset(int result) override;
 
 	std::wstring host_;
 	unsigned short port_;
