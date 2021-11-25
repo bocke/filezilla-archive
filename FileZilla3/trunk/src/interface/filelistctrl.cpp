@@ -180,7 +180,7 @@ template<class CFileData> bool CFileListCtrl<CFileData>::MSWOnNotify(int idCtrl,
 		LV_ITEM& lvi = info->item;
 		long item = lvi.iItem;
 
-		int column = m_pVisibleColumnMapping[lvi.iSubItem];
+		int column = GetActualColumnIndex(lvi.iSubItem);
 
 		if (lvi.mask & LVIF_TEXT) {
 			wxString text = GetItemText(item, column);
@@ -480,7 +480,7 @@ template<class CFileData> NameSortMode CFileListCtrl<CFileData>::GetNameSortMode
 
 template<class CFileData> void CFileListCtrl<CFileData>::OnColumnClicked(wxListEvent &event)
 {
-	int col = m_pVisibleColumnMapping[event.GetColumn()];
+	int col = GetColumnActualIndex(event.GetColumn());
 	if (col == -1) {
 		return;
 	}
