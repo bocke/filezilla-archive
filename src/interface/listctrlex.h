@@ -53,7 +53,8 @@ public:
 	void LoadColumnSettings(interfaceOptions widthsOptionId, interfaceOptions visibilityOptionId, interfaceOptions sortOptionId);
 	void SaveColumnSettings(interfaceOptions widthsOptionId, interfaceOptions visibilityOptionId, interfaceOptions sortOptionId);
 
-	int GetColumnVisibleIndex(int col);
+	int GetColumnVisibleIndex(int col) const;
+	int GetColumnActualIndex(int col) const;
 
 	// Refresh list but not header
 	void RefreshListOnly(bool eraseBackground = true);

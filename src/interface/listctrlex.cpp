@@ -350,7 +350,7 @@ void wxListCtrlEx::OnKeyDown(wxKeyEvent& event)
 wxString wxListCtrlEx::OnGetItemText(long item, long column) const
 {
 	wxListCtrlEx *pThis = const_cast<wxListCtrlEx *>(this);
-	return pThis->GetItemText(item, (unsigned int)m_pVisibleColumnMapping[column]);
+	return pThis->GetItemText(item, GetColumnActualIndex(column));
 }
 
 int wxListCtrlEx::FindItemWithPrefix(const wxString& searchPrefix, int start)
@@ -856,7 +856,7 @@ void wxListCtrlEx::ShowColumnEditor()
 	Refresh();
 }
 
-int wxListCtrlEx::GetColumnVisibleIndex(int col)
+int wxListCtrlEx::GetColumnVisibleIndex(int col) const
 {
 	if (!m_pVisibleColumnMapping) {
 		return -1;
@@ -869,6 +869,17 @@ int wxListCtrlEx::GetColumnVisibleIndex(int col)
 	}
 
 	return -1;
+}
+
+int wxListCtrlEx::GetColumnActualIndex(int col) const
+{
+	if (!m_pVisibleColumnMapping) {
+		return -1;
+	}
+	if (col < 0 || col >= m_columnInfo.size()) {
+		return -1;
+	}
+	return m_pVisibleColumnMapping[col];
 }
 
 int wxListCtrlEx::GetHeaderSortIconIndex(int col)
