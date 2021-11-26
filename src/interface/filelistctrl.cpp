@@ -180,7 +180,7 @@ template<class CFileData> bool CFileListCtrl<CFileData>::MSWOnNotify(int idCtrl,
 		LV_ITEM& lvi = info->item;
 		long item = lvi.iItem;
 
-		int column = GetActualColumnIndex(lvi.iSubItem);
+		int column = GetColumnActualIndex(lvi.iSubItem);
 
 		if (lvi.mask & LVIF_TEXT) {
 			wxString text = GetItemText(item, column);
