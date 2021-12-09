@@ -409,7 +409,10 @@ int CSearchDialogFileList::OnGetItemImage(long item) const
 	if (item < 0 || item >= (int)m_indexMapping.size()) {
 		return -1;
 	}
-	int index = m_indexMapping[item];
+	unsigned int index = m_indexMapping[item];
+	if (index >= pThis->m_fileData.size()) {
+		return -1;
+	}
 
 	int &icon = pThis->m_fileData[index].icon;
 
@@ -418,10 +421,16 @@ int CSearchDialogFileList::OnGetItemImage(long item) const
 	}
 
 	if (mode_ == CSearchDialog::search_mode::local) {
+		if (index >= localFileData_.size()) {
+			return -1;
+		}
 		auto const& file = localFileData_[index];
 		icon = pThis->GetIconIndex(iconType::file, file.path.GetPath() + file.name, true);
 	}
 	else {
+		if (index >= remoteFileData_.size()) {
+			return -1;
+		}
 		icon = pThis->GetIconIndex(iconType::file, remoteFileData_[index].name, false);
 	}
 
