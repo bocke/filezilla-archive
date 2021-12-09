@@ -369,14 +369,21 @@ int CRemoteListView::OnGetItemImage(long item) const
 {
 	CRemoteListView *pThis = const_cast<CRemoteListView *>(this);
 	int index = GetItemIndex(item);
-	if (index == -1) {
+	if (index < 0) {
 		return -1;
 	}
 
+	if (index >= pThis->m_fileData.size()) {
+		return -1;
+	}
 	int &icon = pThis->m_fileData[index].icon;
 
 	if (icon != -2) {
 		return icon;
+	}
+
+	if (!m_pDirectoryListing || index >= m_pDirectoryListing->size()) {
+		return -1;
 	}
 
 	icon = pThis->GetIconIndex(iconType::file, (*m_pDirectoryListing)[index].name, false, (*m_pDirectoryListing)[index].is_dir());
@@ -2515,10 +2522,10 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 	}
 
 	if (!column) {
-		if ((size_t)index == m_pDirectoryListing->size()) {
+		if (m_pDirectoryListing && (size_t)index == m_pDirectoryListing->size()) {
 			return _T("..");
 		}
-		else if ((size_t)index < m_pDirectoryListing->size()) {
+		else if (m_pDirectoryListing && (size_t)index < m_pDirectoryListing->size()) {
 			return (*m_pDirectoryListing)[index].name;
 		}
 		else {
@@ -2529,7 +2536,7 @@ wxString CRemoteListView::GetItemText(int item, unsigned int column)
 		return wxString(); //.. has no attributes
 	}
 
-	if ((size_t)index >= m_pDirectoryListing->size()) {
+	if (!m_pDirectoryListing || (size_t)index >= m_pDirectoryListing->size()) {
 		return wxString();
 	}
 
