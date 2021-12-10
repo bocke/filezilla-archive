@@ -10,6 +10,13 @@ Legend:
     *nix: Unix (e.g BSD) and Unix-like systems (e.g. Linux)
     macOS/OS X: Apple macOS
 
+3.57.0 (2021-12-10)
+
+- Fixed incorrect default settings for file editing
+- Fixed a crash looking up data in file lists
+- Fixed a crash if a HTTPS connection gets canceled during the TLS handshake
+- Updated to libfilezilla 0.35.0
+
 3.56.2 (2021-10-27)
 
 - Fixed a potential crash after uploading
