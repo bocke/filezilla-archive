@@ -208,7 +208,7 @@ void CHttpControlSocket::OnReceive()
 
 void CHttpControlSocket::OnConnect()
 {
-	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_connect) {
+	if (operations_.empty() || operations_.back()->opId != PrivCommand::http_connect || !socket_) {
 		log(logmsg::debug_warning, L"Discarding stale OnConnect");
 		return;
 	}
