@@ -146,7 +146,13 @@ void COptionsPageLogging::SetCtrlState()
 
 void COptionsPageLogging::OnBrowse(wxCommandEvent&)
 {
-	wxFileDialog dlg(this, _("Log file"), wxString(), _T("filezilla.log"), _T("Log files (*.log)|*.log"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	CLocalPath p;
+	std::wstring f;
+	if (!p.SetPath(impl_->file_->GetValue().ToStdWstring(), &f) || f.empty() || p.empty() || !p.Exists()) {
+		p.clear();
+		f = L"filezilla.log";
+	}
+	wxFileDialog dlg(this, _("Log file"), p.GetPath(), f, L"Log files (*.log)|*.log", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if (dlg.ShowModal() != wxID_OK) {
 		return;
