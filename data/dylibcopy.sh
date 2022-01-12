@@ -13,7 +13,7 @@ fi
 frameworks="${bundle}/Contents/Frameworks"
 
 mkdir -p "$frameworks"
-rm -f ${frameworks}/*.processed
+rm -f "${frameworks}/"*.processed
 
 absreadlink()
 {
@@ -93,14 +93,14 @@ process_dylibs()
 process_file()
 {
   local file="$1"
-  process_dylibs "$file" `otool -L "$file" | grep "dylib\\|\\.so" | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/' | grep -v ':$'`
-  process_dylibs "$file" `otool -L "$file" | grep "dylib\\|\\.so" | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep '^/usr/local/' | grep -v ':$'`
+  process_dylibs "$file" `otool -L "$file" | grep -v ':$' | grep "dylib\\|\\.so" | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep -v '^/usr/\|^/System/'`
+  process_dylibs "$file" `otool -L "$file" | grep -v ':$' | grep "dylib\\|\\.so" | sed 's/^[[:blank:]]*//' | sed 's/ .*//' | grep '^/usr/local/'`
 }
 
 for file in "${bundle}/Contents/MacOS/"*; do
   process_file "$file"
 done
 
-rm -f ${frameworks}/*.processed
+rm -f "${frameworks}/"*.processed
 
 echo Dependencies copied
