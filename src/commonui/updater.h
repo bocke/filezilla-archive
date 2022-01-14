@@ -215,6 +215,8 @@ private:
 
 	std::deque<std::unique_ptr<CCommand>> pending_commands_;
 
+	uint64_t resume_offset_{};
+
 	bool manual_{};
 };
 

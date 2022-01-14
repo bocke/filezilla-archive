@@ -339,6 +339,10 @@ bool CUpdater::CreateTransferCommand(std::wstring const& url, std::wstring const
 
 	transfer_flags const flags = transfer_flags::download;
 	auto cmd = new CFileTransferCommand(file_writer_factory(local_file, true), path, file, flags);
+	resume_offset_ = cmd->GetWriter().size();
+	if (resume_offset_ == aio_base::nosize) {
+		resume_offset_ = 0;
+	}
 	pending_commands_.emplace_back(cmd);
 	return true;
 }
@@ -477,6 +481,19 @@ void CUpdater::ProcessOperation(COperationNotification const& operation)
 	}
 
 	if (res != FZ_REPLY_OK) {
+		if (state_ == UpdaterState::newversion_downloading) {
+			auto temp = GetTempFile();
+			if (!temp.empty()) {
+				int64_t s = fz::local_filesys::get_size(fz::to_native(temp));
+				if (s > 0 && static_cast<uint64_t>(s) > resume_offset_) {
+					resume_offset_ = static_cast<uint64_t>(s);
+					res = ContinueDownload();
+					if (res == FZ_REPLY_WOULDBLOCK) {
+						return;
+					}
+				}
+			}
+		}
 		if (state_ != UpdaterState::checking) {
 			s = UpdaterState::newversion;
 		}
